@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tuner | Glass Music Utility</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css?v=dark-bpm-tapper-black-20260530" />
+  </head>
+  <body>
+    <svg class="glass-filter-defs" aria-hidden="true">
+      <filter
+        id="glass-distortion"
+        x="0%"
+        y="0%"
+        width="100%"
+        height="100%"
+        filterUnits="objectBoundingBox"
+        color-interpolation-filters="sRGB"
+      >
+        <feTurbulence type="fractalNoise" baseFrequency="0.001 0.006" numOctaves="1" seed="17" result="turbulence" />
+        <feGaussianBlur in="turbulence" stdDeviation="3" result="softMap" />
+        <feDisplacementMap in="SourceGraphic" in2="softMap" scale="42" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+    </svg>
+
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="#" aria-label="Tuner home">
+          <span class="brand-mark" aria-hidden="true">
+            <span></span><span></span><span></span><span></span><span></span>
+          </span>
+          <span>Tuner</span>
+        </a>
+
+        <nav class="top-actions" aria-label="Tuner tools">
+          <button class="ghost-button" type="button" data-page="converter"><span>♫</span>MP3 Converter</button>
+          <button class="ghost-button active" type="button" data-page="analysis"><span>〰</span>File Analysis</button>
+          <button class="ghost-button" type="button" data-page="delay"><span>≋</span>Delay/Reverb</button>
+          <button class="ghost-button" type="button" data-page="bpm"><span>◷</span>BPM Tool</button>
+          <button class="ghost-button" type="button" data-page="pitch"><span>⌁</span>Pitch Control</button>
+          <button class="ghost-button" type="button" data-page="history"><span>↺</span>History</button>
+          <div class="theme-switch" role="group" aria-label="Theme mode">
+            <button class="theme-choice active" type="button" data-theme-choice="system">System</button>
+            <button class="theme-choice" type="button" data-theme-choice="light">White</button>
+            <button class="theme-choice" type="button" data-theme-choice="dark">Dark</button>
+          </div>
+        </nav>
+      </header>
+
+      <main>
+        <section class="page-view active" data-view="analysis">
+          <article class="panel hero-tool analyzer-panel" id="file-analyzer">
+            <div class="panel-heading hero-heading">
+              <div>
+                <h1>File Analysis Tool</h1>
+                <p>Upload an audio file to view waveform and analyze key musical data.</p>
+              </div>
+              <div class="hero-actions">
+                <button class="icon-pill" type="button" data-page="history" aria-label="Open history">◷</button>
+                <button class="text-button danger-pill" id="clearResultsTop" type="button">Clear</button>
+              </div>
+            </div>
+
+            <div class="drop-zone" id="dropZone">
+              <input id="fileInput" type="file" accept="audio/*,.mp3,.wav,.m4a,.ogg,.flac" multiple />
+              <div class="upload-orb" aria-hidden="true">⇧</div>
+              <div class="upload-copy">
+                <strong>Drag & drop an audio file here</strong>
+                <small>WAV, MP3, M4A, FLAC, OGG up to 200MB</small>
+                <button class="primary-button" id="selectFiles" type="button">Browse Files</button>
+              </div>
+            </div>
+
+            <div class="wave-card" aria-label="Audio preview">
+              <button class="round-button" id="previewButton" type="button" disabled aria-label="Play preview">▶</button>
+              <div class="waveform" id="waveform" aria-hidden="true"></div>
+              <audio id="audioPreview"></audio>
+              <div class="time-row">
+                <span id="previewStart">0:00</span>
+                <span id="previewEnd">0:00</span>
+              </div>
+            </div>
+
+            <div class="file-meta-pill" id="fileMetaPill">
+              <span>♫</span>
+              <strong id="metaFileName">example-track.wav</strong>
+              <span>·</span>
+              <span id="metaFileType">WAV</span>
+              <span>·</span>
+              <span id="metaSampleRate">44.1 kHz</span>
+              <span>·</span>
+              <span id="metaBitDepth">PCM</span>
+              <button class="text-button danger-pill" id="removeFile" type="button">Remove</button>
+            </div>
+
+            <div class="analysis-summary">
+              <div class="summary-title">
+                <span>▥</span>
+                <h2>Analysis Results</h2>
+                <button class="icon-pill" type="button" aria-label="Collapse results">⌃</button>
+              </div>
+              <div class="summary-grid">
+                <div class="metric-card">
+                  <span class="metric-icon teal">◷</span>
+                  <small>BPM</small>
+                  <strong class="analysis-value" id="summaryBpm" style="color: #ffffff !important; -webkit-text-fill-color: #ffffff !important">128.00</strong>
+                  <em>Detected</em>
+                </div>
+                <div class="metric-card">
+                  <span class="metric-icon coral">♫</span>
+                  <small>Key</small>
+                  <strong class="analysis-value" id="summaryKey" style="color: #ffffff !important; -webkit-text-fill-color: #ffffff !important">C Minor</strong>
+                  <em id="summaryCamelot">Camelot 8A</em>
+                </div>
+                <div class="metric-card">
+                  <span class="metric-icon teal">〰</span>
+                  <small>Duration</small>
+                  <strong class="analysis-value" id="summaryDuration" style="color: #ffffff !important; -webkit-text-fill-color: #ffffff !important">03:45.278</strong>
+                  <em>mm:ss.mmm</em>
+                </div>
+                <div class="metric-card">
+                  <span class="metric-icon coral">⌁</span>
+                  <small>Sample Rate</small>
+                  <strong class="analysis-value" id="summaryRate" style="color: #ffffff !important; -webkit-text-fill-color: #ffffff !important">44.1 kHz</strong>
+                  <em>High Quality</em>
+                </div>
+                <div class="metric-card">
+                  <span class="metric-icon teal">⌘</span>
+                  <small>Bit Depth</small>
+                  <strong class="analysis-value" id="summaryDepth" style="color: #ffffff !important; -webkit-text-fill-color: #ffffff !important">PCM</strong>
+                  <em>PCM</em>
+                </div>
+                <div class="metric-card">
+                  <span class="metric-icon coral">▰</span>
+                  <small>Channels</small>
+                  <strong class="analysis-value" id="summaryChannels" style="color: #ffffff !important; -webkit-text-fill-color: #ffffff !important">2</strong>
+                  <em>Stereo</em>
+                </div>
+              </div>
+            </div>
+
+            <div class="results-heading">
+              <h2>Analysis Results</h2>
+              <div class="inline-actions">
+                <button class="text-button" id="exportResults" type="button">Export CSV</button>
+                <button class="text-button" id="clearResults" type="button">Clear Results</button>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>File Name</th>
+                    <th>Duration</th>
+                    <th>BPM</th>
+                    <th>Key</th>
+                    <th>Camelot</th>
+                    <th>Confidence</th>
+                    <th>Analyzed</th>
+                  </tr>
+                </thead>
+                <tbody id="resultsBody">
+                  <tr class="empty-row">
+                    <td colspan="7">No tracks analyzed yet.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </article>
+        </section>
+
+        <section class="page-view" data-view="bpm">
+          <article class="panel hero-tool">
+            <div class="panel-heading hero-heading">
+              <div>
+                <h1>BPM Tool</h1>
+                <p>Tap a tempo or run a clean glass metronome from the same BPM source.</p>
+              </div>
+            </div>
+
+            <div class="split-tools">
+              <article class="utility-card metronome-card">
+                <div class="tool-heading">
+                  <div>
+                    <h3>Metronome</h3>
+                    <p>Tempo-locked click with accent control.</p>
+                  </div>
+                  <span class="beat-light" id="beatLight" aria-hidden="true"></span>
+                </div>
+                <label class="field-label" for="metronomeBpm">Tempo</label>
+                <div class="bpm-control compact-control">
+                  <button type="button" id="metronomeMinus" aria-label="Decrease metronome BPM">−</button>
+                  <input id="metronomeBpm" type="number" min="30" max="300" step="1" value="124" />
+                  <button type="button" id="metronomePlus" aria-label="Increase metronome BPM">+</button>
+                </div>
+                <div class="metronome-display">
+                  <strong id="metronomeBeat">1</strong>
+                  <span id="metronomeLabel">4/4</span>
+                </div>
+                <div class="tool-actions">
+                  <button class="primary-button small-primary" id="metronomeToggle" type="button">Start</button>
+                  <button class="secondary-button" id="metronomeSync" type="button">Sync BPM</button>
+                </div>
+              </article>
+
+              <article class="utility-card tapper-card">
+                <div class="tool-heading">
+                  <div>
+                    <h3>BPM Tapper</h3>
+                    <p>Tap along and send the result to every tempo tool.</p>
+                  </div>
+                </div>
+                <button class="tap-pad" id="dedicatedTapper" type="button">
+                  <strong id="tapperBpm">Tap</strong>
+                  <span id="tapperCount">0 taps</span>
+                </button>
+                <div class="tool-actions">
+                  <button class="secondary-button" id="useTapperBpm" type="button">Use BPM</button>
+                  <button class="secondary-button" id="resetTapper" type="button">Reset</button>
+                </div>
+              </article>
+            </div>
+          </article>
+        </section>
+
+        <section class="page-view" data-view="delay">
+          <aside class="panel hero-tool calculator-panel">
+            <div class="panel-heading hero-heading">
+              <div>
+                <h1>Delay & Reverb Tool</h1>
+                <p>Tempo-locked delay values and quick reverb starting points.</p>
+              </div>
+            </div>
+
+            <label class="field-label" for="bpmInput">BPM</label>
+            <div class="bpm-control">
+              <button type="button" id="bpmMinus" aria-label="Decrease BPM">−</button>
+              <input id="bpmInput" type="number" min="30" max="300" step="0.01" value="124.00" />
+              <button type="button" id="bpmPlus" aria-label="Increase BPM">+</button>
+            </div>
+            <div class="calc-actions">
+              <button class="secondary-button" type="button" id="tapTempo">Tap Tempo</button>
+              <button class="secondary-button teal" type="button" id="syncAnalyzer">Sync to Analyzer</button>
+            </div>
+
+            <div class="delay-layout">
+              <div>
+                <h3>Delay Times</h3>
+                <div class="delay-table" id="delayTable"></div>
+              </div>
+              <div>
+                <h3 class="coral">Reverb Suggestions</h3>
+                <div class="reverb-grid">
+                  <label>
+                    Pre-Delay
+                    <output id="preDelay">20 ms</output>
+                  </label>
+                  <label>
+                    Decay Time
+                    <output id="decayTime">1.45 s</output>
+                  </label>
+                </div>
+                <button class="copy-button" id="copyValues" type="button">Copy All Values</button>
+              </div>
+            </div>
+          </aside>
+        </section>
+
+        <section class="page-view" data-view="pitch">
+          <article class="panel hero-tool">
+            <div class="panel-heading hero-heading">
+              <div>
+                <h1>Pitch Tools</h1>
+                <p>Convert frequency to nearest note, octave, and cents offset.</p>
+              </div>
+            </div>
+
+            <article class="utility-card pitch-card single-card">
+              <div class="tool-heading">
+                <div>
+                  <h3>Frequency to Pitch</h3>
+                  <p>Powered by the MIDI fractional note formula.</p>
+                </div>
+              </div>
+              <label class="field-label" for="hzInput">Frequency</label>
+              <div class="frequency-input">
+                <input id="hzInput" type="number" min="0" step="0.01" value="440" />
+                <span>Hz</span>
+              </div>
+              <div class="pitch-result" id="pitchResult">
+                <strong id="noteDisplay">A4</strong>
+                <span id="offsetDisplay">0 cents</span>
+              </div>
+              <div class="pitch-reference">
+                <button class="secondary-button" type="button" data-frequency="261.63">C4</button>
+                <button class="secondary-button" type="button" data-frequency="440">A4</button>
+                <button class="secondary-button" type="button" data-frequency="880">A5</button>
+              </div>
+            </article>
+          </article>
+        </section>
+
+        <section class="page-view" data-view="converter">
+          <article class="panel hero-tool converter-panel" id="converter">
+            <div class="panel-heading hero-heading">
+              <div>
+                <h1>MP3 Converter</h1>
+              <p>Paste a direct MP3 link you own or have permission to use, then download it.</p>
+              </div>
+            </div>
+            <form class="converter-form" id="convertForm">
+              <label>
+                Audio URL
+                <input id="audioUrl" type="url" placeholder="https://example.com/track.mp3" />
+              </label>
+              <label>
+                Audio File
+                <input id="converterFile" type="file" accept="audio/*,.mp3,.wav,.m4a,.ogg,.flac" />
+              </label>
+              <fieldset class="quality-field">
+                <legend>Output Quality</legend>
+                <div class="quality-options" id="qualityOptions">
+                  <button class="quality-button active" type="button" data-quality="320 kbps">
+                    <strong>320</strong><span>kbps</span>
+                  </button>
+                  <button class="quality-button" type="button" data-quality="256 kbps">
+                    <strong>256</strong><span>kbps</span>
+                  </button>
+                  <button class="quality-button" type="button" data-quality="192 kbps">
+                    <strong>192</strong><span>kbps</span>
+                  </button>
+                  <button class="quality-button" type="button" data-quality="128 kbps">
+                    <strong>128</strong><span>kbps</span>
+                  </button>
+                </div>
+              </fieldset>
+              <div class="turnstile-wrap">
+                <span>Bot Protection</span>
+                <div
+                  id="turnstileWidget"
+                  class="turnstile-widget"
+                  data-turnstile-site-key="1x00000000000000000000AA"
+                ></div>
+              </div>
+              <button class="convert-button" type="submit">Convert to MP3</button>
+            </form>
+            <div class="status-box" id="conversionStatus" role="status">
+              <strong>Idle</strong>
+              <span>Upload WAV, M4A, OGG, FLAC, or another browser-readable audio file to create an MP3.</span>
+            </div>
+          </article>
+        </section>
+
+        <section class="page-view" data-view="history">
+          <article class="panel hero-tool history-panel" id="history">
+            <div class="panel-heading hero-heading">
+              <div>
+                <h1>Analysis History</h1>
+                <p>Recent local results stay on this device.</p>
+              </div>
+              <button class="text-button" id="clearHistory" type="button">Clear History</button>
+            </div>
+            <div class="history-list" id="historyList">
+              <div class="history-empty">No saved analyses yet.</div>
+            </div>
+          </article>
+        </section>
+      </main>
+    </div>
+
+    <script src="lame.min.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
