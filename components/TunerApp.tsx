@@ -6,6 +6,7 @@ import { clampBpm } from "@/lib/format";
 import { useHistory } from "@/hooks/useHistory";
 import { I18nProvider } from "@/lib/i18n";
 import { TopBar } from "./layout/TopBar";
+import { Footer } from "./layout/Footer";
 import { AnalyzerPanel } from "./analysis/AnalyzerPanel";
 import { BpmToolsView } from "./bpm/BpmToolsView";
 import { DelayCalculator } from "./delay/DelayCalculator";
@@ -49,6 +50,12 @@ export function useTuner(): TunerContextValue {
 
 export function TunerApp() {
   const [view, setView] = useState<ViewName>("analysis");
+  // Gates the first-load cascade (header + active panel's children fading up
+  // in a stagger). True only for the very first paint; flipped off shortly
+  // after so revisiting a tab later doesn't replay the mount-in stagger —
+  // CSS animations would otherwise re-run every time `display` flips from
+  // `none` back to `block` on a `.page-view`.
+  const [initialReveal, setInitialReveal] = useState(true);
   const [delayBpm, setDelayBpm] = useState("124.00");
   const [metronomeBpm, setMetronomeBpmState] = useState(124);
   const [lastAnalyzedBpm, setLastAnalyzedBpm] = useState<number | null>(null);
@@ -59,6 +66,13 @@ export function TunerApp() {
   useEffect(() => {
     const initial = window.location.hash.replace("#", "");
     if (VIEW_NAMES.includes(initial as ViewName)) setView(initial as ViewName);
+  }, []);
+
+  useEffect(() => {
+    // Well past the longest cascade delay + animation duration, so the
+    // stagger always finishes before this flips off.
+    const timer = window.setTimeout(() => setInitialReveal(false), 1200);
+    return () => window.clearTimeout(timer);
   }, []);
 
   const showView = useCallback((next: ViewName) => {
@@ -135,34 +149,68 @@ export function TunerApp() {
   return (
     <TunerContext.Provider value={contextValue}>
       <I18nProvider>
-        <div className="app-shell">
+        <div className={`app-shell${initialReveal ? " initial-reveal" : ""}`}>
+          <div className="grain-overlay" aria-hidden="true" />
           <TopBar />
           <main>
-            <section className={`page-view${view === "analysis" ? " active" : ""}`} data-view="analysis">
+            <section
+              className={`page-view${view === "analysis" ? " active" : ""}`}
+              data-view="analysis"
+              data-active={view === "analysis"}
+            >
               <AnalyzerPanel />
             </section>
-            <section className={`page-view${view === "bpm" ? " active" : ""}`} data-view="bpm">
+            <section
+              className={`page-view${view === "bpm" ? " active" : ""}`}
+              data-view="bpm"
+              data-active={view === "bpm"}
+            >
               <BpmToolsView />
             </section>
-            <section className={`page-view${view === "delay" ? " active" : ""}`} data-view="delay">
+            <section
+              className={`page-view${view === "delay" ? " active" : ""}`}
+              data-view="delay"
+              data-active={view === "delay"}
+            >
               <DelayCalculator />
             </section>
-            <section className={`page-view${view === "pitch" ? " active" : ""}`} data-view="pitch">
+            <section
+              className={`page-view${view === "pitch" ? " active" : ""}`}
+              data-view="pitch"
+              data-active={view === "pitch"}
+            >
               <PitchConverter />
             </section>
-            <section className={`page-view${view === "converter" ? " active" : ""}`} data-view="converter">
+            <section
+              className={`page-view${view === "converter" ? " active" : ""}`}
+              data-view="converter"
+              data-active={view === "converter"}
+            >
               <ConverterView />
             </section>
-            <section className={`page-view${view === "loudness" ? " active" : ""}`} data-view="loudness">
+            <section
+              className={`page-view${view === "loudness" ? " active" : ""}`}
+              data-view="loudness"
+              data-active={view === "loudness"}
+            >
               <LoudnessPanel />
             </section>
-            <section className={`page-view${view === "remix" ? " active" : ""}`} data-view="remix">
+            <section
+              className={`page-view${view === "remix" ? " active" : ""}`}
+              data-view="remix"
+              data-active={view === "remix"}
+            >
               <RemixStudio />
             </section>
-            <section className={`page-view${view === "history" ? " active" : ""}`} data-view="history">
+            <section
+              className={`page-view${view === "history" ? " active" : ""}`}
+              data-view="history"
+              data-active={view === "history"}
+            >
               <HistoryPanel />
             </section>
           </main>
+          <Footer />
         </div>
       </I18nProvider>
     </TunerContext.Provider>

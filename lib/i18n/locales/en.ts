@@ -145,7 +145,7 @@ const en = {
 
   // YouTube downloader
   "ytDownloader.title": "Link to Audio",
-  "ytDownloader.subtitle": "YouTube, SoundCloud, Bandcamp, Vimeo, Mixcloud, Audiomack — personal use on your own machine.",
+  "ytDownloader.subtitle": "YouTube, SoundCloud, Bandcamp, Vimeo, Mixcloud, Audiomack — personal use only. The first conversion may take a minute to wake up.",
   "ytDownloader.trackUrl": "Track URL",
   "ytDownloader.urlPlaceholder": "Paste a YouTube or SoundCloud link...",
   "ytDownloader.autoAnalyze": "Auto-analyze after download",
@@ -248,6 +248,10 @@ const en = {
 
   // File picker
   "filePicker.empty": "No file selected",
+
+  // Footer
+  "footer.tagline": "Analyze. Convert. Create.",
+  "footer.copyright": "© 2026 TuneBad · Montréal",
 } as const;
 
 export default en;

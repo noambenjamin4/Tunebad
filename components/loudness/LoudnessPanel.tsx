@@ -6,6 +6,9 @@ import { decodeAudioFileCached } from "@/lib/audio/decode-cache";
 import { PLATFORM_TARGETS } from "@/lib/audio/lufs";
 import { useI18n } from "@/lib/i18n";
 import { GaugeIcon } from "@/components/ui/icons";
+import { setNowPlaying } from "@/lib/audio/now-playing";
+
+const NOW_PLAYING_SOURCE = "loudness-preview";
 
 interface LoudnessWorkerResult {
   id: number;
@@ -77,6 +80,7 @@ export function LoudnessPanel() {
       workerRef.current?.terminate();
       if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
       audioCtxRef.current?.close();
+      setNowPlaying(NOW_PLAYING_SOURCE, false);
     },
     [],
   );
@@ -136,6 +140,7 @@ export function LoudnessPanel() {
     gainRef.current = null;
     sourceRef.current = null;
     audioElRef.current = null;
+    setNowPlaying(NOW_PLAYING_SOURCE, false);
   }, []);
 
   const handleFiles = useCallback(
@@ -329,7 +334,10 @@ export function LoudnessPanel() {
               onPlay={() => {
                 if (!gainRef.current) ensureAudioGraph();
                 if (audioCtxRef.current?.state === "suspended") void audioCtxRef.current.resume();
+                setNowPlaying(NOW_PLAYING_SOURCE, true);
               }}
+              onPause={() => setNowPlaying(NOW_PLAYING_SOURCE, false)}
+              onEnded={() => setNowPlaying(NOW_PLAYING_SOURCE, false)}
             />
             <div className="loudness-preview-actions">
               <button

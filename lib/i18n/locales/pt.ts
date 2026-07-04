@@ -136,7 +136,7 @@ const pt: Record<keyof typeof en, string> = {
   "localConverter.failedFallback": "Tente um arquivo WAV, MP3, M4A, OGG ou FLAC.",
 
   "ytDownloader.title": "Link para áudio",
-  "ytDownloader.subtitle": "YouTube, SoundCloud, Bandcamp, Vimeo, Mixcloud, Audiomack — uso pessoal na sua própria máquina.",
+  "ytDownloader.subtitle": "YouTube, SoundCloud, Bandcamp, Vimeo, Mixcloud, Audiomack — apenas uso pessoal. A primeira conversão pode levar um minuto para iniciar.",
   "ytDownloader.trackUrl": "URL da faixa",
   "ytDownloader.urlPlaceholder": "Cole um link do YouTube ou SoundCloud...",
   "ytDownloader.autoAnalyze": "Analisar automaticamente após o download",
@@ -233,6 +233,9 @@ const pt: Record<keyof typeof en, string> = {
   "lang.selectLabel": "Idioma",
 
   "filePicker.empty": "Nenhum arquivo selecionado",
+
+  "footer.tagline": "Analise. Converta. Crie.",
+  "footer.copyright": "© 2026 TuneBad · Montreal",
 };
 
 export default pt;

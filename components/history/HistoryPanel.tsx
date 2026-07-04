@@ -23,6 +23,15 @@ export function HistoryPanel() {
         </button>
       </div>
       <div className="history-list" id="historyList">
+        {!history.length ? (
+          <svg className="empty-vinyl-motif" viewBox="0 0 160 160" aria-hidden="true">
+            <circle cx="80" cy="80" r="78" fill="none" stroke="currentColor" strokeWidth="1" />
+            <circle cx="80" cy="80" r="58" fill="none" stroke="currentColor" strokeWidth="1" />
+            <circle cx="80" cy="80" r="38" fill="none" stroke="currentColor" strokeWidth="1" />
+            <circle cx="80" cy="80" r="18" fill="none" stroke="currentColor" strokeWidth="1" />
+            <circle cx="80" cy="80" r="4" fill="currentColor" />
+          </svg>
+        ) : null}
         {history.length ? (
           history.map((item, index) => (
             <div className="history-item" key={`${item.name}-${index}`}>

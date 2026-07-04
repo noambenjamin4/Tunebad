@@ -81,16 +81,19 @@ a {
   color: inherit;
 }
 
+/* !important keeps this utility immune to broader rules like
+   `.converter-form input { width: 100% }`, which otherwise inflate
+   visually-hidden inputs and overflow narrow viewports. */
 .sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
 }
 
 :focus-visible {
@@ -100,6 +103,38 @@ a {
 
 .app-shell {
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-shell main {
+  flex: 1 0 auto;
+  /* As a flex item, main otherwise resolves to its content's minimum width
+     (the results table's min-width) and blows out narrow viewports; pin it
+     to the shell so inner .table-wrap containers scroll instead. */
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* ---------------------------------------------------------------------
+   2b. Film grain overlay
+   --------------------------------------------------------------------- */
+.grain-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 140px 140px;
+  opacity: 0.03;
+}
+
+@media (prefers-color-scheme: dark) {
+  .grain-overlay {
+    opacity: 0.045;
+  }
 }
 
 /* ---------------------------------------------------------------------
@@ -184,12 +219,28 @@ input[type="number"] {
 /* ---------------------------------------------------------------------
    4. Header
    --------------------------------------------------------------------- */
+.scroll-sentinel {
+  position: absolute;
+  top: 0;
+  height: 1px;
+  width: 1px;
+  pointer-events: none;
+}
+
 .topbar {
   position: sticky;
   top: 0;
   z-index: 50;
   background: var(--bg);
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid transparent;
+  transition: background-color 200ms ease, border-color 200ms ease, backdrop-filter 200ms ease;
+}
+
+.topbar.scrolled {
+  border-bottom-color: var(--line);
+  background: color-mix(in srgb, var(--bg) 85%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .topbar-inner {
@@ -211,12 +262,48 @@ input[type="number"] {
   flex: 0 0 auto;
 }
 
+.brand-logo-wrap {
+  display: block;
+  flex: none;
+  width: 38px;
+  height: 38px;
+  transform-origin: center center;
+  transition: transform 200ms ease;
+}
+
+.topbar.scrolled .brand-logo-wrap,
+.topbar.scrolled .brand-wordmark {
+  transform: scale(0.92);
+}
+
 .brand-logo {
   display: block;
   width: 38px;
   height: 38px;
   flex: none;
   object-fit: contain;
+  transform-origin: center center;
+  transition: transform 1.2s ease-out;
+}
+
+.brand:hover .brand-logo {
+  transform: rotate(360deg);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .brand-logo-wrap.spinning .brand-logo {
+    animation: logo-spin 1.8s linear infinite;
+    will-change: transform;
+  }
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .brand-wordmark {
@@ -225,6 +312,7 @@ input[type="number"] {
   font-size: 20px;
   text-transform: uppercase;
   letter-spacing: 0.01em;
+  transition: transform 200ms ease;
 }
 
 .top-actions {
@@ -282,6 +370,24 @@ input[type="number"] {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
   z-index: 60;
   overflow: hidden;
+  transform-origin: top right;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .lang-menu-panel {
+    animation: lang-menu-in 160ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+}
+
+@keyframes lang-menu-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .lang-menu-item {
@@ -361,13 +467,33 @@ input[type="number"] {
   border-radius: 0;
 }
 
-@media (min-width: 861px) {
+@media (min-width: 1020px) {
   .top-actions {
     display: flex;
   }
 
   .menu-toggle,
   .mobile-nav {
+    display: none;
+  }
+}
+
+/* Between the hamburger cutoff and full width, the eight desktop tabs plus
+   the logo don't fit at full size — squeeze the tabs, then drop the wordmark
+   (the vinyl mark alone still carries the brand). */
+@media (min-width: 1020px) and (max-width: 1279px) {
+  .topbar-inner {
+    gap: 12px;
+  }
+
+  .top-actions .ghost-button {
+    padding: 8px 10px;
+    font-size: 11px;
+  }
+}
+
+@media (min-width: 1020px) and (max-width: 1139px) {
+  .brand-wordmark {
     display: none;
   }
 }
@@ -387,11 +513,15 @@ input[type="number"] {
   text-transform: uppercase;
   letter-spacing: 0.05em;
   white-space: nowrap;
-  transition: background 120ms ease, color 120ms ease;
+  transition: background 120ms ease, color 120ms ease, transform 120ms ease;
 }
 
 .ghost-button:hover {
   background: var(--hover);
+}
+
+.ghost-button:active {
+  transform: scale(0.97);
 }
 
 .ghost-button.active {
@@ -421,6 +551,103 @@ main {
   margin-top: 64px;
 }
 
+/* View transitions: CSS animations re-run whenever `display` flips from
+   `none` to `block` (a browser guarantee), so switching tabs re-triggers
+   this without any React remount/key trick. Transform/opacity only. */
+@media (prefers-reduced-motion: no-preference) {
+  /* Only on tab SWITCHES (after the initial-reveal window) — the first
+     paint must render the hero instantly or LCP waits out the animation. */
+  .app-shell:not(.initial-reveal) .page-view.active {
+    animation: view-in 320ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .app-shell:not(.initial-reveal) .page-view.active h1 {
+    animation: heading-rise 400ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: 60ms;
+  }
+}
+
+@keyframes view-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes heading-rise {
+  from {
+    opacity: 0;
+    clip-path: inset(100% 0 0 0);
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+    transform: translateY(0);
+  }
+}
+
+/* First-load cascade: header, then the active panel's major direct
+   children, fade up in a short stagger. Scoped to `.initial-reveal`, a class
+   TunerApp applies only for ~1.2s after first mount — CSS animations
+   re-trigger any time a `.page-view` flips `display: none` -> `block`, so
+   without this gate the stagger would replay on every tab switch, not just
+   the first load. */
+@media (prefers-reduced-motion: no-preference) {
+  .initial-reveal .topbar {
+    animation: cascade-in 480ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  /* Skip the first two children (the heading block and the dropzone): they
+     are the LCP candidates and must paint immediately — the stagger only
+     lifts the secondary content below them. */
+  .initial-reveal .page-view.active > .panel > *:nth-child(n + 3),
+  .initial-reveal .page-view.active > .hero-tool > *:nth-child(n + 3) {
+    animation: cascade-in 480ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: calc(80ms + var(--i, 0) * 70ms);
+  }
+
+  .initial-reveal .page-view.active > .panel > *:nth-child(1),
+  .initial-reveal .page-view.active > .hero-tool > *:nth-child(1) {
+    --i: 0;
+  }
+  .initial-reveal .page-view.active > .panel > *:nth-child(2),
+  .initial-reveal .page-view.active > .hero-tool > *:nth-child(2) {
+    --i: 1;
+  }
+  .initial-reveal .page-view.active > .panel > *:nth-child(3),
+  .initial-reveal .page-view.active > .hero-tool > *:nth-child(3) {
+    --i: 2;
+  }
+  .initial-reveal .page-view.active > .panel > *:nth-child(4),
+  .initial-reveal .page-view.active > .hero-tool > *:nth-child(4) {
+    --i: 3;
+  }
+  .initial-reveal .page-view.active > .panel > *:nth-child(5),
+  .initial-reveal .page-view.active > .hero-tool > *:nth-child(5) {
+    --i: 4;
+  }
+  .initial-reveal .page-view.active > .panel > *:nth-child(6),
+  .initial-reveal .page-view.active > .hero-tool > *:nth-child(6) {
+    --i: 5;
+  }
+}
+
+@keyframes cascade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .primary-button,
 .convert-button {
   display: inline-flex;
@@ -438,17 +665,17 @@ main {
   text-transform: uppercase;
   letter-spacing: 0.05em;
   min-height: 44px;
-  transition: opacity 120ms ease;
+  transition: opacity 120ms ease, transform 120ms ease;
 }
 
 .primary-button:hover,
 .convert-button:hover {
-  opacity: 0.9;
+  opacity: 0.82;
 }
 
 .primary-button:active,
 .convert-button:active {
-  transform: scale(0.98);
+  transform: scale(0.97);
 }
 
 .secondary-button,
@@ -470,7 +697,7 @@ main {
   text-transform: uppercase;
   letter-spacing: 0.05em;
   min-height: 44px;
-  transition: background 120ms ease;
+  transition: background 120ms ease, transform 120ms ease;
 }
 
 .secondary-button:hover,
@@ -482,7 +709,7 @@ main {
 .secondary-button:active,
 .text-button:active,
 .copy-button:active {
-  transform: scale(0.98);
+  transform: scale(0.97);
 }
 
 .text-button {
@@ -515,10 +742,15 @@ main {
   border-radius: 50%;
   background: transparent;
   color: var(--ink);
+  transition: background 120ms ease, transform 120ms ease;
 }
 
 .round-button:hover:not(:disabled) {
   background: var(--hover);
+}
+
+.round-button:active:not(:disabled) {
+  transform: scale(0.93);
 }
 
 input[type="text"],
@@ -717,6 +949,24 @@ label.check-row,
   border-color: var(--fill);
 }
 
+.check-mark-path {
+  stroke-dasharray: 14;
+  stroke-dashoffset: 14;
+  animation: check-draw 200ms ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .check-mark-path {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes check-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
 .check-row input:focus-visible + .check-box {
   outline: 2px solid var(--ink);
   outline-offset: 2px;
@@ -748,11 +998,60 @@ label.check-row,
   border-radius: var(--radius-card);
   background: transparent;
   text-align: center;
-  transition: background 120ms ease;
+  transition: background 120ms ease, border-color 120ms ease, transform 120ms ease;
+}
+
+/* Whisper-subtle concentric vinyl rings behind the empty drop zone. Pure
+   CSS (repeating radial gradient) rather than the photo texture: the drop
+   zone is the page's LCP element, and an image background there defers the
+   metric — the photo texture lives in the footer instead. A dedicated
+   ::before layer keeps this from ever touching text contrast. */
+.drop-zone::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-card);
+  background-image: repeating-radial-gradient(
+    circle at center,
+    currentColor 0px,
+    currentColor 1px,
+    transparent 1px,
+    transparent 7px
+  );
+  mask-image: radial-gradient(circle at center, black 0%, transparent 75%);
+  -webkit-mask-image: radial-gradient(circle at center, black 0%, transparent 75%);
+  opacity: 0.05;
+  pointer-events: none;
+}
+
+.drop-zone > * {
+  position: relative;
+}
+
+.drop-zone:hover {
+  border-color: var(--ink);
+  transform: translateY(-1px);
 }
 
 .drop-zone.dragging {
   background: var(--hover);
+  border-color: var(--ink);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .drop-zone.dragging {
+    animation: drop-zone-pulse 1.1s ease-in-out infinite;
+  }
+}
+
+@keyframes drop-zone-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.008);
+  }
 }
 
 .drop-zone input {
@@ -791,11 +1090,22 @@ label.check-row,
   border-radius: var(--radius-pill);
   background: var(--surface);
   cursor: pointer;
-  transition: border-color 120ms ease;
+  transition: border-color 120ms ease, transform 120ms ease;
+}
+
+.file-picker:hover {
+  border-color: var(--ink);
+  transform: translateY(-1px);
 }
 
 .file-picker.dragging {
   border-color: var(--ink);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .file-picker.dragging {
+    animation: drop-zone-pulse 1.1s ease-in-out infinite;
+  }
 }
 
 .file-picker-cta {
@@ -892,7 +1202,7 @@ label.check-row,
 }
 
 .seek-wave-bars.played i {
-  opacity: 0.9;
+  opacity: 1;
 }
 
 .seek-wave-played {
@@ -921,6 +1231,15 @@ label.check-row,
   width: 1px;
   background: var(--ink);
   pointer-events: none;
+  box-shadow: 0 0 6px 1px var(--ink);
+  opacity: 0.6;
+}
+
+@media (prefers-color-scheme: dark) {
+  .seek-wave-head {
+    box-shadow: 0 0 8px 1px var(--ink);
+    opacity: 0.75;
+  }
 }
 
 .seek-wave-times {
@@ -1169,6 +1488,11 @@ tbody tr:last-child td {
   background: transparent;
   color: var(--ink);
   font-weight: 700;
+  transition: background 120ms ease, transform 120ms ease;
+}
+
+.history-pill:active {
+  transform: scale(0.97);
 }
 
 .history-pill:hover {
@@ -1287,11 +1611,14 @@ tbody tr:last-child td {
   border: 1px solid var(--line);
   border-radius: 50%;
   background: transparent;
+  transform: scale(1);
+  transition: transform 100ms ease;
 }
 
 .beat-light.active {
   background: var(--fill);
   border-color: var(--fill);
+  transform: scale(1.15);
 }
 
 .tap-pad {
@@ -1561,10 +1888,15 @@ tbody tr:last-child td {
   background: transparent;
   color: var(--ink);
   font-weight: 700;
+  transition: background 120ms ease, transform 120ms ease;
 }
 
 .quality-button:hover {
   background: var(--hover);
+}
+
+.quality-button:active {
+  transform: scale(0.97);
 }
 
 .quality-button strong {
@@ -1662,10 +1994,15 @@ tbody tr:last-child td {
   text-transform: uppercase;
   letter-spacing: 0.05em;
   text-decoration: none;
+  transition: background 120ms ease, transform 120ms ease;
 }
 
 .download-ready-link:hover {
   background: var(--hover);
+}
+
+.download-ready-link:active {
+  transform: scale(0.97);
 }
 
 .autoflow-chip {
@@ -1849,7 +2186,102 @@ tbody tr:last-child td {
 }
 
 /* ---------------------------------------------------------------------
-   16. Responsive
+   16. Footer
+   --------------------------------------------------------------------- */
+.site-footer {
+  position: relative;
+  flex: none;
+  margin-top: 64px;
+  border-top: 1px solid var(--line);
+  overflow: hidden;
+}
+
+.site-footer::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("/texture-grooves-soft.jpg");
+  background-size: cover;
+  background-position: center;
+  opacity: 0.04;
+  pointer-events: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  .site-footer::before {
+    filter: invert(1);
+    opacity: 0.05;
+  }
+}
+
+.site-footer-inner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 48px 20px;
+  text-align: center;
+}
+
+.site-footer-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.site-footer-logo {
+  display: block;
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.site-footer-wordmark {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--display);
+}
+
+.site-footer-tagline {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.site-footer-copyright {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+}
+
+/* ---------------------------------------------------------------------
+   17. Empty state vinyl motif
+   --------------------------------------------------------------------- */
+.history-list,
+.table-wrap {
+  position: relative;
+}
+
+.empty-vinyl-motif {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 160px;
+  height: 160px;
+  transform: translate(-50%, -50%);
+  color: var(--ink);
+  opacity: 0.08;
+  pointer-events: none;
+}
+
+/* ---------------------------------------------------------------------
+   18. Responsive
    --------------------------------------------------------------------- */
 @media (max-width: 860px) {
   .split-tools,

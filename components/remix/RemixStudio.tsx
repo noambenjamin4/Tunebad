@@ -18,6 +18,9 @@ import {
   type RemixGraph,
   type RemixParams,
 } from "@/lib/audio/remix";
+import { setNowPlaying } from "@/lib/audio/now-playing";
+
+const NOW_PLAYING_SOURCE = "remix-preview";
 
 type Status = { title: string; message: string; tone: "neutral" | "success" | "warning" };
 
@@ -140,6 +143,12 @@ export function RemixStudio() {
 
   // Cleanup on unmount.
   useEffect(() => stopPreview, [stopPreview]);
+
+  useEffect(() => {
+    setNowPlaying(NOW_PLAYING_SOURCE, playing);
+  }, [playing]);
+
+  useEffect(() => () => setNowPlaying(NOW_PLAYING_SOURCE, false), []);
 
   const handleFiles = useCallback(
     async (files: File[]) => {

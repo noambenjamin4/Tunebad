@@ -19,6 +19,15 @@ export function ResultsTable({
   const empty = !results.length && !analyzingNames.length && !failedNames.length && !oversizedNames.length;
   return (
     <div className="table-wrap">
+      {empty ? (
+        <svg className="empty-vinyl-motif" viewBox="0 0 160 160" aria-hidden="true">
+          <circle cx="80" cy="80" r="78" fill="none" stroke="currentColor" strokeWidth="1" />
+          <circle cx="80" cy="80" r="58" fill="none" stroke="currentColor" strokeWidth="1" />
+          <circle cx="80" cy="80" r="38" fill="none" stroke="currentColor" strokeWidth="1" />
+          <circle cx="80" cy="80" r="18" fill="none" stroke="currentColor" strokeWidth="1" />
+          <circle cx="80" cy="80" r="4" fill="currentColor" />
+        </svg>
+      ) : null}
       <table>
         <thead>
           <tr>

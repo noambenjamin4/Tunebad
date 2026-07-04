@@ -136,7 +136,7 @@ const ja: Record<keyof typeof en, string> = {
   "localConverter.failedFallback": "WAV、MP3、M4A、OGG、FLACのいずれかをお試しください。",
 
   "ytDownloader.title": "リンクから音声へ",
-  "ytDownloader.subtitle": "YouTube、SoundCloud、Bandcamp、Vimeo、Mixcloud、Audiomack — 自分のマシンでの個人利用向け。",
+  "ytDownloader.subtitle": "YouTube、SoundCloud、Bandcamp、Vimeo、Mixcloud、Audiomack — 個人利用のみ。初回の変換は起動に1分ほどかかることがあります。",
   "ytDownloader.trackUrl": "トラックURL",
   "ytDownloader.urlPlaceholder": "YouTubeまたはSoundCloudのリンクを貼り付け...",
   "ytDownloader.autoAnalyze": "ダウンロード後に自動解析",
@@ -233,6 +233,9 @@ const ja: Record<keyof typeof en, string> = {
   "lang.selectLabel": "言語",
 
   "filePicker.empty": "ファイルが選択されていません",
+
+  "footer.tagline": "解析。変換。創造。",
+  "footer.copyright": "© 2026 TuneBad · モントリオール",
 };
 
 export default ja;

@@ -135,7 +135,7 @@ const zh: Record<keyof typeof en, string> = {
   "localConverter.failedFallback": "请尝试WAV、MP3、M4A、OGG或FLAC文件。",
 
   "ytDownloader.title": "链接转音频",
-  "ytDownloader.subtitle": "支持YouTube、SoundCloud、Bandcamp、Vimeo、Mixcloud、Audiomack — 仅限个人在自己设备上使用。",
+  "ytDownloader.subtitle": "支持YouTube、SoundCloud、Bandcamp、Vimeo、Mixcloud、Audiomack — 仅限个人使用。首次转换可能需要约一分钟启动。",
   "ytDownloader.trackUrl": "曲目链接",
   "ytDownloader.urlPlaceholder": "粘贴YouTube或SoundCloud链接...",
   "ytDownloader.autoAnalyze": "下载后自动分析",
@@ -232,6 +232,9 @@ const zh: Record<keyof typeof en, string> = {
   "lang.selectLabel": "语言",
 
   "filePicker.empty": "未选择文件",
+
+  "footer.tagline": "分析。转换。创作。",
+  "footer.copyright": "© 2026 TuneBad · 蒙特利尔",
 };
 
 export default zh;
