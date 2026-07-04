@@ -101,10 +101,10 @@ export default function CopyrightPage() {
           <h2>5. Copyright claims and takedown requests</h2>
           <p>
             TuneBad respects the intellectual-property rights of creators. If you are a copyright owner (or an
-            authorized agent) and believe the Service is being used to access your work without authorization, please
-            send a takedown notice to{" "}
-            <a href="mailto:noambenjaminschool@gmail.com">noambenjaminschool@gmail.com</a>. Include the material at
-            issue and proof of your rights, and we will respond promptly to valid notices.
+            authorized agent) and believe the Service is being used to access your work without authorization, you may
+            submit a takedown notice to the site operator. A valid notice should identify the specific work concerned,
+            the material at issue, and include proof that you hold the relevant rights. TuneBad reviews and responds to
+            valid notices promptly, and will remove or block access to the identified material where appropriate.
           </p>
 
           <p className="legal-back">
