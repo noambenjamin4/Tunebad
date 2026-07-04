@@ -15,9 +15,19 @@
 export const remoteDownloaderUrl = process.env.DOWNLOADER_REMOTE_URL || null;
 export const remoteDownloaderKey = process.env.DOWNLOADER_API_KEY || null;
 
+// Home downloader — a copy of the same server/ running on the user's Mac,
+// reached through a tunnel URL. Preferred over the remote (Render) fallback
+// because YouTube bot-walls the Render datacenter IP but not a home IP.
+// Server-side only, same rules as the remote pair above.
+export const homeDownloaderUrl = process.env.DOWNLOADER_HOME_URL || null;
+export const homeDownloaderKey = process.env.DOWNLOADER_HOME_KEY || null;
+
 // Server-side: gates the /api/youtube/* route handlers. True if the local
-// yt-dlp path is explicitly enabled, OR a remote downloader is configured.
+// yt-dlp path is explicitly enabled, OR a remote downloader is configured,
+// OR a home downloader is configured.
 export const isDownloaderEnabled =
-  process.env.ENABLE_LINK_DOWNLOADER === "1" || Boolean(remoteDownloaderUrl && remoteDownloaderKey);
+  process.env.ENABLE_LINK_DOWNLOADER === "1" ||
+  Boolean(remoteDownloaderUrl && remoteDownloaderKey) ||
+  Boolean(homeDownloaderUrl && homeDownloaderKey);
 
 export { downloaderVisible } from "./runtime.client";

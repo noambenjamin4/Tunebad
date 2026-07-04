@@ -3,7 +3,9 @@ import { startJobSchema, validateMediaUrl } from "@/lib/server/validate";
 import { allowJobStart } from "@/lib/server/rate-limit";
 import { runningJobCount } from "@/lib/server/jobs";
 import { SetupError, startYouTubeJob } from "@/lib/server/ytdlp";
-import { isDownloaderEnabled, remoteDownloaderUrl, remoteDownloaderKey } from "@/lib/runtime";
+import { isDownloaderEnabled, remoteDownloaderUrl, remoteDownloaderKey, homeDownloaderUrl, homeDownloaderKey } from "@/lib/runtime";
+import { pickBackend } from "@/lib/server/backends";
+import en from "@/lib/i18n/locales/en";
 
 const MAX_CONCURRENT_JOBS = 2;
 
@@ -39,13 +41,21 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // Never forward unvalidated input — the body reaching the remote server is
+  // Never forward unvalidated input — the body reaching a proxy backend is
   // the zod-parsed and canonicalized data, not the raw request body.
-  if (remoteDownloaderUrl && remoteDownloaderKey) {
+  const homeConfigured = Boolean(homeDownloaderUrl && homeDownloaderKey);
+  const remoteConfigured = Boolean(remoteDownloaderUrl && remoteDownloaderKey);
+
+  if (homeConfigured || remoteConfigured) {
+    const backend = await pickBackend();
+    if (!backend) {
+      return NextResponse.json({ error: "Could not start the download." }, { status: 502 });
+    }
+
     try {
-      const upstream = await fetch(`${remoteDownloaderUrl}/job`, {
+      const upstream = await fetch(`${backend.base}/job`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", "x-api-key": remoteDownloaderKey },
+        headers: { "Content-Type": "application/json", "x-api-key": backend.key },
         body: JSON.stringify({
           url: canonical.url,
           quality: parsed.data.quality,
@@ -54,9 +64,26 @@ export async function POST(request: NextRequest) {
         }),
       });
       const payload = await upstream.json().catch(() => ({}));
+
+      if (!upstream.ok) {
+        // Home was down (we fell back to remote) and remote itself failed to
+        // start the job — surface a clear, actionable message rather than
+        // whatever the remote server returned.
+        if (backend.tag === "remote" && homeConfigured) {
+          return NextResponse.json({ error: payload.error || en["ytDownloader.homeOffline"] }, { status: upstream.status });
+        }
+        return NextResponse.json(payload, { status: upstream.status });
+      }
+
+      if (typeof payload.jobId === "string") {
+        return NextResponse.json({ ...payload, jobId: `${backend.tag}_${payload.jobId}` }, { status: upstream.status });
+      }
       return NextResponse.json(payload, { status: upstream.status });
     } catch (error) {
-      console.error("Failed to reach remote downloader", error);
+      console.error(`Failed to reach ${backend.tag} downloader`, error);
+      if (backend.tag === "remote" && homeConfigured) {
+        return NextResponse.json({ error: en["ytDownloader.homeOffline"] }, { status: 502 });
+      }
       return NextResponse.json({ error: "Could not start the download." }, { status: 502 });
     }
   }

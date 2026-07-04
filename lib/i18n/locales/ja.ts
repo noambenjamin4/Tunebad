@@ -168,6 +168,7 @@ const ja: Record<keyof typeof en, string> = {
   "ytDownloader.couldNotReachServer": "サーバーに接続できませんでした。",
   "ytDownloader.couldNotStart": "ダウンロードを開始できませんでした。",
   "ytDownloader.couldNotFetchAudio": "完成した音声を取得できませんでした。",
+  "ytDownloader.homeOffline": "ダウンローダーに接続できませんでした。Mac で TuneBad を起動するか、しばらくしてからもう一度お試しください。",
 
   "setup.title": "初回セットアップが必要です",
   "setup.ytdlpMissing": "yt-dlpがまだインストールされていません",

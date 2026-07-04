@@ -168,6 +168,7 @@ const it: Record<keyof typeof en, string> = {
   "ytDownloader.couldNotReachServer": "Impossibile raggiungere il server.",
   "ytDownloader.couldNotStart": "Impossibile avviare il download.",
   "ytDownloader.couldNotFetchAudio": "Impossibile recuperare l'audio completato.",
+  "ytDownloader.homeOffline": "Impossibile raggiungere il downloader in questo momento. Apri TuneBad sul tuo Mac, oppure riprova tra poco.",
 
   "setup.title": "Configurazione iniziale necessaria",
   "setup.ytdlpMissing": "yt-dlp non è ancora installato",

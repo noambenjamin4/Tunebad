@@ -177,6 +177,7 @@ const en = {
   "ytDownloader.couldNotReachServer": "Could not reach the server.",
   "ytDownloader.couldNotStart": "Could not start the download.",
   "ytDownloader.couldNotFetchAudio": "Could not fetch the finished audio.",
+  "ytDownloader.homeOffline": "Couldn't reach the downloader right now. Open TuneBad on your Mac, or try again in a moment.",
 
   // Setup notice
   "setup.title": "One-time setup needed",

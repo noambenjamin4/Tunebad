@@ -5,7 +5,8 @@ import { NextResponse } from "next/server";
 import { jobs } from "@/lib/server/jobs";
 import { mediaPathForJob } from "@/lib/server/ytdlp";
 import { UUID_PATTERN } from "@/lib/server/validate";
-import { isDownloaderEnabled, remoteDownloaderUrl, remoteDownloaderKey } from "@/lib/runtime";
+import { isDownloaderEnabled } from "@/lib/runtime";
+import { backendForJob } from "@/lib/server/backends";
 
 export const maxDuration = 60;
 
@@ -21,18 +22,16 @@ export async function GET(_request: Request, { params }: { params: Promise<{ job
   if (!isDownloaderEnabled) return new NextResponse("Not found", { status: 404 });
 
   const { jobId } = await params;
-  if (!UUID_PATTERN.test(jobId)) {
-    return NextResponse.json({ error: "Invalid job id." }, { status: 400 });
-  }
 
-  if (remoteDownloaderUrl && remoteDownloaderKey) {
+  const proxy = backendForJob(jobId);
+  if (proxy) {
     let upstream: Response;
     try {
-      upstream = await fetch(`${remoteDownloaderUrl}/job/${jobId}/file`, {
-        headers: { "x-api-key": remoteDownloaderKey },
+      upstream = await fetch(`${proxy.backend.base}/job/${proxy.upstreamId}/file`, {
+        headers: { "x-api-key": proxy.backend.key },
       });
     } catch (error) {
-      console.error("Failed to reach remote downloader", error);
+      console.error(`Failed to reach ${proxy.backend.tag} downloader`, error);
       return NextResponse.json({ error: "Could not reach the download server." }, { status: 502 });
     }
 
@@ -50,6 +49,12 @@ export async function GET(_request: Request, { params }: { params: Promise<{ job
     if (contentLength) headers["Content-Length"] = contentLength;
 
     return new Response(upstream.body, { headers });
+  }
+
+  // No prefixed backend matched. Only fall back to the in-process local path
+  // for a bare (unprefixed) uuid — anything else is invalid.
+  if (!UUID_PATTERN.test(jobId)) {
+    return NextResponse.json({ error: "Invalid job id." }, { status: 400 });
   }
 
   const job = jobs.get(jobId);

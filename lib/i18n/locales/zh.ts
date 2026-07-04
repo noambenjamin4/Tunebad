@@ -167,6 +167,7 @@ const zh: Record<keyof typeof en, string> = {
   "ytDownloader.couldNotReachServer": "无法连接到服务器。",
   "ytDownloader.couldNotStart": "无法开始下载。",
   "ytDownloader.couldNotFetchAudio": "无法获取已完成的音频。",
+  "ytDownloader.homeOffline": "暂时无法连接下载服务。请在你的 Mac 上打开 TuneBad，或稍后再试。",
 
   "setup.title": "需要进行一次性设置",
   "setup.ytdlpMissing": "尚未安装yt-dlp",

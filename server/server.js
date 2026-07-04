@@ -423,8 +423,12 @@ async function main() {
     });
   });
 
-  server.listen(PORT, () => {
-    console.log(`Remote downloader server listening on port ${PORT}`);
+  // HOST unset (Render) → bind all interfaces as the platform requires. The
+  // Mac Home Bridge sets HOST=127.0.0.1 so it stays off the LAN, reachable
+  // only through the loopback that Tailscale Funnel proxies to.
+  const HOST = process.env.HOST || undefined;
+  server.listen(PORT, HOST, () => {
+    console.log(`Remote downloader server listening on ${HOST || "0.0.0.0"}:${PORT}`);
   });
 }
 
