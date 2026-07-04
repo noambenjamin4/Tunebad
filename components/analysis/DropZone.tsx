@@ -31,6 +31,7 @@ export function DropZone({ onFiles }: { onFiles: (files: File[]) => void }) {
         type="file"
         accept="audio/*,.mp3,.wav,.m4a,.ogg,.flac"
         multiple
+        aria-label={t("common.browseFiles")}
         onChange={(event) => {
           onFiles([...(event.target.files || [])]);
           event.target.value = "";

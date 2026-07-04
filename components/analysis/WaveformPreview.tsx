@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { SeekableWaveform } from "@/components/ui/SeekableWaveform";
 import { useI18n } from "@/lib/i18n";
 
@@ -16,12 +16,12 @@ export function WaveformPreview({
   const { t } = useI18n();
   const audioRef = useRef<HTMLAudioElement>(null);
   const [playing, setPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
 
   useEffect(() => {
     setPlaying(false);
-    setCurrentTime(0);
   }, [previewUrl]);
+
+  const getCurrentTime = useCallback(() => audioRef.current?.currentTime ?? 0, []);
 
   const togglePlayback = async () => {
     const audio = audioRef.current;
@@ -39,20 +39,23 @@ export function WaveformPreview({
     <div className="wave-card" aria-label={t("analysis.audioPreview")}>
       <SeekableWaveform
         bars={bars}
-        currentTime={currentTime}
         duration={duration}
         playing={playing}
+        getCurrentTime={getCurrentTime}
         onTogglePlay={() => void togglePlayback()}
         onSeek={(seconds) => {
+          // SeekableWaveform already applies the CSS var + display time
+          // immediately for its own seek sources (pointer drag, keyboard);
+          // this just moves the actual audio element's playback position.
           if (audioRef.current) audioRef.current.currentTime = seconds;
-          setCurrentTime(seconds);
         }}
         disabled={!previewUrl}
       />
       <audio
         ref={audioRef}
         src={previewUrl ?? undefined}
-        onTimeUpdate={(event) => setCurrentTime(event.currentTarget.currentTime)}
+        onPlay={() => setPlaying(true)}
+        onPause={() => setPlaying(false)}
         onEnded={() => setPlaying(false)}
       />
     </div>

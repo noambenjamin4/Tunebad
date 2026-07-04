@@ -20,9 +20,11 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^16.2.10",
     "@types/node": "^22.15.21",
     "@types/react": "^19.0.12",
     "@types/react-dom": "^19.0.4",
+    "sharp": "^0.35.3",
     "typescript": "^5.8.3"
   }
 }

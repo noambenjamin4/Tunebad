@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState, type DragEvent } from "react";
-import { decodeAudioFile, getAudioContextClass } from "@/lib/audio/decode";
+import { getAudioContextClass } from "@/lib/audio/decode";
+import { decodeAudioFileCached } from "@/lib/audio/decode-cache";
 import { encodeMp3FromChannels, encodeWavFromChannels, downloadBlob } from "@/lib/audio/mp3-encoder";
 import { FormatPicker, type OutputFormat } from "@/components/converter/QualityPicker";
 import { useI18n } from "@/lib/i18n";
@@ -60,11 +61,11 @@ export function RemixStudio() {
 
   // Scrubbing: an AudioBufferSourceNode can't be seeked in place once
   // started, so "seeking" means stopping the current source and starting a
-  // new one at `startOffset`. `elapsed` drives the playhead and is advanced
-  // via rAF while playing (computed from wall-clock time since playback
-  // started, not from any node property).
+  // new one at `startOffset`. Elapsed time is computed on demand from
+  // wall-clock refs (startOffsetRef/startedAtRef/speedMultiplierRef) via
+  // `getElapsed()` — SeekableWaveform's own rAF loop calls this every frame,
+  // so we don't need a per-frame setState here.
   const [startOffset, setStartOffset] = useState(0);
-  const [elapsed, setElapsed] = useState(0);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const previewUrlRef = useRef<string | null>(null);
@@ -75,7 +76,7 @@ export function RemixStudio() {
   const stretchTokenRef = useRef(0);
   const startedAtRef = useRef(0);
   const startOffsetRef = useRef(0);
-  const rafRef = useRef<number | null>(null);
+  const bufferDurationRef = useRef(0);
 
   const params: RemixParams = useMemo(
     () => ({ speed, reverb, bassBoostDb, lockPitch, pitchSemitones }),
@@ -84,21 +85,25 @@ export function RemixStudio() {
 
   const bars = useMemo(() => (buffer ? computeWaveformBars(buffer) : []), [buffer]);
   const bufferDuration = buffer?.duration ?? 0;
+  bufferDurationRef.current = bufferDuration;
 
-  // Kept in sync with the live `speed`/`lockPitch` state so the rAF elapsed-
-  // time loop (whose tick closure is created once per startAt call) always
-  // reads the current value instead of a stale one.
+  // Kept in sync with the live `speed`/`lockPitch` state so `getElapsed()`
+  // (called every frame by SeekableWaveform's own rAF loop) always reads the
+  // current value instead of a stale one.
   const speedMultiplierRef = useRef(1);
 
-  const stopRafLoop = useCallback(() => {
-    if (rafRef.current !== null) {
-      cancelAnimationFrame(rafRef.current);
-      rafRef.current = null;
-    }
+  // Computes elapsed time on demand from wall-clock refs — no per-frame
+  // setState. Passed to SeekableWaveform as `getCurrentTime`.
+  const getElapsed = useCallback(() => {
+    const ctx = audioCtxRef.current;
+    if (!ctx || !graphRef.current) return startOffsetRef.current;
+    return Math.min(
+      bufferDurationRef.current,
+      startOffsetRef.current + (ctx.currentTime - startedAtRef.current) * speedMultiplierRef.current,
+    );
   }, []);
 
   const stopPreview = useCallback(() => {
-    stopRafLoop();
     if (graphRef.current) {
       try {
         graphRef.current.source.stop();
@@ -112,7 +117,7 @@ export function RemixStudio() {
       audioCtxRef.current = null;
     }
     setPlaying(false);
-  }, [stopRafLoop]);
+  }, []);
 
   const resetAll = useCallback(() => {
     stopPreview();
@@ -130,7 +135,6 @@ export function RemixStudio() {
     setPitchSemitones(0);
     setStatus(null);
     setStartOffset(0);
-    setElapsed(0);
     startOffsetRef.current = 0;
   }, [stopPreview]);
 
@@ -149,12 +153,11 @@ export function RemixStudio() {
       setFile(audioFile);
       setBuffer(null);
       setStartOffset(0);
-      setElapsed(0);
       startOffsetRef.current = 0;
       setStatus({ title: t("remix.decodingTitle"), message: t("remix.decodingMessage", { name: audioFile.name }), tone: "neutral" });
 
       try {
-        const { buffer: decoded } = await decodeAudioFile(audioFile);
+        const { buffer: decoded } = await decodeAudioFileCached(audioFile);
         previewUrlRef.current = URL.createObjectURL(audioFile);
         setBuffer(decoded);
         setStatus({
@@ -221,12 +224,12 @@ export function RemixStudio() {
     graph.dryGain.gain.value = 1 - 0.35 * amount;
     graph.bassFilter.gain.value = bassBoostDb;
 
-    // Speed affects how fast `elapsed` should advance. Re-base the rAF
-    // loop's reference point to "now" at the new speed so the playhead
-    // doesn't jump when the speed slider moves mid-playback.
+    // Speed affects how fast elapsed time should advance. Re-base the
+    // reference point to "now" at the new speed so the playhead doesn't jump
+    // when the speed slider moves mid-playback.
     const nextMultiplier = lockPitch ? 1 : speed;
     if (speedMultiplierRef.current !== nextMultiplier) {
-      startOffsetRef.current = elapsed;
+      startOffsetRef.current = getElapsed();
       startedAtRef.current = ctx.currentTime;
       speedMultiplierRef.current = nextMultiplier;
     }
@@ -258,10 +261,8 @@ export function RemixStudio() {
       graph.source.onended = () => {
         if (graphRef.current === graph) {
           graphRef.current = null;
-          stopRafLoop();
           setPlaying(false);
           setStartOffset(0);
-          setElapsed(0);
           startOffsetRef.current = 0;
         }
       };
@@ -270,23 +271,10 @@ export function RemixStudio() {
       startedAtRef.current = ctx.currentTime;
       startOffsetRef.current = offset;
       speedMultiplierRef.current = lockPitch ? 1 : speed;
+      bufferDurationRef.current = playBuffer.duration;
       setPlaying(true);
-
-      const bufferDurationValue = playBuffer.duration;
-      const tick = () => {
-        const activeCtx = audioCtxRef.current;
-        if (!activeCtx || graphRef.current !== graph) return;
-        const nextElapsed = Math.min(
-          bufferDurationValue,
-          startOffsetRef.current + (activeCtx.currentTime - startedAtRef.current) * speedMultiplierRef.current,
-        );
-        setElapsed(nextElapsed);
-        rafRef.current = requestAnimationFrame(tick);
-      };
-      stopRafLoop();
-      rafRef.current = requestAnimationFrame(tick);
     },
-    [buffer, lockPitch, params, speed, stopRafLoop, t],
+    [buffer, lockPitch, params, speed, t],
   );
 
   const togglePlayback = async () => {
@@ -302,7 +290,6 @@ export function RemixStudio() {
     (seconds: number) => {
       const clamped = Math.min(Math.max(0, seconds), bufferDuration);
       setStartOffset(clamped);
-      setElapsed(clamped);
       startOffsetRef.current = clamped;
       if (playing) {
         stopPreview();
@@ -419,7 +406,7 @@ export function RemixStudio() {
           <div className="wave-card remix-wave-card">
             <SeekableWaveform
               bars={bars}
-              currentTime={elapsed}
+              getCurrentTime={getElapsed}
               duration={bufferDuration}
               playing={playing}
               onTogglePlay={() => void togglePlayback()}

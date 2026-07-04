@@ -65,7 +65,7 @@ export async function startYouTubeJob(
   format: "mp3" | "wav",
   trimSilence: boolean,
 ): Promise<YtJob> {
-  sweepJobs();
+  void sweepJobs();
   const ytdlpPath = await resolveYtdlp();
   const ffmpeg = resolveFfmpeg();
 

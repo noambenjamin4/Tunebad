@@ -41,7 +41,8 @@ function loadMp3Encoder(): Promise<void> {
 function floatTo16BitPcm(channelData: Float32Array): Int16Array {
   const pcm = new Int16Array(channelData.length);
   for (let i = 0; i < channelData.length; i += 1) {
-    const sample = Math.max(-1, Math.min(1, channelData[i]));
+    const raw = channelData[i];
+    const sample = raw < -1 ? -1 : raw > 1 ? 1 : raw;
     pcm[i] = sample < 0 ? sample * 0x8000 : sample * 0x7fff;
   }
   return pcm;
@@ -150,7 +151,12 @@ export async function encodeMp3FromChannels(inputChannels: Float32Array[], sampl
   await loadMp3Encoder();
   const channels = Math.min(2, inputChannels.length);
   const left = floatTo16BitPcm(inputChannels[0]);
-  const right = channels > 1 ? floatTo16BitPcm(inputChannels[1]) : left;
+  // When the right channel is the identical Float32Array reference as the
+  // left (mono content duplicated across two channels), reuse the converted
+  // Int16Array instead of running floatTo16BitPcm twice. lamejs's
+  // encodeBuffer only reads from the buffers it's given, so passing the same
+  // Int16Array for both channels is safe.
+  const right = channels > 1 ? (inputChannels[1] === inputChannels[0] ? left : floatTo16BitPcm(inputChannels[1])) : left;
   const encoder = new window.lamejs!.Mp3Encoder(channels, sampleRate, kbps);
   const chunks: Int8Array[] = [];
   const blockSize = 1152;

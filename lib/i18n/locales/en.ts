@@ -34,6 +34,7 @@ const en = {
   "analysis.noTracksYet": "No tracks analyzed yet.",
   "analysis.analyzing": "Analyzing {name}...",
   "analysis.analyzeFailed": "Could not analyze {name}. Try another audio format.",
+  "analyzer.fileTooLarge": "File too large (max 200 MB): {name}",
   "analysis.playPreview": "Play preview",
   "analysis.pausePreview": "Pause preview",
   "analysis.audioPreview": "Audio preview",

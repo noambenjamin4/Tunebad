@@ -67,7 +67,7 @@ function entryFromRemoteRow(row: RemoteRow): HistoryEntry {
 }
 
 async function ensureAnonSession(): Promise<string | null> {
-  const supabase = getSupabase();
+  const supabase = await getSupabase();
   if (!supabase) return null;
   try {
     const { data } = await supabase.auth.getSession();
@@ -101,7 +101,7 @@ export function useHistory() {
       userIdRef.current = userId;
 
       try {
-        const supabase = getSupabase();
+        const supabase = await getSupabase();
         if (!supabase) return;
         const { data, error } = await supabase
           .from(TABLE)
@@ -143,7 +143,7 @@ export function useHistory() {
 
     void (async () => {
       try {
-        const supabase = getSupabase();
+        const supabase = await getSupabase();
         if (!supabase) return;
         let userId = userIdRef.current;
         if (!userId) {
@@ -152,16 +152,17 @@ export function useHistory() {
         }
         if (!userId) return;
 
-        // Dedupe by name: remove any existing rows with this name for this user first.
-        await supabase.from(TABLE).delete().eq("user_id", userId).eq("name", entry.name);
-        await supabase.from(TABLE).insert({
-          user_id: userId,
-          name: result.name,
-          bpm: result.bpm || null,
-          key: result.key || null,
-          camelot: result.camelot || null,
-          duration: result.duration || null,
-        });
+        await supabase.from(TABLE).upsert(
+          {
+            user_id: userId,
+            name: result.name,
+            bpm: result.bpm || null,
+            key: result.key || null,
+            camelot: result.camelot || null,
+            duration: result.duration || null,
+          },
+          { onConflict: "user_id,name" },
+        );
       } catch {
         // Silently fall back to localStorage-only behavior.
       }
@@ -175,7 +176,7 @@ export function useHistory() {
 
     void (async () => {
       try {
-        const supabase = getSupabase();
+        const supabase = await getSupabase();
         if (!supabase) return;
         let userId = userIdRef.current;
         if (!userId) {

@@ -386,6 +386,7 @@ main {
   max-width: 1200px;
   margin: 0 auto;
   padding: 24px 20px 96px;
+  padding-bottom: max(96px, env(safe-area-inset-bottom));
 }
 
 .page-view {
@@ -879,7 +880,7 @@ label.check-row,
   left: 0;
   bottom: 0;
   overflow: hidden;
-  width: 0%;
+  width: var(--seek-pct, 0%);
   pointer-events: none;
 }
 
@@ -895,6 +896,7 @@ label.check-row,
   position: absolute;
   top: 0;
   bottom: 0;
+  left: var(--seek-pct, 0%);
   width: 1px;
   background: var(--ink);
   pointer-events: none;
@@ -1895,6 +1897,17 @@ tbody tr:last-child td {
 
   .metric-card:nth-child(2n) {
     border-right: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 

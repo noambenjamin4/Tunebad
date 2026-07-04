@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { AnalysisResult, WorkerRequest, WorkerResponse } from "@/types/analysis";
-import { decodeAudioFile, describeBitDepth, monoSamples, resampleMono } from "@/lib/audio/decode";
+import { describeBitDepth, monoSamples, resampleMono } from "@/lib/audio/decode";
+import { decodeAudioFileCached } from "@/lib/audio/decode-cache";
 import { estimateBpm, estimateKey } from "@/lib/audio/fallback-analysis";
 import { camelotLabel } from "@/lib/audio/constants";
 import { computeWaveformBars } from "@/lib/audio/waveform";
@@ -10,12 +11,13 @@ import { computeWaveformBars } from "@/lib/audio/waveform";
 // Tunebat's analyzer (recovered from their public worker bundle) runs
 // PercivalBpmEstimator + KeyExtractor on 16 kHz mono audio; match it exactly.
 const ANALYSIS_SAMPLE_RATE = 16000;
-const MAX_FILE_BYTES = 200 * 1024 * 1024;
+export const MAX_FILE_BYTES = 200 * 1024 * 1024;
 
 export interface AnalyzerState {
   results: AnalysisResult[];
   analyzingNames: string[];
   failedNames: string[];
+  oversizedNames: string[];
   current: AnalysisResult | null;
   waveformBars: number[];
   previewUrl: string | null;
@@ -26,6 +28,7 @@ export function useAnalyzer(onResult?: (result: AnalysisResult) => void) {
   const [results, setResults] = useState<AnalysisResult[]>([]);
   const [analyzingNames, setAnalyzingNames] = useState<string[]>([]);
   const [failedNames, setFailedNames] = useState<string[]>([]);
+  const [oversizedNames, setOversizedNames] = useState<string[]>([]);
   const [current, setCurrent] = useState<AnalysisResult | null>(null);
   const [waveformBars, setWaveformBars] = useState<number[]>([]);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -107,16 +110,21 @@ export function useAnalyzer(onResult?: (result: AnalysisResult) => void) {
 
   const analyzeFiles = useCallback(
     async (files: File[]) => {
-      const audioFiles = files.filter(
-        (file) => (file.type.startsWith("audio/") || /\.(mp3|wav|m4a|ogg|flac)$/i.test(file.name)) && file.size <= MAX_FILE_BYTES,
-      );
+      const isAudioLike = (file: File) => file.type.startsWith("audio/") || /\.(mp3|wav|m4a|ogg|flac)$/i.test(file.name);
+      const oversized = files.filter((file) => isAudioLike(file) && file.size > MAX_FILE_BYTES);
+      if (oversized.length) {
+        setOversizedNames((names) => [...oversized.map((file) => file.name), ...names]);
+      }
+
+      const audioFiles = files.filter((file) => isAudioLike(file) && file.size <= MAX_FILE_BYTES);
       if (!audioFiles.length) return;
 
       for (const file of audioFiles) {
         setFailedNames((names) => names.filter((name) => name !== file.name));
+        setOversizedNames((names) => names.filter((name) => name !== file.name));
         setAnalyzingNames((names) => [file.name, ...names]);
         try {
-          const { buffer, arrayBuffer } = await decodeAudioFile(file);
+          const { buffer, arrayBuffer } = await decodeAudioFileCached(file);
           const bars = computeWaveformBars(buffer);
           const mono = monoSamples(buffer);
           const analysisInput = await resampleMono(mono, buffer.sampleRate, ANALYSIS_SAMPLE_RATE);
@@ -166,6 +174,7 @@ export function useAnalyzer(onResult?: (result: AnalysisResult) => void) {
     setCurrent(null);
     setWaveformBars([]);
     setFailedNames([]);
+    setOversizedNames([]);
     setPreviewDuration(0);
     if (previewUrlRef.current) {
       URL.revokeObjectURL(previewUrlRef.current);
@@ -178,6 +187,7 @@ export function useAnalyzer(onResult?: (result: AnalysisResult) => void) {
     results,
     analyzingNames,
     failedNames,
+    oversizedNames,
     current,
     waveformBars,
     previewUrl,

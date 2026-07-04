@@ -25,11 +25,16 @@ const REQUIRED_SAMPLE_RATE = 48000;
 const STAGE1 = { b0: 1.53512485958697, b1: -2.69169618940638, b2: 1.19839281085285, a1: -1.69065929318241, a2: 0.73248077421585 };
 const STAGE2 = { b0: 1.0, b1: -2.0, b2: 1.0, a1: -1.99004745483398, a2: 0.99007225036621 };
 
-// Direct Form I biquad applied in place over the samples, producing a new
-// filtered array (does not mutate the input).
-function biquad(input: Float32Array, coeffs: { b0: number; b1: number; b2: number; a1: number; a2: number }): Float32Array {
+// Direct Form I biquad, writing into `output` (which may alias `input` for a
+// true in-place pass: since we read input[i] into a local before writing
+// output[i], and x1/x2/y1/y2 are kept as scalars rather than re-read from the
+// array, overwriting input[i] with output[i] on the same index is safe).
+function biquad(
+  input: Float32Array,
+  output: Float32Array,
+  coeffs: { b0: number; b1: number; b2: number; a1: number; a2: number },
+): Float32Array {
   const { b0, b1, b2, a1, a2 } = coeffs;
-  const output = new Float32Array(input.length);
   let x1 = 0;
   let x2 = 0;
   let y1 = 0;
@@ -46,8 +51,14 @@ function biquad(input: Float32Array, coeffs: { b0: number; b1: number; b2: numbe
   return output;
 }
 
+// Applies both K-weighting stages using at most one scratch array: stage 1
+// copies `samples` into a fresh buffer (never mutating the caller's input),
+// stage 2 then runs in place on that same buffer.
 function kWeight(samples: Float32Array): Float32Array {
-  return biquad(biquad(samples, STAGE1), STAGE2);
+  const scratch = new Float32Array(samples.length);
+  biquad(samples, scratch, STAGE1);
+  biquad(scratch, scratch, STAGE2);
+  return scratch;
 }
 
 // 400 ms blocks with 75% overlap (100 ms hop), per BS.1770-4 gating.

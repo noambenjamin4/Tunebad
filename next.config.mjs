@@ -1,3 +1,5 @@
+import bundleAnalyzer from "@next/bundle-analyzer";
+
 const isDev = process.env.NODE_ENV !== "production";
 
 // Static-compatible CSP: the app's pages are prerendered at build time, so a
@@ -48,4 +50,6 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+const withBundleAnalyzer = bundleAnalyzer({ enabled: process.env.ANALYZE === "true" });
+
+export default withBundleAnalyzer(nextConfig);

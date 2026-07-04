@@ -33,6 +33,7 @@ const fr: Record<keyof typeof en, string> = {
   "analysis.noTracksYet": "Aucun titre analysé pour l'instant.",
   "analysis.analyzing": "Analyse de {name}...",
   "analysis.analyzeFailed": "Impossible d'analyser {name}. Essayez un autre format audio.",
+  "analyzer.fileTooLarge": "Fichier trop volumineux (max 200 Mo) : {name}",
   "analysis.playPreview": "Lire l'aperçu",
   "analysis.pausePreview": "Mettre en pause l'aperçu",
   "analysis.audioPreview": "Aperçu audio",

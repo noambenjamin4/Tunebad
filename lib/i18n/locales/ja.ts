@@ -33,6 +33,7 @@ const ja: Record<keyof typeof en, string> = {
   "analysis.noTracksYet": "まだ解析されたトラックはありません。",
   "analysis.analyzing": "{name} を解析中...",
   "analysis.analyzeFailed": "{name} を解析できませんでした。別の音声形式をお試しください。",
+  "analyzer.fileTooLarge": "ファイルが大きすぎます(最大200MB): {name}",
   "analysis.playPreview": "プレビュー再生",
   "analysis.pausePreview": "プレビュー一時停止",
   "analysis.audioPreview": "音声プレビュー",

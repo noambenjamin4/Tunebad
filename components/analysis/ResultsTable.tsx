@@ -8,13 +8,15 @@ export function ResultsTable({
   results,
   analyzingNames,
   failedNames,
+  oversizedNames = [],
 }: {
   results: AnalysisResult[];
   analyzingNames: string[];
   failedNames: string[];
+  oversizedNames?: string[];
 }) {
   const { t } = useI18n();
-  const empty = !results.length && !analyzingNames.length && !failedNames.length;
+  const empty = !results.length && !analyzingNames.length && !failedNames.length && !oversizedNames.length;
   return (
     <div className="table-wrap">
       <table>
@@ -44,6 +46,11 @@ export function ResultsTable({
               {failedNames.map((name) => (
                 <tr key={`failed-${name}`}>
                   <td colSpan={7}>{t("analysis.analyzeFailed", { name })}</td>
+                </tr>
+              ))}
+              {oversizedNames.map((name) => (
+                <tr key={`oversized-${name}`}>
+                  <td colSpan={7}>{t("analyzer.fileTooLarge", { name })}</td>
                 </tr>
               ))}
               {results.map((result, index) => (

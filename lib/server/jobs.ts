@@ -35,11 +35,11 @@ export const jobs = (globalStore.__tunerJobs ??= new Map<string, YtJob>());
 // removed by the TTL sweep below, and the OS owns os.tmpdir() leftovers.
 
 if (!globalStore.__tunerJobsSweeper) {
-  globalStore.__tunerJobsSweeper = setInterval(sweepJobs, SWEEP_INTERVAL_MS);
+  globalStore.__tunerJobsSweeper = setInterval(() => void sweepJobs(), SWEEP_INTERVAL_MS);
   globalStore.__tunerJobsSweeper.unref?.();
 }
 
-export function sweepJobs(): void {
+export async function sweepJobs(): Promise<void> {
   const now = Date.now();
   for (const [id, job] of jobs) {
     if (now - job.createdAt > JOB_TTL_MS) {
@@ -49,7 +49,8 @@ export function sweepJobs(): void {
         // already exited
       }
       jobs.delete(id);
-      void rm(job.workdir, { recursive: true, force: true });
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      await rm(job.workdir, { recursive: true, force: true });
     }
   }
 }

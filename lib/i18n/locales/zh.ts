@@ -33,6 +33,7 @@ const zh: Record<keyof typeof en, string> = {
   "analysis.noTracksYet": "尚未分析任何曲目。",
   "analysis.analyzing": "正在分析 {name}...",
   "analysis.analyzeFailed": "无法分析 {name}，请尝试其他音频格式。",
+  "analyzer.fileTooLarge": "文件过大(最大200MB):{name}",
   "analysis.playPreview": "播放预览",
   "analysis.pausePreview": "暂停预览",
   "analysis.audioPreview": "音频预览",

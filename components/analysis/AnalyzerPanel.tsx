@@ -32,6 +32,7 @@ export function AnalyzerPanel() {
     results,
     analyzingNames,
     failedNames,
+    oversizedNames,
     current,
     waveformBars,
     previewUrl,
@@ -95,7 +96,12 @@ export function AnalyzerPanel() {
         </div>
       </div>
 
-      <ResultsTable results={results} analyzingNames={analyzingNames} failedNames={failedNames} />
+      <ResultsTable
+        results={results}
+        analyzingNames={analyzingNames}
+        failedNames={failedNames}
+        oversizedNames={oversizedNames}
+      />
     </article>
   );
 }

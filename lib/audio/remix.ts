@@ -5,10 +5,10 @@
 // soundtouchjs ships no type declarations, so we import it with a suppressed
 // check and describe the small slice of its API this file uses (SoundTouch
 // tempo/pitch processor and the SimpleFilter that pulls stretched frames
-// from a source object) via casts below.
-// @ts-expect-error - soundtouchjs has no bundled or published type declarations
-import * as SoundTouchJs from "soundtouchjs";
-
+// from a source object) via casts below. It's also a sizeable dependency only
+// needed by the pitch-lock/time-stretch path, so it's loaded dynamically (and
+// cached) the first time `timeStretch` actually runs, instead of being part
+// of the main bundle.
 interface SoundTouchInstance {
   tempo: number;
   pitch: number;
@@ -26,12 +26,31 @@ interface SimpleFilterInstance {
   sourcePosition: number;
 }
 
-const SoundTouchCtor = SoundTouchJs.SoundTouch as unknown as new () => SoundTouchInstance;
-const SimpleFilterCtor = SoundTouchJs.SimpleFilter as unknown as new (
+type SoundTouchCtorType = new () => SoundTouchInstance;
+type SimpleFilterCtorType = new (
   sourceSound: SoundTouchSource,
   pipe: SoundTouchInstance,
   callback?: () => void,
 ) => SimpleFilterInstance;
+
+// soundtouchjs has no bundled or published type declarations, so the dynamic
+// import is suppressed the same way the old static import was.
+function importSoundTouchJs(): Promise<any> {
+  // @ts-expect-error - soundtouchjs has no bundled or published type declarations
+  return import("soundtouchjs");
+}
+
+let soundTouchModulePromise: Promise<{ SoundTouchCtor: SoundTouchCtorType; SimpleFilterCtor: SimpleFilterCtorType }> | null = null;
+
+function loadSoundTouch(): Promise<{ SoundTouchCtor: SoundTouchCtorType; SimpleFilterCtor: SimpleFilterCtorType }> {
+  if (!soundTouchModulePromise) {
+    soundTouchModulePromise = importSoundTouchJs().then((SoundTouchJs) => ({
+      SoundTouchCtor: SoundTouchJs.SoundTouch as unknown as SoundTouchCtorType,
+      SimpleFilterCtor: SoundTouchJs.SimpleFilter as unknown as SimpleFilterCtorType,
+    }));
+  }
+  return soundTouchModulePromise;
+}
 
 export interface RemixParams {
   speed: number;
@@ -171,6 +190,7 @@ export async function timeStretch(buffer: AudioBuffer, tempo: number, pitchSemit
     },
   };
 
+  const { SoundTouchCtor, SimpleFilterCtor } = await loadSoundTouch();
   const soundTouch = new SoundTouchCtor();
   soundTouch.tempo = tempo;
   soundTouch.pitchSemitones = pitchSemitones;
@@ -179,8 +199,29 @@ export async function timeStretch(buffer: AudioBuffer, tempo: number, pitchSemit
   const chunkFrames = 4096;
   const chunk = new Float32Array(chunkFrames * 2);
 
-  const outLeftChunks: Float32Array[] = [];
-  const outRightChunks: Float32Array[] = [];
+  // Preallocate the output arrays up front sized to a safe estimate
+  // (ceil(inputFrames / tempo) plus generous slack for the drain tail), and
+  // write extracted chunks directly into them at a running offset. This
+  // avoids the two fresh Float32Array allocations per 4096-frame chunk that
+  // the old chunk-array/concat approach required. We only grow-by-copy in
+  // the rare case the estimate undershoots.
+  let capacity = Math.max(chunkFrames, Math.ceil(totalSourceFrames / tempo) + sampleRate);
+  let outLeft = new Float32Array(capacity);
+  let outRight = new Float32Array(capacity);
+
+  const ensureCapacity = (needed: number) => {
+    if (needed <= capacity) return;
+    let nextCapacity = capacity * 2;
+    while (nextCapacity < needed) nextCapacity *= 2;
+    const grownLeft = new Float32Array(nextCapacity);
+    const grownRight = new Float32Array(nextCapacity);
+    grownLeft.set(outLeft);
+    grownRight.set(outRight);
+    outLeft = grownLeft;
+    outRight = grownRight;
+    capacity = nextCapacity;
+  };
+
   let totalExtracted = 0;
   let lastNonSilentFrame = 0;
   const maxIterations = 200_000;
@@ -190,17 +231,16 @@ export async function timeStretch(buffer: AudioBuffer, tempo: number, pitchSemit
     const framesExtracted = filter.extract(chunk, chunkFrames);
     if (framesExtracted === 0) break;
 
-    const chunkLeft = new Float32Array(framesExtracted);
-    const chunkRight = new Float32Array(framesExtracted);
+    ensureCapacity(totalExtracted + framesExtracted);
     for (let i = 0; i < framesExtracted; i += 1) {
-      chunkLeft[i] = chunk[i * 2];
-      chunkRight[i] = chunk[i * 2 + 1];
-      if (Math.abs(chunk[i * 2]) > 1e-6 || Math.abs(chunk[i * 2 + 1]) > 1e-6) {
+      const l = chunk[i * 2];
+      const r = chunk[i * 2 + 1];
+      outLeft[totalExtracted + i] = l;
+      outRight[totalExtracted + i] = r;
+      if (Math.abs(l) > 1e-6 || Math.abs(r) > 1e-6) {
         lastNonSilentFrame = totalExtracted + i + 1;
       }
     }
-    outLeftChunks.push(chunkLeft);
-    outRightChunks.push(chunkRight);
     totalExtracted += framesExtracted;
     iterations += 1;
   }
@@ -210,18 +250,8 @@ export async function timeStretch(buffer: AudioBuffer, tempo: number, pitchSemit
   const margin = Math.round(sampleRate * 0.05);
   const outputLength = Math.min(totalExtracted, lastNonSilentFrame + margin) || totalExtracted;
 
-  const outLeft = new Float32Array(outputLength);
-  const outRight = new Float32Array(outputLength);
-  let writeIndex = 0;
-  for (let c = 0; c < outLeftChunks.length && writeIndex < outputLength; c += 1) {
-    const cl = outLeftChunks[c];
-    const cr = outRightChunks[c];
-    const remaining = outputLength - writeIndex;
-    const take = Math.min(cl.length, remaining);
-    outLeft.set(cl.subarray(0, take), writeIndex);
-    outRight.set(cr.subarray(0, take), writeIndex);
-    writeIndex += take;
-  }
+  outLeft = outLeft.subarray(0, outputLength);
+  outRight = outRight.subarray(0, outputLength);
 
   const safeLength = Math.max(1, outputLength);
 

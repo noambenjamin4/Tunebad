@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, type DragEvent } from "react";
-import { decodeAudioFile, getAudioContextClass } from "@/lib/audio/decode";
+import { getAudioContextClass } from "@/lib/audio/decode";
+import { decodeAudioFileCached } from "@/lib/audio/decode-cache";
 import { PLATFORM_TARGETS } from "@/lib/audio/lufs";
 import { useI18n } from "@/lib/i18n";
 import { GaugeIcon } from "@/components/ui/icons";
@@ -150,7 +151,7 @@ export function LoudnessPanel() {
       setPreviewUrl(previewUrlRef.current);
 
       try {
-        const { buffer } = await decodeAudioFile(audioFile);
+        const { buffer } = await decodeAudioFileCached(audioFile);
         const channelCount = Math.min(2, buffer.numberOfChannels);
         const channels: Float32Array[] = [];
         for (let c = 0; c < channelCount; c += 1) channels.push(buffer.getChannelData(c).slice());
