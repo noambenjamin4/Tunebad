@@ -29,7 +29,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ job
 
   const { jobId } = await params;
 
-  const proxy = backendForJob(jobId);
+  const proxy = await backendForJob(jobId);
   if (proxy) {
     let upstream: Response;
     try {

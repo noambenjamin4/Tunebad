@@ -1,15 +1,40 @@
 // Picks and validates which downloader backend (home Mac vs Render remote)
 // a job talks to. See lib/runtime.ts for why home is preferred: YouTube
 // bot-walls the Render datacenter IP but not a home IP.
+import { get } from "@vercel/edge-config";
 import { homeDownloaderUrl, homeDownloaderKey, remoteDownloaderUrl, remoteDownloaderKey } from "@/lib/runtime";
 import { UUID_PATTERN } from "@/lib/server/validate";
 
 export type BackendTag = "home" | "remote";
 export type Backend = { base: string; key: string; tag: BackendTag };
 
-function homeBackend(): Backend | null {
-  if (!homeDownloaderUrl || !homeDownloaderKey) return null;
-  return { base: homeDownloaderUrl, key: homeDownloaderKey, tag: "home" };
+// The Mac bridge's public tunnel URL changes whenever cloudflared restarts
+// (e.g. on reboot). The bridge writes its current URL into the Edge Config
+// `bridgeUrl` key on every startup, so the proxy always routes to wherever
+// the Mac currently is — no redeploy needed. The DOWNLOADER_HOME_URL env is a
+// static fallback/override (used in local dev or if Edge Config is absent).
+// Cached briefly so we don't read Edge Config on every request.
+let homeUrlCache: { value: string | null; at: number } | null = null;
+const HOME_URL_TTL_MS = 20_000;
+
+async function resolveHomeUrl(): Promise<string | null> {
+  if (homeUrlCache && Date.now() - homeUrlCache.at < HOME_URL_TTL_MS) return homeUrlCache.value;
+  let value: string | null = null;
+  try {
+    const fromStore = await get<string>("bridgeUrl");
+    if (typeof fromStore === "string" && fromStore.startsWith("https://")) value = fromStore;
+  } catch {
+    // Edge Config not configured/reachable — fall back to the env override.
+  }
+  if (!value && homeDownloaderUrl?.startsWith("https://")) value = homeDownloaderUrl;
+  homeUrlCache = { value, at: Date.now() };
+  return value;
+}
+
+async function homeBackend(): Promise<Backend | null> {
+  if (!homeDownloaderKey) return null;
+  const base = await resolveHomeUrl();
+  return base ? { base, key: homeDownloaderKey, tag: "home" } : null;
 }
 
 function remoteBackend(): Backend | null {
@@ -21,7 +46,7 @@ function remoteBackend(): Backend | null {
 // now, else remote. A 2s health-check timeout keeps this from stalling the
 // POST /api/youtube request when the Mac is off or the tunnel is down.
 export async function pickBackend(): Promise<Backend | null> {
-  const home = homeBackend();
+  const home = await homeBackend();
   if (home) {
     try {
       const res = await fetch(`${home.base}/health`, { signal: AbortSignal.timeout(2000) });
@@ -38,7 +63,7 @@ export async function pickBackend(): Promise<Backend | null> {
 // path-traversal / injection guard for the two proxy GET routes, so it's
 // intentionally strict: bad prefix, malformed uuid, or a backend that isn't
 // currently configured all return null.
-export function backendForJob(jobId: string): { backend: Backend; upstreamId: string } | null {
+export async function backendForJob(jobId: string): Promise<{ backend: Backend; upstreamId: string } | null> {
   const separatorIndex = jobId.indexOf("_");
   if (separatorIndex === -1) return null;
 
@@ -47,7 +72,7 @@ export function backendForJob(jobId: string): { backend: Backend; upstreamId: st
   if (!UUID_PATTERN.test(upstreamId)) return null;
 
   if (prefix === "home") {
-    const backend = homeBackend();
+    const backend = await homeBackend();
     return backend ? { backend, upstreamId } : null;
   }
   if (prefix === "remote") {
