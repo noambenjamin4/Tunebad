@@ -23,7 +23,8 @@ const baloo2 = Baloo_2({
   variable: "--font-display",
 });
 
-const DESCRIPTION = "A music utility for file analysis, BPM, pitch, delay, reverb, and MP3 conversion.";
+const DESCRIPTION =
+  "In-browser music toolkit: analyze BPM, key, and loudness, apply pitch and slowed + reverb, and download from YouTube, Spotify, and more as MP3, WAV, or MP4.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://tuner-delta-six.vercel.app"),
