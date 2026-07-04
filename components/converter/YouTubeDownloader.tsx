@@ -8,14 +8,36 @@ import { delayDivisions } from "@/lib/audio/delay";
 import { useI18n } from "@/lib/i18n";
 import { CheckRow } from "@/components/ui/CheckRow";
 import { SetupNotice } from "./SetupNotice";
-import { QualityPicker, FormatPicker, type Quality, type OutputFormat } from "./QualityPicker";
+import { PlaylistBatch } from "./PlaylistBatch";
+import type { PlaylistItem } from "@/hooks/usePlaylistBatch";
+import {
+  QualityPicker,
+  ResolutionPicker,
+  FormatPicker,
+  VIDEO_FORMAT_OPTION,
+  type Quality,
+  type Resolution,
+  type OutputFormat,
+} from "./QualityPicker";
+
+const LINK_FORMATS = [
+  { value: "mp3" as const, label: "MP3", hintKey: "converter.formatHintSmallFile" as const },
+  { value: "wav" as const, label: "WAV", hintKey: "converter.formatHintSampleExact" as const },
+  VIDEO_FORMAT_OPTION,
+];
+
+const DEFAULT_AUDIO_QUALITY: Quality = "320";
+const DEFAULT_VIDEO_RESOLUTION: Resolution = "1080";
 
 export function YouTubeDownloader() {
   const { requestAnalysis, lastAnalysis, showView } = useTuner();
   const { state, start, reset } = useYouTubeJob();
   const { t } = useI18n();
   const [url, setUrl] = useState("");
-  const [quality, setQuality] = useState<Quality>("320");
+  // A single `quality` field is shared by both pickers — kbps values while
+  // format is mp3/wav, resolution values while format is mp4 — so it's always
+  // valid for whatever format is currently selected (see onFormatChange).
+  const [quality, setQuality] = useState<string>(DEFAULT_AUDIO_QUALITY);
   const [format, setFormat] = useState<OutputFormat>("mp3");
   const [trimSilence, setTrimSilence] = useState(true);
   const [autoAnalyze, setAutoAnalyze] = useState(true);
@@ -24,10 +46,70 @@ export function YouTubeDownloader() {
   const [autoAnalyzedName, setAutoAnalyzedName] = useState<string | null>(null);
   const autoAnalyzedJobRef = useRef<string | null>(null);
 
+  // Playlist mode: a URL containing list= offers a "convert whole playlist"
+  // affordance instead of forcing the single-video flow. A plain watch?v=
+  // (even with list= present) still defaults to single unless the user
+  // explicitly opts into batch mode via that affordance — keeps the common
+  // case (pasting a video link from within a playlist) predictable.
+  const [playlistMode, setPlaylistMode] = useState(false);
+  const [playlistLoading, setPlaylistLoading] = useState(false);
+  const [playlistError, setPlaylistError] = useState<string | null>(null);
+  const [playlistItems, setPlaylistItems] = useState<PlaylistItem[] | null>(null);
+  const [playlistBatchConfig, setPlaylistBatchConfig] = useState<{ format: OutputFormat; quality: string } | null>(null);
+
   const busy = state.phase === "starting" || state.phase === "working";
+  const isVideo = format === "mp4";
+  const hasPlaylistParam = /[?&]list=/.test(url);
+
+  useEffect(() => {
+    // Any URL edit invalidates a previously enumerated playlist / toggle.
+    setPlaylistMode(false);
+    setPlaylistItems(null);
+    setPlaylistBatchConfig(null);
+    setPlaylistError(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [url]);
+
+  const onFormatChange = (nextFormat: OutputFormat) => {
+    setFormat(nextFormat);
+    if (nextFormat === "mp4") {
+      setQuality(DEFAULT_VIDEO_RESOLUTION);
+    } else {
+      setQuality(DEFAULT_AUDIO_QUALITY);
+    }
+  };
 
   const onSubmit = (event: FormEvent) => {
     event.preventDefault();
+
+    if (playlistMode) {
+      setInputError(null);
+      setPlaylistError(null);
+      setPlaylistItems(null);
+      setPlaylistLoading(true);
+      void (async () => {
+        try {
+          const response = await fetch("/api/youtube/playlist", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ url }),
+          });
+          const payload = await response.json().catch(() => ({}));
+          if (!response.ok || !Array.isArray(payload.items)) {
+            setPlaylistError(payload.error || t("ytDownloader.couldNotStart"));
+            return;
+          }
+          setPlaylistItems(payload.items);
+          setPlaylistBatchConfig({ format, quality });
+        } catch {
+          setPlaylistError(t("ytDownloader.couldNotReachServer"));
+        } finally {
+          setPlaylistLoading(false);
+        }
+      })();
+      return;
+    }
+
     const validated = validateMediaUrl(url);
     if (!validated) {
       setInputError(t("ytDownloader.linkError"));
@@ -78,6 +160,7 @@ export function YouTubeDownloader() {
 
   useEffect(() => {
     if (state.phase !== "done") return;
+    if (isVideo) return;
     if (!autoAnalyze) return;
     if (autoAnalyzedJobRef.current === state.jobId) return;
     autoAnalyzedJobRef.current = state.jobId;
@@ -120,16 +203,35 @@ export function YouTubeDownloader() {
             disabled={busy}
           />
         </label>
-        <FormatPicker value={format} onChange={setFormat} />
-        {format === "mp3" ? <QualityPicker value={quality} onChange={setQuality} /> : null}
-        <CheckRow checked={trimSilence} onChange={setTrimSilence} disabled={busy}>
-          {t("converter.autoTrim")}
-        </CheckRow>
-        <CheckRow checked={autoAnalyze} onChange={setAutoAnalyze} disabled={busy}>
-          {t("ytDownloader.autoAnalyze")}
-        </CheckRow>
-        <button className="convert-button" type="submit" disabled={busy || !url.trim()}>
-          {busy ? t("ytDownloader.loading") : t("converter.convertTo", { format: format.toUpperCase() })}
+        {hasPlaylistParam ? (
+          <CheckRow checked={playlistMode} onChange={setPlaylistMode} disabled={busy || playlistLoading}>
+            {t("ytDownloader.playlistConvertAll")}
+          </CheckRow>
+        ) : null}
+        <FormatPicker value={format} onChange={onFormatChange} formats={LINK_FORMATS} />
+        {isVideo ? (
+          <ResolutionPicker value={quality as Resolution} onChange={setQuality} />
+        ) : format === "mp3" ? (
+          <QualityPicker value={quality as Quality} onChange={setQuality} />
+        ) : null}
+        {isVideo || playlistMode ? null : (
+          <>
+            <CheckRow checked={trimSilence} onChange={setTrimSilence} disabled={busy}>
+              {t("converter.autoTrim")}
+            </CheckRow>
+            <CheckRow checked={autoAnalyze} onChange={setAutoAnalyze} disabled={busy}>
+              {t("ytDownloader.autoAnalyze")}
+            </CheckRow>
+          </>
+        )}
+        <button className="convert-button" type="submit" disabled={busy || playlistLoading || !url.trim()}>
+          {playlistLoading
+            ? t("ytDownloader.loading")
+            : busy
+              ? t("ytDownloader.loading")
+              : playlistMode
+                ? t("ytDownloader.playlistConvertAll")
+                : t("converter.convertTo", { format: format.toUpperCase() })}
         </button>
       </form>
 
@@ -138,10 +240,26 @@ export function YouTubeDownloader() {
           <strong>{t("ytDownloader.linkErrorTitle")}</strong>
           <span>{inputError}</span>
         </div>
+      ) : playlistError ? (
+        <div className="status-box" data-tone="warning" role="status">
+          <strong>{t("ytDownloader.linkErrorTitle")}</strong>
+          <span>{playlistError}</span>
+        </div>
+      ) : playlistLoading ? (
+        <div className="status-box" role="status">
+          <strong>{t("ytDownloader.playlistDetected")}</strong>
+          <span>{t("ytDownloader.startingMessage")}</span>
+        </div>
+      ) : playlistItems && playlistBatchConfig ? (
+        <div className="status-box" role="status">
+          <strong>{t("ytDownloader.playlistDetected")}</strong>
+          <span>{t("ytDownloader.playlistTracks", { count: playlistItems.length })}</span>
+          <PlaylistBatch items={playlistItems} format={playlistBatchConfig.format} quality={playlistBatchConfig.quality} />
+        </div>
       ) : state.phase === "idle" ? (
         <div className="status-box" role="status">
           <strong>{t("ytDownloader.idleTitle")}</strong>
-          <span>{t("ytDownloader.idleMessage")}</span>
+          <span>{isVideo ? t("ytDownloader.videoNote") : t("ytDownloader.idleMessage")}</span>
         </div>
       ) : state.phase === "starting" ? (
         <div className="status-box" role="status">
@@ -167,21 +285,23 @@ export function YouTubeDownloader() {
               <a className="download-ready-link" href={`/api/youtube/${state.jobId}/file`}>
                 {t("ytDownloader.downloadFormat", { format: format.toUpperCase() })}
               </a>
-              <button
-                className="text-button"
-                type="button"
-                disabled={handingOff}
-                onClick={() => void manualAnalyze(state.jobId, state.title)}
-              >
-                {handingOff ? t("ytDownloader.loading") : t("ytDownloader.analyzeTrack")}
-              </button>
+              {isVideo ? null : (
+                <button
+                  className="text-button"
+                  type="button"
+                  disabled={handingOff}
+                  onClick={() => void manualAnalyze(state.jobId, state.title)}
+                >
+                  {handingOff ? t("ytDownloader.loading") : t("ytDownloader.analyzeTrack")}
+                </button>
+              )}
               <button className="text-button" type="button" onClick={reset}>
                 {t("ytDownloader.newDownload")}
               </button>
             </span>
           </span>
-          {analysisPending ? <span className="autoflow-chip">{t("ytDownloader.analyzing")}</span> : null}
-          {analysisReady && lastAnalysis ? (
+          {isVideo ? null : analysisPending ? <span className="autoflow-chip">{t("ytDownloader.analyzing")}</span> : null}
+          {!isVideo && analysisReady && lastAnalysis ? (
             <span className="autoflow-chip">
               <span>
                 <strong>{Math.round(lastAnalysis.bpm)} BPM</strong> · <strong>{lastAnalysis.key}</strong> ·{" "}

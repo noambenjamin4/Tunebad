@@ -4,6 +4,7 @@ import path from "node:path";
 import { randomUUID } from "node:crypto";
 import ffmpegPath from "ffmpeg-static";
 import { jobs, sweepJobs, YT_BASE_DIR, type YtJob } from "./jobs";
+import type { YtFormat } from "@/types/analysis";
 
 export class SetupError extends Error {
   constructor(public code: "YTDLP_MISSING" | "FFMPEG_MISSING") {
@@ -57,7 +58,7 @@ function classifyError(stderr: string): string {
   if (lower.includes("video unavailable")) return "That video is unavailable.";
   if (lower.includes("age") && lower.includes("restrict")) return "That video is age-restricted and can't be downloaded.";
   if (lower.includes("match-filter") || lower.includes("does not pass filter")) return "That video is longer than the 90 minute limit.";
-  if (lower.includes("max-filesize") || lower.includes("file is larger")) return "That video's audio exceeds the 300 MB limit.";
+  if (lower.includes("max-filesize") || lower.includes("file is larger")) return "That download exceeds the size limit.";
   if (lower.includes("private video")) return "That video is private.";
   if (lower.includes("sign in")) return "YouTube requires a sign-in for that video.";
   if (lower.includes("unsupported url") || lower.includes("is not a valid url")) return "That link isn't supported.";
@@ -69,7 +70,7 @@ export async function startYouTubeJob(
   sanitizedUrl: string,
   sourceLabel: string,
   quality: string,
-  format: "mp3" | "wav",
+  format: YtFormat,
   trimSilence: boolean,
 ): Promise<YtJob> {
   void sweepJobs();
@@ -94,22 +95,31 @@ export async function startYouTubeJob(
 
   const args = [
     "--no-playlist",
-    "-f", "bestaudio/best",
-    "-x",
-    "--audio-format", format,
-    // WAV is lossless PCM; bitrate only applies to MP3
-    ...(format === "mp3" ? ["--audio-quality", `${quality}K`] : []),
+    ...(format === "mp4"
+      ? [
+          "-f",
+          `bv*[height<=${quality}][vcodec^=avc1]+ba[ext=m4a]/bv*[height<=${quality}]+ba/b[height<=${quality}]`,
+          "--merge-output-format", "mp4",
+          "--postprocessor-args", "Merger:-movflags +faststart",
+        ]
+      : [
+          "-f", "bestaudio/best",
+          "-x",
+          "--audio-format", format,
+          // WAV is lossless PCM; bitrate only applies to MP3
+          ...(format === "mp3" ? ["--audio-quality", `${quality}K`] : []),
+        ]),
     "--ffmpeg-location", ffmpeg,
     "--match-filter", "duration <= 5400",
-    "--max-filesize", "300M",
+    "--max-filesize", format === "mp4" ? "2G" : "300M",
     "--no-mtime",
     "--newline",
     "--progress",
     "--print-to-file", "%(title)s", path.join(workdir, "title.txt"),
-    "-o", path.join(workdir, "audio.%(ext)s"),
+    "-o", path.join(workdir, "media.%(ext)s"),
   ];
 
-  if (trimSilence) {
+  if (trimSilence && format !== "mp4") {
     args.push("--postprocessor-args", `ExtractAudio:-af ${SILENCE_TRIM_FILTER}`);
   }
 
@@ -164,5 +174,74 @@ export async function startYouTubeJob(
 }
 
 export function mediaPathForJob(job: YtJob): string {
-  return path.join(job.workdir, `audio.${job.format}`);
+  return path.join(job.workdir, `media.${job.format}`);
+}
+
+export interface PlaylistItem {
+  id: string;
+  title: string | null;
+}
+
+// Enumerates a YouTube playlist's entries without creating a download job —
+// this is a quick metadata fetch (--flat-playlist never touches ffmpeg or
+// writes a workdir), so it deliberately does not count against the
+// job-start rate limit. Mirrors the /playlist handler in server/server.js.
+export async function enumeratePlaylist(canonicalPlaylistUrl: string): Promise<PlaylistItem[]> {
+  const ytdlpPath = await resolveYtdlp();
+
+  const args = ["--flat-playlist", "--dump-single-json", "--playlist-end", "50", "--no-warnings", "--", canonicalPlaylistUrl];
+
+  const child = spawn(ytdlpPath, args, { shell: false, stdio: ["ignore", "pipe", "pipe"] });
+
+  let stdout = "";
+  let stderrTail = "";
+
+  const exitCode = await new Promise<number>((resolve, reject) => {
+    const timer = setTimeout(() => {
+      child.kill("SIGKILL");
+      reject(new Error("Playlist lookup timed out."));
+    }, 30_000);
+    timer.unref?.();
+
+    child.stdout.on("data", (chunk: Buffer) => {
+      stdout += chunk.toString("utf8");
+    });
+    child.stderr.on("data", (chunk: Buffer) => {
+      stderrTail = (stderrTail + chunk.toString("utf8")).slice(-4000);
+    });
+    child.on("error", (error) => {
+      clearTimeout(timer);
+      reject(error);
+    });
+    child.on("close", (code) => {
+      clearTimeout(timer);
+      resolve(code ?? 1);
+    });
+  });
+
+  if (exitCode !== 0) {
+    throw new Error(stripInternalPaths(classifyError(stderrTail)));
+  }
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(stdout);
+  } catch {
+    throw new Error("Could not read that playlist.");
+  }
+
+  const entries = (parsed as { entries?: unknown[] })?.entries;
+  if (!Array.isArray(entries)) return [];
+
+  const items: PlaylistItem[] = [];
+  for (const entry of entries) {
+    if (!entry || typeof entry !== "object") continue;
+    const id = (entry as { id?: unknown }).id;
+    if (typeof id !== "string" || !id) continue;
+    const rawTitle = (entry as { title?: unknown }).title;
+    const title = typeof rawTitle === "string" && rawTitle ? rawTitle : null;
+    items.push({ id, title });
+    if (items.length >= 50) break;
+  }
+  return items;
 }

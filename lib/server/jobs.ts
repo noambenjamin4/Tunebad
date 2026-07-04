@@ -2,12 +2,12 @@ import { rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import type { ChildProcess } from "node:child_process";
-import type { YtJobPublic, YtJobStatus } from "@/types/analysis";
+import type { YtFormat, YtJobPublic, YtJobStatus } from "@/types/analysis";
 
 export interface YtJob {
   id: string;
   videoId: string;
-  format: "mp3" | "wav";
+  format: YtFormat;
   status: YtJobStatus;
   progress: number;
   title: string | null;

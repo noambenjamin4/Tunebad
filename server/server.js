@@ -13,7 +13,7 @@ const fsp = require("node:fs/promises");
 const path = require("node:path");
 const os = require("node:os");
 const { spawn } = require("node:child_process");
-const { validateMediaUrl } = require("./media-url");
+const { validateMediaUrl, validatePlaylistUrl } = require("./media-url");
 
 const PORT = Number(process.env.PORT) || 8787;
 const API_KEY = process.env.API_KEY;
@@ -39,7 +39,10 @@ const MAX_BODY_BYTES = 8 * 1024; // POST /job bodies are a URL + a couple of enu
 // Global job-start rate limit — defense-in-depth beyond the API key. One
 // compromised/leaked key shouldn't allow unbounded yt-dlp spawning.
 const JOB_START_WINDOW_MS = 10 * 60 * 1000;
-const MAX_JOB_STARTS_PER_WINDOW = 20;
+// Env-overridable so the Mac home bridge can raise it (a 50-track playlist
+// batch would otherwise self-throttle against the default); Render stays
+// on the default.
+const MAX_JOB_STARTS_PER_WINDOW = Number(process.env.YTDLP_MAX_JOB_STARTS) || 20;
 /** @type {number[]} */
 const jobStartTimestamps = [];
 
@@ -106,7 +109,7 @@ function classifyError(stderr) {
   if (lower.includes("video unavailable")) return "That video is unavailable.";
   if (lower.includes("age") && lower.includes("restrict")) return "That video is age-restricted and can't be downloaded.";
   if (lower.includes("match-filter") || lower.includes("does not pass filter")) return "That video is longer than the 90 minute limit.";
-  if (lower.includes("max-filesize") || lower.includes("file is larger")) return "That video's audio exceeds the 300 MB limit.";
+  if (lower.includes("max-filesize") || lower.includes("file is larger")) return "That download exceeds the size limit.";
   if (lower.includes("private video")) return "That video is private.";
   if (lower.includes("sign in")) return "YouTube requires a sign-in for that video.";
   if (lower.includes("unsupported url") || lower.includes("is not a valid url")) return "That link isn't supported.";
@@ -136,26 +139,35 @@ async function startJob(sanitizedUrl, quality, format, trimSilence) {
 
   const args = [
     "--no-playlist",
-    "-f", "bestaudio/best",
-    "-x",
-    "--audio-format", format,
-    // WAV is lossless PCM; bitrate only applies to MP3
-    ...(format === "mp3" ? ["--audio-quality", `${quality}K`] : []),
+    ...(format === "mp4"
+      ? [
+          "-f",
+          `bv*[height<=${quality}][vcodec^=avc1]+ba[ext=m4a]/bv*[height<=${quality}]+ba/b[height<=${quality}]`,
+          "--merge-output-format", "mp4",
+          "--postprocessor-args", "Merger:-movflags +faststart",
+        ]
+      : [
+          "-f", "bestaudio/best",
+          "-x",
+          "--audio-format", format,
+          // WAV is lossless PCM; bitrate only applies to MP3
+          ...(format === "mp3" ? ["--audio-quality", `${quality}K`] : []),
+        ]),
     "--ffmpeg-location", FFMPEG_PATH,
     "--match-filter", "duration <= 5400",
-    "--max-filesize", "300M",
+    "--max-filesize", format === "mp4" ? "2G" : "300M",
     "--no-mtime",
     "--newline",
     "--progress",
     "--print-to-file", "%(title)s", path.join(workdir, "title.txt"),
-    "-o", path.join(workdir, "audio.%(ext)s"),
+    "-o", path.join(workdir, "media.%(ext)s"),
   ];
 
   if (process.env.YTDLP_COOKIES) {
     args.push("--cookies", "/tmp/cookies.txt");
   }
 
-  if (trimSilence) {
+  if (trimSilence && format !== "mp4") {
     args.push("--postprocessor-args", `ExtractAudio:-af ${SILENCE_TRIM_FILTER}`);
   }
 
@@ -209,8 +221,63 @@ async function startJob(sanitizedUrl, quality, format, trimSilence) {
   return job;
 }
 
+// Enumerates a YouTube playlist's entries without creating a download job —
+// --flat-playlist never touches ffmpeg or writes a workdir, so this is a
+// quick metadata fetch that does not count against the job-start rate
+// limit. Mirrors lib/server/ytdlp.ts's enumeratePlaylist for the local path.
+function enumeratePlaylist(canonicalPlaylistUrl) {
+  return new Promise((resolve, reject) => {
+    const args = ["--flat-playlist", "--dump-single-json", "--playlist-end", "50", "--no-warnings", "--", canonicalPlaylistUrl];
+    const child = spawn(YTDLP_PATH, args, { shell: false, stdio: ["ignore", "pipe", "pipe"] });
+
+    let stdout = "";
+    let stderrTail = "";
+
+    const timer = setTimeout(() => {
+      child.kill("SIGKILL");
+      reject(new Error("Playlist lookup timed out."));
+    }, 30_000);
+    timer.unref?.();
+
+    child.stdout.on("data", (chunk) => {
+      stdout += chunk.toString("utf8");
+    });
+    child.stderr.on("data", (chunk) => {
+      stderrTail = (stderrTail + chunk.toString("utf8")).slice(-4000);
+    });
+    child.on("error", (error) => {
+      clearTimeout(timer);
+      reject(error);
+    });
+    child.on("close", (code) => {
+      clearTimeout(timer);
+      if (code !== 0) {
+        reject(new Error(stripInternalPaths(classifyError(stderrTail))));
+        return;
+      }
+      let parsed;
+      try {
+        parsed = JSON.parse(stdout);
+      } catch {
+        reject(new Error("Could not read that playlist."));
+        return;
+      }
+      const entries = parsed && Array.isArray(parsed.entries) ? parsed.entries : [];
+      const items = [];
+      for (const entry of entries) {
+        if (!entry || typeof entry !== "object") continue;
+        if (typeof entry.id !== "string" || !entry.id) continue;
+        const title = typeof entry.title === "string" && entry.title ? entry.title : null;
+        items.push({ id: entry.id, title });
+        if (items.length >= 50) break;
+      }
+      resolve(items);
+    });
+  });
+}
+
 function mediaPathForJob(job) {
-  return path.join(job.workdir, `audio.${job.format}`);
+  return path.join(job.workdir, `media.${job.format}`);
 }
 
 function publicJob(job) {
@@ -277,8 +344,10 @@ function sendJson(res, status, body) {
 }
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const QUALITY_VALUES = new Set(["320", "256", "192", "128"]);
-const FORMAT_VALUES = new Set(["mp3", "wav"]);
+const AUDIO_QUALITY_VALUES = new Set(["320", "256", "192", "128"]);
+const VIDEO_QUALITY_VALUES = new Set(["1080", "720", "480"]);
+const FORMAT_VALUES = new Set(["mp3", "wav", "mp4"]);
+const CONTENT_TYPE_BY_FORMAT = { mp3: "audio/mpeg", wav: "audio/wav", mp4: "video/mp4" };
 
 async function handleRequest(req, res) {
   const url = new URL(req.url, `http://localhost:${PORT}`);
@@ -320,12 +389,18 @@ async function handleRequest(req, res) {
       sendJson(res, 400, { error: "Provide a YouTube URL and a quality of 320, 256, 192, or 128." });
       return;
     }
-    if (typeof quality !== "string" || !QUALITY_VALUES.has(quality)) {
-      sendJson(res, 400, { error: "Provide a YouTube URL and a quality of 320, 256, 192, or 128." });
+    if (typeof format !== "string" || !FORMAT_VALUES.has(format)) {
+      sendJson(res, 400, { error: "Provide a YouTube URL and a valid format (mp3, wav, or mp4)." });
       return;
     }
-    if (typeof format !== "string" || !FORMAT_VALUES.has(format)) {
-      sendJson(res, 400, { error: "Provide a YouTube URL and a quality of 320, 256, 192, or 128." });
+    const validQualities = format === "mp4" ? VIDEO_QUALITY_VALUES : AUDIO_QUALITY_VALUES;
+    if (typeof quality !== "string" || !validQualities.has(quality)) {
+      sendJson(res, 400, {
+        error:
+          format === "mp4"
+            ? "Provide a YouTube URL and a resolution of 1080, 720, or 480."
+            : "Provide a YouTube URL and a quality of 320, 256, 192, or 128.",
+      });
       return;
     }
     if (typeof trimSilence !== "boolean") {
@@ -361,6 +436,46 @@ async function handleRequest(req, res) {
     return;
   }
 
+  if (method === "POST" && pathname === "/playlist") {
+    let body;
+    try {
+      body = await readJsonBody(req, MAX_BODY_BYTES);
+    } catch (error) {
+      if (error instanceof BodyTooLargeError) {
+        sendJson(res, 413, { error: "Request body too large." });
+        return;
+      }
+      sendJson(res, 400, { error: "Invalid request body." });
+      return;
+    }
+
+    if (!body || typeof body !== "object") {
+      sendJson(res, 400, { error: "Invalid request body." });
+      return;
+    }
+
+    const { url: rawUrl } = body;
+    if (typeof rawUrl !== "string" || rawUrl.length === 0 || rawUrl.length > 2048) {
+      sendJson(res, 400, { error: "Provide a YouTube playlist URL." });
+      return;
+    }
+
+    const canonicalPlaylistUrl = validatePlaylistUrl(rawUrl);
+    if (!canonicalPlaylistUrl) {
+      sendJson(res, 400, { error: "Paste a YouTube playlist link." });
+      return;
+    }
+
+    try {
+      const items = await enumeratePlaylist(canonicalPlaylistUrl);
+      sendJson(res, 200, { items });
+    } catch (error) {
+      console.error("Failed to enumerate playlist:", error instanceof Error ? error.message : error);
+      sendJson(res, 502, { error: "Could not read that playlist." });
+    }
+    return;
+  }
+
   const jobMatch = pathname.match(/^\/job\/([^/]+)(?:\/(file))?$/);
   if (method === "GET" && jobMatch) {
     const [, jobId, sub] = jobMatch;
@@ -388,7 +503,7 @@ async function handleRequest(req, res) {
         return;
       }
       res.writeHead(200, {
-        "Content-Type": job.format === "wav" ? "audio/wav" : "audio/mpeg",
+        "Content-Type": CONTENT_TYPE_BY_FORMAT[job.format] || "application/octet-stream",
         "Content-Length": String(stat.size),
         "Content-Disposition": contentDisposition(job.title, job.format),
         "Cache-Control": "no-store",

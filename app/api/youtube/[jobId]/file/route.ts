@@ -10,6 +10,12 @@ import { backendForJob } from "@/lib/server/backends";
 
 export const maxDuration = 60;
 
+const CONTENT_TYPE_BY_FORMAT: Record<string, string> = {
+  mp3: "audio/mpeg",
+  wav: "audio/wav",
+  mp4: "video/mp4",
+};
+
 function contentDisposition(title: string | null, sourceLabel: string, ext: string): string {
   const fallback = sourceLabel ? `tuner-${sourceLabel}.${ext}` : `tuner-download.${ext}`;
   const base = (title || "").replace(/[^\w\s.-]/g, "").replace(/\s+/g, " ").trim().slice(0, 120);
@@ -76,7 +82,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ job
   const stream = Readable.toWeb(createReadStream(filePath)) as ReadableStream;
   return new Response(stream, {
     headers: {
-      "Content-Type": job.format === "wav" ? "audio/wav" : "audio/mpeg",
+      "Content-Type": CONTENT_TYPE_BY_FORMAT[job.format] || "application/octet-stream",
       "Content-Length": String(size),
       "Content-Disposition": contentDisposition(job.title, job.videoId, job.format),
       "Cache-Control": "no-store",

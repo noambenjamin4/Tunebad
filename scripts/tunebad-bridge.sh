@@ -14,6 +14,9 @@ export HOST=127.0.0.1
 export API_KEY="***REMOVED-ROTATED-KEY***"
 export YTDLP_PATH="$DIR/bin/yt-dlp"
 export FFMPEG_PATH="$DIR/node_modules/ffmpeg-static/ffmpeg"
+# Higher job-start ceiling so a 50-track playlist batch doesn't self-throttle
+# (the public Render fallback keeps the conservative default).
+export YTDLP_MAX_JOB_STARTS=60
 
 cd "$DIR" || exit 1
 

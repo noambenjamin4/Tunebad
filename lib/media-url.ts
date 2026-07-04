@@ -3,6 +3,7 @@
 // of other platforms that yt-dlp can pull audio from.
 const YOUTUBE_HOSTS = new Set(["youtube.com", "www.youtube.com", "m.youtube.com", "music.youtube.com", "youtu.be"]);
 const VIDEO_ID_PATTERN = /^[A-Za-z0-9_-]{11}$/;
+const PLAYLIST_ID_PATTERN = /^[A-Za-z0-9_-]{10,64}$/;
 
 const SOUNDCLOUD_HOSTS = new Set(["soundcloud.com", "on.soundcloud.com", "m.soundcloud.com"]);
 const VIMEO_HOSTS = new Set(["vimeo.com", "www.vimeo.com", "player.vimeo.com"]);
@@ -33,6 +34,27 @@ export function canonicalYouTubeUrl(input: string): { url: string; videoId: stri
 
   if (!videoId || !VIDEO_ID_PATTERN.test(videoId)) return null;
   return { url: `https://www.youtube.com/watch?v=${videoId}`, videoId };
+}
+
+// Extracts and validates a YouTube playlist id (from either
+// youtube.com/playlist?list=<id> or youtube.com/watch?...&list=<id>), then
+// rebuilds a canonical playlist URL so raw user input never reaches the
+// yt-dlp child process. Deliberately strict even though the caller also runs
+// yt-dlp with shell:false + `--`.
+export function validatePlaylistUrl(input: string): string | null {
+  let parsed: URL;
+  try {
+    parsed = new URL(input.trim());
+  } catch {
+    return null;
+  }
+  if (parsed.protocol !== "https:" && parsed.protocol !== "http:") return null;
+  if (!YOUTUBE_HOSTS.has(parsed.hostname.toLowerCase())) return null;
+
+  const listId = parsed.searchParams.get("list");
+  if (!listId || !PLAYLIST_ID_PATTERN.test(listId)) return null;
+
+  return `https://www.youtube.com/playlist?list=${listId}`;
 }
 
 // Validates and canonicalizes a URL across all supported platforms. Raw user

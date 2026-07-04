@@ -125,6 +125,8 @@ const en = {
   "converter.qualityLegend": "Output Quality",
   "converter.formatHintSmallFile": "small file",
   "converter.formatHintSampleExact": "sample-exact",
+  "converter.formatHintVideo": "Video file",
+  "converter.resolutionLegend": "Resolution",
   "converter.autoTrim": "Auto-trim silent intro",
   "converter.working": "Converting...",
   "converter.convertTo": "Convert to {format}",
@@ -153,6 +155,7 @@ const en = {
   "ytDownloader.linkError": "Paste a YouTube, SoundCloud, Bandcamp, Vimeo, Mixcloud, or Audiomack link.",
   "ytDownloader.idleTitle": "Idle",
   "ytDownloader.idleMessage": "Paste a link and pick a quality to create an MP3.",
+  "ytDownloader.videoNote": "MP4 keeps the full video.",
   "ytDownloader.startingTitle": "Starting",
   "ytDownloader.startingMessage": "Contacting source...",
   "ytDownloader.converting": "Converting",
@@ -178,6 +181,11 @@ const en = {
   "ytDownloader.couldNotStart": "Could not start the download.",
   "ytDownloader.couldNotFetchAudio": "Could not fetch the finished audio.",
   "ytDownloader.homeOffline": "Couldn't reach the downloader right now. Open TuneBad on your Mac, or try again in a moment.",
+  "ytDownloader.playlistDetected": "Playlist detected",
+  "ytDownloader.playlistTracks": "{count} tracks",
+  "ytDownloader.playlistConvertAll": "Convert whole playlist",
+  "ytDownloader.playlistItemFailed": "Failed",
+  "ytDownloader.playlistProgress": "{done} / {total} done",
 
   // Setup notice
   "setup.title": "One-time setup needed",
