@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: tuner-remote-downloader
+    runtime: docker
+    dockerfilePath: server/Dockerfile
+    dockerContext: server
+    plan: free
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: API_KEY
+        sync: false
+      - key: YTDLP_COOKIES
+        sync: false

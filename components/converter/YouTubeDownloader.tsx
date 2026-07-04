@@ -90,6 +90,13 @@ export function YouTubeDownloader() {
   const analysisReady = Boolean(autoAnalyzedName) && lastAnalysis?.name === autoAnalyzedName;
   const analysisPending = Boolean(autoAnalyzedName) && !analysisReady;
 
+  // Wakes a sleeping Render free-tier remote downloader as soon as this card
+  // is visible, so it's warm by the time the user submits a link. No-op if
+  // no remote downloader is configured (the route returns 204 either way).
+  useEffect(() => {
+    void fetch("/api/youtube/wake").catch(() => {});
+  }, []);
+
   return (
     <article className="utility-card converter-card">
       <div className="tool-heading">

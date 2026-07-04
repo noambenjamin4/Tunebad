@@ -3,9 +3,13 @@ import { startJobSchema, validateMediaUrl } from "@/lib/server/validate";
 import { allowJobStart } from "@/lib/server/rate-limit";
 import { runningJobCount } from "@/lib/server/jobs";
 import { SetupError, startYouTubeJob } from "@/lib/server/ytdlp";
-import { isDownloaderEnabled } from "@/lib/runtime";
+import { isDownloaderEnabled, remoteDownloaderUrl, remoteDownloaderKey } from "@/lib/runtime";
 
 const MAX_CONCURRENT_JOBS = 2;
+
+// Render's free instances spin down when idle and cold-start in ~50s; Fluid
+// Compute is enabled on the Vercel project so 60s is allowed on Hobby.
+export const maxDuration = 60;
 
 export async function POST(request: NextRequest) {
   if (!isDownloaderEnabled) return new NextResponse("Not found", { status: 404 });
@@ -33,6 +37,28 @@ export async function POST(request: NextRequest) {
       { error: "Paste a YouTube, SoundCloud, Bandcamp, Vimeo, Mixcloud, or Audiomack link." },
       { status: 400 },
     );
+  }
+
+  // Never forward unvalidated input — the body reaching the remote server is
+  // the zod-parsed and canonicalized data, not the raw request body.
+  if (remoteDownloaderUrl && remoteDownloaderKey) {
+    try {
+      const upstream = await fetch(`${remoteDownloaderUrl}/job`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-api-key": remoteDownloaderKey },
+        body: JSON.stringify({
+          url: canonical.url,
+          quality: parsed.data.quality,
+          format: parsed.data.format,
+          trimSilence: parsed.data.trimSilence,
+        }),
+      });
+      const payload = await upstream.json().catch(() => ({}));
+      return NextResponse.json(payload, { status: upstream.status });
+    } catch (error) {
+      console.error("Failed to reach remote downloader", error);
+      return NextResponse.json({ error: "Could not start the download." }, { status: 502 });
+    }
   }
 
   if (runningJobCount() >= MAX_CONCURRENT_JOBS) {

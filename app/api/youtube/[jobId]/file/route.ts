@@ -5,7 +5,9 @@ import { NextResponse } from "next/server";
 import { jobs } from "@/lib/server/jobs";
 import { mediaPathForJob } from "@/lib/server/ytdlp";
 import { UUID_PATTERN } from "@/lib/server/validate";
-import { isDownloaderEnabled } from "@/lib/runtime";
+import { isDownloaderEnabled, remoteDownloaderUrl, remoteDownloaderKey } from "@/lib/runtime";
+
+export const maxDuration = 60;
 
 function contentDisposition(title: string | null, sourceLabel: string, ext: string): string {
   const fallback = sourceLabel ? `tuner-${sourceLabel}.${ext}` : `tuner-download.${ext}`;
@@ -22,6 +24,34 @@ export async function GET(_request: Request, { params }: { params: Promise<{ job
   if (!UUID_PATTERN.test(jobId)) {
     return NextResponse.json({ error: "Invalid job id." }, { status: 400 });
   }
+
+  if (remoteDownloaderUrl && remoteDownloaderKey) {
+    let upstream: Response;
+    try {
+      upstream = await fetch(`${remoteDownloaderUrl}/job/${jobId}/file`, {
+        headers: { "x-api-key": remoteDownloaderKey },
+      });
+    } catch (error) {
+      console.error("Failed to reach remote downloader", error);
+      return NextResponse.json({ error: "Could not reach the download server." }, { status: 502 });
+    }
+
+    if (!upstream.ok || !upstream.body) {
+      const payload = await upstream.json().catch(() => ({ error: "That download isn't finished." }));
+      return NextResponse.json(payload, { status: upstream.status || 502 });
+    }
+
+    const headers: Record<string, string> = { "Cache-Control": "no-store" };
+    const contentType = upstream.headers.get("content-type");
+    const contentDispositionHeader = upstream.headers.get("content-disposition");
+    const contentLength = upstream.headers.get("content-length");
+    if (contentType) headers["Content-Type"] = contentType;
+    if (contentDispositionHeader) headers["Content-Disposition"] = contentDispositionHeader;
+    if (contentLength) headers["Content-Length"] = contentLength;
+
+    return new Response(upstream.body, { headers });
+  }
+
   const job = jobs.get(jobId);
   if (!job) {
     return NextResponse.json({ error: "Job not found. It may have expired." }, { status: 404 });
