@@ -1,17 +1,75 @@
-create table if not exists public.analysis_results (
+-- Tuner: analysis history persistence (OPTIONAL Supabase backend)
+--
+-- Setup:
+--   1. Create a Supabase project at https://supabase.com/dashboard.
+--   2. Open the SQL editor for your project and run this entire file once.
+--   3. Go to Authentication -> Providers and enable "Anonymous sign-ins".
+--      (Tuner signs users in anonymously so each browser gets its own
+--      private history; no email/password/OAuth is required.)
+--   4. Copy your Project URL and anon public key into NEXT_PUBLIC_SUPABASE_URL
+--      and NEXT_PUBLIC_SUPABASE_ANON_KEY (locally in .env.local, or in your
+--      Vercel project's Environment Variables).
+--
+-- If these env vars are left unset, Tuner falls back to localStorage-only
+-- history and none of this is required.
+
+create table if not exists public.analysis_history (
   id uuid primary key default gen_random_uuid(),
-  file_name text not null,
-  duration_seconds numeric,
-  bpm numeric,
-  musical_key text,
-  scale text,
-  confidence integer,
-  sample_rate integer,
-  channels integer,
+  user_id uuid not null default auth.uid(),
+  name text not null,
+  bpm real,
+  key text,
+  camelot text,
+  duration real,
   created_at timestamptz not null default now()
 );
 
-create index if not exists analysis_results_created_at_idx
-  on public.analysis_results (created_at desc);
+alter table public.analysis_history enable row level security;
 
-alter table public.analysis_results enable row level security;
+drop policy if exists "analysis_history_select_own" on public.analysis_history;
+create policy "analysis_history_select_own"
+  on public.analysis_history
+  for select
+  to authenticated
+  using (auth.uid() = user_id);
+
+drop policy if exists "analysis_history_insert_own" on public.analysis_history;
+create policy "analysis_history_insert_own"
+  on public.analysis_history
+  for insert
+  to authenticated
+  with check (auth.uid() = user_id);
+
+drop policy if exists "analysis_history_delete_own" on public.analysis_history;
+create policy "analysis_history_delete_own"
+  on public.analysis_history
+  for delete
+  to authenticated
+  using (auth.uid() = user_id);
+
+-- Keep only the 50 most recent rows per user; trims older rows after each insert.
+create or replace function public.cap_history_rows()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  delete from public.analysis_history
+  where user_id = new.user_id
+    and id not in (
+      select id
+      from public.analysis_history
+      where user_id = new.user_id
+      order by created_at desc
+      limit 50
+    );
+  return new;
+end;
+$$;
+
+drop trigger if exists cap_history_rows on public.analysis_history;
+create trigger cap_history_rows
+  after insert on public.analysis_history
+  for each row
+  execute function public.cap_history_rows();

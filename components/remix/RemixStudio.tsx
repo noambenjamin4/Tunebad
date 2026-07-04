@@ -1,0 +1,535 @@
+"use client";
+
+import { useCallback, useEffect, useMemo, useRef, useState, type DragEvent } from "react";
+import { decodeAudioFile, getAudioContextClass } from "@/lib/audio/decode";
+import { encodeMp3FromChannels, encodeWavFromChannels, downloadBlob } from "@/lib/audio/mp3-encoder";
+import { FormatPicker, type OutputFormat } from "@/components/converter/QualityPicker";
+import { useI18n } from "@/lib/i18n";
+import { CheckRow } from "@/components/ui/CheckRow";
+import { SeekableWaveform } from "@/components/ui/SeekableWaveform";
+import { computeWaveformBars } from "@/lib/audio/waveform";
+import { SlowedIcon } from "@/components/ui/icons";
+import {
+  buildRemixGraph,
+  coupledSemitones,
+  renderRemix,
+  timeStretch,
+  type RemixGraph,
+  type RemixParams,
+} from "@/lib/audio/remix";
+
+type Status = { title: string; message: string; tone: "neutral" | "success" | "warning" };
+
+type Preset = { name: string; speed: number; reverb: number; bassBoostDb: number };
+
+const PRESETS: Preset[] = [
+  { name: "Slowed + Reverb", speed: 0.8, reverb: 40, bassBoostDb: 0 },
+  { name: "Nightcore", speed: 1.25, reverb: 0, bassBoostDb: 0 },
+];
+
+const DEBOUNCE_MS = 400;
+
+function matchesPreset(preset: Preset, speed: number, reverb: number, bassBoostDb: number): boolean {
+  return Math.abs(preset.speed - speed) < 0.005 && preset.reverb === reverb && preset.bassBoostDb === bassBoostDb;
+}
+
+function formatSemitones(value: number): string {
+  const rounded = Math.round(value * 10) / 10;
+  const sign = rounded > 0 ? "+" : rounded < 0 ? "−" : "";
+  return `${sign}${Math.abs(rounded).toFixed(1)} st`;
+}
+
+export function RemixStudio() {
+  const { t } = useI18n();
+  const [file, setFile] = useState<File | null>(null);
+  const [dragging, setDragging] = useState(false);
+  const [buffer, setBuffer] = useState<AudioBuffer | null>(null);
+
+  const [speed, setSpeed] = useState(0.8);
+  const [reverb, setReverb] = useState(40);
+  const [bassBoostDb, setBassBoostDb] = useState(0);
+  const [lockPitch, setLockPitch] = useState(false);
+  const [pitchSemitones, setPitchSemitones] = useState(0);
+
+  const [playing, setPlaying] = useState(false);
+  const [reprocessing, setReprocessing] = useState(false);
+  const [working, setWorking] = useState(false);
+  const [format, setFormat] = useState<OutputFormat>("mp3");
+  // null = idle; the idle status is derived at render time so it follows the active locale.
+  const [status, setStatus] = useState<Status | null>(null);
+
+  // Scrubbing: an AudioBufferSourceNode can't be seeked in place once
+  // started, so "seeking" means stopping the current source and starting a
+  // new one at `startOffset`. `elapsed` drives the playhead and is advanced
+  // via rAF while playing (computed from wall-clock time since playback
+  // started, not from any node property).
+  const [startOffset, setStartOffset] = useState(0);
+  const [elapsed, setElapsed] = useState(0);
+
+  const inputRef = useRef<HTMLInputElement>(null);
+  const previewUrlRef = useRef<string | null>(null);
+  const audioCtxRef = useRef<AudioContext | null>(null);
+  const graphRef = useRef<RemixGraph | null>(null);
+  const stretchedBufferRef = useRef<AudioBuffer | null>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const stretchTokenRef = useRef(0);
+  const startedAtRef = useRef(0);
+  const startOffsetRef = useRef(0);
+  const rafRef = useRef<number | null>(null);
+
+  const params: RemixParams = useMemo(
+    () => ({ speed, reverb, bassBoostDb, lockPitch, pitchSemitones }),
+    [speed, reverb, bassBoostDb, lockPitch, pitchSemitones],
+  );
+
+  const bars = useMemo(() => (buffer ? computeWaveformBars(buffer) : []), [buffer]);
+  const bufferDuration = buffer?.duration ?? 0;
+
+  // Kept in sync with the live `speed`/`lockPitch` state so the rAF elapsed-
+  // time loop (whose tick closure is created once per startAt call) always
+  // reads the current value instead of a stale one.
+  const speedMultiplierRef = useRef(1);
+
+  const stopRafLoop = useCallback(() => {
+    if (rafRef.current !== null) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
+  }, []);
+
+  const stopPreview = useCallback(() => {
+    stopRafLoop();
+    if (graphRef.current) {
+      try {
+        graphRef.current.source.stop();
+      } catch {
+        // already stopped
+      }
+      graphRef.current = null;
+    }
+    if (audioCtxRef.current) {
+      void audioCtxRef.current.close();
+      audioCtxRef.current = null;
+    }
+    setPlaying(false);
+  }, [stopRafLoop]);
+
+  const resetAll = useCallback(() => {
+    stopPreview();
+    if (previewUrlRef.current) {
+      URL.revokeObjectURL(previewUrlRef.current);
+      previewUrlRef.current = null;
+    }
+    stretchedBufferRef.current = null;
+    setFile(null);
+    setBuffer(null);
+    setSpeed(0.8);
+    setReverb(40);
+    setBassBoostDb(0);
+    setLockPitch(false);
+    setPitchSemitones(0);
+    setStatus(null);
+    setStartOffset(0);
+    setElapsed(0);
+    startOffsetRef.current = 0;
+  }, [stopPreview]);
+
+  // Cleanup on unmount.
+  useEffect(() => stopPreview, [stopPreview]);
+
+  const handleFiles = useCallback(
+    async (files: File[]) => {
+      const audioFile = files.find((f) => f.type.startsWith("audio/") || /\.(mp3|wav|m4a|ogg|flac)$/i.test(f.name));
+      if (!audioFile) return;
+
+      stopPreview();
+      if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
+      stretchedBufferRef.current = null;
+
+      setFile(audioFile);
+      setBuffer(null);
+      setStartOffset(0);
+      setElapsed(0);
+      startOffsetRef.current = 0;
+      setStatus({ title: t("remix.decodingTitle"), message: t("remix.decodingMessage", { name: audioFile.name }), tone: "neutral" });
+
+      try {
+        const { buffer: decoded } = await decodeAudioFile(audioFile);
+        previewUrlRef.current = URL.createObjectURL(audioFile);
+        setBuffer(decoded);
+        setStatus({
+          title: t("remix.readyTitle"),
+          message: t("remix.readyMessage", { name: audioFile.name }),
+          tone: "success",
+        });
+      } catch (error) {
+        console.error(error);
+        setStatus({
+          title: t("remix.decodeFailedTitle"),
+          message: error instanceof Error ? error.message : t("remix.decodeFailedFallback"),
+          tone: "warning",
+        });
+      }
+    },
+    [stopPreview, t],
+  );
+
+  const handleDrag = (event: DragEvent, active: boolean) => {
+    event.preventDefault();
+    setDragging(active);
+  };
+
+  // Keeps a stretched copy of the buffer ready whenever lock-pitch (or its
+  // semitone/speed inputs) change. Debounced so slider drags don't trigger a
+  // stretch per frame.
+  useEffect(() => {
+    if (!buffer) return;
+    if (!lockPitch) {
+      stretchedBufferRef.current = null;
+      return;
+    }
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    const token = ++stretchTokenRef.current;
+    setReprocessing(true);
+    debounceRef.current = setTimeout(() => {
+      void (async () => {
+        try {
+          const stretched = await timeStretch(buffer, speed, pitchSemitones);
+          if (stretchTokenRef.current !== token) return;
+          stretchedBufferRef.current = stretched;
+        } catch (error) {
+          console.error("Time-stretch failed", error);
+        } finally {
+          if (stretchTokenRef.current === token) setReprocessing(false);
+        }
+      })();
+    }, DEBOUNCE_MS);
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [buffer, lockPitch, speed, pitchSemitones]);
+
+  // Live-update the playing graph's params in place (no restart needed) for
+  // everything except lock-pitch changes, which require a re-stretched buffer.
+  useEffect(() => {
+    const graph = graphRef.current;
+    const ctx = audioCtxRef.current;
+    if (!graph || !ctx) return;
+    if (!lockPitch) graph.source.playbackRate.value = speed;
+    const amount = reverb / 100;
+    graph.wetGain.gain.value = 0.65 * amount;
+    graph.dryGain.gain.value = 1 - 0.35 * amount;
+    graph.bassFilter.gain.value = bassBoostDb;
+
+    // Speed affects how fast `elapsed` should advance. Re-base the rAF
+    // loop's reference point to "now" at the new speed so the playhead
+    // doesn't jump when the speed slider moves mid-playback.
+    const nextMultiplier = lockPitch ? 1 : speed;
+    if (speedMultiplierRef.current !== nextMultiplier) {
+      startOffsetRef.current = elapsed;
+      startedAtRef.current = ctx.currentTime;
+      speedMultiplierRef.current = nextMultiplier;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [speed, reverb, bassBoostDb, lockPitch]);
+
+  const applyPreset = (preset: Preset) => {
+    setSpeed(preset.speed);
+    setReverb(preset.reverb);
+    setBassBoostDb(preset.bassBoostDb);
+  };
+
+  // Starts (or restarts) playback at `offset` seconds into the source
+  // buffer. Used both by the transport button and by seeking while playing
+  // (seeking an AudioBufferSourceNode requires tearing down and rebuilding
+  // the graph — it has no in-place seek).
+  const startAt = useCallback(
+    (offset: number) => {
+      if (!buffer) return;
+      const AudioContextClass = getAudioContextClass();
+      if (!AudioContextClass) {
+        setStatus({ title: t("remix.playbackUnavailableTitle"), message: t("remix.playbackUnavailableMessage"), tone: "warning" });
+        return;
+      }
+
+      const playBuffer = lockPitch ? stretchedBufferRef.current ?? buffer : buffer;
+      const ctx = new AudioContextClass();
+      const graph = buildRemixGraph(ctx, playBuffer, params, offset);
+      graph.source.onended = () => {
+        if (graphRef.current === graph) {
+          graphRef.current = null;
+          stopRafLoop();
+          setPlaying(false);
+          setStartOffset(0);
+          setElapsed(0);
+          startOffsetRef.current = 0;
+        }
+      };
+      audioCtxRef.current = ctx;
+      graphRef.current = graph;
+      startedAtRef.current = ctx.currentTime;
+      startOffsetRef.current = offset;
+      speedMultiplierRef.current = lockPitch ? 1 : speed;
+      setPlaying(true);
+
+      const bufferDurationValue = playBuffer.duration;
+      const tick = () => {
+        const activeCtx = audioCtxRef.current;
+        if (!activeCtx || graphRef.current !== graph) return;
+        const nextElapsed = Math.min(
+          bufferDurationValue,
+          startOffsetRef.current + (activeCtx.currentTime - startedAtRef.current) * speedMultiplierRef.current,
+        );
+        setElapsed(nextElapsed);
+        rafRef.current = requestAnimationFrame(tick);
+      };
+      stopRafLoop();
+      rafRef.current = requestAnimationFrame(tick);
+    },
+    [buffer, lockPitch, params, speed, stopRafLoop, t],
+  );
+
+  const togglePlayback = async () => {
+    if (playing) {
+      stopPreview();
+      return;
+    }
+    if (!buffer) return;
+    startAt(startOffset);
+  };
+
+  const handleSeek = useCallback(
+    (seconds: number) => {
+      const clamped = Math.min(Math.max(0, seconds), bufferDuration);
+      setStartOffset(clamped);
+      setElapsed(clamped);
+      startOffsetRef.current = clamped;
+      if (playing) {
+        stopPreview();
+        startAt(clamped);
+      }
+    },
+    [bufferDuration, playing, startAt, stopPreview],
+  );
+
+  const onExport = async () => {
+    if (!file || !buffer) return;
+    setWorking(true);
+    setStatus({ title: t("remix.rendering"), message: t("remix.renderingMessage"), tone: "neutral" });
+    try {
+      let renderSource = buffer;
+      let renderParams = params;
+      if (lockPitch) {
+        setStatus({ title: t("remix.reprocessingTitle"), message: t("remix.reprocessingForLockMessage"), tone: "neutral" });
+        renderSource = await timeStretch(buffer, speed, pitchSemitones);
+        renderParams = { ...params, speed: 1 };
+      }
+
+      setStatus({ title: t("remix.rendering"), message: t("remix.renderingMessage"), tone: "neutral" });
+      const { channels, sampleRate } = await renderRemix(renderSource, renderParams);
+
+      const baseName = file.name.replace(/\.[^.]+$/, "") || "tuner-audio";
+      const suffix = speed > 1 ? "nightcore" : speed < 1 ? "slowed-reverb" : "remix";
+
+      let blob: Blob;
+      if (format === "wav") {
+        blob = encodeWavFromChannels(channels, sampleRate);
+        downloadBlob(blob, `${baseName}-${suffix}.wav`);
+      } else {
+        blob = await encodeMp3FromChannels(channels, sampleRate, 320);
+        downloadBlob(blob, `${baseName}-${suffix}.mp3`);
+      }
+
+      setStatus({ title: t("remix.doneTitle"), message: t("remix.doneMessage", { format: format.toUpperCase() }), tone: "success" });
+    } catch (error) {
+      console.error(error);
+      setStatus({
+        title: t("remix.exportFailedTitle"),
+        message: error instanceof Error ? error.message : t("remix.exportFailedFallback"),
+        tone: "warning",
+      });
+    } finally {
+      setWorking(false);
+    }
+  };
+
+  const pitchReadout = lockPitch
+    ? t("remix.pitchLocked")
+    : t("remix.pitchReadout", { value: formatSemitones(coupledSemitones(speed)) });
+  const activePreset = PRESETS.find((preset) => matchesPreset(preset, speed, reverb, bassBoostDb));
+
+  return (
+    <article className="panel hero-tool remix-panel">
+      <div className="panel-heading hero-heading">
+        <div>
+          <h1>
+            <SlowedIcon className="panel-title-icon" />
+            {t("remix.title")}
+          </h1>
+          <p>{t("remix.subtitle")}</p>
+        </div>
+        {file && (
+          <div className="hero-actions">
+            <button className="text-button danger-pill" type="button" onClick={resetAll}>
+              {t("common.reset")}
+            </button>
+          </div>
+        )}
+      </div>
+
+      {!file && (
+        <div
+          className={`drop-zone${dragging ? " dragging" : ""}`}
+          onDragEnter={(event) => handleDrag(event, true)}
+          onDragOver={(event) => handleDrag(event, true)}
+          onDragLeave={(event) => handleDrag(event, false)}
+          onDrop={(event) => {
+            handleDrag(event, false);
+            void handleFiles([...event.dataTransfer.files]);
+          }}
+        >
+          <input
+            ref={inputRef}
+            type="file"
+            accept="audio/*,.mp3,.wav,.m4a,.ogg,.flac"
+            onChange={(event) => {
+              void handleFiles([...(event.target.files || [])]);
+              event.target.value = "";
+            }}
+          />
+          <div className="upload-copy">
+            <small>{t("common.dropAudioFile")}</small>
+            <span>{t("remix.dropHint")}</span>
+            <button className="secondary-button" type="button" onClick={() => inputRef.current?.click()}>
+              {t("common.browseFiles")}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {file && buffer && (
+        <article className="utility-card remix-controls-card">
+          <div className="tool-heading">
+            <div>
+              <h3>{file.name}</h3>
+              <p>{t("remix.controlsSubtitle")}</p>
+            </div>
+          </div>
+
+          <div className="wave-card remix-wave-card">
+            <SeekableWaveform
+              bars={bars}
+              currentTime={elapsed}
+              duration={bufferDuration}
+              playing={playing}
+              onTogglePlay={() => void togglePlayback()}
+              onSeek={handleSeek}
+              disabled={reprocessing}
+            />
+          </div>
+
+          <div className="remix-presets">
+            {PRESETS.map((preset) => (
+              <button
+                key={preset.name}
+                type="button"
+                className={`quality-button${activePreset?.name === preset.name ? " active" : ""}`}
+                onClick={() => applyPreset(preset)}
+              >
+                {/* Preset names ("Slowed + Reverb", "Nightcore") are proper nouns — never translated. */}
+                <strong>{preset.name}</strong>
+                <span>{t("remix.presetSummary", { speed: preset.speed, reverb: preset.reverb })}</span>
+              </button>
+            ))}
+          </div>
+
+          <div className="remix-slider-row">
+            <label className="field-label" htmlFor="speedSlider">
+              {t("remix.speed", { x: speed.toFixed(2) })}
+            </label>
+            <input
+              id="speedSlider"
+              className="remix-slider"
+              type="range"
+              min={0.5}
+              max={1.5}
+              step={0.01}
+              value={speed}
+              onChange={(event) => setSpeed(Number.parseFloat(event.target.value))}
+            />
+            <span className="remix-pitch-readout">{pitchReadout}</span>
+          </div>
+
+          <div className="remix-slider-row">
+            <label className="field-label" htmlFor="reverbSlider">
+              {t("remix.reverb", { x: reverb })}
+            </label>
+            <input
+              id="reverbSlider"
+              className="remix-slider"
+              type="range"
+              min={0}
+              max={100}
+              step={1}
+              value={reverb}
+              onChange={(event) => setReverb(Number.parseInt(event.target.value, 10))}
+            />
+          </div>
+
+          <div className="remix-slider-row">
+            <label className="field-label" htmlFor="bassSlider">
+              {t("remix.bassBoost", { sign: bassBoostDb > 0 ? "+" : "", db: bassBoostDb })}
+            </label>
+            <input
+              id="bassSlider"
+              className="remix-slider"
+              type="range"
+              min={0}
+              max={12}
+              step={0.5}
+              value={bassBoostDb}
+              onChange={(event) => setBassBoostDb(Number.parseFloat(event.target.value))}
+            />
+          </div>
+
+          <div className="remix-pitch-row">
+            <CheckRow checked={lockPitch} onChange={setLockPitch}>
+              {t("remix.lockPitch")}
+            </CheckRow>
+            <input
+              className="remix-slider"
+              type="range"
+              min={-12}
+              max={12}
+              step={1}
+              value={pitchSemitones}
+              disabled={!lockPitch}
+              onChange={(event) => setPitchSemitones(Number.parseInt(event.target.value, 10))}
+              aria-label={t("remix.pitchSemitoneShift")}
+            />
+            <span className="remix-pitch-readout">{formatSemitones(pitchSemitones)}</span>
+          </div>
+
+          {reprocessing && (
+            <div className="status-box" role="status">
+              <strong>{t("remix.reprocessingTitle")}</strong>
+              <span>{t("remix.reprocessingMessage")}</span>
+            </div>
+          )}
+
+          <div className="remix-export-row">
+            <FormatPicker value={format} onChange={setFormat} />
+            <button className="convert-button" type="button" onClick={() => void onExport()} disabled={working || reprocessing}>
+              {working ? t("remix.rendering") : t("remix.exportFormat", { format: format.toUpperCase() })}
+            </button>
+          </div>
+        </article>
+      )}
+
+      <div className="status-box" data-tone={(status ?? { tone: "neutral" }).tone} role="status">
+        <strong>{status ? status.title : t("remix.uploadTitle")}</strong>
+        <span>{status ? status.message : t("remix.uploadMessage")}</span>
+      </div>
+    </article>
+  );
+}
