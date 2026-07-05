@@ -1,5 +1,5 @@
 import { TunebadApp } from "@/components/TunebadApp";
 
 export default function Home() {
-  return <TunebadApp />;
+  return <TunebadApp landing />;
 }

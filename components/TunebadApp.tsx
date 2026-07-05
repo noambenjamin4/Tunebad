@@ -7,6 +7,7 @@ import { useHistory } from "@/hooks/useHistory";
 import { I18nProvider } from "@/lib/i18n";
 import { TopBar } from "./layout/TopBar";
 import { Footer } from "./layout/Footer";
+import { LandingSeo } from "./layout/LandingSeo";
 import { AnalyzerPanel } from "./analysis/AnalyzerPanel";
 import { BpmToolsView } from "./bpm/BpmToolsView";
 import { DelayCalculator } from "./delay/DelayCalculator";
@@ -67,7 +68,10 @@ export function useTunebad(): TunebadContextValue {
   return value;
 }
 
-export function TunebadApp({ initialView = "analysis" }: { initialView?: ViewName } = {}) {
+export function TunebadApp({
+  initialView = "analysis",
+  landing = false,
+}: { initialView?: ViewName; landing?: boolean } = {}) {
   const [view, setView] = useState<ViewName>(initialView);
   // Gates the first-load cascade (header + active panel's children fading up
   // in a stagger). True only for the very first paint; flipped off shortly
@@ -236,6 +240,7 @@ export function TunebadApp({ initialView = "analysis" }: { initialView?: ViewNam
               <HistoryPanel />
             </section>
           </main>
+          {landing && <LandingSeo />}
           <Footer />
         </div>
       </I18nProvider>
