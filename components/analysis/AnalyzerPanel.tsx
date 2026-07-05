@@ -7,6 +7,7 @@ import { exportResultsCsv } from "@/lib/csv";
 import { useI18n } from "@/lib/i18n";
 import { DropZone } from "./DropZone";
 import { LinkAnalyze, type LinkPreviewMeta } from "./LinkAnalyze";
+import { RecentStrip } from "./RecentStrip";
 import { WaveformPreview } from "./WaveformPreview";
 import { FileMetaPill } from "./FileMetaPill";
 import { AnalysisSummary } from "./AnalysisSummary";
@@ -146,6 +147,8 @@ export function AnalyzerPanel() {
         failedNames={failedNames}
         oversizedNames={oversizedNames}
       />
+
+      <RecentStrip />
     </article>
   );
 }

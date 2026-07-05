@@ -24,8 +24,6 @@ type CachedRow = {
   camelot: string | null;
 };
 
-type RecentRow = Pick<CachedRow, "id" | "title" | "artist" | "bpm" | "key" | "camelot">;
-
 type Phase = "idle" | "looking" | "fetching";
 
 /** Make a link result shareable: /key-bpm-finder?song=<id>. */
@@ -39,13 +37,12 @@ export function LinkAnalyze({ onPreviewFile }: { onPreviewFile: (file: File, met
   const [phase, setPhase] = useState<Phase>("idle");
   const [cached, setCached] = useState<CachedRow | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [recent, setRecent] = useState<RecentRow[]>([]);
   const [copied, setCopied] = useState(false);
 
   const busy = phase !== "idle";
 
   // Shared permalinks (?song=<id>) resolve straight from the community cache;
-  // the recent strip shows what the community analyzed last.
+  // picks from the RecentStrip arrive via a custom event.
   useEffect(() => {
     const song = new URLSearchParams(window.location.search).get("song");
     if (song) {
@@ -56,12 +53,12 @@ export function LinkAnalyze({ onPreviewFile }: { onPreviewFile: (file: File, met
         })
         .catch(() => {});
     }
-    void fetch("/api/recent")
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data: { recent?: RecentRow[] } | null) => {
-        if (data?.recent?.length) setRecent(data.recent);
-      })
-      .catch(() => {});
+    const onShowSong = (e: Event) => {
+      const row = (e as CustomEvent<CachedRow>).detail;
+      if (row?.id) setCached({ ...row, bpm_alt: row.bpm_alt ?? null });
+    };
+    window.addEventListener("tunebad:show-song", onShowSong);
+    return () => window.removeEventListener("tunebad:show-song", onShowSong);
   }, []);
 
   const copyPermalink = (id: string) => {
@@ -176,33 +173,6 @@ export function LinkAnalyze({ onPreviewFile }: { onPreviewFile: (file: File, met
         </div>
       ) : null}
 
-      {recent.length > 0 ? (
-        <div className="link-analyze-recent">
-          <span className="link-analyze-label">{t("analysis.recentTitle")}</span>
-          <ul>
-            {recent.map((r) => (
-              <li key={r.id}>
-                <button
-                  type="button"
-                  className="link-analyze-recent-pill"
-                  onClick={() => {
-                    setCached({ ...r, bpm_alt: null });
-                    window.history.replaceState(null, "", `/key-bpm-finder?song=${encodeURIComponent(r.id)}`);
-                  }}
-                >
-                  <span className="link-analyze-recent-title">
-                    {r.artist ? `${r.artist} - ` : ""}
-                    {r.title}
-                  </span>
-                  <span className="link-analyze-recent-stats">
-                    {Math.round(r.bpm)} BPM · {r.key}
-                  </span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
     </div>
   );
 }
