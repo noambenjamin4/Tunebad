@@ -23,21 +23,44 @@ const baloo2 = Baloo_2({
   variable: "--font-display",
 });
 
+const TITLE = "Key & BPM of Any Song — Free Music Analyzer | TuneBad";
 const DESCRIPTION =
-  "In-browser music toolkit: analyze BPM, key, and loudness, apply pitch and slowed + reverb, and download from YouTube, Spotify, and more as MP3, WAV, or MP4.";
+  "Find the key, BPM, and loudness of any song, free in your browser. Analyze an audio file or paste a YouTube, Spotify, or SoundCloud link, then convert to MP3, WAV, or MP4.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://tunebad.com"),
+  applicationName: "TuneBad",
   title: {
-    default: "TuneBad | Music Utility",
+    default: TITLE,
     template: "%s | TuneBad",
   },
   description: DESCRIPTION,
+  keywords: [
+    "key finder",
+    "BPM finder",
+    "song key finder",
+    "BPM counter",
+    "tempo finder",
+    "key and BPM finder",
+    "music analyzer",
+    "loudness meter",
+    "LUFS meter",
+    "pitch shifter",
+    "slowed and reverb",
+    "YouTube to MP3",
+    "Spotify to MP3",
+    "audio converter",
+    "TuneBad",
+  ],
+  authors: [{ name: "TuneBad" }],
+  creator: "TuneBad",
+  publisher: "TuneBad",
+  category: "music",
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "TuneBad | Music Utility",
+    title: TITLE,
     description: DESCRIPTION,
     url: "/",
     siteName: "TuneBad",
@@ -46,7 +69,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "TuneBad | Music Utility",
+    title: TITLE,
     description: DESCRIPTION,
   },
   icons: {
@@ -77,6 +100,50 @@ export const viewport: Viewport = {
   ],
 };
 
+// Static structured data (JSON-LD) so Google understands what TuneBad is and can
+// show rich results. Content is a fixed string literal — no user input — so this
+// is not an HTML-injection sink.
+const STRUCTURED_DATA = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://tunebad.com/#website",
+      url: "https://tunebad.com/",
+      name: "TuneBad",
+      description: DESCRIPTION,
+      publisher: { "@id": "https://tunebad.com/#org" },
+      inLanguage: "en",
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://tunebad.com/#org",
+      name: "TuneBad",
+      url: "https://tunebad.com/",
+      logo: "https://tunebad.com/icon-512.png",
+    },
+    {
+      "@type": ["WebApplication", "SoftwareApplication"],
+      "@id": "https://tunebad.com/#app",
+      name: "TuneBad",
+      url: "https://tunebad.com/",
+      applicationCategory: "MultimediaApplication",
+      operatingSystem: "Any (web browser)",
+      browserRequirements: "Requires JavaScript. Requires HTML5.",
+      description: DESCRIPTION,
+      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+      featureList: [
+        "Key & BPM finder for any song",
+        "Loudness (LUFS) meter",
+        "Pitch shifter",
+        "Delay & reverb time calculator",
+        "Slowed + reverb studio",
+        "YouTube, Spotify & SoundCloud to MP3, WAV or MP4 converter",
+      ],
+    },
+  ],
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -84,6 +151,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(STRUCTURED_DATA) }}
+        />
+      </head>
       <body className={`${geistSans.variable} ${geistMono.variable} ${baloo2.variable}`}>{children}</body>
     </html>
   );
