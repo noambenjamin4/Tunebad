@@ -17,6 +17,8 @@
   --fill: #111111;
   --fill-ink: #ffffff;
   --hover: rgba(0, 0, 0, 0.04);
+  --scroll-thumb: rgba(0, 0, 0, 0.2);
+  --scroll-thumb-hover: rgba(0, 0, 0, 0.34);
 
   --radius-pill: 9999px;
   --radius-card: 24px;
@@ -35,6 +37,8 @@
     --fill: #f2f2f2;
     --fill-ink: #0a0a0a;
     --hover: rgba(255, 255, 255, 0.06);
+    --scroll-thumb: rgba(255, 255, 255, 0.2);
+    --scroll-thumb-hover: rgba(255, 255, 255, 0.34);
   }
 }
 
@@ -43,6 +47,32 @@
    --------------------------------------------------------------------- */
 * {
   box-sizing: border-box;
+}
+
+/* Thin, themed scrollbars: a subtle line that matches light/dark instead of
+   the chunky OS default. Firefox + modern Chrome read scrollbar-width/color;
+   WebKit uses the pseudo-elements below. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scroll-thumb) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scroll-thumb);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scroll-thumb-hover);
 }
 
 html {
