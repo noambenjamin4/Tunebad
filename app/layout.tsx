@@ -81,6 +81,9 @@ export const metadata: Metadata = {
     // fallbacks for the few contexts that don't render SVG favicons.
     icon: [
       { url: "/icon.svg", type: "image/svg+xml" },
+      // 48px is the size multiple Google Search wants for result favicons;
+      // app/favicon.ico (48px PNG-in-ICO) covers the /favicon.ico fallback.
+      { url: "/icon-48.png", sizes: "48x48", type: "image/png" },
       { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
       { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
     ],
@@ -117,6 +120,9 @@ const STRUCTURED_DATA = {
       "@id": `${SITE_URL}/#website`,
       url: `${SITE_URL}/`,
       name: "TuneBad",
+      // Google's site-name docs recommend a name + alternateName pair; the
+      // domain form is the natural alternate.
+      alternateName: "tunebad.com",
       description: DESCRIPTION,
       publisher: { "@id": `${SITE_URL}/#org` },
       inLanguage: "en",
