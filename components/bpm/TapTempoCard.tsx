@@ -1,11 +1,11 @@
 "use client";
 
-import { useTuner } from "../TunerApp";
+import { useTunebad } from "../TunebadApp";
 import { useTapTempo } from "@/hooks/useTapTempo";
 import { useI18n } from "@/lib/i18n";
 
 export function TapTempoCard() {
-  const { setMainBpm } = useTuner();
+  const { setMainBpm } = useTunebad();
   const { bpm, count, tap, reset } = useTapTempo(5000);
   const { t } = useI18n();
 

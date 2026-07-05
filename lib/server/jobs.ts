@@ -20,23 +20,23 @@ export interface YtJob {
 const JOB_TTL_MS = 30 * 60 * 1000;
 const SWEEP_INTERVAL_MS = 10 * 60 * 1000;
 
-export const YT_BASE_DIR = path.join(os.tmpdir(), "tuner-yt");
+export const YT_BASE_DIR = path.join(os.tmpdir(), "tunebad-yt");
 
 // Stored on globalThis so dev-mode HMR re-evaluation doesn't orphan jobs.
 const globalStore = globalThis as unknown as {
-  __tunerJobs?: Map<string, YtJob>;
-  __tunerJobsSweeper?: ReturnType<typeof setInterval>;
+  __tunebadJobs?: Map<string, YtJob>;
+  __tunebadJobsSweeper?: ReturnType<typeof setInterval>;
 };
 
-export const jobs = (globalStore.__tunerJobs ??= new Map<string, YtJob>());
+export const jobs = (globalStore.__tunebadJobs ??= new Map<string, YtJob>());
 
 // No boot-time wipe of YT_BASE_DIR: dev-mode module re-evaluation makes any
 // "run once per process" cleanup racy against live jobs. Finished workdirs are
 // removed by the TTL sweep below, and the OS owns os.tmpdir() leftovers.
 
-if (!globalStore.__tunerJobsSweeper) {
-  globalStore.__tunerJobsSweeper = setInterval(() => void sweepJobs(), SWEEP_INTERVAL_MS);
-  globalStore.__tunerJobsSweeper.unref?.();
+if (!globalStore.__tunebadJobsSweeper) {
+  globalStore.__tunebadJobsSweeper = setInterval(() => void sweepJobs(), SWEEP_INTERVAL_MS);
+  globalStore.__tunebadJobsSweeper.unref?.();
 }
 
 export async function sweepJobs(): Promise<void> {

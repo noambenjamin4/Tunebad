@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useTuner } from "../TunerApp";
+import { useTunebad } from "../TunebadApp";
 import { useTapTempo } from "@/hooks/useTapTempo";
 import { delayDivisions } from "@/lib/audio/delay";
 import { clampBpm } from "@/lib/format";
@@ -25,7 +25,7 @@ const PRESET_NAME_KEYS: Record<string, DictKey> = {
 };
 
 export function DelayCalculator() {
-  const { delayBpm, setDelayBpmInput, setMainBpm, lastAnalyzedBpm } = useTuner();
+  const { delayBpm, setDelayBpmInput, setMainBpm, lastAnalyzedBpm } = useTunebad();
   const { tap } = useTapTempo(4500);
   const { t } = useI18n();
   const [copied, setCopied] = useState(false);

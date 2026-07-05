@@ -1,5 +1,5 @@
-import { TunerApp } from "@/components/TunerApp";
+import { TunebadApp } from "@/components/TunebadApp";
 
 export default function Home() {
-  return <TunerApp />;
+  return <TunebadApp />;
 }

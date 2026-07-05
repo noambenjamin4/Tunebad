@@ -324,7 +324,7 @@ export function RemixStudio() {
       setStatus({ title: t("remix.rendering"), message: t("remix.renderingMessage"), tone: "neutral" });
       const { channels, sampleRate } = await renderRemix(renderSource, renderParams);
 
-      const baseName = file.name.replace(/\.[^.]+$/, "") || "tuner-audio";
+      const baseName = file.name.replace(/\.[^.]+$/, "") || "tunebad-audio";
       const suffix = speed > 1 ? "nightcore" : speed < 1 ? "slowed-reverb" : "remix";
 
       let blob: Blob;

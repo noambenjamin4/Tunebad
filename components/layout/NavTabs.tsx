@@ -1,6 +1,6 @@
 "use client";
 
-import { useTuner, type ViewName } from "../TunerApp";
+import { useTunebad, type ViewName } from "../TunebadApp";
 import { useI18n } from "@/lib/i18n";
 import type { DictKey } from "@/lib/i18n/locales/en";
 
@@ -16,7 +16,7 @@ const TABS: { page: ViewName; labelKey: DictKey }[] = [
 ];
 
 export function NavTabs({ onNavigate }: { onNavigate?: () => void }) {
-  const { view, showView } = useTuner();
+  const { view, showView } = useTunebad();
   const { t } = useI18n();
   return (
     <>

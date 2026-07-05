@@ -23,7 +23,7 @@ export function exportResultsCsv(results: AnalysisResult[]): void {
   const url = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
   const link = document.createElement("a");
   link.href = url;
-  link.download = "tuner-analysis-results.csv";
+  link.download = "tunebad-analysis-results.csv";
   link.click();
   URL.revokeObjectURL(url);
 }

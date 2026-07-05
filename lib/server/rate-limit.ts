@@ -11,8 +11,8 @@ const MAX_STARTS = 80;
 const MAX_ENUMERATE = 20;
 
 type Buckets = { starts: Map<string, number[]>; enumerate: Map<string, number[]> };
-const globalStore = globalThis as unknown as { __tunerRateLimit?: Buckets };
-const buckets = (globalStore.__tunerRateLimit ??= { starts: new Map(), enumerate: new Map() });
+const globalStore = globalThis as unknown as { __tunebadRateLimit?: Buckets };
+const buckets = (globalStore.__tunebadRateLimit ??= { starts: new Map(), enumerate: new Map() });
 
 function allow(store: Map<string, number[]>, key: string, max: number): boolean {
   const now = Date.now();
@@ -36,9 +36,9 @@ export function allowEnumerate(key: string): boolean {
 
 // Periodic sweep so buckets don't grow unbounded under many distinct IPs. Only
 // arm one interval per process (dev HMR re-imports this module).
-const timerHost = globalStore as unknown as { __tunerRateLimitSweep?: boolean };
-if (!timerHost.__tunerRateLimitSweep) {
-  timerHost.__tunerRateLimitSweep = true;
+const timerHost = globalStore as unknown as { __tunebadRateLimitSweep?: boolean };
+if (!timerHost.__tunebadRateLimitSweep) {
+  timerHost.__tunebadRateLimitSweep = true;
   const timer = setInterval(() => {
     const now = Date.now();
     for (const store of [buckets.starts, buckets.enumerate]) {

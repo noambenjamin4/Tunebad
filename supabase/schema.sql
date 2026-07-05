@@ -1,16 +1,16 @@
--- Tuner: analysis history persistence (OPTIONAL Supabase backend)
+-- TuneBad: analysis history persistence (OPTIONAL Supabase backend)
 --
 -- Setup:
 --   1. Create a Supabase project at https://supabase.com/dashboard.
 --   2. Open the SQL editor for your project and run this entire file once.
 --   3. Go to Authentication -> Providers and enable "Anonymous sign-ins".
---      (Tuner signs users in anonymously so each browser gets its own
+--      (TuneBad signs users in anonymously so each browser gets its own
 --      private history; no email/password/OAuth is required.)
 --   4. Copy your Project URL and anon public key into NEXT_PUBLIC_SUPABASE_URL
 --      and NEXT_PUBLIC_SUPABASE_ANON_KEY (locally in .env.local, or in your
 --      Vercel project's Environment Variables).
 --
--- If these env vars are left unset, Tuner falls back to localStorage-only
+-- If these env vars are left unset, TuneBad falls back to localStorage-only
 -- history and none of this is required.
 
 create table if not exists public.analysis_history (

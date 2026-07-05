@@ -2,12 +2,12 @@
 
 import { useEffect, useRef, useState } from "react";
 import { NavTabs } from "./NavTabs";
-import { useTuner } from "../TunerApp";
+import { useTunebad } from "../TunebadApp";
 import { LanguageMenu } from "@/components/ui/LanguageMenu";
 import { NOW_PLAYING_EVENT, isAnyAudioPlaying, type NowPlayingDetail } from "@/lib/audio/now-playing";
 
 export function TopBar() {
-  const { showView } = useTuner();
+  const { showView } = useTunebad();
   const [menuOpen, setMenuOpen] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [scrolled, setScrolled] = useState(false);

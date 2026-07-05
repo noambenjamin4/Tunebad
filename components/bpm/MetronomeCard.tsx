@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useTuner } from "../TunerApp";
+import { useTunebad } from "../TunebadApp";
 import { useMetronome } from "@/hooks/useMetronome";
 import { clampBpm } from "@/lib/format";
 import { useI18n } from "@/lib/i18n";
@@ -10,7 +10,7 @@ import { setNowPlaying } from "@/lib/audio/now-playing";
 const NOW_PLAYING_SOURCE = "metronome";
 
 export function MetronomeCard() {
-  const { metronomeBpm, setMetronomeBpm, delayBpm } = useTuner();
+  const { metronomeBpm, setMetronomeBpm, delayBpm } = useTunebad();
   const { running, beat, lightOn, toggle } = useMetronome(metronomeBpm);
   const { t } = useI18n();
 

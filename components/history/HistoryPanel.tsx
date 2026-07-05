@@ -1,11 +1,11 @@
 "use client";
 
-import { useTuner } from "../TunerApp";
+import { useTunebad } from "../TunebadApp";
 import { useI18n } from "@/lib/i18n";
 import { HistoryIcon } from "@/components/ui/icons";
 
 export function HistoryPanel() {
-  const { history, clearHistory, setMainBpm, showView } = useTuner();
+  const { history, clearHistory, setMainBpm, showView } = useTunebad();
   const { t } = useI18n();
 
   return (

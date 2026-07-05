@@ -36,11 +36,11 @@ export function LocalFileConverter() {
       tone: "neutral",
     });
     try {
-      const baseName = file.name.replace(/\.[^.]+$/, "") || "tuner-audio";
+      const baseName = file.name.replace(/\.[^.]+$/, "") || "tunebad-audio";
       let blob: Blob;
       if (format === "wav") {
         blob = await convertFileToWav(file, trimSilence);
-        downloadBlob(blob, `${baseName}-tuner.wav`);
+        downloadBlob(blob, `${baseName}-tunebad.wav`);
       } else {
         const kbps = Number.parseInt(quality, 10);
         blob = await convertFileToMp3(file, kbps, trimSilence);

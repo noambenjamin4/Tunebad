@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect } from "react";
-import { useTuner } from "../TunerApp";
+import { useTunebad } from "../TunebadApp";
 import { useAnalyzer } from "@/hooks/useAnalyzer";
 import { exportResultsCsv } from "@/lib/csv";
 import { useI18n } from "@/lib/i18n";
@@ -15,7 +15,7 @@ import { WaveformIcon } from "@/components/ui/icons";
 
 export function AnalyzerPanel() {
   const { showView, setMainBpm, setLastAnalyzedBpm, setLastAnalysis, rememberResult, pendingFiles, clearPendingFiles } =
-    useTuner();
+    useTunebad();
   const { t } = useI18n();
 
   const onResult = useCallback(

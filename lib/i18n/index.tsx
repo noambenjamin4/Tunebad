@@ -34,7 +34,8 @@ const LOCALE_LOADERS: Record<Exclude<LocaleCode, "en">, () => Promise<{ default:
   zh: () => import("./locales/zh"),
 };
 
-const STORAGE_KEY = "tuner-locale";
+const STORAGE_KEY = "tunebad-locale";
+const LEGACY_STORAGE_KEY = "tuner-locale";
 
 function isLocaleCode(value: string): value is LocaleCode {
   return LOCALES.some((locale) => locale.code === value);
@@ -43,7 +44,7 @@ function isLocaleCode(value: string): value is LocaleCode {
 function detectLocale(): LocaleCode {
   if (typeof window === "undefined") return "en";
   try {
-    const stored = window.localStorage.getItem(STORAGE_KEY);
+    const stored = window.localStorage.getItem(STORAGE_KEY) ?? window.localStorage.getItem(LEGACY_STORAGE_KEY);
     if (stored && isLocaleCode(stored)) return stored;
   } catch {
     // localStorage unavailable (e.g. private mode) — fall through to navigator detection

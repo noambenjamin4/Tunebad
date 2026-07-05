@@ -20,7 +20,7 @@ export type ViewName = "analysis" | "bpm" | "delay" | "pitch" | "converter" | "l
 
 const VIEW_NAMES: ViewName[] = ["analysis", "bpm", "delay", "pitch", "converter", "loudness", "remix", "history"];
 
-interface TunerContextValue {
+interface TunebadContextValue {
   view: ViewName;
   showView(view: ViewName): void;
   delayBpm: string;
@@ -40,15 +40,15 @@ interface TunerContextValue {
   clearPendingFiles(): void;
 }
 
-const TunerContext = createContext<TunerContextValue | null>(null);
+const TunebadContext = createContext<TunebadContextValue | null>(null);
 
-export function useTuner(): TunerContextValue {
-  const value = useContext(TunerContext);
-  if (!value) throw new Error("useTuner must be used inside <TunerApp>");
+export function useTunebad(): TunebadContextValue {
+  const value = useContext(TunebadContext);
+  if (!value) throw new Error("useTunebad must be used inside <TunebadApp>");
   return value;
 }
 
-export function TunerApp() {
+export function TunebadApp() {
   const [view, setView] = useState<ViewName>("analysis");
   // Gates the first-load cascade (header + active panel's children fading up
   // in a stagger). True only for the very first paint; flipped off shortly
@@ -107,7 +107,7 @@ export function TunerApp() {
 
   const clearPendingFiles = useCallback(() => setPendingFiles(null), []);
 
-  const contextValue = useMemo<TunerContextValue>(
+  const contextValue = useMemo<TunebadContextValue>(
     () => ({
       view,
       showView,
@@ -147,7 +147,7 @@ export function TunerApp() {
   );
 
   return (
-    <TunerContext.Provider value={contextValue}>
+    <TunebadContext.Provider value={contextValue}>
       <I18nProvider>
         <div className={`app-shell${initialReveal ? " initial-reveal" : ""}`}>
           <div className="grain-overlay" aria-hidden="true" />
@@ -213,6 +213,6 @@ export function TunerApp() {
           <Footer />
         </div>
       </I18nProvider>
-    </TunerContext.Provider>
+    </TunebadContext.Provider>
   );
 }

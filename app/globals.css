@@ -593,7 +593,7 @@ main {
 
 /* First-load cascade: header, then the active panel's major direct
    children, fade up in a short stagger. Scoped to `.initial-reveal`, a class
-   TunerApp applies only for ~1.2s after first mount — CSS animations
+   TunebadApp applies only for ~1.2s after first mount — CSS animations
    re-trigger any time a `.page-view` flips `display: none` -> `block`, so
    without this gate the stagger would replay on every tab switch, not just
    the first load. */

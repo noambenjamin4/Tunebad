@@ -5,7 +5,8 @@ import type { AnalysisResult, HistoryEntry } from "@/types/analysis";
 import { formatTime } from "@/lib/format";
 import { getSupabase, isSupabaseConfigured } from "@/lib/supabase/client";
 
-const HISTORY_STORAGE_KEY = "tuner-analysis-history";
+const HISTORY_STORAGE_KEY = "tunebad-analysis-history";
+const LEGACY_HISTORY_KEY = "tuner-analysis-history";
 const HISTORY_LIMIT = 24;
 const REMOTE_LIMIT = 50;
 const TABLE = "analysis_history";
@@ -21,7 +22,17 @@ interface RemoteRow {
 
 function readLocal(): HistoryEntry[] {
   try {
-    const stored = JSON.parse(localStorage.getItem(HISTORY_STORAGE_KEY) || "[]");
+    let raw = localStorage.getItem(HISTORY_STORAGE_KEY);
+    // One-time migration from the pre-rename key so existing history carries over.
+    if (raw == null) {
+      const legacy = localStorage.getItem(LEGACY_HISTORY_KEY);
+      if (legacy != null) {
+        localStorage.setItem(HISTORY_STORAGE_KEY, legacy);
+        localStorage.removeItem(LEGACY_HISTORY_KEY);
+        raw = legacy;
+      }
+    }
+    const stored = JSON.parse(raw || "[]");
     return Array.isArray(stored) ? stored : [];
   } catch {
     return [];

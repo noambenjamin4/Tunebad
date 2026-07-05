@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { useTuner } from "../TunerApp";
+import { useTunebad } from "../TunebadApp";
 import { useYouTubeJob } from "@/hooks/useYouTubeJob";
 import { validateMediaUrl, validateSpotifyUrl } from "@/lib/media-url";
 import { delayDivisions } from "@/lib/audio/delay";
@@ -30,7 +30,7 @@ const DEFAULT_AUDIO_QUALITY: Quality = "320";
 const DEFAULT_VIDEO_RESOLUTION: Resolution = "1080";
 
 export function YouTubeDownloader() {
-  const { requestAnalysis, lastAnalysis, showView } = useTuner();
+  const { requestAnalysis, lastAnalysis, showView } = useTunebad();
   const { state, start, reset } = useYouTubeJob();
   const { t } = useI18n();
   const [url, setUrl] = useState("");
@@ -182,7 +182,7 @@ export function YouTubeDownloader() {
       const blob = await response.blob();
       const type = blob.type || (format === "wav" ? "audio/wav" : "audio/mpeg");
       const ext = type === "audio/wav" ? "wav" : "mp3";
-      const name = `${title || "tuner-download"}.${ext}`;
+      const name = `${title || "tunebad-download"}.${ext}`;
       const file = new File([blob], name, { type });
       requestAnalysis([file], { switchView: false });
       return name;
@@ -202,7 +202,7 @@ export function YouTubeDownloader() {
       const blob = await response.blob();
       const type = blob.type || (format === "wav" ? "audio/wav" : "audio/mpeg");
       const ext = type === "audio/wav" ? "wav" : "mp3";
-      const file = new File([blob], `${title || "tuner-download"}.${ext}`, { type });
+      const file = new File([blob], `${title || "tunebad-download"}.${ext}`, { type });
       requestAnalysis([file]);
     } catch (error) {
       console.error(error);

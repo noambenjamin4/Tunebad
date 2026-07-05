@@ -290,7 +290,7 @@ function publicJob(job) {
 }
 
 function contentDisposition(title, ext) {
-  const fallback = `tuner-download.${ext}`;
+  const fallback = `tunebad-download.${ext}`;
   const base = (title || "").replace(/[^\w\s.-]/g, "").replace(/\s+/g, " ").trim().slice(0, 120);
   const asciiName = base ? `${base}.${ext}` : fallback;
   const utf8Name = encodeURIComponent(title ? `${title.slice(0, 120)}.${ext}` : fallback);
