@@ -2433,6 +2433,14 @@ tbody tr:last-child td {
   width: 100%;
 }
 
+/* Buttons hug their label instead of stretching to the grid track (a
+   full-width pill with a centered label reads as an empty button on wide
+   screens). */
+.cutter-slider-row .secondary-button {
+  justify-self: start;
+  width: fit-content;
+}
+
 .cutter-times {
   display: flex;
   flex-wrap: wrap;
@@ -2440,6 +2448,15 @@ tbody tr:last-child td {
   font-family: var(--font-mono);
   font-size: 13px;
   color: var(--muted);
+}
+
+/* Breathing room between the fade toggles (they rendered flush together). */
+.cutter-fade-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 32px;
+  padding-top: 4px;
 }
 
 .cutter-export-row {
