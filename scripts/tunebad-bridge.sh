@@ -10,6 +10,10 @@
 # the bridge publishes its current URL to the site's Edge Config store — the
 # proxy always routes to wherever this Mac currently is (self-healing).
 #
+# A watchdog actively health-checks the public tunnel URL every ~25s and
+# rotates the tunnel (fresh URL + republish) if it goes unreachable — even if
+# the cloudflared process is still alive but its tunnel silently broke.
+#
 # Managed by launchd (com.tunebad.bridge): starts at login, restarts on crash.
 set -u
 
@@ -67,9 +71,17 @@ trap cleanup TERM INT
 # Wait for the server to answer before opening the tunnel.
 for _ in {1..60}; do curl -s -o /dev/null "http://127.0.0.1:$PORT/health" && break; sleep 0.5; done
 
+# Watchdog cadence: poll the PUBLIC tunnel URL end-to-end, and rotate the
+# tunnel after this many consecutive failures. cloudflared quick-tunnels can
+# silently break while the process stays alive, so waiting for the process to
+# exit isn't enough — we actively health-check the real URL the website uses.
+WATCH_INTERVAL=25
+FAIL_THRESHOLD=2
+
 LAST_URL=""
-# (Re)start cloudflared, capture its URL, publish it; if cloudflared dies,
-# loop restarts it and republishes the new URL.
+# (Re)start cloudflared, capture its URL, publish it, then watch it. If the
+# tunnel dies (process exit OR silent break), rotate to a fresh one and
+# republish. Outer loop ends only when the download server itself stops.
 while kill -0 "$SERVER_PID" 2>/dev/null; do
   : > /tmp/tunebad-cf.log
   "$DIR/bin/cloudflared" tunnel --url "http://127.0.0.1:$PORT" --no-autoupdate >> /tmp/tunebad-cf.log 2>&1 &
@@ -80,10 +92,44 @@ while kill -0 "$SERVER_PID" 2>/dev/null; do
     URL=$(grep -o 'https://[a-z0-9-]*\.trycloudflare\.com' /tmp/tunebad-cf.log | head -1)
     [ -n "$URL" ] && break
   done
-  if [ -n "$URL" ] && [ "$URL" != "$LAST_URL" ]; then
+
+  if [ -z "$URL" ]; then
+    # cloudflared never produced a URL; kill it and retry from the top.
+    echo "$(date '+%H:%M:%S') tunnel produced no URL — retrying" >> "$LOG"
+    kill "$TUNNEL_PID" 2>/dev/null
+    wait "$TUNNEL_PID" 2>/dev/null
+    sleep 5
+    continue
+  fi
+
+  if [ "$URL" != "$LAST_URL" ]; then
     publish_url "$URL"
     LAST_URL="$URL"
   fi
-  # Wait for cloudflared to exit (crash / network change), then loop to restart.
+
+  # Active watchdog: curl the public URL end-to-end. Break (to rotate the
+  # tunnel) if cloudflared exits or the URL is unreachable FAIL_THRESHOLD times
+  # in a row. A single blip is tolerated so we don't churn on transient hiccups.
+  fails=0
+  while kill -0 "$SERVER_PID" 2>/dev/null; do
+    sleep "$WATCH_INTERVAL"
+    if ! kill -0 "$TUNNEL_PID" 2>/dev/null; then
+      echo "$(date '+%H:%M:%S') cloudflared exited — restarting tunnel" >> "$LOG"
+      break
+    fi
+    if curl -s -o /dev/null -m 8 "$URL/health"; then
+      fails=0
+    else
+      fails=$((fails + 1))
+      echo "$(date '+%H:%M:%S') tunnel health check failed ${fails}/${FAIL_THRESHOLD} ($URL)" >> "$LOG"
+      if [ "$fails" -ge "$FAIL_THRESHOLD" ]; then
+        echo "$(date '+%H:%M:%S') tunnel unreachable — rotating to a fresh one" >> "$LOG"
+        break
+      fi
+    fi
+  done
+
+  # Ensure the old cloudflared is gone before the outer loop starts a new one.
+  kill "$TUNNEL_PID" 2>/dev/null
   wait "$TUNNEL_PID" 2>/dev/null
 done
