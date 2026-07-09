@@ -16,7 +16,7 @@ export const alt = "Song key, BPM, and Camelot on TuneBad";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-const font = readFileSync(join(process.cwd(), "app/_og/Baloo2-Bold.ttf"));
+const font = readFileSync(join(process.cwd(), "app/_og/Display-Bold.ttf"));
 
 export default async function Image({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -46,7 +46,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
           justifyContent: "space-between",
           background: "#0a0a0a",
           padding: 72,
-          fontFamily: "Baloo",
+          fontFamily: "Display",
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
@@ -84,7 +84,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
     ),
     {
       ...size,
-      fonts: [{ name: "Baloo", data: await font, weight: 700, style: "normal" }],
+      fonts: [{ name: "Display", data: await font, weight: 700, style: "normal" }],
     },
   );
 }

@@ -36,7 +36,7 @@ const nextConfig = {
   // new URL(...import.meta.url) to a bare asset path that fetch() can't parse, so
   // the route reads the font from disk instead — which requires it to be traced.
   outputFileTracingIncludes: {
-    "/song/[slug]/opengraph-image": ["./app/_og/Baloo2-Bold.ttf"],
+    "/song/[slug]/opengraph-image": ["./app/_og/Display-Bold.ttf"],
   },
   serverExternalPackages: ["ffmpeg-static"],
   webpack: (config, { isServer }) => {
