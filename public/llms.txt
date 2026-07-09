@@ -6,7 +6,7 @@ Key facts:
 - Analysis (key, BPM, loudness) runs client-side on the essentia audio engine, the same engine used by leading key/BPM tools.
 - BPM results show both the detected tempo and its half/double (for example "150 or 75") because many songs can be read at either.
 - Results include musical key, Camelot code for harmonic mixing, energy, danceability, and loudness in dBFS.
-- The converter supports YouTube, Spotify, SoundCloud, Bandcamp, Vimeo, Mixcloud, and Audiomack, for personal use only.
+- The converter supports YouTube, Spotify, SoundCloud, TikTok, Instagram, X (Twitter), Bandcamp, Vimeo, Mixcloud, and Audiomack, for personal use only.
 - Available in 8 languages: English, French, Spanish, German, Portuguese, Italian, Japanese, and Chinese.
 
 ## Tools

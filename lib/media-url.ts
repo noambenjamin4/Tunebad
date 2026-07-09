@@ -9,6 +9,9 @@ const SOUNDCLOUD_HOSTS = new Set(["soundcloud.com", "on.soundcloud.com", "m.soun
 const VIMEO_HOSTS = new Set(["vimeo.com", "www.vimeo.com", "player.vimeo.com"]);
 const MIXCLOUD_HOSTS = new Set(["mixcloud.com", "www.mixcloud.com"]);
 const AUDIOMACK_HOSTS = new Set(["audiomack.com", "www.audiomack.com"]);
+const TIKTOK_HOSTS = new Set(["tiktok.com", "www.tiktok.com", "m.tiktok.com", "vm.tiktok.com", "vt.tiktok.com"]);
+const INSTAGRAM_HOSTS = new Set(["instagram.com", "www.instagram.com", "m.instagram.com"]);
+const TWITTER_HOSTS = new Set(["twitter.com", "www.twitter.com", "mobile.twitter.com", "x.com", "www.x.com"]);
 
 // Extracts and validates the 11-char video ID, then rebuilds a canonical URL so
 // raw user input never reaches the yt-dlp child process.
@@ -117,6 +120,9 @@ export function validateMediaUrl(input: string): { url: string; platform: string
   else if (VIMEO_HOSTS.has(host)) platform = "Vimeo";
   else if (MIXCLOUD_HOSTS.has(host)) platform = "Mixcloud";
   else if (AUDIOMACK_HOSTS.has(host)) platform = "Audiomack";
+  else if (TIKTOK_HOSTS.has(host)) platform = "TikTok";
+  else if (INSTAGRAM_HOSTS.has(host)) platform = "Instagram";
+  else if (TWITTER_HOSTS.has(host)) platform = "X";
 
   if (!platform) return null;
   if (parsed.pathname.length <= 1) return null; // reject bare homepages

@@ -148,12 +148,12 @@ const en = {
 
   // YouTube downloader
   "ytDownloader.title": "Paste a Link",
-  "ytDownloader.subtitle": "Works with YouTube, SoundCloud, Bandcamp, Vimeo, Mixcloud, Audiomack, and Spotify. For personal use only. The first conversion can take a minute to wake up.",
+  "ytDownloader.subtitle": "Works with YouTube, SoundCloud, TikTok, Instagram, X, Bandcamp, Vimeo, Mixcloud, Audiomack, and Spotify. For personal use only. The first conversion can take a minute to wake up.",
   "ytDownloader.trackUrl": "Track URL",
   "ytDownloader.urlPlaceholder": "Paste a YouTube or SoundCloud link...",
   "ytDownloader.autoAnalyze": "Auto-analyze after download",
   "ytDownloader.linkErrorTitle": "Check the link",
-  "ytDownloader.linkError": "Paste a YouTube, SoundCloud, Bandcamp, Vimeo, Mixcloud, or Audiomack link.",
+  "ytDownloader.linkError": "Paste a YouTube, SoundCloud, TikTok, Instagram, X, Bandcamp, Vimeo, Mixcloud, or Audiomack link.",
   "ytDownloader.idleTitle": "Idle",
   "ytDownloader.idleMessage": "Paste a link and pick a quality to create an MP3.",
   "ytDownloader.videoNote": "MP4 keeps the full video.",
