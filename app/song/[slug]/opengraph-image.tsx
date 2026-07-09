@@ -50,6 +50,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
+          {/* Vinyl mark drawn with nested divs (no font glyph, so no tofu box). */}
           <div
             style={{
               width: 54,
@@ -59,11 +60,9 @@ export default async function Image({ params }: { params: Promise<{ slug: string
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              color: "#0a0a0a",
-              fontSize: 26,
             }}
           >
-            ●
+            <div style={{ width: 16, height: 16, borderRadius: 999, background: "#0a0a0a" }} />
           </div>
           <div style={{ fontSize: 36, color: "#ffffff", letterSpacing: 2 }}>TUNEBAD</div>
         </div>
