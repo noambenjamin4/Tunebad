@@ -133,34 +133,72 @@ function decode(mp3) {
   });
 }
 
-// ---- Deezer charts (keyless) ----------------------------------------------
-const CHARTS = [
-  ["global", "https://api.deezer.com/chart/0/tracks?limit=100"],
-  ["pop", "https://api.deezer.com/chart/132/tracks?limit=100"],
-  ["rap", "https://api.deezer.com/chart/116/tracks?limit=100"],
-  ["dance", "https://api.deezer.com/chart/113/tracks?limit=100"],
-  ["rock", "https://api.deezer.com/chart/152/tracks?limit=50"],
-  ["rnb", "https://api.deezer.com/chart/165/tracks?limit=50"],
-  ["electro", "https://api.deezer.com/chart/106/tracks?limit=50"],
-  ["alt", "https://api.deezer.com/chart/85/tracks?limit=50"],
+// ---- Deezer sources (keyless) ----------------------------------------------
+// Every genre chart Deezer publishes (fetched dynamically), plus that genre's
+// editorial playlists, plus a few well-known "Top <country>" playlists. Invalid
+// playlist ids just log and skip, so the list is safe to extend.
+const COUNTRY_PLAYLISTS = [
+  ["top-worldwide", 3155776842],
+  ["top-usa", 1313621735],
+  ["top-france", 1109890291],
+  ["top-uk", 1111142221],
+  ["top-germany", 1111143121],
+  ["top-brazil", 1111141961],
+  ["top-canada", 1652248171],
+  ["top-spain", 1116190041],
+  ["top-italy", 1111142421],
+  ["top-mexico", 1111142361],
 ];
+
+function addTracks(byId, list, label) {
+  let added = 0;
+  for (const t of list || []) {
+    if (t.preview && t.id && t.title && !byId.has(t.id)) {
+      byId.set(t.id, { id: t.id, title: t.title, artist: t.artist?.name || "", preview: t.preview, duration: t.duration || null });
+      added += 1;
+    }
+  }
+  console.log(`${label}: +${added} (${byId.size} unique so far)`);
+}
+
+async function getJson(url) {
+  const r = await fetch(url, { signal: AbortSignal.timeout(10000) });
+  if (!r.ok) throw new Error(`http ${r.status}`);
+  return r.json();
+}
 
 async function collectTracks() {
   const byId = new Map();
-  for (const [name, url] of CHARTS) {
-    try {
-      const r = await fetch(url, { signal: AbortSignal.timeout(10000) });
-      const j = await r.json();
-      for (const t of j.data || []) {
-        if (t.preview && t.id && t.title && !byId.has(t.id)) {
-          byId.set(t.id, { id: t.id, title: t.title, artist: t.artist?.name || "", preview: t.preview, duration: t.duration || null });
-        }
-      }
-      console.log(`chart ${name}: ${j.data?.length ?? 0} tracks (${byId.size} unique so far)`);
-    } catch (e) {
-      console.log(`chart ${name}: failed (${e.message})`);
-    }
+
+  // 1. Every genre chart (24 genres x up to 100 tracks).
+  let genres = [{ id: 0, name: "All" }];
+  try {
+    const g = await getJson("https://api.deezer.com/genre");
+    genres = g.data ?? genres;
+  } catch (e) {
+    console.log(`genre list failed (${e.message}); using All only`);
   }
+  for (const g of genres) {
+    try {
+      const j = await getJson(`https://api.deezer.com/chart/${g.id}/tracks?limit=100`);
+      addTracks(byId, j.data, `chart ${g.name}`);
+    } catch (e) {
+      console.log(`chart ${g.name}: failed (${e.message})`);
+    }
+    await new Promise((r) => setTimeout(r, 250)); // stay polite, ~50 req/5s quota
+  }
+
+  // 2. Country/editorial Top playlists.
+  for (const [name, id] of COUNTRY_PLAYLISTS) {
+    try {
+      const j = await getJson(`https://api.deezer.com/playlist/${id}/tracks?limit=100`);
+      addTracks(byId, j.data, `playlist ${name}`);
+    } catch (e) {
+      console.log(`playlist ${name}: failed (${e.message})`);
+    }
+    await new Promise((r) => setTimeout(r, 250));
+  }
+
   return [...byId.values()];
 }
 
@@ -182,8 +220,26 @@ async function upsert(row) {
 // ---- main ------------------------------------------------------------------
 const es = await getEssentia();
 console.log("essentia ready:", !!es);
-const tracks = (await collectTracks()).slice(0, LIMIT);
-console.log(`\nseeding ${tracks.length} tracks...\n`);
+
+// Skip tracks already cached (re-runs shouldn't redownload analyzed previews).
+const existing = new Set();
+try {
+  for (let from = 0; ; from += 1000) {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/link_analysis?select=id&limit=1000&offset=${from}`, {
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+      signal: AbortSignal.timeout(10000),
+    });
+    const rows = await r.json();
+    for (const row of rows) existing.add(row.id);
+    if (rows.length < 1000) break;
+  }
+} catch {
+  // no pre-filter; ignore-duplicates still protects correctness
+}
+console.log(`already cached: ${existing.size}`);
+
+const tracks = (await collectTracks()).filter((t) => !existing.has(`dz:${t.id}`)).slice(0, LIMIT);
+console.log(`\nseeding ${tracks.length} new tracks...\n`);
 
 let ok = 0, fail = 0;
 for (const [i, t] of tracks.entries()) {

@@ -123,6 +123,36 @@ export async function readSongsByCamelot(
   }
 }
 
+/** Cached songs in one musical key — backs the /songs/key/<slug> hub pages. */
+export async function readSongsByKey(key: string, limit = 300): Promise<CachedAnalysis[]> {
+  if (!isLinkAnalysisConfigured) return [];
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/link_analysis?key=eq.${encodeURIComponent(key)}&order=created_at.desc&limit=${limit}`,
+      { headers: restHeaders(), signal: AbortSignal.timeout(FETCH_TIMEOUT_MS), next: { revalidate: 3600 } },
+    );
+    if (!res.ok) return [];
+    return (await res.json()) as CachedAnalysis[];
+  } catch {
+    return [];
+  }
+}
+
+/** Cached songs within a BPM window — backs the /songs/bpm/<n> hub pages. */
+export async function readSongsByBpmRange(min: number, max: number, limit = 300): Promise<CachedAnalysis[]> {
+  if (!isLinkAnalysisConfigured) return [];
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/link_analysis?bpm=gte.${min}&bpm=lte.${max}&order=created_at.desc&limit=${limit}`,
+      { headers: restHeaders(), signal: AbortSignal.timeout(FETCH_TIMEOUT_MS), next: { revalidate: 3600 } },
+    );
+    if (!res.ok) return [];
+    return (await res.json()) as CachedAnalysis[];
+  } catch {
+    return [];
+  }
+}
+
 /** All cached songs (slug + title + artist) for the sitemap and /songs index. */
 export async function readAllSongs(limit = 5000): Promise<CachedAnalysis[]> {
   if (!isLinkAnalysisConfigured) return [];

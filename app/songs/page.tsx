@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { readAllSongs } from "@/lib/server/link-analysis";
 import { SongBrowser } from "@/components/songs/SongBrowser";
+import { ALL_KEYS, keyToSlug } from "@/lib/audio/harmonic";
+import { camelot } from "@/lib/audio/constants";
 
 // Index of every analyzed song. Acts as the hub that links out to each
 // /song/<slug> page so crawlers can reach them all.
@@ -15,7 +17,24 @@ export const metadata: Metadata = {
 };
 
 export default async function SongsPage() {
-  const songs = await readAllSongs(2000);
+  const songs = await readAllSongs(5000);
+
+  // Crawlable browse links: keys that actually have songs, and the most
+  // common integer BPMs (the hub pages 404 below 3 songs, so mirror that).
+  const keyCounts = new Map<string, number>();
+  const bpmCounts = new Map<number, number>();
+  for (const s of songs) {
+    keyCounts.set(s.key, (keyCounts.get(s.key) ?? 0) + 1);
+    const b = Math.round(s.bpm);
+    for (let n = b - 2; n <= b + 2; n += 1) bpmCounts.set(n, (bpmCounts.get(n) ?? 0) + 1);
+  }
+  const keyHubs = ALL_KEYS.filter((k) => (keyCounts.get(k) ?? 0) > 0);
+  const bpmHubs = [...bpmCounts.entries()]
+    .filter(([bpm, count]) => bpm >= 40 && bpm <= 220 && count >= 3)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 16)
+    .map(([bpm]) => bpm)
+    .sort((a, b) => a - b);
 
   return (
     <div className="app-shell">
@@ -38,6 +57,37 @@ export default async function SongsPage() {
             The key, BPM, and Camelot code for {songs.length} songs, analyzed from official previews.
             Want a track that is not here? <Link href="/key-bpm-finder">Analyze it yourself</Link>.
           </p>
+
+          {keyHubs.length > 0 && (
+            <section className="song-section">
+              <h2>Browse by key</h2>
+              <ul className="song-keychips">
+                {keyHubs.map((k) => (
+                  <li key={k}>
+                    <span className="song-keychip">{camelot[k]}</span>
+                    <Link href={`/songs/key/${keyToSlug(k)}`} className="song-keychip-rel">
+                      {k}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          {bpmHubs.length > 0 && (
+            <section className="song-section">
+              <h2>Browse by BPM</h2>
+              <ul className="song-keychips">
+                {bpmHubs.map((b) => (
+                  <li key={b}>
+                    <Link href={`/songs/bpm/${b}`} className="song-keychip-rel">
+                      {b} BPM
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
 
           {songs.length === 0 ? (
             <p className="song-note">No songs analyzed yet. Be the first — paste a link on the Key &amp; BPM Finder.</p>

@@ -7,7 +7,7 @@ import {
   readSongsByCamelot,
   type CachedAnalysis,
 } from "@/lib/server/link-analysis";
-import { compatibleCodes, relationLabel } from "@/lib/audio/harmonic";
+import { compatibleCodes, relationLabel, keyToSlug, slugToKey } from "@/lib/audio/harmonic";
 
 // Programmatic per-song pages, one for every track in the shared link-analysis
 // cache. Statically generated for the songs known at build time and filled in
@@ -224,6 +224,13 @@ export default async function SongPage({ params }: { params: Promise<{ slug: str
               </ul>
             </section>
           )}
+
+          <p className="song-hubs">
+            {slugToKey(keyToSlug(song.key)) ? (
+              <Link href={`/songs/key/${keyToSlug(song.key)}`}>All songs in {song.key} →</Link>
+            ) : null}
+            <Link href={`/songs/bpm/${bpm}`}>All songs at {bpm} BPM →</Link>
+          </p>
 
           <p className="song-note">
             These figures come from analyzing an official 30-second preview of the track with

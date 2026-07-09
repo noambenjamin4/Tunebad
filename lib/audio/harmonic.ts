@@ -36,6 +36,25 @@ export function compatibleCodes(code: string): CamelotCode[] {
   return camelotNeighbors(code).filter((c) => c !== `${p.n}${p.letter}`);
 }
 
+/** The 24 canonical keys, in Camelot-wheel order (1A..12A, 1B..12B). */
+export const ALL_KEYS = [
+  "G# Minor", "D# Minor", "A# Minor", "F Minor", "C Minor", "G Minor",
+  "D Minor", "A Minor", "E Minor", "B Minor", "F# Minor", "C# Minor",
+  "B Major", "F# Major", "C# Major", "G# Major", "D# Major", "A# Major",
+  "F Major", "C Major", "G Major", "D Major", "A Major", "E Major",
+] as const;
+
+/** "G# Minor" -> "g-sharp-minor" (URL slug for key hub pages). */
+export function keyToSlug(key: string): string {
+  return key.toLowerCase().replace("#", "-sharp").replace(/\s+/g, "-");
+}
+
+/** "g-sharp-minor" -> "G# Minor", or null for anything not a canonical key. */
+export function slugToKey(slug: string): string | null {
+  const match = ALL_KEYS.find((k) => keyToSlug(k) === slug);
+  return match ?? null;
+}
+
 /** Plain-language label for how a neighbor relates to the source key. */
 export function relationLabel(fromCode: string, toCode: string): string {
   const a = parse(fromCode);
