@@ -1,4 +1,6 @@
 import { ImageResponse } from "next/og";
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { readAnalysisBySlug } from "@/lib/server/link-analysis";
 
 // Per-song share card. When a /song/<slug> link is posted to Discord, iMessage,
@@ -9,15 +11,14 @@ export const alt = "Song key, BPM, and Camelot on TuneBad";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-// Colocated font read via import.meta.url — the pattern Next traces reliably
-// into the serverless bundle (a process.cwd() path is not always included).
-async function loadFont(): Promise<ArrayBuffer> {
-  return fetch(new URL("./Baloo2-Bold.ttf", import.meta.url)).then((r) => r.arrayBuffer());
-}
+// Colocated font, resolved from import.meta.url so Next traces it into the
+// serverless bundle. Read with fs (Node's fetch does not support file:// URLs,
+// which is why the edge-style fetch(new URL(...)) pattern 500s on this runtime).
+const font = readFileSync(fileURLToPath(new URL("./Baloo2-Bold.ttf", import.meta.url)));
 
 export default async function Image({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const [song, font] = await Promise.all([readAnalysisBySlug(slug), loadFont()]);
+  const song = await readAnalysisBySlug(slug);
 
   const title = song?.title ?? "TuneBad";
   const artist = song?.artist ?? "";
