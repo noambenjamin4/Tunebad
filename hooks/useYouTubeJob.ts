@@ -56,7 +56,14 @@ export function useYouTubeJob() {
     };
   }, [activeJobId, t]);
 
-  const start = useCallback(async (url: string, quality: string, format: string, trimSilence: boolean) => {
+  const start = useCallback(
+    async (
+      url: string,
+      quality: string,
+      format: string,
+      trimSilence: boolean,
+      section?: { start: number; end: number } | null,
+    ) => {
     setState({ phase: "starting" });
 
     let response: Response;
@@ -64,7 +71,13 @@ export function useYouTubeJob() {
       response = await fetch("/api/youtube", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url, quality, format, trimSilence }),
+        body: JSON.stringify({
+          url,
+          quality,
+          format,
+          trimSilence,
+          ...(section ? { sectionStart: section.start, sectionEnd: section.end } : {}),
+        }),
       });
     } catch {
       setState({ phase: "error", message: t("ytDownloader.couldNotReachServer") });
@@ -83,7 +96,9 @@ export function useYouTubeJob() {
     }
 
     setState({ phase: "working", jobId: payload.jobId, status: "starting", progress: 0, title: null });
-  }, [t]);
+    },
+    [t],
+  );
 
   const reset = useCallback(() => {
     setState({ phase: "idle" });

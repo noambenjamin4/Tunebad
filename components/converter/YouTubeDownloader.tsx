@@ -35,6 +35,16 @@ const AUDIO_MIME_BY_FORMAT: Partial<Record<OutputFormat, string>> = {
   opus: "audio/opus",
 };
 
+/** "1:30" or "90" -> whole seconds; null when the text isn't a valid time. */
+function parseTimestamp(raw: string): number | null {
+  const text = raw.trim();
+  if (!text) return null;
+  if (/^\d+$/.test(text)) return Number(text);
+  const match = /^(\d{1,3}):([0-5]?\d)$/.exec(text);
+  if (!match) return null;
+  return Number(match[1]) * 60 + Number(match[2]);
+}
+
 const DEFAULT_AUDIO_QUALITY: Quality = "320";
 const DEFAULT_VIDEO_RESOLUTION: Resolution = "1080";
 
@@ -50,6 +60,9 @@ export function YouTubeDownloader() {
   const [format, setFormat] = useState<OutputFormat>("mp3");
   const [trimSilence, setTrimSilence] = useState(true);
   const [autoAnalyze, setAutoAnalyze] = useState(true);
+  const [sectionOn, setSectionOn] = useState(false);
+  const [sectionFrom, setSectionFrom] = useState("");
+  const [sectionTo, setSectionTo] = useState("");
   const [inputError, setInputError] = useState<string | null>(null);
   const [handingOff, setHandingOff] = useState(false);
   const [autoAnalyzedName, setAutoAnalyzedName] = useState<string | null>(null);
@@ -177,10 +190,24 @@ export function YouTubeDownloader() {
       setInputError(t("ytDownloader.linkError"));
       return;
     }
+
+    // Optional "only a section" trim: parse m:ss (or plain seconds), require
+    // end after start. Values become integers here; the server re-validates.
+    let section: { start: number; end: number } | null = null;
+    if (sectionOn) {
+      const from = parseTimestamp(sectionFrom);
+      const to = parseTimestamp(sectionTo);
+      if (from == null || to == null || to <= from || to > 5400) {
+        setInputError(t("converter.sectionInvalid"));
+        return;
+      }
+      section = { start: from, end: to };
+    }
+
     setInputError(null);
     autoAnalyzedJobRef.current = null;
     setAutoAnalyzedName(null);
-    void start(validated.url, quality, format, trimSilence);
+    void start(validated.url, quality, format, trimSilence, section);
   };
 
   const analyzeDownloaded = async (jobId: string, title: string | null) => {
@@ -289,6 +316,33 @@ export function YouTubeDownloader() {
             <CheckRow checked={autoAnalyze} onChange={setAutoAnalyze} disabled={busy}>
               {t("ytDownloader.autoAnalyze")}
             </CheckRow>
+            <CheckRow checked={sectionOn} onChange={setSectionOn} disabled={busy}>
+              {t("converter.sectionToggle")}
+            </CheckRow>
+            {sectionOn ? (
+              <div className="section-inputs">
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  className="section-input font-mono"
+                  aria-label={t("converter.sectionFrom")}
+                  placeholder={t("converter.sectionFrom")}
+                  value={sectionFrom}
+                  onChange={(event) => setSectionFrom(event.target.value)}
+                  disabled={busy}
+                />
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  className="section-input font-mono"
+                  aria-label={t("converter.sectionTo")}
+                  placeholder={t("converter.sectionTo")}
+                  value={sectionTo}
+                  onChange={(event) => setSectionTo(event.target.value)}
+                  disabled={busy}
+                />
+              </div>
+            ) : null}
           </>
         )}
         <button className="convert-button" type="submit" disabled={busy || playlistLoading || !url.trim()}>

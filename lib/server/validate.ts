@@ -18,10 +18,22 @@ export const startJobSchema = z
     quality: z.enum(["320", "256", "192", "128", "1080", "720", "480"]),
     format: z.enum(["mp3", "wav", "m4a", "opus", "mp4"]).default("mp3"),
     trimSilence: z.boolean().default(true),
+    // Optional section download ("only 0:45-1:30"): whole seconds, bounded by
+    // the same 90-minute cap as full downloads.
+    sectionStart: z.number().int().min(0).max(5400).optional(),
+    sectionEnd: z.number().int().min(1).max(5400).optional(),
   })
   .refine((data) => Boolean(data.url) !== Boolean(data.query), {
     message: "Provide exactly one of url or query.",
     path: ["url"],
+  })
+  .refine((data) => (data.sectionStart == null) === (data.sectionEnd == null), {
+    message: "Provide both sectionStart and sectionEnd, or neither.",
+    path: ["sectionStart"],
+  })
+  .refine((data) => data.sectionStart == null || data.sectionEnd == null || data.sectionEnd > data.sectionStart, {
+    message: "sectionEnd must be after sectionStart.",
+    path: ["sectionEnd"],
   })
   .superRefine((data, ctx) => {
     // Search-query jobs (Spotify-matched tracks) are audio only — mp4 doesn't

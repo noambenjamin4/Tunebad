@@ -73,6 +73,9 @@ export async function POST(request: NextRequest) {
           quality: parsed.data.quality,
           format: parsed.data.format,
           trimSilence: parsed.data.trimSilence,
+          ...(parsed.data.sectionStart != null && parsed.data.sectionEnd != null
+            ? { sectionStart: parsed.data.sectionStart, sectionEnd: parsed.data.sectionEnd }
+            : {}),
         }),
       });
       const payload = await upstream.json().catch(() => ({}));
@@ -112,6 +115,9 @@ export async function POST(request: NextRequest) {
       parsed.data.format,
       parsed.data.trimSilence,
       isSearchJob ? parsed.data.query : null,
+      parsed.data.sectionStart != null && parsed.data.sectionEnd != null
+        ? { start: parsed.data.sectionStart, end: parsed.data.sectionEnd }
+        : null,
     );
     return NextResponse.json({ jobId: job.id }, { status: 202 });
   } catch (error) {

@@ -73,6 +73,7 @@ export async function startYouTubeJob(
   format: YtFormat,
   trimSilence: boolean,
   searchQuery?: string | null,
+  section?: { start: number; end: number } | null,
 ): Promise<YtJob> {
   void sweepJobs();
   const ytdlpPath = await resolveYtdlp();
@@ -131,6 +132,12 @@ export async function startYouTubeJob(
   // filter can't apply there and fails the whole job; skip trim for it.
   if (trimSilence && format !== "mp4" && format !== "opus") {
     args.push("--postprocessor-args", `ExtractAudio:-af ${SILENCE_TRIM_FILTER}`);
+  }
+
+  // Section download ("only 0:45-1:30"): values are zod-validated integers,
+  // formatted here into yt-dlp's *start-end range — never raw user text.
+  if (section) {
+    args.push("--download-sections", `*${section.start}-${section.end}`, "--force-keyframes-at-cuts");
   }
 
   // Spotify-matched tracks (no direct URL) resolve via a yt-dlp search

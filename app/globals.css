@@ -2941,6 +2941,29 @@ tbody tr:last-child td {
   margin: 2px 0 0;
 }
 
+/* "Download only a section" inputs (converter) */
+.section-inputs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.section-input {
+  flex: 0 1 150px;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--ink);
+  padding: 10px 16px;
+  font-size: 14px;
+}
+
+.section-input:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 1px;
+}
+
 /* Hub links at the bottom of a song page ("all songs in X / at N BPM") */
 .song-hubs {
   display: flex;

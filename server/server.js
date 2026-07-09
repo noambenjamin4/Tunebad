@@ -117,7 +117,7 @@ function classifyError(stderr) {
   return stripInternalPaths(lastLine.replace(/^ERROR:\s*/i, "")).slice(0, 300);
 }
 
-async function startJob(sanitizedUrl, quality, format, trimSilence, searchQuery) {
+async function startJob(sanitizedUrl, quality, format, trimSilence, searchQuery, section) {
   void sweepJobs();
 
   const id = crypto.randomUUID();
@@ -180,6 +180,12 @@ async function startJob(sanitizedUrl, quality, format, trimSilence, searchQuery)
   // filter can't apply there and fails the whole job; skip trim for it.
   if (trimSilence && format !== "mp4" && format !== "opus") {
     args.push("--postprocessor-args", `ExtractAudio:-af ${SILENCE_TRIM_FILTER}`);
+  }
+
+  // Section download ("only 0:45-1:30"): values are validated integers,
+  // formatted here into yt-dlp's *start-end range — never raw user text.
+  if (section) {
+    args.push("--download-sections", `*${section.start}-${section.end}`, "--force-keyframes-at-cuts");
   }
 
   // Spotify-matched tracks (no direct URL) resolve via a yt-dlp search
@@ -402,7 +408,19 @@ async function handleRequest(req, res) {
       return;
     }
 
-    const { url: rawUrl, query: rawQuery, quality, format = "mp3", trimSilence = true } = body;
+    const { url: rawUrl, query: rawQuery, quality, format = "mp3", trimSilence = true, sectionStart, sectionEnd } = body;
+
+    // Optional section download: both bounds or neither, whole seconds within
+    // the 90-minute cap, end after start. Mirrors lib/server/validate.ts.
+    let section = null;
+    if (sectionStart != null || sectionEnd != null) {
+      const okInt = (v) => Number.isInteger(v) && v >= 0 && v <= 5400;
+      if (!okInt(sectionStart) || !okInt(sectionEnd) || sectionEnd <= sectionStart) {
+        sendJson(res, 400, { error: "Provide a valid section (whole seconds, end after start, within 90 minutes)." });
+        return;
+      }
+      section = { start: sectionStart, end: sectionEnd };
+    }
 
     // Two mutually-exclusive job shapes: a direct URL (existing flow) or a
     // search query (Spotify-matched track, no direct URL — resolved via
@@ -469,7 +487,7 @@ async function handleRequest(req, res) {
     }
 
     try {
-      const job = await startJob(canonicalUrl, quality, format, trimSilence, hasQuery ? rawQuery : undefined);
+      const job = await startJob(canonicalUrl, quality, format, trimSilence, hasQuery ? rawQuery : undefined, section);
       sendJson(res, 202, { jobId: job.id });
     } catch (error) {
       console.error("Failed to start job:", error instanceof Error ? error.message : error);
