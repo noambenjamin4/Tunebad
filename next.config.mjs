@@ -32,6 +32,12 @@ const csp = [
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   outputFileTracingRoot: import.meta.dirname,
+  // Force the OG-card font into that route's serverless bundle. Webpack rewrites
+  // new URL(...import.meta.url) to a bare asset path that fetch() can't parse, so
+  // the route reads the font from disk instead — which requires it to be traced.
+  outputFileTracingIncludes: {
+    "/song/[slug]/opengraph-image": ["./app/_og/Baloo2-Bold.ttf"],
+  },
   serverExternalPackages: ["ffmpeg-static"],
   webpack: (config, { isServer }) => {
     if (!isServer) {

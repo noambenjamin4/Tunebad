@@ -1,23 +1,26 @@
 import { ImageResponse } from "next/og";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { readAnalysisBySlug } from "@/lib/server/link-analysis";
 
 // Per-song share card. When a /song/<slug> link is posted to Discord, iMessage,
 // Twitter, etc., this renders a branded 1200x630 image with the track's key,
 // BPM, and Camelot instead of a generic site thumbnail.
 //
-// Edge runtime is the supported home for ImageResponse with a colocated font:
-// fetch(new URL("./font", import.meta.url)) resolves the bundled asset here (on
-// the Node runtime that same call 500s, because Node's fetch rejects file://).
-export const runtime = "edge";
+// The font is read from disk (not fetch(new URL(...))): webpack rewrites that
+// URL to a bare asset path fetch() cannot parse, on either runtime. The font
+// lives in a private app/_og folder and is force-bundled via
+// outputFileTracingIncludes in next.config.mjs so this read works on Vercel.
+export const runtime = "nodejs";
 export const alt = "Song key, BPM, and Camelot on TuneBad";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-const fontData = fetch(new URL("./Baloo2-Bold.ttf", import.meta.url)).then((r) => r.arrayBuffer());
+const font = readFileSync(join(process.cwd(), "app/_og/Baloo2-Bold.ttf"));
 
 export default async function Image({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const [song, font] = await Promise.all([readAnalysisBySlug(slug), fontData]);
+  const song = await readAnalysisBySlug(slug);
 
   const title = song?.title ?? "TuneBad";
   const artist = song?.artist ?? "";
