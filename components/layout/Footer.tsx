@@ -42,6 +42,7 @@ export function Footer() {
         </nav>
         {/* English guide articles; next/link prefetches these full navigations. */}
         <nav className="site-footer-tools site-footer-guides" aria-label={t("footer.guides")}>
+          <Link href="/songs">Song database</Link>
           <Link href="/guides/find-key-and-bpm-of-any-song">Key & BPM guide</Link>
           <Link href="/guides/camelot-wheel-harmonic-mixing">Camelot wheel</Link>
           <Link href="/guides/what-is-lufs-streaming-loudness">What is LUFS</Link>

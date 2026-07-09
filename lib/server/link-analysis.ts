@@ -12,6 +12,7 @@ export const isLinkAnalysisConfigured = Boolean(SUPABASE_URL && SUPABASE_ANON_KE
 
 export type CachedAnalysis = {
   id: string;
+  slug: string;
   title: string;
   artist: string | null;
   bpm: number;
@@ -85,8 +86,40 @@ export async function readRecentAnalyses(limit: number): Promise<CachedAnalysis[
   }
 }
 
-/** First write wins: duplicate ids are ignored (no update policy server-side either). */
-export async function writeCachedAnalysis(row: Omit<CachedAnalysis, "created_at">): Promise<boolean> {
+/** A cached song by its SEO slug — backs the /song/<slug> pages. */
+export async function readAnalysisBySlug(slug: string): Promise<CachedAnalysis | null> {
+  if (!isLinkAnalysisConfigured) return null;
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/link_analysis?slug=eq.${encodeURIComponent(slug)}&limit=1`,
+      { headers: restHeaders(), signal: AbortSignal.timeout(FETCH_TIMEOUT_MS), next: { revalidate: 3600 } },
+    );
+    if (!res.ok) return null;
+    const rows = (await res.json()) as CachedAnalysis[];
+    return rows[0] ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/** All cached songs (slug + title + artist) for the sitemap and /songs index. */
+export async function readAllSongs(limit = 5000): Promise<CachedAnalysis[]> {
+  if (!isLinkAnalysisConfigured) return [];
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/link_analysis?select=*&order=created_at.desc&limit=${limit}`,
+      { headers: restHeaders(), signal: AbortSignal.timeout(FETCH_TIMEOUT_MS), next: { revalidate: 3600 } },
+    );
+    if (!res.ok) return [];
+    return (await res.json()) as CachedAnalysis[];
+  } catch {
+    return [];
+  }
+}
+
+/** First write wins: duplicate ids are ignored (no update policy server-side either).
+ *  `slug` is filled by a DB trigger from title+artist, so callers never send it. */
+export async function writeCachedAnalysis(row: Omit<CachedAnalysis, "created_at" | "slug">): Promise<boolean> {
   if (!isLinkAnalysisConfigured) return false;
   try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/link_analysis`, {
