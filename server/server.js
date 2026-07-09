@@ -176,7 +176,9 @@ async function startJob(sanitizedUrl, quality, format, trimSilence, searchQuery)
     args.push("--cookies", "/tmp/cookies.txt");
   }
 
-  if (trimSilence && format !== "mp4") {
+  // OPUS is a streamcopy of the original stream (no re-encode) — an audio
+  // filter can't apply there and fails the whole job; skip trim for it.
+  if (trimSilence && format !== "mp4" && format !== "opus") {
     args.push("--postprocessor-args", `ExtractAudio:-af ${SILENCE_TRIM_FILTER}`);
   }
 
@@ -360,8 +362,8 @@ function sendJson(res, status, body) {
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const AUDIO_QUALITY_VALUES = new Set(["320", "256", "192", "128"]);
 const VIDEO_QUALITY_VALUES = new Set(["1080", "720", "480"]);
-const FORMAT_VALUES = new Set(["mp3", "wav", "mp4"]);
-const CONTENT_TYPE_BY_FORMAT = { mp3: "audio/mpeg", wav: "audio/wav", mp4: "video/mp4" };
+const FORMAT_VALUES = new Set(["mp3", "wav", "m4a", "opus", "mp4"]);
+const CONTENT_TYPE_BY_FORMAT = { mp3: "audio/mpeg", wav: "audio/wav", m4a: "audio/mp4", opus: "audio/opus", mp4: "video/mp4" };
 // Mirrors lib/server/validate.ts's PRINTABLE_QUERY_PATTERN.
 // eslint-disable-next-line no-control-regex
 const PRINTABLE_QUERY_PATTERN = /^[^\x00-\x1f\x7f]+$/;
@@ -422,7 +424,7 @@ async function handleRequest(req, res) {
       return;
     }
     if (typeof format !== "string" || !FORMAT_VALUES.has(format)) {
-      sendJson(res, 400, { error: "Provide a YouTube URL and a valid format (mp3, wav, or mp4)." });
+      sendJson(res, 400, { error: "Provide a YouTube URL and a valid format (mp3, wav, m4a, opus, or mp4)." });
       return;
     }
     if (hasQuery && format === "mp4") {

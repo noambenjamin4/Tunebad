@@ -127,7 +127,9 @@ export async function startYouTubeJob(
     "-o", path.join(workdir, "media.%(ext)s"),
   ];
 
-  if (trimSilence && format !== "mp4") {
+  // OPUS is a streamcopy of the original stream (no re-encode) — an audio
+  // filter can't apply there and fails the whole job; skip trim for it.
+  if (trimSilence && format !== "mp4" && format !== "opus") {
     args.push("--postprocessor-args", `ExtractAudio:-af ${SILENCE_TRIM_FILTER}`);
   }
 

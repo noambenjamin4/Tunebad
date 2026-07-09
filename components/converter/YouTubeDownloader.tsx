@@ -23,8 +23,17 @@ import {
 const LINK_FORMATS = [
   { value: "mp3" as const, label: "MP3", hintKey: "converter.formatHintSmallFile" as const },
   { value: "wav" as const, label: "WAV", hintKey: "converter.formatHintSampleExact" as const },
+  { value: "m4a" as const, label: "M4A", hintKey: "converter.formatHintM4a" as const },
+  { value: "opus" as const, label: "OPUS", hintKey: "converter.formatHintOpus" as const },
   VIDEO_FORMAT_OPTION,
 ];
+
+const AUDIO_MIME_BY_FORMAT: Partial<Record<OutputFormat, string>> = {
+  mp3: "audio/mpeg",
+  wav: "audio/wav",
+  m4a: "audio/mp4",
+  opus: "audio/opus",
+};
 
 const DEFAULT_AUDIO_QUALITY: Quality = "320";
 const DEFAULT_VIDEO_RESOLUTION: Resolution = "1080";
@@ -180,8 +189,8 @@ export function YouTubeDownloader() {
       const response = await fetch(`/api/youtube/${jobId}/file`);
       if (!response.ok) throw new Error(t("ytDownloader.couldNotFetchAudio"));
       const blob = await response.blob();
-      const type = blob.type || (format === "wav" ? "audio/wav" : "audio/mpeg");
-      const ext = type === "audio/wav" ? "wav" : "mp3";
+      const type = blob.type || AUDIO_MIME_BY_FORMAT[format] || "audio/mpeg";
+      const ext = format === "mp4" ? "mp4" : format;
       const name = `${title || "tunebad-download"}.${ext}`;
       const file = new File([blob], name, { type });
       requestAnalysis([file], { switchView: false });
@@ -200,8 +209,8 @@ export function YouTubeDownloader() {
       const response = await fetch(`/api/youtube/${jobId}/file`);
       if (!response.ok) throw new Error(t("ytDownloader.couldNotFetchAudio"));
       const blob = await response.blob();
-      const type = blob.type || (format === "wav" ? "audio/wav" : "audio/mpeg");
-      const ext = type === "audio/wav" ? "wav" : "mp3";
+      const type = blob.type || AUDIO_MIME_BY_FORMAT[format] || "audio/mpeg";
+      const ext = format === "mp4" ? "mp4" : format;
       const file = new File([blob], `${title || "tunebad-download"}.${ext}`, { type });
       requestAnalysis([file]);
     } catch (error) {
@@ -269,6 +278,9 @@ export function YouTubeDownloader() {
         ) : format === "mp3" ? (
           <QualityPicker value={quality as Quality} onChange={setQuality} />
         ) : null}
+        {/* Honesty over marketing: competitors sell "320kbps" upscaled from
+            ~128-160kbps streams; we say what the numbers really mean. */}
+        {!isSpotify && !isVideo ? <p className="source-quality-note">{t("converter.sourceQualityNote")}</p> : null}
         {isSpotify ? null : isVideo || playlistMode ? null : (
           <>
             <CheckRow checked={trimSilence} onChange={setTrimSilence} disabled={busy}>

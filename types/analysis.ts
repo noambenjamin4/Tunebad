@@ -55,7 +55,7 @@ export interface WorkerResponse {
 
 export type YtJobStatus = "starting" | "downloading" | "converting" | "done" | "error";
 
-export type YtFormat = "mp3" | "wav" | "mp4";
+export type YtFormat = "mp3" | "wav" | "m4a" | "opus" | "mp4";
 
 export interface YtJobPublic {
   status: YtJobStatus;

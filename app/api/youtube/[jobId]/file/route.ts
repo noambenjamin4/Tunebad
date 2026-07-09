@@ -13,6 +13,8 @@ export const maxDuration = 60;
 const CONTENT_TYPE_BY_FORMAT: Record<string, string> = {
   mp3: "audio/mpeg",
   wav: "audio/wav",
+  m4a: "audio/mp4",
+  opus: "audio/opus",
   mp4: "video/mp4",
 };
 

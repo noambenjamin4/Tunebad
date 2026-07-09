@@ -2933,6 +2933,14 @@ tbody tr:last-child td {
   font-size: 13px;
 }
 
+/* Honest source-quality note under the converter's format/quality pickers */
+.source-quality-note {
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--muted);
+  margin: 2px 0 0;
+}
+
 /* Hub links at the bottom of a song page ("all songs in X / at N BPM") */
 .song-hubs {
   display: flex;

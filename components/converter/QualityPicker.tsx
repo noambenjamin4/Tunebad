@@ -20,7 +20,7 @@ const FORMATS: { value: "mp3" | "wav"; label: string; hintKey: DictKey }[] = [
 
 export const VIDEO_FORMAT_OPTION = { value: "mp4", label: "MP4", hintKey: "converter.formatHintVideo" } as const;
 
-export type OutputFormat = "mp3" | "wav" | "mp4";
+export type OutputFormat = "mp3" | "wav" | "m4a" | "opus" | "mp4";
 
 export function FormatPicker({
   value,

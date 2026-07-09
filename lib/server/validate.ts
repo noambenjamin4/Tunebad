@@ -16,7 +16,7 @@ export const startJobSchema = z
     url: z.string().max(2048).optional(),
     query: z.string().min(1).max(300).regex(PRINTABLE_QUERY_PATTERN, "query must not contain control characters").optional(),
     quality: z.enum(["320", "256", "192", "128", "1080", "720", "480"]),
-    format: z.enum(["mp3", "wav", "mp4"]).default("mp3"),
+    format: z.enum(["mp3", "wav", "m4a", "opus", "mp4"]).default("mp3"),
     trimSilence: z.boolean().default(true),
   })
   .refine((data) => Boolean(data.url) !== Boolean(data.query), {
@@ -30,7 +30,7 @@ export const startJobSchema = z
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["format"],
-        message: "format must be mp3 or wav when using a search query",
+        message: "format must be an audio format when using a search query",
       });
       return;
     }
