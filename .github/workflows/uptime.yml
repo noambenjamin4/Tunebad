@@ -1,0 +1,45 @@
+# Uptime canary: probes the pages that matter every 30 minutes and fails the
+# workflow if any of them stop returning 200. GitHub emails the repo owner on
+# workflow failure, so an outage (like the song-page 500s on July 9) surfaces
+# in minutes instead of whenever someone happens to look.
+#
+# GETs only — no download jobs are started, so this never touches the bridge.
+name: uptime
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Probe key pages
+        run: |
+          set -u
+          BASE="https://www.tunebad.com"
+          FAILED=0
+          probe() {
+            local path="$1"
+            local code
+            code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 25 "$BASE$path")
+            if [ "$code" = "200" ]; then
+              echo "OK  $code  $path"
+            else
+              echo "BAD $code  $path"
+              FAILED=1
+            fi
+          }
+          probe "/"
+          probe "/key-bpm-finder"
+          probe "/converter"
+          probe "/playlist-analyzer"
+          probe "/mp3-cutter"
+          probe "/songs"
+          # Canary for all 2,500+ programmatic pages (the July 9 outage class)
+          probe "/song/never-gonna-give-you-up-rick-astley"
+          probe "/songs/key/c-major"
+          probe "/sitemap.xml"
+          exit $FAILED
