@@ -339,6 +339,7 @@ const en = {
   "cutter.end": "End",
   "cutter.useCurrentStart": "Set start to playhead",
   "cutter.useCurrentEnd": "Set end to playhead",
+  "cutter.backToStart": "Back to the start of the selection",
   "cutter.fadeIn": "Fade in",
   "cutter.fadeOut": "Fade out",
   "cutter.selection": "Selection",

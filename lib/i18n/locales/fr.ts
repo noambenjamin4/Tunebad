@@ -317,6 +317,7 @@ const fr: Record<keyof typeof en, string> = {
   "cutter.end": "Fin",
   "cutter.useCurrentStart": "Placer le début à la tête de lecture",
   "cutter.useCurrentEnd": "Placer la fin à la tête de lecture",
+  "cutter.backToStart": "Revenir au début de la sélection",
   "cutter.fadeIn": "Fade in",
   "cutter.fadeOut": "Fade out",
   "cutter.selection": "Sélection",

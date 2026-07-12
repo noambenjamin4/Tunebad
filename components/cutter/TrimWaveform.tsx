@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { formatTime } from "@/lib/format";
+import { formatTimeTenths } from "@/lib/format";
 import { useI18n } from "@/lib/i18n";
 
 function clamp(value: number, min: number, max: number): number {
@@ -17,7 +17,13 @@ const KEY_STEP_SECONDS = 1;
  * "this is the part you keep". Press or drag anywhere on the wave and the
  * NEAREST bound snaps to the pointer — tap at 0:40 near the left and the
  * start becomes 0:40; drag near the right edge and you're moving the end.
- * The playhead renders as a thin line driven by a CSS var (no re-renders).
+ * The selection edges render as chunky grip bars; the fade in/out toggles
+ * sit ON the wave at the selection's top corners (like the reference
+ * cutter), and the playhead is a thin line driven by a CSS var (no
+ * re-renders). Under the wave: absolute start/end times pinned under the
+ * selection edges plus the selection length centered beneath.
+ * `headSignal` forces a playhead reposition after a programmatic seek while
+ * paused (e.g. the back-to-start button).
  */
 export function TrimWaveform({
   bars,
@@ -28,7 +34,11 @@ export function TrimWaveform({
   getCurrentTime,
   onChangeStart,
   onChangeEnd,
-  onTogglePlay,
+  fadeIn,
+  fadeOut,
+  onToggleFadeIn,
+  onToggleFadeOut,
+  headSignal = 0,
   disabled,
 }: {
   bars: number[];
@@ -39,7 +49,11 @@ export function TrimWaveform({
   getCurrentTime: () => number;
   onChangeStart: (seconds: number) => void;
   onChangeEnd: (seconds: number) => void;
-  onTogglePlay: () => void;
+  fadeIn: boolean;
+  fadeOut: boolean;
+  onToggleFadeIn: () => void;
+  onToggleFadeOut: () => void;
+  headSignal?: number;
   disabled?: boolean;
 }) {
   const { t } = useI18n();
@@ -68,7 +82,7 @@ export function TrimWaveform({
       rafRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [playing, duration]);
+  }, [playing, duration, headSignal]);
 
   const secondsFromClientX = (clientX: number): number => {
     const track = trackRef.current;
@@ -121,87 +135,110 @@ export function TrimWaveform({
     }
   };
 
+  // Fade buttons sit on the trim track, which owns every pointerdown for
+  // drag-to-trim — stop the event there so pressing a toggle never moves a
+  // bound underneath it.
+  const stopTrackDrag = (event: React.PointerEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+  };
+
   const startPct = duration > 0 ? (start / duration) * 100 : 0;
   const endPct = duration > 0 ? (end / duration) * 100 : 100;
   const max = bars.length ? Math.max(...bars) : 1;
 
   return (
-    <div className="seek-wave trim-wave">
-      <button
-        className="round-button"
-        type="button"
-        aria-label={playing ? t("analysis.pausePreview") : t("analysis.playPreview")}
-        disabled={disabled}
-        onClick={onTogglePlay}
+    <div className="trim-wave">
+      <div
+        ref={trackRef}
+        className="seek-wave-track trim-wave-track"
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerUp}
       >
-        {playing ? (
-          <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
-            <rect x="3" y="2.5" width="3.4" height="11" rx="1" fill="currentColor" />
-            <rect x="9.6" y="2.5" width="3.4" height="11" rx="1" fill="currentColor" />
-          </svg>
-        ) : (
-          <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
-            <path d="M4.5 2.8v10.4c0 .8.9 1.3 1.6.9l8-5.2c.6-.4.6-1.4 0-1.8l-8-5.2c-.7-.4-1.6.1-1.6.9z" fill="currentColor" />
-          </svg>
-        )}
-      </button>
+        <div className="seek-wave-bars" aria-hidden="true">
+          {bars.map((bar, index) => (
+            <i key={index} style={{ height: `${Math.max(8, (bar / max) * 100)}%` }} />
+          ))}
+        </div>
 
-      <div className="seek-wave-main">
+        {/* Shaded = discarded; the light middle band is what gets kept. */}
+        <div className="trim-shade" style={{ left: 0, width: `${startPct}%` }} aria-hidden="true" />
         <div
-          ref={trackRef}
-          className="seek-wave-track trim-wave-track"
-          onPointerDown={handlePointerDown}
-          onPointerMove={handlePointerMove}
-          onPointerUp={handlePointerUp}
-          onPointerCancel={handlePointerUp}
+          className="trim-shade trim-shade-right"
+          style={{ left: `${endPct}%`, width: `${100 - endPct}%` }}
+          aria-hidden="true"
+        />
+
+        {/* Fade toggles pinned to the selection's top corners. */}
+        <button
+          className="trim-fade-btn"
+          type="button"
+          style={{ left: `clamp(4px, calc(${startPct}% + 8px), calc(${endPct}% - 46px))` }}
+          aria-pressed={fadeIn}
+          aria-label={t("cutter.fadeIn")}
+          title={t("cutter.fadeIn")}
+          disabled={disabled}
+          onPointerDown={stopTrackDrag}
+          onClick={onToggleFadeIn}
         >
-          <div className="seek-wave-bars" aria-hidden="true">
-            {bars.map((bar, index) => (
-              <i key={index} style={{ height: `${Math.max(8, (bar / max) * 100)}%` }} />
-            ))}
-          </div>
+          <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M2 13.5 C 8 13.5, 8 2.5, 14 2.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+          </svg>
+        </button>
+        <button
+          className="trim-fade-btn trim-fade-btn-out"
+          type="button"
+          style={{ left: `min(clamp(calc(${startPct}% + 46px), calc(${endPct}% - 8px), calc(100% - 4px)), calc(100% - 4px))` }}
+          aria-pressed={fadeOut}
+          aria-label={t("cutter.fadeOut")}
+          title={t("cutter.fadeOut")}
+          disabled={disabled}
+          onPointerDown={stopTrackDrag}
+          onClick={onToggleFadeOut}
+        >
+          <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M2 2.5 C 8 2.5, 8 13.5, 14 13.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+          </svg>
+        </button>
 
-          {/* Shaded = discarded; the light middle band is what gets kept. */}
-          <div className="trim-shade" style={{ left: 0, width: `${startPct}%` }} aria-hidden="true" />
-          <div
-            className="trim-shade trim-shade-right"
-            style={{ left: `${endPct}%`, width: `${100 - endPct}%` }}
-            aria-hidden="true"
-          />
+        <div
+          className="trim-handle"
+          style={{ left: `${startPct}%` }}
+          role="slider"
+          tabIndex={disabled ? -1 : 0}
+          aria-label={t("cutter.start")}
+          aria-valuemin={0}
+          aria-valuemax={Math.round(duration)}
+          aria-valuenow={Math.round(start)}
+          aria-valuetext={formatTimeTenths(start)}
+          onKeyDown={handleKey("start")}
+        />
+        <div
+          className="trim-handle trim-handle-end"
+          style={{ left: `${endPct}%` }}
+          role="slider"
+          tabIndex={disabled ? -1 : 0}
+          aria-label={t("cutter.end")}
+          aria-valuemin={0}
+          aria-valuemax={Math.round(duration)}
+          aria-valuenow={Math.round(end)}
+          aria-valuetext={formatTimeTenths(end)}
+          onKeyDown={handleKey("end")}
+        />
 
-          <div
-            className="trim-handle"
-            style={{ left: `${startPct}%` }}
-            role="slider"
-            tabIndex={disabled ? -1 : 0}
-            aria-label={t("cutter.start")}
-            aria-valuemin={0}
-            aria-valuemax={Math.round(duration)}
-            aria-valuenow={Math.round(start)}
-            aria-valuetext={formatTime(start)}
-            onKeyDown={handleKey("start")}
-          />
-          <div
-            className="trim-handle trim-handle-end"
-            style={{ left: `${endPct}%` }}
-            role="slider"
-            tabIndex={disabled ? -1 : 0}
-            aria-label={t("cutter.end")}
-            aria-valuemin={0}
-            aria-valuemax={Math.round(duration)}
-            aria-valuenow={Math.round(end)}
-            aria-valuetext={formatTime(end)}
-            onKeyDown={handleKey("end")}
-          />
-
-          <div className="trim-head" aria-hidden="true" />
-        </div>
-
-        <div className="seek-wave-times trim-wave-times">
-          <span>{formatTime(start)}</span>
-          <span>{formatTime(end)}</span>
-        </div>
+        <div className="trim-head" aria-hidden="true" />
       </div>
+
+      {/* Absolute times pinned under the selection edges... */}
+      <div className="trim-times">
+        <span style={{ left: `clamp(24px, ${startPct}%, calc(100% - 24px))` }}>{formatTimeTenths(start)}</span>
+        <span style={{ left: `clamp(24px, ${endPct}%, calc(100% - 24px))` }}>{formatTimeTenths(end)}</span>
+      </div>
+      {/* ...and the selection length centered beneath the wave. */}
+      <p className="trim-duration" aria-label={t("cutter.selection")}>
+        {formatTimeTenths(Math.max(0, end - start))}
+      </p>
     </div>
   );
 }

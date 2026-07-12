@@ -5,27 +5,18 @@ import { decodeAudioFileCached } from "@/lib/audio/decode-cache";
 import { computeWaveformBars } from "@/lib/audio/waveform";
 import { encodeMp3FromChannels, encodeWavFromChannels, downloadBlob } from "@/lib/audio/mp3-encoder";
 import { TrimWaveform } from "./TrimWaveform";
-import { CheckRow } from "@/components/ui/CheckRow";
-import { FormatPicker, type OutputFormat } from "@/components/converter/QualityPicker";
+import type { OutputFormat } from "@/components/converter/QualityPicker";
 import { useI18n } from "@/lib/i18n";
 import { WaveformIcon } from "@/components/ui/icons";
 import { setNowPlaying } from "@/lib/audio/now-playing";
+import { formatTimeTenths } from "@/lib/format";
 
 const NOW_PLAYING_SOURCE = "cutter-preview";
 const MIN_SELECTION_SECONDS = 0.1;
+const STEP_SECONDS = 0.1;
 const FADE_SECONDS = 0.5;
 
 type Status = { title: string; message: string; tone: "neutral" | "success" | "warning" };
-
-// mm:ss.s readout for the selection sliders — lib/format.ts's formatTime only
-// gives whole seconds, and the cutter needs tenth-second precision for
-// accurate trims.
-function formatMmSsTenths(seconds: number): string {
-  if (!Number.isFinite(seconds) || seconds < 0) return "0:00.0";
-  const minutes = Math.floor(seconds / 60);
-  const secs = (seconds % 60).toFixed(1).padStart(4, "0");
-  return `${minutes}:${secs}`;
-}
 
 // Applies a linear fade in/out in place on each channel. Ramp length is
 // clamped to half the selection so short clips still fade sensibly.
@@ -66,6 +57,9 @@ export function CutterPanel() {
   const [format, setFormat] = useState<OutputFormat>("mp3");
   const [working, setWorking] = useState(false);
   const [status, setStatus] = useState<Status | null>(null);
+  // Bumped after programmatic seeks while paused so the waveform playhead
+  // repositions (its rAF loop only runs during playback).
+  const [headSignal, setHeadSignal] = useState(0);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const previewUrlRef = useRef<string | null>(null);
@@ -189,6 +183,23 @@ export function CutterPanel() {
     handleEndChange(current);
   };
 
+  // ±0.1s steppers. Snap to a whole tenth so repeated nudges never
+  // accumulate float drift (0.30000000000000004 in the readout).
+  const nudgeStart = (delta: number) => {
+    handleStartChange(Math.round((start + delta) * 10) / 10);
+  };
+
+  const nudgeEnd = (delta: number) => {
+    handleEndChange(Math.round((end + delta) * 10) / 10);
+  };
+
+  const backToStart = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.currentTime = start;
+    setHeadSignal((n) => n + 1);
+  };
+
   const onExport = async () => {
     if (!file || !buffer) return;
     if (end - start < MIN_SELECTION_SECONDS) {
@@ -285,13 +296,9 @@ export function CutterPanel() {
 
       {file && buffer && (
         <article className="utility-card cutter-controls-card">
-          <div className="tool-heading">
-            <div>
-              <h3>{file.name}</h3>
-            </div>
-          </div>
-
+          {/* Hero block: file name (small, right-aligned) over the trim wave. */}
           <div className="wave-card cutter-wave-card">
+            <div className="cutter-wave-name">{file.name}</div>
             <TrimWaveform
               bars={bars}
               duration={duration}
@@ -301,7 +308,11 @@ export function CutterPanel() {
               getCurrentTime={getCurrentTime}
               onChangeStart={handleStartChange}
               onChangeEnd={handleEndChange}
-              onTogglePlay={() => void togglePlayback()}
+              fadeIn={fadeIn}
+              fadeOut={fadeOut}
+              onToggleFadeIn={() => setFadeIn((v) => !v)}
+              onToggleFadeOut={() => setFadeOut((v) => !v)}
+              headSignal={headSignal}
             />
             <audio
               ref={audioRef}
@@ -313,62 +324,131 @@ export function CutterPanel() {
             />
           </div>
 
-          <div className="cutter-selection">
-            <div className="cutter-slider-row">
-              <label className="field-label" htmlFor="cutterStart">
-                {t("cutter.start")}
-              </label>
-              <input
-                id="cutterStart"
-                className="cutter-slider"
-                type="range"
-                min={0}
-                max={duration}
-                step={0.1}
-                value={start}
-                onChange={(event) => handleStartChange(Number.parseFloat(event.target.value))}
-              />
-              <span className="cutter-times font-mono">{formatMmSsTenths(start)}</span>
-              <button className="secondary-button" type="button" onClick={useCurrentAsStart}>
-                {t("cutter.useCurrentStart")}
+          {/* Bottom control bar: transport | start/end steppers | format + save. */}
+          <div className="cutter-bar">
+            <div className="cutter-transport">
+              <button
+                className="cutter-play-pill"
+                type="button"
+                aria-label={playing ? t("analysis.pausePreview") : t("analysis.playPreview")}
+                onClick={() => void togglePlayback()}
+              >
+                {playing ? (
+                  <svg width="18" height="18" viewBox="0 0 16 16" aria-hidden="true">
+                    <rect x="3" y="2.5" width="3.4" height="11" rx="1" fill="currentColor" />
+                    <rect x="9.6" y="2.5" width="3.4" height="11" rx="1" fill="currentColor" />
+                  </svg>
+                ) : (
+                  <svg width="18" height="18" viewBox="0 0 16 16" aria-hidden="true">
+                    <path d="M4.5 2.8v10.4c0 .8.9 1.3 1.6.9l8-5.2c.6-.4.6-1.4 0-1.8l-8-5.2c-.7-.4-1.6.1-1.6.9z" fill="currentColor" />
+                  </svg>
+                )}
+              </button>
+              <button
+                className="round-button cutter-skip-btn"
+                type="button"
+                aria-label={t("cutter.backToStart")}
+                title={t("cutter.backToStart")}
+                onClick={backToStart}
+              >
+                <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+                  <rect x="2.8" y="2.5" width="2.4" height="11" rx="1" fill="currentColor" />
+                  <path d="M13.2 3.7v8.6c0 .8-.9 1.3-1.6.9L5.4 9.1c-.6-.4-.6-1.4 0-1.8l6.2-4.3c.7-.5 1.6 0 1.6.7z" fill="currentColor" />
+                </svg>
               </button>
             </div>
 
-            <div className="cutter-slider-row">
-              <label className="field-label" htmlFor="cutterEnd">
-                {t("cutter.end")}
-              </label>
-              <input
-                id="cutterEnd"
-                className="cutter-slider"
-                type="range"
-                min={0}
-                max={duration}
-                step={0.1}
-                value={end}
-                onChange={(event) => handleEndChange(Number.parseFloat(event.target.value))}
-              />
-              <span className="cutter-times font-mono">{formatMmSsTenths(end)}</span>
-              <button className="secondary-button" type="button" onClick={useCurrentAsEnd}>
-                {t("cutter.useCurrentEnd")}
+            <div className="cutter-steppers">
+              <div className="cutter-stepper">
+                <div className="cutter-stepper-row">
+                  <span className="cutter-stepper-label">{t("cutter.start")}:</span>
+                  <div className="cutter-stepper-pill">
+                    <span className="cutter-stepper-time" data-testid="cutter-start-time">
+                      {formatTimeTenths(start)}
+                    </span>
+                    <span className="cutter-stepper-arrows">
+                      <button
+                        type="button"
+                        aria-label={`${t("cutter.start")} +0.1s`}
+                        onClick={() => nudgeStart(STEP_SECONDS)}
+                      >
+                        <svg width="10" height="6" viewBox="0 0 10 6" aria-hidden="true">
+                          <path d="M1 5l4-4 4 4" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </button>
+                      <button
+                        type="button"
+                        aria-label={`${t("cutter.start")} -0.1s`}
+                        onClick={() => nudgeStart(-STEP_SECONDS)}
+                      >
+                        <svg width="10" height="6" viewBox="0 0 10 6" aria-hidden="true">
+                          <path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </button>
+                    </span>
+                  </div>
+                </div>
+                <button className="text-button cutter-set-btn" type="button" onClick={useCurrentAsStart}>
+                  {t("cutter.useCurrentStart")}
+                </button>
+              </div>
+
+              <div className="cutter-stepper">
+                <div className="cutter-stepper-row">
+                  <span className="cutter-stepper-label">{t("cutter.end")}:</span>
+                  <div className="cutter-stepper-pill">
+                    <span className="cutter-stepper-time" data-testid="cutter-end-time">
+                      {formatTimeTenths(end)}
+                    </span>
+                    <span className="cutter-stepper-arrows">
+                      <button
+                        type="button"
+                        aria-label={`${t("cutter.end")} +0.1s`}
+                        onClick={() => nudgeEnd(STEP_SECONDS)}
+                      >
+                        <svg width="10" height="6" viewBox="0 0 10 6" aria-hidden="true">
+                          <path d="M1 5l4-4 4 4" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </button>
+                      <button
+                        type="button"
+                        aria-label={`${t("cutter.end")} -0.1s`}
+                        onClick={() => nudgeEnd(-STEP_SECONDS)}
+                      >
+                        <svg width="10" height="6" viewBox="0 0 10 6" aria-hidden="true">
+                          <path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </button>
+                    </span>
+                  </div>
+                </div>
+                <button className="text-button cutter-set-btn" type="button" onClick={useCurrentAsEnd}>
+                  {t("cutter.useCurrentEnd")}
+                </button>
+              </div>
+            </div>
+
+            <div className="cutter-output">
+              <div className="cutter-format-compact">
+                <span className="cutter-stepper-label">{t("converter.formatLegend")}:</span>
+                <div className="cutter-format-pills" role="group" aria-label={t("converter.formatLegend")}>
+                  {(["mp3", "wav"] as const).map((value) => (
+                    <button
+                      key={value}
+                      className={`cutter-format-pill${format === value ? " active" : ""}`}
+                      type="button"
+                      aria-pressed={format === value}
+                      onClick={() => setFormat(value)}
+                    >
+                      {value.toUpperCase()}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <button className="convert-button" type="button" onClick={() => void onExport()} disabled={working}>
+                {working ? t("cutter.exporting") : t("cutter.export")}
               </button>
             </div>
-
-            <div className="cutter-fade-row">
-              <CheckRow checked={fadeIn} onChange={setFadeIn}>
-                {t("cutter.fadeIn")}
-              </CheckRow>
-              <CheckRow checked={fadeOut} onChange={setFadeOut}>
-                {t("cutter.fadeOut")}
-              </CheckRow>
-            </div>
-          </div>
-
-          <div className="cutter-export-row">
-            <FormatPicker value={format} onChange={setFormat} />
-            <button className="convert-button" type="button" onClick={() => void onExport()} disabled={working}>
-              {working ? t("cutter.exporting") : t("cutter.export")}
-            </button>
           </div>
         </article>
       )}

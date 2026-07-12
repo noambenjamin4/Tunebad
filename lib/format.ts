@@ -5,6 +5,17 @@ export function formatTime(seconds: number): string {
   return `${minutes}:${secs}`;
 }
 
+// m:ss.d readout with tenth-second precision — the MP3 cutter's trim times
+// and steppers need finer granularity than formatTime's whole seconds.
+// Rounds to tenths FIRST so 59.97s becomes 1:00.0 rather than 0:60.0.
+export function formatTimeTenths(seconds: number): string {
+  if (!Number.isFinite(seconds) || seconds < 0) return "0:00.0";
+  const tenths = Math.round(seconds * 10);
+  const minutes = Math.floor(tenths / 600);
+  const rest = tenths % 600;
+  return `${minutes}:${String(Math.floor(rest / 10)).padStart(2, "0")}.${rest % 10}`;
+}
+
 export function formatDetailedTime(seconds: number): string {
   if (!Number.isFinite(seconds)) return "00:00.000";
   const minutes = Math.floor(seconds / 60).toString().padStart(2, "0");

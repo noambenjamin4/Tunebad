@@ -317,6 +317,7 @@ const ja: Record<keyof typeof en, string> = {
   "cutter.end": "終了",
   "cutter.useCurrentStart": "開始位置を再生位置に合わせる",
   "cutter.useCurrentEnd": "終了位置を再生位置に合わせる",
+  "cutter.backToStart": "選択範囲の先頭に戻る",
   "cutter.fadeIn": "フェードイン",
   "cutter.fadeOut": "フェードアウト",
   "cutter.selection": "選択範囲",

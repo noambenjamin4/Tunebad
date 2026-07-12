@@ -2527,62 +2527,185 @@ tbody tr:last-child td {
 }
 
 /* -------------------------------------------------------------------------
-   MP3 Cutter
+   MP3 Cutter — hero trim wave over a single bottom control bar
    ------------------------------------------------------------------------- */
-.cutter-selection {
-  display: grid;
-  gap: 14px;
-  padding: 0 clamp(20px, 4vw, 40px) 20px;
-}
-
-.cutter-slider-row {
-  display: grid;
+/* The wave card stacks: file name (small, right-aligned) over the wave. */
+.cutter-wave-card {
+  flex-direction: column;
+  align-items: stretch;
   gap: 8px;
-  min-width: 0;
+  padding: 14px 20px 12px;
 }
 
-.cutter-slider-row input[type="range"] {
-  width: 100%;
-}
-
-/* Buttons hug their label instead of stretching to the grid track (a
-   full-width pill with a centered label reads as an empty button on wide
-   screens). */
-.cutter-slider-row .secondary-button {
-  justify-self: start;
-  width: fit-content;
-}
-
-.cutter-times {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 16px;
-  font-family: var(--font-mono);
-  font-size: 13px;
+.cutter-wave-name {
+  text-align: right;
+  font-size: 12px;
   color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-/* Breathing room between the fade toggles (they rendered flush together). */
-.cutter-fade-row {
+/* One row: transport | start/end steppers | format + save. Wraps on
+   narrow screens instead of clipping. */
+.cutter-bar {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  gap: 12px 32px;
-  padding-top: 4px;
-}
-
-.cutter-export-row {
-  display: grid;
-  grid-template-columns: minmax(200px, 1fr) auto;
-  align-items: end;
-  gap: 18px;
+  align-items: flex-start;
+  gap: 18px 28px;
   padding: 0 clamp(20px, 4vw, 40px) 24px;
 }
 
-/* Same phone rule as the remix grids: stack instead of clipping. */
+.cutter-transport {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Primary transport: a wide solid pill, mirroring the reference cutter's
+   oversized play button (monochrome fill instead of green). */
+.cutter-play-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 68px;
+  min-height: 44px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--fill);
+  color: var(--fill-ink);
+  transition: opacity 120ms ease, transform 120ms ease;
+}
+
+.cutter-play-pill:hover {
+  opacity: 0.82;
+}
+
+.cutter-play-pill:active {
+  transform: scale(0.97);
+}
+
+.cutter-steppers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 24px;
+}
+
+.cutter-stepper {
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+}
+
+.cutter-stepper-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cutter-stepper-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+
+/* Time pill with ±0.1s chevrons stacked to its right. */
+.cutter-stepper-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 4px 8px 4px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+}
+
+.cutter-stepper-time {
+  min-width: 56px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.cutter-stepper-arrows {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cutter-stepper-arrows button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 16px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink);
+  transition: background 120ms ease;
+}
+
+.cutter-stepper-arrows button:hover {
+  background: var(--hover);
+}
+
+/* "Set to playhead" helpers live right under their stepper. */
+.cutter-set-btn {
+  min-height: 30px;
+  padding: 0 12px;
+  font-size: 10px;
+}
+
+.cutter-output {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px 18px;
+  margin-left: auto;
+}
+
+.cutter-format-compact {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cutter-format-pills {
+  display: flex;
+  gap: 6px;
+}
+
+.cutter-format-pill {
+  min-height: 34px;
+  padding: 6px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  transition: background 120ms ease;
+}
+
+.cutter-format-pill:hover {
+  background: var(--hover);
+}
+
+.cutter-format-pill.active {
+  background: var(--fill);
+  border-color: var(--fill);
+  color: var(--fill-ink);
+}
+
+/* Phone: once the bar wraps, the save column stops hugging the right. */
 @media (max-width: 560px) {
-  .cutter-export-row {
-    grid-template-columns: 1fr;
+  .cutter-output {
+    margin-left: 0;
   }
 }
 
@@ -3426,7 +3549,9 @@ tbody tr:last-child td {
 .frequency-input span,
 .quality-button strong,
 .loudness-preview-label,
-.cutter-times,
+.cutter-stepper-time,
+.trim-times,
+.trim-duration,
 .link-analyze-stats,
 .link-analyze-recent-stats,
 .site-footer-copyright,
@@ -3819,11 +3944,28 @@ tbody tr:last-child td {
   color: var(--muted);
 }
 
-/* Trim waveform (MP3 cutter): dark shades mark the discarded ends, the light
-   middle band is the kept selection, thin line = playhead. */
+/* Trim waveform (MP3 cutter): the hero trim control. Dark shades mark the
+   discarded ends, the light middle band is the kept selection, chunky grip
+   bars mark the bounds, the fade toggles sit on the wave's top corners, and
+   the thin line is the playhead. */
+.trim-wave {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  min-width: 0;
+}
+
 .trim-wave-track {
+  height: 140px;
   cursor: ew-resize;
   touch-action: none;
+}
+
+@media (max-width: 640px) {
+  .trim-wave-track {
+    height: 100px;
+  }
 }
 
 .trim-shade {
@@ -3840,11 +3982,12 @@ tbody tr:last-child td {
   border-radius: 0 var(--radius-inner) var(--radius-inner) 0;
 }
 
+/* Chunky bound handles: a full-height 10px grip bar with three dots. */
 .trim-handle {
   position: absolute;
-  top: -6px;
-  bottom: -6px;
-  width: 22px;
+  top: -4px;
+  bottom: -4px;
+  width: 26px;
   transform: translateX(-50%);
   cursor: ew-resize;
   pointer-events: none; /* the track handles pointers; these are focus/aria stops */
@@ -3856,10 +3999,24 @@ tbody tr:last-child td {
   top: 0;
   bottom: 0;
   left: 50%;
-  width: 4px;
+  width: 10px;
   transform: translateX(-50%);
-  border-radius: var(--radius-pill);
+  border-radius: 5px;
   background: var(--ink);
+}
+
+.trim-handle::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 3px;
+  height: 3px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: 0 -6px 0 var(--surface), 0 6px 0 var(--surface);
+  z-index: 1;
 }
 
 .trim-handle:focus-visible {
@@ -3869,6 +4026,40 @@ tbody tr:last-child td {
 .trim-handle:focus-visible::after {
   outline: 2px solid var(--ink);
   outline-offset: 2px;
+}
+
+/* Fade in/out toggles pinned to the selection's top corners. Pressed =
+   filled ink with a surface icon. */
+.trim-fade-btn {
+  position: absolute;
+  top: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink);
+  z-index: 2;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+/* The fade-out button hangs LEFT of its coordinate so it stays inside the
+   selection when the end bound is at 100%. */
+.trim-fade-btn-out {
+  transform: translateX(-100%);
+}
+
+.trim-fade-btn:hover {
+  background: var(--hover);
+}
+
+.trim-fade-btn[aria-pressed="true"] {
+  background: var(--fill);
+  border-color: var(--fill);
+  color: var(--fill-ink);
 }
 
 .trim-head {
@@ -3881,9 +4072,34 @@ tbody tr:last-child td {
   pointer-events: none;
 }
 
-.trim-wave-times {
-  display: flex;
-  justify-content: space-between;
+/* Absolute start/end times pinned under the selection edges... */
+.trim-times {
+  position: relative;
+  height: 16px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.trim-times span {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  /* Background chip so that when a narrow selection pushes the two labels
+     together, the later (end) label reads cleanly over the start label
+     instead of garbling. */
+  background: var(--surface);
+  padding: 0 4px;
+  border-radius: 4px;
+}
+
+/* ...and the selection length, larger and centered, beneath. */
+.trim-duration {
+  margin: 0;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ink);
 }
 
 /* ---------------------------------------------------------------------

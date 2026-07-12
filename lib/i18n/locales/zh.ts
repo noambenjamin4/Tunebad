@@ -316,6 +316,7 @@ const zh: Record<keyof typeof en, string> = {
   "cutter.end": "结束",
   "cutter.useCurrentStart": "将开始点设为播放位置",
   "cutter.useCurrentEnd": "将结束点设为播放位置",
+  "cutter.backToStart": "回到选区开头",
   "cutter.fadeIn": "淡入",
   "cutter.fadeOut": "淡出",
   "cutter.selection": "选区",

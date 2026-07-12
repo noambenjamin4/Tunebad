@@ -317,6 +317,7 @@ const es: Record<keyof typeof en, string> = {
   "cutter.end": "Fin",
   "cutter.useCurrentStart": "Fijar el inicio en el cursor de reproducción",
   "cutter.useCurrentEnd": "Fijar el fin en el cursor de reproducción",
+  "cutter.backToStart": "Volver al inicio de la selección",
   "cutter.fadeIn": "Fade in",
   "cutter.fadeOut": "Fade out",
   "cutter.selection": "Selección",

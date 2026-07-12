@@ -317,6 +317,7 @@ const de: Record<keyof typeof en, string> = {
   "cutter.end": "Ende",
   "cutter.useCurrentStart": "Start an die Abspielposition setzen",
   "cutter.useCurrentEnd": "Ende an die Abspielposition setzen",
+  "cutter.backToStart": "Zurück zum Anfang der Auswahl",
   "cutter.fadeIn": "Fade-in",
   "cutter.fadeOut": "Fade-out",
   "cutter.selection": "Auswahl",

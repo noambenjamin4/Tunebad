@@ -317,6 +317,7 @@ const pt: Record<keyof typeof en, string> = {
   "cutter.end": "Fim",
   "cutter.useCurrentStart": "Definir o início no cursor de reprodução",
   "cutter.useCurrentEnd": "Definir o fim no cursor de reprodução",
+  "cutter.backToStart": "Voltar ao início da seleção",
   "cutter.fadeIn": "Fade in",
   "cutter.fadeOut": "Fade out",
   "cutter.selection": "Seleção",
