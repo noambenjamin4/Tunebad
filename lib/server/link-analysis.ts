@@ -153,18 +153,28 @@ export async function readSongsByBpmRange(min: number, max: number, limit = 300)
   }
 }
 
-/** All cached songs (slug + title + artist) for the sitemap and /songs index. */
-export async function readAllSongs(limit = 5000): Promise<CachedAnalysis[]> {
+/** All cached songs (slug + title + artist) for the sitemap and /songs index.
+ *  Supabase silently caps any single query at 1000 rows (db-max-rows), so this
+ *  pages through in 1000-row chunks until a short page or `limit` is reached —
+ *  otherwise every song past the first thousand vanishes from the sitemap. */
+export async function readAllSongs(limit = 10000): Promise<CachedAnalysis[]> {
   if (!isLinkAnalysisConfigured) return [];
+  const PAGE = 1000;
+  const all: CachedAnalysis[] = [];
   try {
-    const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/link_analysis?select=*&order=created_at.desc&limit=${limit}`,
-      { headers: restHeaders(), signal: AbortSignal.timeout(FETCH_TIMEOUT_MS), next: { revalidate: 3600 } },
-    );
-    if (!res.ok) return [];
-    return (await res.json()) as CachedAnalysis[];
+    for (let offset = 0; offset < limit; offset += PAGE) {
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/link_analysis?select=*&order=created_at.desc&limit=${Math.min(PAGE, limit - offset)}&offset=${offset}`,
+        { headers: restHeaders(), signal: AbortSignal.timeout(FETCH_TIMEOUT_MS), next: { revalidate: 3600 } },
+      );
+      if (!res.ok) break;
+      const page = (await res.json()) as CachedAnalysis[];
+      all.push(...page);
+      if (page.length < PAGE) break;
+    }
+    return all;
   } catch {
-    return [];
+    return all;
   }
 }
 

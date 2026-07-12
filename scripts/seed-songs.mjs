@@ -154,7 +154,7 @@ function addTracks(byId, list, label) {
   let added = 0;
   for (const t of list || []) {
     if (t.preview && t.id && t.title && !byId.has(t.id)) {
-      byId.set(t.id, { id: t.id, title: t.title, artist: t.artist?.name || "", preview: t.preview, duration: t.duration || null });
+      byId.set(t.id, { id: t.id, title: t.title, artist: t.artist?.name || "", artistId: t.artist?.id || null, preview: t.preview, duration: t.duration || null });
       added += 1;
     }
   }
@@ -196,6 +196,26 @@ async function collectTracks() {
     } catch (e) {
       console.log(`playlist ${name}: failed (${e.message})`);
     }
+    await new Promise((r) => setTimeout(r, 250));
+  }
+
+  // 3. Each chart artist's own top tracks. Charts only surface the hit of the
+  // moment; the artist's catalog is where the long-tail song pages come from.
+  const artistIds = new Map();
+  for (const t of byId.values()) {
+    if (t.artistId && !artistIds.has(t.artistId)) artistIds.set(t.artistId, t.artist);
+  }
+  const ARTIST_CAP = 600;
+  let done = 0;
+  for (const [artistId, artistName] of [...artistIds.entries()].slice(0, ARTIST_CAP)) {
+    try {
+      const j = await getJson(`https://api.deezer.com/artist/${artistId}/top?limit=25`);
+      addTracks(byId, j.data, `artist ${artistName}`);
+    } catch (e) {
+      console.log(`artist ${artistName}: failed (${e.message})`);
+    }
+    done += 1;
+    if (done % 50 === 0) console.log(`--- artist sweep ${done}/${Math.min(artistIds.size, ARTIST_CAP)} ---`);
     await new Promise((r) => setTimeout(r, 250));
   }
 
