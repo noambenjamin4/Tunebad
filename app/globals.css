@@ -83,6 +83,9 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  /* clip (not hidden): kills sideways page scroll without creating a scroll
+     container, so the sticky topbar keeps sticking. */
+  overflow-x: clip;
   background: var(--bg);
   color: var(--ink);
   font-family: var(--font-sans), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -279,10 +282,12 @@ input[type="number"] {
   display: flex;
   align-items: center;
   gap: 20px;
-  max-width: 1200px;
+  /* Full-bleed: the brand hugs the left edge and the tab row gets the whole
+     viewport width, so the language trigger is never pushed off-screen. */
+  max-width: none;
   height: 64px;
   margin: 0 auto;
-  padding-inline: 20px;
+  padding-inline: 16px;
 }
 
 .brand {
@@ -352,6 +357,15 @@ input[type="number"] {
   align-items: center;
   gap: 4px;
   flex: 1;
+  /* Squeeze/scroll INSIDE the nav when tabs outgrow the row, instead of
+     overflowing the flex line and shoving the language trigger off-screen. */
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.top-actions::-webkit-scrollbar {
+  display: none;
 }
 
 .lang-slot {
@@ -373,7 +387,8 @@ input[type="number"] {
   border-radius: var(--radius-pill);
   background: transparent;
   color: var(--ink);
-  font-family: var(--font-mono);
+  font-family: var(--font-display), sans-serif;
+  font-weight: 700;
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -513,18 +528,22 @@ input[type="number"] {
 /* Between the hamburger cutoff and full width, the eight desktop tabs plus
    the logo don't fit at full size — squeeze the tabs, then drop the wordmark
    (the vinyl mark alone still carries the brand). */
-@media (min-width: 1020px) and (max-width: 1279px) {
+@media (min-width: 1020px) and (max-width: 1439px) {
   .topbar-inner {
     gap: 12px;
   }
 
+  .top-actions {
+    gap: 2px;
+  }
+
   .top-actions .ghost-button {
-    padding: 8px 10px;
+    padding: 8px 8px;
     font-size: 11px;
   }
 }
 
-@media (min-width: 1020px) and (max-width: 1139px) {
+@media (min-width: 1020px) and (max-width: 1279px) {
   .brand-wordmark {
     display: none;
   }
@@ -2523,7 +2542,7 @@ tbody tr:last-child td {
 .link-analyze {
   display: grid;
   gap: 8px;
-  margin: 0 clamp(20px, 4vw, 40px) 4px;
+  margin: clamp(20px, 3vw, 28px) clamp(20px, 4vw, 40px) 12px;
   padding: 16px 18px;
   border: 1px solid var(--line);
   border-radius: var(--radius-inner);
@@ -3560,7 +3579,10 @@ tbody tr:last-child td {
 .tools-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 14px;
+  gap: 18px;
+  /* Direct child of the overflow-hidden .panel: needs its own inset, same
+     clamp the heading uses, or the cards sit flush against the card border. */
+  padding: clamp(20px, 4vw, 40px);
 }
 
 .tools-card {
