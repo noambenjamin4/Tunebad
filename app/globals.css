@@ -3765,3 +3765,78 @@ tbody tr:last-child td {
   display: flex;
   justify-content: space-between;
 }
+
+/* ---------------------------------------------------------------------
+   Reverb type + EQ (Slowed + Reverb studio)
+   --------------------------------------------------------------------- */
+.reverb-eq-section {
+  display: grid;
+  gap: 10px;
+}
+
+/* 5 character pills in one row; the appended position keeps this winning
+   over the base .quality-options 4-column grid. Below 480px the generic
+   .quality-options:not(...):not(...) mobile rule (higher specificity)
+   collapses it to 2 columns, which is the intended phone layout. */
+.quality-options.reverb-eq-types {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.reverb-eq-types .quality-button {
+  min-width: 0;
+  padding: 0 6px;
+}
+
+.reverb-eq-types .quality-button strong {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.reverb-eq-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.reverb-eq-container {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.reverb-eq-svg {
+  display: block;
+  width: 100%;
+  height: 190px;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.reverb-eq-svg[data-disabled] {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.reverb-eq-node {
+  cursor: grab;
+  outline: none;
+}
+
+.reverb-eq-node:active {
+  cursor: grabbing;
+}
+
+.reverb-eq-node:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.reverb-eq-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  fill: var(--muted);
+}

@@ -11,13 +11,18 @@ import { SeekableWaveform } from "@/components/ui/SeekableWaveform";
 import { computeWaveformBars } from "@/lib/audio/waveform";
 import { SlowedIcon } from "@/components/ui/icons";
 import {
+  applyReverbEqParams,
   buildRemixGraph,
   coupledSemitones,
+  NEUTRAL_REVERB_EQ,
   renderRemix,
   timeStretch,
   type RemixGraph,
   type RemixParams,
+  type ReverbEqParams,
+  type ReverbType,
 } from "@/lib/audio/remix";
+import { ReverbEq } from "@/components/remix/ReverbEq";
 import { setNowPlaying } from "@/lib/audio/now-playing";
 
 const NOW_PLAYING_SOURCE = "remix-preview";
@@ -32,6 +37,16 @@ const PRESETS: Preset[] = [
 ];
 
 const DEBOUNCE_MS = 400;
+
+// Reverb-character pill labels come from i18n; the type values feed
+// REVERB_TYPES in lib/audio/remix.ts.
+const REVERB_TYPE_OPTIONS = [
+  { type: "room", labelKey: "remix.typeRoom" },
+  { type: "plate", labelKey: "remix.typePlate" },
+  { type: "hall", labelKey: "remix.typeHall" },
+  { type: "cathedral", labelKey: "remix.typeCathedral" },
+  { type: "saturated", labelKey: "remix.typeSaturated" },
+] as const;
 
 function matchesPreset(preset: Preset, speed: number, reverb: number, bassBoostDb: number): boolean {
   return Math.abs(preset.speed - speed) < 0.005 && preset.reverb === reverb && preset.bassBoostDb === bassBoostDb;
@@ -54,6 +69,8 @@ export function RemixStudio() {
   const [bassBoostDb, setBassBoostDb] = useState(0);
   const [lockPitch, setLockPitch] = useState(false);
   const [pitchSemitones, setPitchSemitones] = useState(0);
+  const [reverbType, setReverbType] = useState<ReverbType>("hall");
+  const [reverbEq, setReverbEq] = useState<ReverbEqParams>(NEUTRAL_REVERB_EQ);
 
   const [playing, setPlaying] = useState(false);
   const [reprocessing, setReprocessing] = useState(false);
@@ -82,8 +99,8 @@ export function RemixStudio() {
   const bufferDurationRef = useRef(0);
 
   const params: RemixParams = useMemo(
-    () => ({ speed, reverb, bassBoostDb, lockPitch, pitchSemitones }),
-    [speed, reverb, bassBoostDb, lockPitch, pitchSemitones],
+    () => ({ speed, reverb, bassBoostDb, lockPitch, pitchSemitones, reverbType, reverbEq }),
+    [speed, reverb, bassBoostDb, lockPitch, pitchSemitones, reverbType, reverbEq],
   );
 
   const bars = useMemo(() => (buffer ? computeWaveformBars(buffer) : []), [buffer]);
@@ -136,6 +153,8 @@ export function RemixStudio() {
     setBassBoostDb(0);
     setLockPitch(false);
     setPitchSemitones(0);
+    setReverbType("hall");
+    setReverbEq(NEUTRAL_REVERB_EQ);
     setStatus(null);
     setStartOffset(0);
     startOffsetRef.current = 0;
@@ -244,6 +263,26 @@ export function RemixStudio() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [speed, reverb, bassBoostDb, lockPitch]);
+
+  // EQ changes apply live to the current graph's wet-path filters — no
+  // rebuild needed (the BiquadFilterNodes stay in place; only their values
+  // move).
+  const handleReverbEqChange = useCallback((eq: ReverbEqParams) => {
+    setReverbEq(eq);
+    if (graphRef.current) applyReverbEqParams(graphRef.current.reverbEq, eq);
+  }, []);
+
+  // Changing the reverb TYPE swaps the convolver's impulse response, which
+  // requires rebuilding the playback graph — the same stop-and-restart
+  // mechanism seeking uses. This runs after render so `startAt` (and the
+  // `params` it captures) already reflect the new type.
+  useEffect(() => {
+    if (!graphRef.current || !audioCtxRef.current) return;
+    const offset = getElapsed();
+    stopPreview();
+    startAt(offset);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reverbType]);
 
   const applyPreset = (preset: Preset) => {
     setSpeed(preset.speed);
@@ -470,6 +509,33 @@ export function RemixStudio() {
               value={reverb}
               onChange={(event) => setReverb(Number.parseInt(event.target.value, 10))}
             />
+          </div>
+
+          <div className="reverb-eq-section">
+            <span className="field-label" id="reverbTypeLegend">
+              {t("remix.reverbTypeLegend")}
+            </span>
+            <div className="quality-options reverb-eq-types" role="group" aria-labelledby="reverbTypeLegend">
+              {REVERB_TYPE_OPTIONS.map(({ type, labelKey }) => (
+                <button
+                  key={type}
+                  type="button"
+                  className={`quality-button${reverbType === type ? " active" : ""}`}
+                  aria-pressed={reverbType === type}
+                  onClick={() => setReverbType(type)}
+                >
+                  <strong>{t(labelKey)}</strong>
+                </button>
+              ))}
+            </div>
+
+            <div className="reverb-eq-heading">
+              <span className="field-label">{t("remix.reverbEqTitle")}</span>
+              <button className="text-button" type="button" onClick={() => handleReverbEqChange(NEUTRAL_REVERB_EQ)}>
+                {t("remix.reverbEqReset")}
+              </button>
+            </div>
+            <ReverbEq eq={reverbEq} onChange={handleReverbEqChange} disabled={working} />
           </div>
 
           <div className="remix-slider-row">

@@ -52,12 +52,45 @@ function loadSoundTouch(): Promise<{ SoundTouchCtor: SoundTouchCtorType; SimpleF
   return soundTouchModulePromise;
 }
 
+// Reverb characters: each is an impulse-response recipe (length + decay rate),
+// and "saturated" additionally drives the wet signal through a soft clipper.
+export type ReverbType = "room" | "plate" | "hall" | "cathedral" | "saturated";
+
+export const REVERB_TYPES: Record<ReverbType, { seconds: number; decay: number; drive: number }> = {
+  room: { seconds: 0.9, decay: 6, drive: 0 },
+  plate: { seconds: 1.8, decay: 4.5, drive: 0 },
+  hall: { seconds: 2.8, decay: 3.5, drive: 0 },
+  cathedral: { seconds: 5.5, decay: 2.2, drive: 0 },
+  saturated: { seconds: 2.8, decay: 3.0, drive: 3 },
+};
+
+// Parametric EQ applied to the WET (reverb) path only, so the reverb can sit
+// in just the highs, just the lows, or any shape in between. Neutral defaults
+// leave the sound untouched.
+export interface ReverbEqParams {
+  highpassHz: number; // 20 = off
+  lowpassHz: number; // 20000 = off
+  lowShelf: { hz: number; db: number };
+  peak: { hz: number; db: number };
+  highShelf: { hz: number; db: number };
+}
+
+export const NEUTRAL_REVERB_EQ: ReverbEqParams = {
+  highpassHz: 20,
+  lowpassHz: 20000,
+  lowShelf: { hz: 150, db: 0 },
+  peak: { hz: 1000, db: 0 },
+  highShelf: { hz: 6000, db: 0 },
+};
+
 export interface RemixParams {
   speed: number;
   reverb: number;
   bassBoostDb: number;
   lockPitch: boolean;
   pitchSemitones: number;
+  reverbType: ReverbType;
+  reverbEq: ReverbEqParams;
 }
 
 // A short, exponentially-decaying noise burst used as the reverb's impulse
@@ -72,6 +105,66 @@ export function generateImpulseResponse(ctx: BaseAudioContext, seconds = 2.8, de
     }
   }
   return impulse;
+}
+
+// Soft-clip curve for the "saturated" reverb character (tanh drive).
+function saturationCurve(drive: number): Float32Array<ArrayBuffer> {
+  const samples = 1024;
+  const curve = new Float32Array(new ArrayBuffer(samples * 4));
+  for (let i = 0; i < samples; i += 1) {
+    const x = (i / (samples - 1)) * 2 - 1;
+    curve[i] = Math.tanh(drive * x) / Math.tanh(drive);
+  }
+  return curve;
+}
+
+/** The wet-path EQ chain, in series. Exposed so the UI can live-tweak nodes. */
+export interface ReverbEqNodes {
+  highpass: BiquadFilterNode;
+  lowShelf: BiquadFilterNode;
+  peak: BiquadFilterNode;
+  highShelf: BiquadFilterNode;
+  lowpass: BiquadFilterNode;
+}
+
+export function applyReverbEqParams(nodes: ReverbEqNodes, eq: ReverbEqParams): void {
+  nodes.highpass.frequency.value = eq.highpassHz;
+  nodes.lowShelf.frequency.value = eq.lowShelf.hz;
+  nodes.lowShelf.gain.value = eq.lowShelf.db;
+  nodes.peak.frequency.value = eq.peak.hz;
+  nodes.peak.gain.value = eq.peak.db;
+  nodes.highShelf.frequency.value = eq.highShelf.hz;
+  nodes.highShelf.gain.value = eq.highShelf.db;
+  nodes.lowpass.frequency.value = eq.lowpassHz;
+}
+
+function buildReverbEqChain(ctx: BaseAudioContext, eq: ReverbEqParams): ReverbEqNodes {
+  const highpass = ctx.createBiquadFilter();
+  highpass.type = "highpass";
+  highpass.Q.value = 0.7;
+
+  const lowShelf = ctx.createBiquadFilter();
+  lowShelf.type = "lowshelf";
+
+  const peak = ctx.createBiquadFilter();
+  peak.type = "peaking";
+  peak.Q.value = 1;
+
+  const highShelf = ctx.createBiquadFilter();
+  highShelf.type = "highshelf";
+
+  const lowpass = ctx.createBiquadFilter();
+  lowpass.type = "lowpass";
+  lowpass.Q.value = 0.7;
+
+  const nodes = { highpass, lowShelf, peak, highShelf, lowpass };
+  applyReverbEqParams(nodes, eq);
+
+  highpass.connect(lowShelf);
+  lowShelf.connect(peak);
+  peak.connect(highShelf);
+  highShelf.connect(lowpass);
+  return nodes;
 }
 
 // Wet/dry mix for the reverb send. Kept as a pure function so it can be unit
@@ -92,15 +185,17 @@ export interface RemixGraph {
   dryGain: GainNode;
   wetGain: GainNode;
   bassFilter: BiquadFilterNode;
+  reverbEq: ReverbEqNodes;
 }
 
-// Builds: source -> [dry gain, convolver -> wet gain] -> bass shelf -> destination,
-// and starts the source immediately (at `offset` seconds into the buffer).
-// `offset` lets playback begin partway through the buffer, which is how
-// scrubbing works for an AudioBufferSourceNode: it can't be seeked in place
-// once started, so seeking means stopping and rebuilding this graph with a
-// new offset. The caller can still live-update dryGain/wetGain/bassFilter/
-// source.playbackRate afterward.
+// Builds: source -> [dry gain, convolver (-> drive) -> reverb EQ -> wet gain]
+// -> bass shelf -> destination, and starts the source immediately (at `offset`
+// seconds into the buffer). `offset` lets playback begin partway through the
+// buffer, which is how scrubbing works for an AudioBufferSourceNode: it can't
+// be seeked in place once started, so seeking means stopping and rebuilding
+// this graph with a new offset. The caller can still live-update dryGain/
+// wetGain/bassFilter/reverbEq/source.playbackRate afterward; changing the
+// reverb TYPE requires a rebuild (the convolver's impulse response swaps).
 export function buildRemixGraph(ctx: BaseAudioContext, buffer: AudioBuffer, params: RemixParams, offset = 0): RemixGraph {
   const source = ctx.createBufferSource();
   source.buffer = buffer;
@@ -112,17 +207,31 @@ export function buildRemixGraph(ctx: BaseAudioContext, buffer: AudioBuffer, para
   dryGain.gain.value = dry;
   wetGain.gain.value = wet;
 
+  const type = REVERB_TYPES[params.reverbType] ?? REVERB_TYPES.hall;
   const convolver = ctx.createConvolver();
-  convolver.buffer = generateImpulseResponse(ctx);
+  convolver.buffer = generateImpulseResponse(ctx, type.seconds, type.decay);
 
   const bassFilter = ctx.createBiquadFilter();
   bassFilter.type = "lowshelf";
   bassFilter.frequency.value = 200;
   bassFilter.gain.value = params.bassBoostDb;
 
+  const reverbEq = buildReverbEqChain(ctx, params.reverbEq);
+
   source.connect(dryGain);
   source.connect(convolver);
-  convolver.connect(wetGain);
+
+  // Wet path: convolver (-> soft clipper for the saturated character) -> EQ -> wet gain.
+  let wetTail: AudioNode = convolver;
+  if (type.drive > 0) {
+    const shaper = ctx.createWaveShaper();
+    shaper.curve = saturationCurve(type.drive);
+    shaper.oversample = "2x";
+    wetTail.connect(shaper);
+    wetTail = shaper;
+  }
+  wetTail.connect(reverbEq.highpass);
+  reverbEq.lowpass.connect(wetGain);
 
   dryGain.connect(bassFilter);
   wetGain.connect(bassFilter);
@@ -131,7 +240,7 @@ export function buildRemixGraph(ctx: BaseAudioContext, buffer: AudioBuffer, para
   const clampedOffset = Math.min(Math.max(0, offset), Math.max(0, buffer.duration - 0.001));
   source.start(0, clampedOffset);
 
-  return { source, dryGain, wetGain, bassFilter };
+  return { source, dryGain, wetGain, bassFilter, reverbEq };
 }
 
 // Renders the remix graph offline to raw channel data, ready for encoding.
@@ -145,7 +254,9 @@ export async function renderRemix(
 ): Promise<{ channels: Float32Array[]; sampleRate: number }> {
   const numberOfChannels = Math.min(2, buffer.numberOfChannels);
   const effectiveSpeed = params.lockPitch ? 1 : params.speed;
-  const length = Math.ceil((buffer.duration / effectiveSpeed + 2.8) * buffer.sampleRate);
+  // Tail padding must cover the selected reverb type's impulse length.
+  const tail = (REVERB_TYPES[params.reverbType] ?? REVERB_TYPES.hall).seconds;
+  const length = Math.ceil((buffer.duration / effectiveSpeed + tail) * buffer.sampleRate);
   const offline = new OfflineAudioContext(numberOfChannels, length, buffer.sampleRate);
 
   buildRemixGraph(offline, buffer, params);
