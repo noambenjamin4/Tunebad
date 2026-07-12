@@ -16,8 +16,14 @@ export const metadata: Metadata = {
   alternates: { canonical: "/songs" },
 };
 
+// The hub/count computations want the full catalog, but rendering every row
+// is a page-weight problem (1.6MB of HTML at ~4k songs and growing): the
+// browsable table shows the latest LIST_CAP, and crawlers reach the rest
+// through the sitemap and the key/BPM hub mesh.
+const LIST_CAP = 2000;
+
 export default async function SongsPage() {
-  const songs = await readAllSongs(5000);
+  const songs = await readAllSongs(20000);
 
   // Crawlable browse links: keys that actually have songs, and the most
   // common integer BPMs (the hub pages 404 below 3 songs, so mirror that).
@@ -92,8 +98,15 @@ export default async function SongsPage() {
           {songs.length === 0 ? (
             <p className="song-note">No songs analyzed yet. Be the first — paste a link on the Key &amp; BPM Finder.</p>
           ) : (
+            <>
+            {songs.length > LIST_CAP && (
+              <p className="song-note">
+                The table below shows the latest {LIST_CAP} songs. Every analyzed song is reachable
+                through the key and BPM hubs above, or straight from search.
+              </p>
+            )}
             <SongBrowser
-              songs={songs.map((s) => ({
+              songs={songs.slice(0, LIST_CAP).map((s) => ({
                 slug: s.slug,
                 title: s.title,
                 artist: s.artist,
@@ -102,6 +115,7 @@ export default async function SongsPage() {
                 camelot: s.camelot,
               }))}
             />
+            </>
           )}
         </article>
       </main>

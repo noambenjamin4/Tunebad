@@ -25,7 +25,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   });
 
-  const songs = await readAllSongs(5000);
+  // Sitemap protocol caps a single file at 50k URLs; 20k leaves headroom for
+  // every other route while the seeded catalog keeps growing.
+  const songs = await readAllSongs(20000);
   const songRoutes: MetadataRoute.Sitemap = songs.map((s) => ({
     url: `${base}/song/${s.slug}`,
     lastModified: now,

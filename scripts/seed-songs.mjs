@@ -219,6 +219,37 @@ async function collectTracks() {
     await new Promise((r) => setTimeout(r, 250));
   }
 
+  // 4. Related-artist expansion: chart artists are the head of the catalog;
+  // their related artists are the body. Bounded fan-out so the API stays polite.
+  const RELATED_SOURCES = 150;
+  const RELATED_ARTIST_CAP = 800;
+  const relatedIds = new Map();
+  for (const [artistId] of [...artistIds.entries()].slice(0, RELATED_SOURCES)) {
+    if (relatedIds.size >= RELATED_ARTIST_CAP) break;
+    try {
+      const j = await getJson(`https://api.deezer.com/artist/${artistId}/related?limit=20`);
+      for (const a of j.data || []) {
+        if (a.id && !artistIds.has(a.id) && !relatedIds.has(a.id)) relatedIds.set(a.id, a.name);
+      }
+    } catch {
+      // skip quietly; related lookup is best-effort
+    }
+    await new Promise((r) => setTimeout(r, 250));
+  }
+  console.log(`--- related-artist pool: ${relatedIds.size} new artists ---`);
+  let relDone = 0;
+  for (const [artistId, artistName] of [...relatedIds.entries()].slice(0, RELATED_ARTIST_CAP)) {
+    try {
+      const j = await getJson(`https://api.deezer.com/artist/${artistId}/top?limit=15`);
+      addTracks(byId, j.data, `related ${artistName}`);
+    } catch (e) {
+      console.log(`related ${artistName}: failed (${e.message})`);
+    }
+    relDone += 1;
+    if (relDone % 100 === 0) console.log(`--- related sweep ${relDone}/${Math.min(relatedIds.size, RELATED_ARTIST_CAP)} ---`);
+    await new Promise((r) => setTimeout(r, 250));
+  }
+
   return [...byId.values()];
 }
 
