@@ -1913,6 +1913,12 @@ tbody tr:last-child td {
   grid-template-columns: repeat(3, minmax(56px, 1fr));
 }
 
+/* Media converter pills: 5-7 formats, so let the grid flow instead of fixing
+   a column count (4 across on a 375px phone, more as the card widens). */
+.media-format-options {
+  grid-template-columns: repeat(auto-fill, minmax(62px, 1fr));
+}
+
 @media (max-width: 480px) {
   .resolution-options {
     grid-template-columns: repeat(2, minmax(56px, 1fr));
@@ -1923,7 +1929,7 @@ tbody tr:last-child td {
      the card + mobile form padding is subtracted on a 375px phone. Drop to
      two columns, matching how the resolution picker collapses just above.
      The :not() guards keep the format/resolution pickers on their own rules. */
-  .quality-options:not(.format-options):not(.resolution-options) {
+  .quality-options:not(.format-options):not(.resolution-options):not(.media-format-options) {
     grid-template-columns: repeat(2, minmax(56px, 1fr));
   }
 }

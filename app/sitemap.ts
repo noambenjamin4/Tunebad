@@ -83,6 +83,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     tool("/compress-image-to-100kb"),
     tool("/compress-video"),
     tool("/compress-video-for-discord"),
+    tool("/video-converter"),
+    tool("/audio-converter"),
     tool("/merge-pdf"),
     tool("/jpg-to-pdf"),
     tool("/unzip-files"),

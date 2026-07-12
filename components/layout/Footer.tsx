@@ -53,6 +53,8 @@ export function Footer() {
           <Link href="/unzip-files">{t("tools.cardZip")}</Link>
           <Link href="/compress-video">{t("tools.cardVideo")}</Link>
           <Link href="/compress-video-for-discord">{t("tools.cardDiscord")}</Link>
+          <Link href="/video-converter">{t("tools.cardVideoConvert")}</Link>
+          <Link href="/audio-converter">{t("tools.cardAudioConvert")}</Link>
         </nav>
         {/* English guide articles; next/link prefetches these full navigations. */}
         <nav className="site-footer-tools site-footer-guides" aria-label={t("footer.guides")}>

@@ -470,6 +470,19 @@ const ja: Record<keyof typeof en, string> = {
   "tools.descVideo": "ブラウザ内で動画を目標サイズまで小さくします。",
   "tools.cardDiscord": "Discord用に圧縮",
   "tools.descDiscord": "クリップをDiscordの10MBアップロード上限に収めます。",
+  // Media converters (video/audio, any format to any format)
+  "tools.cardVideoConvert": "動画コンバーター",
+  "tools.descVideoConvert": "MP4、WebM、MKV、MOVなどに、ブラウザ内で変換。",
+  "tools.cardAudioConvert": "音声コンバーター",
+  "tools.descAudioConvert": "MP3、WAV、FLAC、OGG、M4Aに、ブラウザ内で変換。",
+  "mediatool.titleVideo": "動画コンバーター",
+  "mediatool.subtitleVideo": "動画をMP4、WebM、MKV、MOV、AVI、FLV、WMVにブラウザ内で変換できます。ファイルがデバイスから外に出ることはありません。",
+  "mediatool.titleAudio": "音声コンバーター",
+  "mediatool.subtitleAudio": "音声をMP3、WAV、FLAC、OGG、M4Aにブラウザ内で変換できます。ファイルがデバイスから外に出ることはありません。",
+  "mediatool.bitrate": "MP3ビットレート",
+  "mediatool.converting": "変換中...",
+  "mediatool.convertFail": "そのファイルを変換できませんでした。別の形式か、もっと小さいファイルをお試しください。",
+  "mediatool.dropAudio": "ここに音声ファイルをドロップ（最大{size}まで）",
 };
 
 export default ja;

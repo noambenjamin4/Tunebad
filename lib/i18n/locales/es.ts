@@ -470,6 +470,19 @@ const es: Record<keyof typeof en, string> = {
   "tools.descVideo": "Reduce un vídeo al tamaño que quieras, en tu navegador.",
   "tools.cardDiscord": "Comprimir para Discord",
   "tools.descDiscord": "Deja un clip por debajo del límite de subida de 10MB de Discord.",
+  // Media converters (video/audio, any format to any format)
+  "tools.cardVideoConvert": "Convertidor de vídeo",
+  "tools.descVideoConvert": "MP4, WebM, MKV, MOV y más, en tu navegador.",
+  "tools.cardAudioConvert": "Convertidor de audio",
+  "tools.descAudioConvert": "MP3, WAV, FLAC, OGG y M4A, en tu navegador.",
+  "mediatool.titleVideo": "Convertidor de vídeo",
+  "mediatool.subtitleVideo": "Convierte un vídeo a MP4, WebM, MKV, MOV, AVI, FLV o WMV directamente en tu navegador. El archivo nunca sale de tu dispositivo.",
+  "mediatool.titleAudio": "Convertidor de audio",
+  "mediatool.subtitleAudio": "Convierte audio a MP3, WAV, FLAC, OGG o M4A directamente en tu navegador. El archivo nunca sale de tu dispositivo.",
+  "mediatool.bitrate": "Bitrate del MP3",
+  "mediatool.converting": "Convirtiendo...",
+  "mediatool.convertFail": "No se pudo convertir ese archivo. Prueba con otro formato o un archivo más pequeño.",
+  "mediatool.dropAudio": "Suelta un archivo de audio aquí (hasta {size})",
 };
 
 export default es;

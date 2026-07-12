@@ -31,6 +31,8 @@ Key facts:
 - [Unzip Files](https://www.tunebad.com/unzip-files): Open a ZIP archive and download its contents, or bundle files into a new ZIP.
 - [Compress Video](https://www.tunebad.com/compress-video): Shrink a video to 10, 25, 50, or 100 MB in the browser, no upload.
 - [Compress Video for Discord](https://www.tunebad.com/compress-video-for-discord): Get a clip under Discord's 10MB limit in the browser.
+- [Video Converter](https://www.tunebad.com/video-converter): Convert a video to MP4, WebM, MKV, MOV, AVI, FLV, or WMV in the browser, no upload.
+- [Audio Converter](https://www.tunebad.com/audio-converter): Convert audio to MP3 (128/192/320 kbps), WAV, FLAC, OGG, or M4A in the browser, no upload.
 
 ## Pages
 

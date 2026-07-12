@@ -16,6 +16,8 @@ const CARDS = [
   ["merge-pdf", "MERGE", "PDF FILES"],
   ["jpg-to-pdf", "JPG TO", "PDF"],
   ["unzip-files", "UNZIP", "FILES"],
+  ["video-converter", "VIDEO", "CONVERTER"],
+  ["audio-converter", "AUDIO", "CONVERTER"],
 ];
 
 const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");

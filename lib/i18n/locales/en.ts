@@ -500,6 +500,19 @@ const en = {
   "tools.descVideo": "Shrink a video to a target size, in your browser.",
   "tools.cardDiscord": "Compress for Discord",
   "tools.descDiscord": "Get a clip under Discord's 10MB upload limit.",
+  // Media converters (video/audio, any format to any format)
+  "tools.cardVideoConvert": "Video Converter",
+  "tools.descVideoConvert": "MP4, WebM, MKV, MOV, and more, in your browser.",
+  "tools.cardAudioConvert": "Audio Converter",
+  "tools.descAudioConvert": "MP3, WAV, FLAC, OGG, and M4A, in your browser.",
+  "mediatool.titleVideo": "Video Converter",
+  "mediatool.subtitleVideo": "Convert a video to MP4, WebM, MKV, MOV, AVI, FLV, or WMV right in your browser. The file never leaves your device.",
+  "mediatool.titleAudio": "Audio Converter",
+  "mediatool.subtitleAudio": "Convert audio to MP3, WAV, FLAC, OGG, or M4A right in your browser. The file never leaves your device.",
+  "mediatool.bitrate": "MP3 bitrate",
+  "mediatool.converting": "Converting...",
+  "mediatool.convertFail": "Could not convert that file. Try another format or a smaller file.",
+  "mediatool.dropAudio": "Drop an audio file here (up to {size})",
 } as const;
 
 export default en;

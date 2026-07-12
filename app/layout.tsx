@@ -157,6 +157,8 @@ const STRUCTURED_DATA = {
         "Playlist key & BPM analyzer",
         "Image converter, resizer & compressor (in-browser)",
         "In-browser video compressor (for Discord and more)",
+        "Video converter: MP4, WebM, MKV, MOV, AVI, FLV, WMV (in-browser)",
+        "Audio converter: MP3, WAV, FLAC, OGG, M4A (in-browser)",
         "PDF merge and JPG to PDF (in-browser)",
         "ZIP and unzip files (in-browser)",
       ],

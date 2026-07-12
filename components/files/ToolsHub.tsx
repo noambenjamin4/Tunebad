@@ -17,6 +17,8 @@ const FILE_TOOLS: { href: string; nameKey: DictKey; descKey: DictKey }[] = [
   { href: "/unzip-files", nameKey: "tools.cardZip", descKey: "tools.descZip" },
   { href: "/compress-video", nameKey: "tools.cardVideo", descKey: "tools.descVideo" },
   { href: "/compress-video-for-discord", nameKey: "tools.cardDiscord", descKey: "tools.descDiscord" },
+  { href: "/video-converter", nameKey: "tools.cardVideoConvert", descKey: "tools.descVideoConvert" },
+  { href: "/audio-converter", nameKey: "tools.cardAudioConvert", descKey: "tools.descAudioConvert" },
 ];
 
 export function ToolsHub({ extra }: { extra?: { href: string; nameKey: DictKey; descKey: DictKey }[] }) {

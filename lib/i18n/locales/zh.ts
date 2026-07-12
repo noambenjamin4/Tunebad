@@ -469,6 +469,19 @@ const zh: Record<keyof typeof en, string> = {
   "tools.descVideo": "在浏览器里把视频缩小到目标大小。",
   "tools.cardDiscord": "为Discord压缩",
   "tools.descDiscord": "让片段控制在Discord的10MB上传上限以内。",
+  // Media converters (video/audio, any format to any format)
+  "tools.cardVideoConvert": "视频转换器",
+  "tools.descVideoConvert": "在浏览器里转换MP4、WebM、MKV、MOV等格式。",
+  "tools.cardAudioConvert": "音频转换器",
+  "tools.descAudioConvert": "在浏览器里转换MP3、WAV、FLAC、OGG和M4A。",
+  "mediatool.titleVideo": "视频转换器",
+  "mediatool.subtitleVideo": "在浏览器里就能把视频转换成MP4、WebM、MKV、MOV、AVI、FLV或WMV。文件绝不会离开你的设备。",
+  "mediatool.titleAudio": "音频转换器",
+  "mediatool.subtitleAudio": "在浏览器里就能把音频转换成MP3、WAV、FLAC、OGG或M4A。文件绝不会离开你的设备。",
+  "mediatool.bitrate": "MP3比特率",
+  "mediatool.converting": "正在转换...",
+  "mediatool.convertFail": "无法转换这个文件。换个格式，或换个更小的文件试试。",
+  "mediatool.dropAudio": "把音频文件拖到这里（不超过{size}）",
 };
 
 export default zh;
