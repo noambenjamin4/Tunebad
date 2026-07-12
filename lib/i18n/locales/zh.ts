@@ -275,6 +275,9 @@ const zh: Record<keyof typeof en, string> = {
   // Homepage landing / FAQ section
   "landing.heading": "为制作人和DJ准备的免费工具",
   "landing.lede": "TuneBad是一套免费的音乐工具，适合所有和音乐打交道的人。你可以查找歌曲的调性、BPM和响度，把YouTube或Spotify链接转成MP3，给音轨降速并加上混响，改变音高，或者计算混音用的延迟时间。一切都在浏览器里运行，没有广告，也不用注册账号。",
+  "landing.dbProof": "已分析 {count} 首歌曲，数量持续增长，每首都附有调性、BPM 和 Camelot 代码。",
+  "landing.dbBrowse": "浏览歌曲数据库",
+  "landing.dbWheel": "探索 Camelot 轮盘",
   "landing.value1Title": "100%免费",
   "landing.value1Body": "所有工具都免费使用。没有试用期，没有付费墙，也没有需要升级的版本。",
   "landing.value2Title": "无广告，免注册",

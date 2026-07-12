@@ -293,6 +293,9 @@ const en = {
   "landing.heading": "Free tools for producers and DJs",
   "landing.lede":
     "TuneBad is a free set of tools for anyone who works with music. Find a song's key, BPM, and loudness, turn a YouTube or Spotify link into an MP3, slow a track down and add reverb, change the pitch, or work out delay times for your mix. It all runs in your browser, with no ads and no account.",
+  "landing.dbProof": "{count} songs analyzed and counting, each with its key, BPM, and Camelot code.",
+  "landing.dbBrowse": "Browse the song database",
+  "landing.dbWheel": "Explore the Camelot wheel",
   "landing.value1Title": "100% free",
   "landing.value1Body": "Every tool is free to use. No trial, no paywall, nothing to upgrade.",
   "landing.value2Title": "No ads, no sign-up",

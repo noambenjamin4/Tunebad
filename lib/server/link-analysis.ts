@@ -178,6 +178,25 @@ export async function readAllSongs(limit = 10000): Promise<CachedAnalysis[]> {
   }
 }
 
+/** Total number of analyzed songs, without fetching rows (PostgREST exact count). */
+export async function countSongs(): Promise<number | null> {
+  if (!isLinkAnalysisConfigured) return null;
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/link_analysis?select=id&limit=1`, {
+      headers: { ...restHeaders(), Prefer: "count=exact", Range: "0-0" },
+      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+      next: { revalidate: 3600 },
+    });
+    if (!res.ok) return null;
+    const range = res.headers.get("content-range");
+    const total = range?.split("/")[1];
+    const n = total ? Number(total) : NaN;
+    return Number.isFinite(n) ? n : null;
+  } catch {
+    return null;
+  }
+}
+
 /** First write wins: duplicate ids are ignored (no update policy server-side either).
  *  `slug` is filled by a DB trigger from title+artist, so callers never send it. */
 export async function writeCachedAnalysis(row: Omit<CachedAnalysis, "created_at" | "slug">): Promise<boolean> {

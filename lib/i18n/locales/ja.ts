@@ -276,6 +276,9 @@ const ja: Record<keyof typeof en, string> = {
   // Homepage landing / FAQ section
   "landing.heading": "プロデューサーとDJのための無料ツール",
   "landing.lede": "TuneBadは、音楽に関わるすべての人のための無料ツール集です。曲のキー、BPM、ラウドネスの解析、YouTubeやSpotifyのリンクからMP3への変換、トラックを遅くしてリバーブを加える加工、ピッチの変更、ミックス用のディレイタイムの計算までできます。すべてブラウザ上で動作し、広告もアカウントも不要です。",
+  "landing.dbProof": "解析済みの楽曲は{count}曲、今も増え続けています。各曲にキー、BPM、Camelotコード付きです。",
+  "landing.dbBrowse": "楽曲データベースを見る",
+  "landing.dbWheel": "Camelotホイールを見る",
   "landing.value1Title": "100%無料",
   "landing.value1Body": "すべてのツールが無料で使えます。お試し期間もペイウォールもなく、アップグレードの必要もありません。",
   "landing.value2Title": "広告なし、登録不要",

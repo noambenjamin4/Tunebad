@@ -276,6 +276,9 @@ const it: Record<keyof typeof en, string> = {
   // Homepage landing / FAQ section
   "landing.heading": "Strumenti gratuiti per producer e DJ",
   "landing.lede": "TuneBad è una raccolta gratuita di strumenti per chi lavora con la musica. Trova tonalità, BPM e loudness di un brano, trasforma un link YouTube o Spotify in un MP3, rallenta una traccia e aggiungi il reverb, cambia l'intonazione o calcola i tempi di delay per il tuo mix. Tutto funziona nel browser, senza pubblicità e senza account.",
+  "landing.dbProof": "{count} brani analizzati e il numero continua a crescere, ognuno con tonalità, BPM e codice Camelot.",
+  "landing.dbBrowse": "Sfoglia il database dei brani",
+  "landing.dbWheel": "Esplora la ruota Camelot",
   "landing.value1Title": "100% gratuito",
   "landing.value1Body": "Ogni strumento è gratuito. Nessuna prova, nessun paywall, niente da sbloccare.",
   "landing.value2Title": "Niente pubblicità, niente registrazione",

@@ -36,13 +36,21 @@ const FAQ_JSON_LD = {
   })),
 };
 
-export function LandingSeo() {
+export function LandingSeo({ songCount }: { songCount?: number }) {
   const { t } = useI18n();
   return (
     <section className="seo-landing" aria-label="About TuneBad">
       <div className="seo-inner">
         <h2 className="seo-heading">{t("landing.heading")}</h2>
         <p className="seo-lede">{t("landing.lede")}</p>
+        {songCount != null && songCount > 100 && (
+          <p className="seo-lede seo-db-proof">
+            {t("landing.dbProof", { count: songCount.toLocaleString("en-US") })}{" "}
+            <a href="/songs">{t("landing.dbBrowse")}</a>
+            {" · "}
+            <a href="/camelot-wheel">{t("landing.dbWheel")}</a>
+          </p>
+        )}
 
         <ul className="seo-values">
           {VALUE_KEYS.map((v) => (
