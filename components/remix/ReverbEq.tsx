@@ -164,6 +164,18 @@ function computeResponseDb(eq: ReverbEqParams): number[] | null {
   return combined.map((magnitude) => 20 * Math.log10(Math.max(magnitude, 1e-6)));
 }
 
+// Combined-curve dB at an arbitrary frequency, interpolated between the
+// log-spaced curve points. The dots render on THIS value (not the filter's
+// own gain) so they always sit on the drawn line.
+function curveDbAt(dbValues: number[], hz: number): number {
+  const t = clamp(Math.log(hz / F_MIN) / Math.log(F_MAX / F_MIN), 0, 1) * (dbValues.length - 1);
+  const i = Math.floor(t);
+  const frac = t - i;
+  const a = dbValues[i];
+  const b = dbValues[Math.min(i + 1, dbValues.length - 1)];
+  return a + (b - a) * frac;
+}
+
 function curvePath(geo: Geometry, dbValues: number[]): { line: string; fill: string } {
   const parts: string[] = [];
   for (let i = 0; i < dbValues.length; i += 1) {
@@ -194,7 +206,8 @@ export function ReverbEq({ eq, onChange, disabled = false }: ReverbEqProps) {
   const svgRef = useRef<SVGSVGElement>(null);
   const activeRef = useRef<EqNodeId | null>(null);
   const rafRef = useRef(0);
-  const [paths, setPaths] = useState<{ line: string; fill: string } | null>(null);
+  const [curve, setCurve] = useState<{ line: string; fill: string; db: number[] } | null>(null);
+  const curveDbRef = useRef<number[] | null>(null);
 
   // The viewBox width tracks the rendered width so SVG units stay 1:1 with
   // CSS pixels (round nodes, undistorted hit radii at any card width).
@@ -232,7 +245,10 @@ export function ReverbEq({ eq, onChange, disabled = false }: ReverbEqProps) {
     const compute = () => {
       lastComputeRef.current = performance.now();
       const db = computeResponseDb(eq);
-      if (db) setPaths(curvePath(geo, db));
+      if (db) {
+        curveDbRef.current = db;
+        setCurve({ ...curvePath(geo, db), db });
+      }
     };
     // Geometry changes (resize, initial measure) always compute immediately:
     // ResizeObserver already batches per frame, and a stale-width curve would
@@ -267,7 +283,8 @@ export function ReverbEq({ eq, onChange, disabled = false }: ReverbEqProps) {
       for (const def of NODE_DEFS) {
         const { hz, db } = nodeValue(eqRef.current, def.id);
         const dx = xOf(geoRef.current, hz) - local.x;
-        const dy = (def.hasGain ? yOf(clamp(db, -DB_RANGE, DB_RANGE)) : MID_Y) - local.y;
+        const onCurve = curveDbRef.current ? curveDbAt(curveDbRef.current, hz) : db;
+        const dy = yOf(clamp(onCurve, -DB_RANGE, DB_RANGE)) - local.y;
         const dist = Math.hypot(dx, dy);
         if (dist < bestDist) {
           bestDist = dist;
@@ -288,7 +305,15 @@ export function ReverbEq({ eq, onChange, disabled = false }: ReverbEqProps) {
       const local = toLocal(clientX, clientY);
       if (!def || !local) return;
       const hz = clamp(hzOf(geoRef.current, local.x), def.minHz, def.maxHz);
-      const db = def.hasGain ? clamp(dbOf(local.y), -GAIN_LIMIT, GAIN_LIMIT) : 0;
+      // The dot renders on the COMBINED curve, so dragging targets the curve
+      // height at the pointer: subtract the neighbors' contribution (curve
+      // minus own gain) to get the gain that puts the curve under the pointer.
+      let db = 0;
+      if (def.hasGain) {
+        const current = nodeValue(eqRef.current, def.id);
+        const neighbors = curveDbRef.current ? curveDbAt(curveDbRef.current, hz) - current.db : 0;
+        db = clamp(dbOf(local.y) - neighbors, -GAIN_LIMIT, GAIN_LIMIT);
+      }
       onChange(withNode(eqRef.current, id, Math.round(hz), Math.round(db * 10) / 10));
     },
     [onChange, toLocal],
@@ -394,18 +419,20 @@ export function ReverbEq({ eq, onChange, disabled = false }: ReverbEqProps) {
         <line x1={PAD_L} y1={MID_Y} x2={PAD_L + geo.plotW} y2={MID_Y} stroke="var(--line)" strokeWidth={1} />
 
         {/* Response curve */}
-        {paths && (
+        {curve && (
           <>
-            <path className="reverb-eq-fill" d={paths.fill} fill="var(--ink)" opacity={0.06} stroke="none" />
-            <path className="reverb-eq-curve" d={paths.line} fill="none" stroke="var(--ink)" strokeWidth={2} />
+            <path className="reverb-eq-fill" d={curve.fill} fill="var(--ink)" opacity={0.06} stroke="none" />
+            <path className="reverb-eq-curve" d={curve.line} fill="none" stroke="var(--ink)" strokeWidth={2} />
           </>
         )}
 
-        {/* Draggable filter nodes */}
+        {/* Draggable filter nodes — pinned to the combined curve so the dot
+            always sits ON the line, like a real DAW EQ. */}
         {NODE_DEFS.map((def) => {
           const { hz, db } = nodeValue(eq, def.id);
           const cx = xOf(geo, hz);
-          const cy = def.hasGain ? yOf(clamp(db, -DB_RANGE, DB_RANGE)) : MID_Y;
+          const onCurve = curve ? curveDbAt(curve.db, hz) : db;
+          const cy = yOf(clamp(onCurve, -DB_RANGE, DB_RANGE));
           const valueText = def.hasGain ? `${Math.round(hz)} Hz, ${db > 0 ? "+" : ""}${db} dB` : `${Math.round(hz)} Hz`;
           return (
             <g key={def.id}>
