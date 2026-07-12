@@ -3909,3 +3909,82 @@ tbody tr:last-child td {
   font-size: 10px;
   fill: var(--muted);
 }
+
+/* ---------------------------------------------------------------------
+   "Mixes well with this" suggestions under the analysis summary
+   --------------------------------------------------------------------- */
+.similar-songs {
+  display: grid;
+  gap: 8px;
+  margin: 0 32px 24px;
+}
+
+.similar-songs-label {
+  font-family: var(--font-display), sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+
+.similar-songs-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.similar-songs-list li {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.similar-songs-pill {
+  display: grid;
+  gap: 2px;
+  text-align: left;
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--ink);
+  text-decoration: none;
+  max-width: 100%;
+  transition: background 120ms ease;
+}
+
+.similar-songs-pill:hover {
+  background: var(--hover);
+}
+
+.similar-songs-title {
+  font-size: 13px;
+  font-weight: 700;
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.similar-songs-stats {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .similar-songs {
+    margin-left: 16px;
+    margin-right: 16px;
+  }
+
+  .similar-songs-title {
+    max-width: 100%;
+  }
+}

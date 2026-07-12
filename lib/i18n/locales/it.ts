@@ -329,6 +329,7 @@ const it: Record<keyof typeof en, string> = {
   "analysis.copyLink": "Copia link",
   "analysis.copied": "Copiato",
   "analysis.copyResult": "Copia risultato",
+  "analysis.mixesWith": "Si mixa bene con questa traccia",
   "app.dropAnywhere": "Rilascia il file per analizzarlo",
 
   "playlist.inputLabel": "Incolla un link a una playlist Spotify o YouTube",

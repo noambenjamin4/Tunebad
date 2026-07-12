@@ -329,6 +329,7 @@ const ja: Record<keyof typeof en, string> = {
   "analysis.copyLink": "リンクをコピー",
   "analysis.copied": "コピーしました",
   "analysis.copyResult": "結果をコピー",
+  "analysis.mixesWith": "この曲とよく合う曲",
   "app.dropAnywhere": "ファイルをドロップすると解析します",
 
   "playlist.inputLabel": "SpotifyまたはYouTubeのプレイリストリンクを貼り付け",

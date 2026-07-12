@@ -351,6 +351,7 @@ const en = {
   "analysis.copyLink": "Copy link",
   "analysis.copied": "Copied",
   "analysis.copyResult": "Copy result",
+  "analysis.mixesWith": "Mixes well with this",
   "app.dropAnywhere": "Drop the file to analyze it",
 
   // Playlist analyzer

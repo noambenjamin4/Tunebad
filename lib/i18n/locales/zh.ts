@@ -328,6 +328,7 @@ const zh: Record<keyof typeof en, string> = {
   "analysis.copyLink": "复制链接",
   "analysis.copied": "已复制",
   "analysis.copyResult": "复制结果",
+  "analysis.mixesWith": "适合与这首歌混音",
   "app.dropAnywhere": "松开文件即可开始分析",
 
   "playlist.inputLabel": "粘贴Spotify或YouTube播放列表链接",

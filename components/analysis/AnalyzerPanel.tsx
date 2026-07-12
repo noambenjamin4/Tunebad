@@ -11,6 +11,7 @@ import { RecentStrip } from "./RecentStrip";
 import { WaveformPreview } from "./WaveformPreview";
 import { FileMetaPill } from "./FileMetaPill";
 import { AnalysisSummary } from "./AnalysisSummary";
+import { SimilarSongs } from "./SimilarSongs";
 import { ResultsTable } from "./ResultsTable";
 import type { AnalysisResult } from "@/types/analysis";
 import { WaveformIcon } from "@/components/ui/icons";
@@ -120,6 +121,7 @@ export function AnalyzerPanel() {
           <WaveformPreview bars={waveformBars} previewUrl={previewUrl} duration={previewDuration} />
           <FileMetaPill result={current} onRemove={clearResults} />
           <AnalysisSummary result={current} />
+          <SimilarSongs result={current} />
         </>
       ) : null}
 
