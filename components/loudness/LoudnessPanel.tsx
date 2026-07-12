@@ -4,11 +4,24 @@ import { useCallback, useEffect, useRef, useState, type DragEvent } from "react"
 import { getAudioContextClass } from "@/lib/audio/decode";
 import { decodeAudioFileCached } from "@/lib/audio/decode-cache";
 import { PLATFORM_TARGETS } from "@/lib/audio/lufs";
+import { downloadBlob, encodeMp3FromChannels, encodeWavFromChannels } from "@/lib/audio/mp3-encoder";
 import { useI18n } from "@/lib/i18n";
 import { GaugeIcon } from "@/components/ui/icons";
 import { setNowPlaying } from "@/lib/audio/now-playing";
 
 const NOW_PLAYING_SOURCE = "loudness-preview";
+
+// Normalize-and-export targets. "custom" swaps the pill value for a numeric
+// input clamped to CUSTOM_TARGET_MIN..CUSTOM_TARGET_MAX LUFS.
+const EXPORT_TARGETS = [
+  { id: "spotify", name: "Spotify", lufs: -14 },
+  { id: "youtube", name: "YouTube", lufs: -14 },
+  { id: "apple", name: "Apple Music", lufs: -16 },
+] as const;
+const CUSTOM_TARGET_MIN = -24;
+const CUSTOM_TARGET_MAX = -6;
+// Gain is capped so sample peaks never exceed -1 dBFS after normalizing.
+const EXPORT_PEAK_CEILING = 10 ** (-1 / 20);
 
 interface LoudnessWorkerResult {
   id: number;
@@ -63,6 +76,9 @@ export function LoudnessPanel() {
   const [lufs, setLufs] = useState<number | null>(null);
   const [peakDb, setPeakDb] = useState<number | null>(null);
   const [selectedPlatform, setSelectedPlatform] = useState<string | null>(null);
+  const [exportTarget, setExportTarget] = useState<string>("spotify");
+  const [customTarget, setCustomTarget] = useState("-14");
+  const [exporting, setExporting] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const previewUrlRef = useRef<string | null>(null);
@@ -132,6 +148,9 @@ export function LoudnessPanel() {
     setPeakDb(null);
     setSelectedPlatform(null);
     setMeasuring(false);
+    setExportTarget("spotify");
+    setCustomTarget("-14");
+    setExporting(false);
     if (previewUrlRef.current) {
       URL.revokeObjectURL(previewUrlRef.current);
       previewUrlRef.current = null;
@@ -226,6 +245,60 @@ export function LoudnessPanel() {
   };
 
   const selectedPenalty = selectedPlatform ? PLATFORM_TARGETS.find((p) => p.name === selectedPlatform) : null;
+
+  // The target LUFS the export will aim for, or null when the custom value is
+  // not a usable number.
+  const preset = EXPORT_TARGETS.find((target) => target.id === exportTarget);
+  let targetLufs: number | null = preset ? preset.lufs : null;
+  if (exportTarget === "custom") {
+    const parsed = Number.parseFloat(customTarget);
+    targetLufs = Number.isFinite(parsed) ? Math.min(CUSTOM_TARGET_MAX, Math.max(CUSTOM_TARGET_MIN, parsed)) : null;
+  }
+
+  const exportNormalized = async (encodeAs: "wav" | "mp3") => {
+    if (!file || lufs === null || targetLufs === null || exporting) return;
+    setExporting(true);
+    setError(null);
+    try {
+      // Re-decode from the module cache (the measurement pass transferred its
+      // resampled copies to the worker, so the AudioBuffer is the source of
+      // truth here). Export keeps the file's own sample rate and duration.
+      const { buffer } = await decodeAudioFileCached(file);
+      const channelCount = Math.min(2, buffer.numberOfChannels);
+      const channels: Float32Array[] = [];
+      for (let c = 0; c < channelCount; c += 1) channels.push(buffer.getChannelData(c).slice());
+
+      let linear = 10 ** ((targetLufs - lufs) / 20);
+      // Peak-safe cap: if the gain would push the sample peak above -1 dBFS,
+      // reduce the gain so the peak lands exactly at -1 dBFS instead. This is
+      // a gain limit, not a true-peak limiter.
+      let peak = 0;
+      for (const channel of channels) {
+        for (let i = 0; i < channel.length; i += 1) {
+          const abs = Math.abs(channel[i]);
+          if (abs > peak) peak = abs;
+        }
+      }
+      if (peak > 0 && peak * linear > EXPORT_PEAK_CEILING) linear = EXPORT_PEAK_CEILING / peak;
+
+      for (const channel of channels) {
+        for (let i = 0; i < channel.length; i += 1) channel[i] *= linear;
+      }
+
+      const blob =
+        encodeAs === "wav"
+          ? encodeWavFromChannels(channels, buffer.sampleRate)
+          : await encodeMp3FromChannels(channels, buffer.sampleRate, 320);
+      const stem = file.name.replace(/\.[^.]+$/, "") || "track";
+      const targetLabel = `${targetLufs}`.replace(/\.\d+$/, (frac) => frac.replace(".", "p"));
+      downloadBlob(blob, `${stem} ${targetLabel}LUFS.${encodeAs}`);
+    } catch (err) {
+      console.error("Loudness export failed", err);
+      setError(t("loudness.exportFailed"));
+    } finally {
+      setExporting(false);
+    }
+  };
 
   return (
     <article className="panel hero-tool loudness-panel">
@@ -361,6 +434,72 @@ export function LoudnessPanel() {
                 ? t("loudness.previewingAt", { platform: selectedPlatform, value: formatDb(selectedPenalty.lufs - lufs) })
                 : t("loudness.previewingOriginal")}
             </span>
+          </div>
+
+          <div className="loudness-export">
+            <strong className="loudness-export-title">{t("loudness.exportTitle")}</strong>
+            <div className="quality-options" role="group" aria-label={t("loudness.exportTargetAria")}>
+              {EXPORT_TARGETS.map((target) => (
+                <button
+                  key={target.id}
+                  type="button"
+                  className={`quality-button${exportTarget === target.id ? " active" : ""}`}
+                  aria-pressed={exportTarget === target.id}
+                  disabled={exporting}
+                  onClick={() => setExportTarget(target.id)}
+                >
+                  <strong>{target.lufs}</strong>
+                  <span>{target.name}</span>
+                </button>
+              ))}
+              <button
+                type="button"
+                className={`quality-button${exportTarget === "custom" ? " active" : ""}`}
+                aria-pressed={exportTarget === "custom"}
+                disabled={exporting}
+                onClick={() => setExportTarget("custom")}
+              >
+                <strong>{exportTarget === "custom" && targetLufs !== null ? targetLufs : "±"}</strong>
+                <span>{t("loudness.exportCustom")}</span>
+              </button>
+            </div>
+
+            {exportTarget === "custom" && (
+              <label className="field-label loudness-export-custom">
+                {t("loudness.exportCustomLabel")}
+                <input
+                  className="imgtool-number"
+                  type="number"
+                  min={CUSTOM_TARGET_MIN}
+                  max={CUSTOM_TARGET_MAX}
+                  step={0.5}
+                  value={customTarget}
+                  disabled={exporting}
+                  onChange={(event) => setCustomTarget(event.target.value)}
+                />
+              </label>
+            )}
+
+            <div className="loudness-export-actions">
+              <button
+                className="convert-button"
+                type="button"
+                disabled={exporting || targetLufs === null}
+                onClick={() => void exportNormalized("wav")}
+              >
+                {exporting ? t("loudness.exporting") : t("loudness.exportWav")}
+              </button>
+              <button
+                className="convert-button"
+                type="button"
+                disabled={exporting || targetLufs === null}
+                onClick={() => void exportNormalized("mp3")}
+              >
+                {exporting ? t("loudness.exporting") : t("loudness.exportMp3")}
+              </button>
+            </div>
+
+            <p className="loudness-export-note">{t("loudness.exportNote")}</p>
           </div>
         </>
       )}

@@ -13,11 +13,14 @@ import {
   extractZip,
   type ZipEntry,
 } from "@/lib/files/zip";
+import { createTarGz, extractTarArchive, isTarFileName } from "@/lib/files/tar";
 
 type Status = { title: string; message: string; tone: "neutral" | "success" | "warning" };
 type Tab = "extract" | "create";
+type ArchiveFormat = "zip" | "targz";
 
-const ZIP_ACCEPT = "application/zip,application/x-zip-compressed,.zip";
+const ARCHIVE_ACCEPT =
+  "application/zip,application/x-zip-compressed,application/x-tar,application/gzip,.zip,.tar,.tar.gz,.tgz";
 
 /** An entry's download filename: last path segment of the sanitized name. */
 function entryFileName(name: string): string {
@@ -27,6 +30,7 @@ function entryFileName(name: string): string {
 export function ZipTool() {
   const { t } = useI18n();
   const [tab, setTab] = useState<Tab>("extract");
+  const [format, setFormat] = useState<ArchiveFormat>("zip");
   const [entries, setEntries] = useState<ZipEntry[]>([]);
   const [createFiles, setCreateFiles] = useState<File[]>([]);
   const [working, setWorking] = useState(false);
@@ -49,7 +53,7 @@ export function ZipTool() {
     setEntries([]);
     setStatus({ title: t("files.processing"), message: file.name, tone: "neutral" });
     try {
-      const out = await extractZip(file);
+      const out = isTarFileName(file.name) ? await extractTarArchive(file) : await extractZip(file);
       setEntries(out);
       setStatus({
         title: t("files.done"),
@@ -98,14 +102,15 @@ export function ZipTool() {
     setStatus(warned);
   };
 
-  const buildZip = async () => {
+  const buildArchive = async () => {
     if (!createFiles.length) return;
     setWorking(true);
     setStatus({ title: t("files.processing"), message: createFiles[0].name, tone: "neutral" });
     try {
-      const blob = await createZip(createFiles);
-      downloadBlob(blob, "archive.zip");
-      setStatus({ title: t("files.done"), message: `archive.zip · ${formatBytes(blob.size)}`, tone: "success" });
+      const blob = format === "targz" ? await createTarGz(createFiles) : await createZip(createFiles);
+      const fileName = format === "targz" ? "archive.tar.gz" : "archive.zip";
+      downloadBlob(blob, fileName);
+      setStatus({ title: t("files.done"), message: `${fileName} · ${formatBytes(blob.size)}`, tone: "success" });
     } catch {
       setStatus({ title: t("files.failed"), message: "", tone: "warning" });
     } finally {
@@ -147,7 +152,7 @@ export function ZipTool() {
         {tab === "extract" ? (
           <>
             <FileDrop
-              accept={ZIP_ACCEPT}
+              accept={ARCHIVE_ACCEPT}
               disabled={working}
               onFiles={(files) => void extract(files)}
               hint={t("ziptool.dropZip", { size: formatBytes(ZIP_MAX_BYTES) })}
@@ -187,6 +192,27 @@ export function ZipTool() {
               hint={t("ziptool.dropFiles")}
             />
 
+            <div className="quality-options format-options" role="group" aria-label={t("ziptool.formatLabel")}>
+              <button
+                className={`quality-button${format === "zip" ? " active" : ""}`}
+                type="button"
+                aria-pressed={format === "zip"}
+                disabled={working}
+                onClick={() => setFormat("zip")}
+              >
+                <strong>ZIP</strong>
+              </button>
+              <button
+                className={`quality-button${format === "targz" ? " active" : ""}`}
+                type="button"
+                aria-pressed={format === "targz"}
+                disabled={working}
+                onClick={() => setFormat("targz")}
+              >
+                <strong>TAR.GZ</strong>
+              </button>
+            </div>
+
             {createFiles.length ? (
               <ul className="imgtool-results">
                 {createFiles.map((file, index) => (
@@ -210,9 +236,9 @@ export function ZipTool() {
               className="convert-button"
               type="button"
               disabled={working || !createFiles.length}
-              onClick={() => void buildZip()}
+              onClick={() => void buildArchive()}
             >
-              {t("ziptool.create")}
+              {t("ziptool.create", { format: format === "targz" ? "TAR.GZ" : "ZIP" })}
             </button>
           </>
         )}

@@ -2392,6 +2392,42 @@ tbody tr:last-child td {
   font-family: var(--font-mono);
 }
 
+/* Normalize-and-export card: same framing as .loudness-preview. */
+.loudness-export {
+  display: grid;
+  gap: 12px;
+  margin: 0 32px 32px;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+}
+
+.loudness-export-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.loudness-export-custom {
+  max-width: 200px;
+}
+
+.loudness-export-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.loudness-export-actions .convert-button {
+  flex: 1;
+  min-width: 0;
+}
+
+.loudness-export-note {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
 /* ---------------------------------------------------------------------
    16. Footer
    --------------------------------------------------------------------- */
@@ -3184,6 +3220,7 @@ tbody tr:last-child td {
   .loudness-grid,
   .loudness-note,
   .loudness-preview,
+  .loudness-export,
   .history-list {
     margin-left: 16px;
     margin-right: 16px;

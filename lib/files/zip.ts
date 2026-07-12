@@ -8,7 +8,8 @@ type FflateModule = typeof import("fflate");
 
 let fflatePromise: Promise<FflateModule> | null = null;
 
-function loadFflate(): Promise<FflateModule> {
+/** Lazy-loaded fflate module, shared with lib/files/tar.ts. */
+export function loadFflate(): Promise<FflateModule> {
   if (!fflatePromise) fflatePromise = import("fflate");
   return fflatePromise;
 }
