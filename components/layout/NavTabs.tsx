@@ -39,6 +39,11 @@ export function NavTabs({ onNavigate }: { onNavigate?: () => void }) {
           {t(tab.labelKey)}
         </a>
       ))}
+      {/* Real navigation out of the SPA: the file tools live on standalone
+          pages (/tools hub), so no showView intercept here. */}
+      <a className="ghost-button" href="/tools" onClick={() => onNavigate?.()}>
+        {t("nav.moreTools")}
+      </a>
     </>
   );
 }

@@ -40,6 +40,15 @@ export function Footer() {
             </a>
           ))}
         </nav>
+        {/* File tools: standalone pages outside the SPA. */}
+        <nav className="site-footer-tools" aria-label={t("nav.moreTools")}>
+          <Link href="/tools">{t("nav.moreTools")}</Link>
+          <Link href="/image-converter">{t("tools.cardImageConvert")}</Link>
+          <Link href="/compress-image">{t("tools.cardImageCompress")}</Link>
+          <Link href="/resize-image">{t("tools.cardImageResize")}</Link>
+          <Link href="/resize-image-for-instagram">{t("tools.cardInstagram")}</Link>
+          <Link href="/compress-image-to-100kb">{t("tools.card100kb")}</Link>
+        </nav>
         {/* English guide articles; next/link prefetches these full navigations. */}
         <nav className="site-footer-tools site-footer-guides" aria-label={t("footer.guides")}>
           <Link href="/playlist-analyzer">Playlist analyzer</Link>

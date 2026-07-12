@@ -3541,3 +3541,112 @@ tbody tr:last-child td {
     align-items: flex-start;
   }
 }
+
+/* ---------------------------------------------------------------------
+   File tools (/tools hub + image/pdf/zip/video utilities)
+   --------------------------------------------------------------------- */
+.tool-page {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
+}
+
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+.tools-card {
+  display: block;
+  text-decoration: none;
+  color: var(--ink);
+  transition: background 0.15s ease;
+}
+
+.tools-card:hover {
+  background: var(--hover);
+}
+
+.tools-card h3 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 17px;
+  margin: 0 0 6px;
+}
+
+.tools-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.imgtool-dimensions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 14px 18px;
+}
+
+.imgtool-number {
+  display: block;
+  margin-top: 6px;
+  width: 130px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-field);
+  background: var(--surface);
+  color: var(--ink);
+  padding: 10px 14px;
+  font-size: 14px;
+  font-family: var(--font-sans);
+  font-variant-numeric: tabular-nums;
+}
+
+.imgtool-number:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 1px;
+}
+
+.imgtool-quality input[type="range"] {
+  display: block;
+  width: min(360px, 100%);
+  margin-top: 10px;
+}
+
+.imgtool-results {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+}
+
+.imgtool-results li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.imgtool-result-name {
+  font-weight: 700;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.imgtool-result-meta {
+  color: var(--muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.imgtool-single-result {
+  margin: 16px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}

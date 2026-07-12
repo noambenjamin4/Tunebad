@@ -20,6 +20,12 @@ Key facts:
 - [Pitch Shifter](https://www.tunebad.com/pitch-shifter): Change the pitch or key of an audio file without changing its tempo.
 - [Delay & Reverb Calculator](https://www.tunebad.com/delay-reverb-calculator): Enter a BPM and get delay times in milliseconds and Hz, from 1/1 down to 1/64, including dotted and triplet values.
 - [BPM Tap Tempo & Metronome](https://www.tunebad.com/bpm-tap): Tap along to find a song's BPM, or use the built-in metronome.
+- [More Tools hub](https://www.tunebad.com/tools): Free file utilities that run entirely in the browser, nothing is uploaded.
+- [Image Converter](https://www.tunebad.com/image-converter): Convert PNG, JPG, and WebP images in the browser.
+- [Compress Image](https://www.tunebad.com/compress-image): Shrink JPG/PNG/WebP file sizes with a quality slider.
+- [Resize Image](https://www.tunebad.com/resize-image): Resize images to exact pixel dimensions, with aspect-ratio lock.
+- [Resize for Instagram](https://www.tunebad.com/resize-image-for-instagram): Exact Instagram sizes, Story 1080x1920, post 1080x1080, portrait 1080x1350, landscape 1080x566.
+- [Compress Image to 100KB](https://www.tunebad.com/compress-image-to-100kb): Compress a photo under an exact size cap (50KB, 100KB, 200KB, or 500KB).
 
 ## Pages
 

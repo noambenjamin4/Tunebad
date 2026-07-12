@@ -154,6 +154,8 @@ const STRUCTURED_DATA = {
         "Slowed + reverb studio",
         "MP3 cutter and ringtone maker",
         "YouTube, Spotify & SoundCloud to MP3, WAV or MP4 converter",
+        "Playlist key & BPM analyzer",
+        "Image converter, resizer & compressor (in-browser)",
       ],
     },
   ],
