@@ -66,6 +66,45 @@ export async function mergePdfs(files: File[]): Promise<Blob> {
   return new Blob([out as BlobPart], { type: "application/pdf" });
 }
 
+/** Number of pages in the given PDF (rejects encrypted/unreadable files). */
+export async function pdfPageCount(file: File): Promise<number> {
+  const { PDFDocument } = await loadPdfLib();
+  const bytes = await file.arrayBuffer();
+  try {
+    const doc = await PDFDocument.load(bytes);
+    return doc.getPageCount();
+  } catch (error) {
+    if (isEncryptedError(error)) throw new PdfEncryptedError(file.name);
+    throw new PdfParseError(file.name);
+  }
+}
+
+/**
+ * Extract pages `from`..`to` (1-based, inclusive) into a new PDF. The caller
+ * validates the range against the page count; out-of-range values throw.
+ */
+export async function extractPages(file: File, from: number, to: number): Promise<Blob> {
+  const { PDFDocument } = await loadPdfLib();
+  const bytes = await file.arrayBuffer();
+  let doc;
+  try {
+    doc = await PDFDocument.load(bytes);
+  } catch (error) {
+    if (isEncryptedError(error)) throw new PdfEncryptedError(file.name);
+    throw new PdfParseError(file.name);
+  }
+  const count = doc.getPageCount();
+  if (!Number.isInteger(from) || !Number.isInteger(to) || from < 1 || to > count || from > to) {
+    throw new RangeError(`Invalid page range ${from}-${to} for ${count} pages`);
+  }
+  const out = await PDFDocument.create();
+  const indices = Array.from({ length: to - from + 1 }, (_, i) => from - 1 + i);
+  const pages = await out.copyPages(doc, indices);
+  for (const page of pages) out.addPage(page);
+  const saved = await out.save();
+  return new Blob([saved as BlobPart], { type: "application/pdf" });
+}
+
 function isPng(bytes: Uint8Array): boolean {
   return bytes.length > 4 && bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47;
 }

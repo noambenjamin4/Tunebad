@@ -20,8 +20,14 @@ export type RelatedSlug =
   | "unzip-files"
   | "compress-video"
   | "compress-video-for-discord"
+  | "compress-video-for-whatsapp"
   | "video-converter"
-  | "audio-converter";
+  | "audio-converter"
+  | "split-pdf"
+  | "mkv-to-mp4"
+  | "mov-to-mp4"
+  | "flac-to-mp3"
+  | "wav-to-mp3";
 
 const REGISTRY: Record<RelatedSlug, { nameKey: DictKey; descKey: DictKey }> = {
   "image-converter": { nameKey: "tools.cardImageConvert", descKey: "tools.descImageConvert" },
@@ -34,8 +40,14 @@ const REGISTRY: Record<RelatedSlug, { nameKey: DictKey; descKey: DictKey }> = {
   "unzip-files": { nameKey: "tools.cardZip", descKey: "tools.descZip" },
   "compress-video": { nameKey: "tools.cardVideo", descKey: "tools.descVideo" },
   "compress-video-for-discord": { nameKey: "tools.cardDiscord", descKey: "tools.descDiscord" },
+  "compress-video-for-whatsapp": { nameKey: "tools.cardWhatsapp", descKey: "tools.descWhatsapp" },
   "video-converter": { nameKey: "tools.cardVideoConvert", descKey: "tools.descVideoConvert" },
   "audio-converter": { nameKey: "tools.cardAudioConvert", descKey: "tools.descAudioConvert" },
+  "split-pdf": { nameKey: "tools.cardPdfSplit", descKey: "tools.descPdfSplit" },
+  "mkv-to-mp4": { nameKey: "tools.cardMkvMp4", descKey: "tools.descMkvMp4" },
+  "mov-to-mp4": { nameKey: "tools.cardMovMp4", descKey: "tools.descMovMp4" },
+  "flac-to-mp3": { nameKey: "tools.cardFlacMp3", descKey: "tools.descFlacMp3" },
+  "wav-to-mp3": { nameKey: "tools.cardWavMp3", descKey: "tools.descWavMp3" },
 };
 
 export function RelatedTools({ tools }: { tools: RelatedSlug[] }) {

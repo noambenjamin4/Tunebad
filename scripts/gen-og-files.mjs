@@ -18,6 +18,12 @@ const CARDS = [
   ["unzip-files", "UNZIP", "FILES"],
   ["video-converter", "VIDEO", "CONVERTER"],
   ["audio-converter", "AUDIO", "CONVERTER"],
+  ["compress-video-whatsapp", "COMPRESS FOR", "WHATSAPP"],
+  ["split-pdf", "SPLIT", "PDF"],
+  ["mkv-to-mp4", "MKV TO", "MP4"],
+  ["mov-to-mp4", "MOV TO", "MP4"],
+  ["flac-to-mp3", "FLAC TO", "MP3"],
+  ["wav-to-mp3", "WAV TO", "MP3"],
 ];
 
 const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");

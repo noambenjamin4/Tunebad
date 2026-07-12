@@ -563,6 +563,94 @@ const en = {
   "vidtool.faqDiscord3A": "No. The compression runs entirely in your browser, so the clip never leaves your device.",
   "vidtool.faqDiscord4Q": "Is it free, and is there a watermark?",
   "vidtool.faqDiscord4A": "Yes, it is free, and there is no watermark, no sign-up, and no ads.",
+  // Compress for WhatsApp
+  "vidtool.titleWhatsapp": "Compress Video for WhatsApp",
+  "vidtool.subtitleWhatsapp": "Get your video under WhatsApp's 16 MB share limit without uploading it anywhere or adding a watermark.",
+  "vidtool.whatsappNote": "WhatsApp caps videos shared as playable media at 16 MB on most versions. Bigger files have to go as documents, which do not autoplay in the chat. 16 MB is the safe target.",
+  "tools.cardWhatsapp": "Compress for WhatsApp",
+  "tools.descWhatsapp": "Get a video under WhatsApp's 16MB share limit.",
+  "vidtool.faqWhatsapp1Q": "What is WhatsApp's video size limit?",
+  "vidtool.faqWhatsapp1A":
+    "Videos shared as playable media in a chat are capped at 16 MB on most versions of WhatsApp. You can send bigger files as documents, but they arrive as attachments instead of playing inline.",
+  "vidtool.faqWhatsapp2Q": "How do I send a long video on WhatsApp?",
+  "vidtool.faqWhatsapp2A":
+    "Compress it under 16 MB with the preset above and send it as a normal video. If quality matters more than inline playback, send the original file as a document instead.",
+  "vidtool.faqWhatsapp3Q": "Is my video uploaded to a server?",
+  "vidtool.faqWhatsapp3A": "No. The compression runs entirely in your browser, so the video never leaves your device.",
+  "vidtool.faqWhatsapp4Q": "Will compressing for WhatsApp reduce the quality?",
+  "vidtool.faqWhatsapp4A":
+    "Some quality loss is unavoidable, because the tool lowers the bitrate until the video fits the target. Short clips survive the 16 MB cap much better than long ones.",
+  // Split PDF
+  "tools.cardPdfSplit": "Split PDF",
+  "tools.descPdfSplit": "Extract a page range into a new PDF.",
+  "pdftool.titleSplit": "Split PDF",
+  "pdftool.subtitleSplit": "Pull a range of pages out of a PDF into a new file. Everything runs in your browser, nothing gets uploaded.",
+  "pdftool.dropPdf": "Drop a PDF here (up to {size})",
+  "pdftool.pageCount": "{count} pages",
+  "pdftool.fromPage": "From page",
+  "pdftool.toPage": "To page",
+  "pdftool.extract": "Extract pages",
+  "pdftool.rangeInvalid": "Check the page range: it has to start at page 1 or later, end at the last page or earlier, and the end cannot come before the start.",
+  // MKV to MP4
+  "tools.cardMkvMp4": "MKV to MP4",
+  "tools.descMkvMp4": "Turn rips and OBS recordings into MP4.",
+  "mediatool.titleMkv": "MKV to MP4 Converter",
+  "mediatool.subtitleMkv":
+    "MKV is the container behind most rips, OBS recordings, and downloads, and plenty of players, phones, and editors refuse to open it. Convert it to an MP4 that plays everywhere, right in your browser. The file never leaves your device.",
+  "mediatool.faqMkv1Q": "Why won't my MKV file play?",
+  "mediatool.faqMkv1A":
+    "MKV is a container, not a codec, and many players, TVs, phones, and editing apps simply do not read it. Converting to MP4 with H.264 video and AAC audio produces a file that plays almost everywhere.",
+  "mediatool.faqMkv2Q": "Does converting MKV to MP4 lose quality?",
+  "mediatool.faqMkv2A":
+    "The video is re-encoded with H.264 at a high-quality setting, so there is a small, usually invisible loss. That trade is what makes the result compatible with nearly every device.",
+  "mediatool.faqMkv3Q": "Is my MKV uploaded to a server?",
+  "mediatool.faqMkv3A":
+    "No. The conversion runs entirely in your browser, so the file never leaves your device. Files up to 500 MB are supported, free and without a watermark.",
+  // MOV to MP4
+  "tools.cardMovMp4": "MOV to MP4",
+  "tools.descMovMp4": "Turn iPhone and QuickTime clips into MP4.",
+  "mediatool.titleMov": "MOV to MP4 Converter",
+  "mediatool.subtitleMov":
+    "MOV is the QuickTime format iPhones and Macs record in, and it often refuses to play on Windows, Android, or the web. Convert it to an MP4 that works everywhere, right in your browser. The file never leaves your device.",
+  "mediatool.faqMov1Q": "Why is my iPhone video a MOV file?",
+  "mediatool.faqMov1A":
+    "iPhones and Macs record video in Apple's QuickTime MOV format. It plays fine on Apple devices, but Windows, Android, and many websites expect MP4 instead.",
+  "mediatool.faqMov2Q": "Will converting MOV to MP4 lose quality?",
+  "mediatool.faqMov2A":
+    "The clip is re-encoded with H.264 at a high-quality setting, so any loss is small and usually invisible. The result plays on practically any device or platform.",
+  "mediatool.faqMov3Q": "Are my videos uploaded anywhere?",
+  "mediatool.faqMov3A":
+    "No. The conversion happens entirely in your browser, so the clip never leaves your device. Files up to 500 MB are supported, free and without a watermark.",
+  // FLAC to MP3
+  "tools.cardFlacMp3": "FLAC to MP3",
+  "tools.descFlacMp3": "Shrink lossless audio into portable MP3s.",
+  "mediatool.titleFlac": "FLAC to MP3 Converter",
+  "mediatool.subtitleFlac":
+    "FLAC keeps every bit of the original recording, which is great for an archive and heavy for a phone. Convert it to MP3 at the bitrate you choose, right in your browser. MP3 is lossy, so keep the FLAC as your master copy. Your music never leaves your device.",
+  "mediatool.faqFlac1Q": "Does converting FLAC to MP3 lose quality?",
+  "mediatool.faqFlac1A":
+    "Yes, MP3 is a lossy format, so some detail is always discarded. At 320 kbps most people cannot hear the difference. Keep the FLAC file as your lossless master and use the MP3 for phones and sharing.",
+  "mediatool.faqFlac2Q": "Which MP3 bitrate should I pick?",
+  "mediatool.faqFlac2A":
+    "320 kbps for the best quality, 192 kbps for a good balance, and 128 kbps for the smallest files. A FLAC album that takes 400 MB lands around 100 MB as 320 kbps MP3s.",
+  "mediatool.faqFlac3Q": "Is my music uploaded to a server?",
+  "mediatool.faqFlac3A":
+    "No. The conversion runs entirely in your browser, so your files never leave your device. Files up to 200 MB are supported, free and without a sign-up.",
+  // WAV to MP3
+  "tools.cardWavMp3": "WAV to MP3",
+  "tools.descWavMp3": "Turn raw WAV exports into small MP3s.",
+  "mediatool.titleWav": "WAV to MP3 Converter",
+  "mediatool.subtitleWav":
+    "WAV files are raw, uncompressed audio: a three-minute export can top 30 MB, too big to email or message. Convert it to MP3 at the bitrate you choose, right in your browser. MP3 is lossy, so keep the WAV if you plan to edit the audio again later.",
+  "mediatool.faqWav1Q": "How much smaller does a WAV get as an MP3?",
+  "mediatool.faqWav1A":
+    "A lot. A 16-bit stereo WAV runs about 10 MB per minute; the same audio is roughly 2.4 MB per minute at 320 kbps and 1 MB per minute at 128 kbps, a 4x to 10x reduction.",
+  "mediatool.faqWav2Q": "Does converting WAV to MP3 reduce quality?",
+  "mediatool.faqWav2A":
+    "Yes, MP3 is lossy, so some detail is discarded. At 320 kbps the difference is inaudible to most people. Keep the WAV as your editing master and use the MP3 for sharing.",
+  "mediatool.faqWav3Q": "Are my audio files uploaded?",
+  "mediatool.faqWav3A":
+    "No. The conversion happens entirely in your browser, and the file never leaves your device. Files up to 200 MB are supported, free, with no sign-up and no ads.",
 } as const;
 
 export default en;

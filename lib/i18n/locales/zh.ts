@@ -527,6 +527,88 @@ const zh: Record<keyof typeof en, string> = {
   "vidtool.faqDiscord3A": "不会。压缩完全在你的浏览器里进行，片段绝不会离开你的设备。",
   "vidtool.faqDiscord4Q": "免费吗？有水印吗？",
   "vidtool.faqDiscord4A": "免费，没有水印，无需注册，也没有广告。",
+  "vidtool.titleWhatsapp": "压缩视频以适配WhatsApp",
+  "vidtool.subtitleWhatsapp": "把视频压到WhatsApp 16 MB分享上限以下，无需上传到任何地方，也没有水印。",
+  "vidtool.whatsappNote": "在大多数版本的WhatsApp中，以可播放媒体形式分享的视频上限为16 MB。更大的文件只能作为文档发送，无法在聊天中直接播放。16 MB是最稳妥的目标。",
+  "tools.cardWhatsapp": "为WhatsApp压缩",
+  "tools.descWhatsapp": "把视频压到WhatsApp 16MB分享上限以下。",
+  "vidtool.faqWhatsapp1Q": "WhatsApp的视频大小限制是多少？",
+  "vidtool.faqWhatsapp1A":
+    "在大多数版本的WhatsApp中，作为可播放媒体分享的视频上限为16 MB。更大的文件可以作为文档发送，但会以附件形式送达，无法在聊天中直接播放。",
+  "vidtool.faqWhatsapp2Q": "怎么在WhatsApp上发送长视频？",
+  "vidtool.faqWhatsapp2A":
+    "用上面的预设把视频压到16 MB以下，然后按普通视频发送。如果画质比内嵌播放更重要，可以把原始文件作为文档发送。",
+  "vidtool.faqWhatsapp3Q": "我的视频会被上传到服务器吗？",
+  "vidtool.faqWhatsapp3A": "不会。压缩完全在你的浏览器里进行，视频绝不会离开你的设备。",
+  "vidtool.faqWhatsapp4Q": "为WhatsApp压缩会降低画质吗？",
+  "vidtool.faqWhatsapp4A":
+    "一定的画质损失不可避免，因为工具会降低码率直到视频符合目标大小。短片段在16 MB上限下的表现远好于长视频。",
+  "tools.cardPdfSplit": "拆分PDF",
+  "tools.descPdfSplit": "把页码范围提取成新的PDF。",
+  "pdftool.titleSplit": "拆分PDF",
+  "pdftool.subtitleSplit": "从PDF中提取一段页码范围，生成新文件。全部在你的浏览器里完成，不会上传任何内容。",
+  "pdftool.dropPdf": "把PDF拖到这里（最大{size}）",
+  "pdftool.pageCount": "{count}页",
+  "pdftool.fromPage": "起始页",
+  "pdftool.toPage": "结束页",
+  "pdftool.extract": "提取页面",
+  "pdftool.rangeInvalid": "请检查页码范围：起始页不能小于1，结束页不能超过最后一页，且结束页不能在起始页之前。",
+  "tools.cardMkvMp4": "MKV转MP4",
+  "tools.descMkvMp4": "把抓取文件和OBS录制转换为MP4。",
+  "mediatool.titleMkv": "MKV转MP4转换器",
+  "mediatool.subtitleMkv":
+    "MKV是大多数抓取文件、OBS录制和下载视频使用的容器，很多播放器、手机和剪辑软件都打不开它。在浏览器里直接把它转换成随处可播的MP4，文件绝不会离开你的设备。",
+  "mediatool.faqMkv1Q": "为什么我的MKV文件放不了？",
+  "mediatool.faqMkv1A":
+    "MKV是容器而不是编码格式，很多播放器、电视、手机和剪辑应用根本不认它。转换成H.264视频加AAC音频的MP4后，几乎在任何地方都能播放。",
+  "mediatool.faqMkv2Q": "MKV转MP4会损失画质吗？",
+  "mediatool.faqMkv2A":
+    "视频会以高质量设置的H.264重新编码，所以会有少量、通常看不出来的损失。正是这一取舍让结果几乎兼容所有设备。",
+  "mediatool.faqMkv3Q": "我的MKV会被上传到服务器吗？",
+  "mediatool.faqMkv3A":
+    "不会。转换完全在你的浏览器里进行，文件绝不会离开你的设备。支持最大500 MB的文件，免费且没有水印。",
+  "tools.cardMovMp4": "MOV转MP4",
+  "tools.descMovMp4": "把iPhone和QuickTime片段转换为MP4。",
+  "mediatool.titleMov": "MOV转MP4转换器",
+  "mediatool.subtitleMov":
+    "MOV是iPhone和Mac录制视频用的QuickTime格式，在Windows、Android或网页上经常放不了。在浏览器里直接把它转换成随处可用的MP4，文件绝不会离开你的设备。",
+  "mediatool.faqMov1Q": "为什么我的iPhone视频是MOV文件？",
+  "mediatool.faqMov1A":
+    "iPhone和Mac用苹果的QuickTime MOV格式录制视频。它在苹果设备上播放没问题，但Windows、Android和很多网站需要MP4。",
+  "mediatool.faqMov2Q": "MOV转MP4会损失画质吗？",
+  "mediatool.faqMov2A":
+    "片段会以高质量设置的H.264重新编码，损失很小，通常看不出来。转换结果几乎能在任何设备或平台上播放。",
+  "mediatool.faqMov3Q": "我的视频会被上传到哪里吗？",
+  "mediatool.faqMov3A":
+    "不会。转换完全在你的浏览器里进行，片段绝不会离开你的设备。支持最大500 MB的文件，免费且没有水印。",
+  "tools.cardFlacMp3": "FLAC转MP3",
+  "tools.descFlacMp3": "把无损音频压缩成便携的MP3。",
+  "mediatool.titleFlac": "FLAC转MP3转换器",
+  "mediatool.subtitleFlac":
+    "FLAC保留了原始录音的每一个比特，适合存档但对手机太大。在浏览器里直接转换成你选定码率的MP3。MP3是有损格式，请把FLAC留作母带。你的音乐绝不会离开你的设备。",
+  "mediatool.faqFlac1Q": "FLAC转MP3会损失音质吗？",
+  "mediatool.faqFlac1A":
+    "会。MP3是有损格式，总会舍弃一些细节。在320 kbps下大多数人听不出区别。把FLAC文件留作无损母带，MP3用于手机和分享。",
+  "mediatool.faqFlac2Q": "我该选哪个MP3码率？",
+  "mediatool.faqFlac2A":
+    "320 kbps音质最好，192 kbps兼顾大小与音质，128 kbps文件最小。一张400 MB的FLAC专辑转成320 kbps的MP3大约100 MB。",
+  "mediatool.faqFlac3Q": "我的音乐会被上传到服务器吗？",
+  "mediatool.faqFlac3A":
+    "不会。转换完全在你的浏览器里进行，文件绝不会离开你的设备。支持最大200 MB的文件，免费且无需注册。",
+  "tools.cardWavMp3": "WAV转MP3",
+  "tools.descWavMp3": "把原始WAV导出转换成小巧的MP3。",
+  "mediatool.titleWav": "WAV转MP3转换器",
+  "mediatool.subtitleWav":
+    "WAV是未压缩的原始音频：三分钟的导出可能超过30 MB，用邮件或消息发送都太大。在浏览器里直接转换成你选定码率的MP3。MP3是有损格式，如果以后还要编辑音频，请保留WAV。",
+  "mediatool.faqWav1Q": "WAV转成MP3能小多少？",
+  "mediatool.faqWav1A":
+    "小很多。16位立体声WAV每分钟约10 MB；同样的音频在320 kbps下每分钟约2.4 MB，128 kbps下约1 MB，缩小4到10倍。",
+  "mediatool.faqWav2Q": "WAV转MP3会降低音质吗？",
+  "mediatool.faqWav2A":
+    "会。MP3是有损格式，会舍弃一些细节。在320 kbps下大多数人听不出差别。把WAV留作编辑母带，MP3用于分享。",
+  "mediatool.faqWav3Q": "我的音频文件会被上传吗？",
+  "mediatool.faqWav3A":
+    "不会。转换完全在你的浏览器里进行，文件绝不会离开你的设备。支持最大200 MB的文件，免费、无需注册、没有广告。",
 };
 
 export default zh;

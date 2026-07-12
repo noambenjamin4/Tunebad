@@ -528,6 +528,88 @@ const es: Record<keyof typeof en, string> = {
   "vidtool.faqDiscord3A": "No. La compresión se ejecuta por completo en tu navegador, así que el clip nunca sale de tu dispositivo.",
   "vidtool.faqDiscord4Q": "¿Es gratis? ¿Tiene marca de agua?",
   "vidtool.faqDiscord4A": "Sí, es gratis, y no hay marca de agua, ni registro, ni anuncios.",
+  "vidtool.titleWhatsapp": "Comprimir vídeo para WhatsApp",
+  "vidtool.subtitleWhatsapp": "Deja tu vídeo por debajo del límite de 16 MB de WhatsApp sin subirlo a ningún sitio y sin marca de agua.",
+  "vidtool.whatsappNote": "WhatsApp limita los vídeos compartidos como medio reproducible a 16 MB en la mayoría de las versiones. Los archivos más grandes deben ir como documento, que no se reproduce dentro del chat. 16 MB es el objetivo seguro.",
+  "tools.cardWhatsapp": "Comprimir para WhatsApp",
+  "tools.descWhatsapp": "Deja un vídeo bajo el límite de 16MB de WhatsApp.",
+  "vidtool.faqWhatsapp1Q": "¿Cuál es el límite de tamaño de vídeo de WhatsApp?",
+  "vidtool.faqWhatsapp1A":
+    "Los vídeos compartidos como medio reproducible en un chat están limitados a 16 MB en la mayoría de las versiones de WhatsApp. Puedes enviar archivos más grandes como documento, pero llegan como adjunto en lugar de reproducirse en el chat.",
+  "vidtool.faqWhatsapp2Q": "¿Cómo envío un vídeo largo por WhatsApp?",
+  "vidtool.faqWhatsapp2A":
+    "Comprímelo por debajo de 16 MB con el preajuste de arriba y envíalo como un vídeo normal. Si la calidad importa más que la reproducción en el chat, envía el archivo original como documento.",
+  "vidtool.faqWhatsapp3Q": "¿Mi vídeo se sube a un servidor?",
+  "vidtool.faqWhatsapp3A": "No. La compresión se ejecuta por completo en tu navegador, así que el vídeo nunca sale de tu dispositivo.",
+  "vidtool.faqWhatsapp4Q": "¿Comprimir para WhatsApp reduce la calidad?",
+  "vidtool.faqWhatsapp4A":
+    "Cierta pérdida de calidad es inevitable, porque la herramienta baja el bitrate hasta que el vídeo cabe en el objetivo. Los clips cortos aguantan el límite de 16 MB mucho mejor que los largos.",
+  "tools.cardPdfSplit": "Dividir PDF",
+  "tools.descPdfSplit": "Extrae un rango de páginas a un nuevo PDF.",
+  "pdftool.titleSplit": "Dividir PDF",
+  "pdftool.subtitleSplit": "Extrae un rango de páginas de un PDF a un archivo nuevo. Todo ocurre en tu navegador, nada se sube a ningún sitio.",
+  "pdftool.dropPdf": "Suelta un PDF aquí (hasta {size})",
+  "pdftool.pageCount": "{count} páginas",
+  "pdftool.fromPage": "Desde la página",
+  "pdftool.toPage": "Hasta la página",
+  "pdftool.extract": "Extraer páginas",
+  "pdftool.rangeInvalid": "Revisa el rango de páginas: debe empezar en la página 1 o después, terminar en la última página o antes, y el final no puede ir antes del inicio.",
+  "tools.cardMkvMp4": "MKV a MP4",
+  "tools.descMkvMp4": "Convierte rips y grabaciones de OBS en MP4.",
+  "mediatool.titleMkv": "Convertidor de MKV a MP4",
+  "mediatool.subtitleMkv":
+    "MKV es el contenedor detrás de la mayoría de rips, grabaciones de OBS y descargas, y muchos reproductores, teléfonos y editores se niegan a abrirlo. Conviértelo a un MP4 que se reproduce en todas partes, directamente en tu navegador. El archivo nunca sale de tu dispositivo.",
+  "mediatool.faqMkv1Q": "¿Por qué no se reproduce mi archivo MKV?",
+  "mediatool.faqMkv1A":
+    "MKV es un contenedor, no un códec, y muchos reproductores, televisores, teléfonos y aplicaciones de edición simplemente no lo leen. Convertir a MP4 con vídeo H.264 y audio AAC produce un archivo que se reproduce casi en cualquier parte.",
+  "mediatool.faqMkv2Q": "¿Convertir MKV a MP4 pierde calidad?",
+  "mediatool.faqMkv2A":
+    "El vídeo se recodifica con H.264 en un ajuste de alta calidad, así que hay una pérdida pequeña y normalmente invisible. Ese intercambio es lo que hace el resultado compatible con casi cualquier dispositivo.",
+  "mediatool.faqMkv3Q": "¿Mi MKV se sube a un servidor?",
+  "mediatool.faqMkv3A":
+    "No. La conversión se ejecuta por completo en tu navegador, así que el archivo nunca sale de tu dispositivo. Se admiten archivos de hasta 500 MB, gratis y sin marca de agua.",
+  "tools.cardMovMp4": "MOV a MP4",
+  "tools.descMovMp4": "Convierte clips de iPhone y QuickTime en MP4.",
+  "mediatool.titleMov": "Convertidor de MOV a MP4",
+  "mediatool.subtitleMov":
+    "MOV es el formato QuickTime en el que graban los iPhone y los Mac, y a menudo se niega a reproducirse en Windows, Android o la web. Conviértelo a un MP4 que funciona en todas partes, directamente en tu navegador. El archivo nunca sale de tu dispositivo.",
+  "mediatool.faqMov1Q": "¿Por qué mi vídeo de iPhone es un archivo MOV?",
+  "mediatool.faqMov1A":
+    "Los iPhone y los Mac graban vídeo en el formato QuickTime MOV de Apple. Se reproduce bien en dispositivos Apple, pero Windows, Android y muchos sitios web esperan MP4.",
+  "mediatool.faqMov2Q": "¿Convertir MOV a MP4 pierde calidad?",
+  "mediatool.faqMov2A":
+    "El clip se recodifica con H.264 en un ajuste de alta calidad, así que la pérdida es pequeña y normalmente invisible. El resultado se reproduce en prácticamente cualquier dispositivo o plataforma.",
+  "mediatool.faqMov3Q": "¿Mis vídeos se suben a algún sitio?",
+  "mediatool.faqMov3A":
+    "No. La conversión ocurre por completo en tu navegador, así que el clip nunca sale de tu dispositivo. Se admiten archivos de hasta 500 MB, gratis y sin marca de agua.",
+  "tools.cardFlacMp3": "FLAC a MP3",
+  "tools.descFlacMp3": "Reduce audio sin pérdida a MP3 portátiles.",
+  "mediatool.titleFlac": "Convertidor de FLAC a MP3",
+  "mediatool.subtitleFlac":
+    "FLAC conserva cada bit de la grabación original, ideal para archivar pero pesado para un teléfono. Conviértelo a MP3 con el bitrate que elijas, directamente en tu navegador. El MP3 es un formato con pérdida, así que guarda el FLAC como copia maestra. Tu música nunca sale de tu dispositivo.",
+  "mediatool.faqFlac1Q": "¿Convertir FLAC a MP3 pierde calidad?",
+  "mediatool.faqFlac1A":
+    "Sí, el MP3 es un formato con pérdida, así que siempre se descarta algo de detalle. A 320 kbps la mayoría de la gente no oye la diferencia. Guarda el archivo FLAC como máster sin pérdida y usa el MP3 para el teléfono y para compartir.",
+  "mediatool.faqFlac2Q": "¿Qué bitrate de MP3 debería elegir?",
+  "mediatool.faqFlac2A":
+    "320 kbps para la mejor calidad, 192 kbps para un buen equilibrio y 128 kbps para los archivos más pequeños. Un álbum FLAC de 400 MB queda en torno a 100 MB en MP3 a 320 kbps.",
+  "mediatool.faqFlac3Q": "¿Mi música se sube a un servidor?",
+  "mediatool.faqFlac3A":
+    "No. La conversión se ejecuta por completo en tu navegador, así que tus archivos nunca salen de tu dispositivo. Se admiten archivos de hasta 200 MB, gratis y sin registro.",
+  "tools.cardWavMp3": "WAV a MP3",
+  "tools.descWavMp3": "Convierte exportaciones WAV crudas en MP3 pequeños.",
+  "mediatool.titleWav": "Convertidor de WAV a MP3",
+  "mediatool.subtitleWav":
+    "Los archivos WAV son audio crudo sin comprimir: una exportación de tres minutos puede superar los 30 MB, demasiado para un correo o un mensaje. Conviértelo a MP3 con el bitrate que elijas, directamente en tu navegador. El MP3 es un formato con pérdida, así que guarda el WAV si piensas volver a editar el audio.",
+  "mediatool.faqWav1Q": "¿Cuánto se reduce un WAV al pasarlo a MP3?",
+  "mediatool.faqWav1A":
+    "Mucho. Un WAV estéreo de 16 bits ocupa unos 10 MB por minuto; el mismo audio ronda los 2,4 MB por minuto a 320 kbps y 1 MB por minuto a 128 kbps, una reducción de 4 a 10 veces.",
+  "mediatool.faqWav2Q": "¿Convertir WAV a MP3 reduce la calidad?",
+  "mediatool.faqWav2A":
+    "Sí, el MP3 es un formato con pérdida, así que se descarta algo de detalle. A 320 kbps la diferencia es inaudible para la mayoría. Guarda el WAV como máster de edición y usa el MP3 para compartir.",
+  "mediatool.faqWav3Q": "¿Mis archivos de audio se suben a algún sitio?",
+  "mediatool.faqWav3A":
+    "No. La conversión ocurre por completo en tu navegador y el archivo nunca sale de tu dispositivo. Se admiten archivos de hasta 200 MB, gratis, sin registro y sin anuncios.",
 };
 
 export default es;

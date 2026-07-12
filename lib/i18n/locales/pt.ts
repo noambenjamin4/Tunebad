@@ -528,6 +528,88 @@ const pt: Record<keyof typeof en, string> = {
   "vidtool.faqDiscord3A": "Não. A compressão roda inteiramente no seu navegador, então o clipe nunca sai do seu dispositivo.",
   "vidtool.faqDiscord4Q": "É gratuito? Tem marca d'água?",
   "vidtool.faqDiscord4A": "Sim, é gratuito, e não há marca d'água, cadastro nem anúncios.",
+  "vidtool.titleWhatsapp": "Comprimir vídeo para WhatsApp",
+  "vidtool.subtitleWhatsapp": "Deixe seu vídeo abaixo do limite de compartilhamento de 16 MB do WhatsApp sem enviá-lo a lugar nenhum e sem marca d'água.",
+  "vidtool.whatsappNote": "O WhatsApp limita vídeos compartilhados como mídia reproduzível a 16 MB na maioria das versões. Arquivos maiores precisam ir como documento, que não toca direto na conversa. 16 MB é o alvo seguro.",
+  "tools.cardWhatsapp": "Comprimir para WhatsApp",
+  "tools.descWhatsapp": "Deixe um vídeo abaixo do limite de 16MB do WhatsApp.",
+  "vidtool.faqWhatsapp1Q": "Qual é o limite de tamanho de vídeo do WhatsApp?",
+  "vidtool.faqWhatsapp1A":
+    "Vídeos compartilhados como mídia reproduzível em uma conversa são limitados a 16 MB na maioria das versões do WhatsApp. Você pode enviar arquivos maiores como documento, mas eles chegam como anexo em vez de tocar na conversa.",
+  "vidtool.faqWhatsapp2Q": "Como envio um vídeo longo pelo WhatsApp?",
+  "vidtool.faqWhatsapp2A":
+    "Comprima-o abaixo de 16 MB com o preset acima e envie como um vídeo normal. Se a qualidade importa mais do que a reprodução direta, envie o arquivo original como documento.",
+  "vidtool.faqWhatsapp3Q": "Meu vídeo é enviado para um servidor?",
+  "vidtool.faqWhatsapp3A": "Não. A compressão roda inteiramente no seu navegador, então o vídeo nunca sai do seu dispositivo.",
+  "vidtool.faqWhatsapp4Q": "Comprimir para o WhatsApp reduz a qualidade?",
+  "vidtool.faqWhatsapp4A":
+    "Alguma perda de qualidade é inevitável, porque a ferramenta baixa o bitrate até o vídeo caber no alvo. Clipes curtos aguentam o limite de 16 MB muito melhor do que os longos.",
+  "tools.cardPdfSplit": "Dividir PDF",
+  "tools.descPdfSplit": "Extraia um intervalo de páginas para um novo PDF.",
+  "pdftool.titleSplit": "Dividir PDF",
+  "pdftool.subtitleSplit": "Extraia um intervalo de páginas de um PDF para um novo arquivo. Tudo roda no seu navegador, nada é enviado para lugar nenhum.",
+  "pdftool.dropPdf": "Solte um PDF aqui (até {size})",
+  "pdftool.pageCount": "{count} páginas",
+  "pdftool.fromPage": "Da página",
+  "pdftool.toPage": "Até a página",
+  "pdftool.extract": "Extrair páginas",
+  "pdftool.rangeInvalid": "Confira o intervalo de páginas: ele precisa começar na página 1 ou depois, terminar na última página ou antes, e o fim não pode vir antes do início.",
+  "tools.cardMkvMp4": "MKV para MP4",
+  "tools.descMkvMp4": "Transforme rips e gravações do OBS em MP4.",
+  "mediatool.titleMkv": "Conversor de MKV para MP4",
+  "mediatool.subtitleMkv":
+    "MKV é o contêiner por trás da maioria dos rips, gravações do OBS e downloads, e muitos players, celulares e editores se recusam a abri-lo. Converta para um MP4 que toca em qualquer lugar, direto no seu navegador. O arquivo nunca sai do seu dispositivo.",
+  "mediatool.faqMkv1Q": "Por que meu arquivo MKV não toca?",
+  "mediatool.faqMkv1A":
+    "MKV é um contêiner, não um codec, e muitos players, TVs, celulares e aplicativos de edição simplesmente não o leem. Converter para MP4 com vídeo H.264 e áudio AAC produz um arquivo que toca em quase qualquer lugar.",
+  "mediatool.faqMkv2Q": "Converter MKV para MP4 perde qualidade?",
+  "mediatool.faqMkv2A":
+    "O vídeo é recodificado com H.264 em um ajuste de alta qualidade, então há uma perda pequena e normalmente invisível. É essa troca que torna o resultado compatível com quase todo dispositivo.",
+  "mediatool.faqMkv3Q": "Meu MKV é enviado para um servidor?",
+  "mediatool.faqMkv3A":
+    "Não. A conversão roda inteiramente no seu navegador, então o arquivo nunca sai do seu dispositivo. Arquivos de até 500 MB são aceitos, grátis e sem marca d'água.",
+  "tools.cardMovMp4": "MOV para MP4",
+  "tools.descMovMp4": "Transforme clipes de iPhone e QuickTime em MP4.",
+  "mediatool.titleMov": "Conversor de MOV para MP4",
+  "mediatool.subtitleMov":
+    "MOV é o formato QuickTime em que iPhones e Macs gravam, e ele muitas vezes se recusa a tocar no Windows, no Android ou na web. Converta para um MP4 que funciona em qualquer lugar, direto no seu navegador. O arquivo nunca sai do seu dispositivo.",
+  "mediatool.faqMov1Q": "Por que meu vídeo de iPhone é um arquivo MOV?",
+  "mediatool.faqMov1A":
+    "iPhones e Macs gravam vídeo no formato QuickTime MOV da Apple. Ele toca bem em dispositivos Apple, mas Windows, Android e muitos sites esperam MP4.",
+  "mediatool.faqMov2Q": "Converter MOV para MP4 perde qualidade?",
+  "mediatool.faqMov2A":
+    "O clipe é recodificado com H.264 em um ajuste de alta qualidade, então a perda é pequena e normalmente invisível. O resultado toca em praticamente qualquer dispositivo ou plataforma.",
+  "mediatool.faqMov3Q": "Meus vídeos são enviados para algum lugar?",
+  "mediatool.faqMov3A":
+    "Não. A conversão acontece inteiramente no seu navegador, então o clipe nunca sai do seu dispositivo. Arquivos de até 500 MB são aceitos, grátis e sem marca d'água.",
+  "tools.cardFlacMp3": "FLAC para MP3",
+  "tools.descFlacMp3": "Reduza áudio sem perdas a MP3s portáteis.",
+  "mediatool.titleFlac": "Conversor de FLAC para MP3",
+  "mediatool.subtitleFlac":
+    "O FLAC guarda cada bit da gravação original, ótimo para arquivo e pesado para o celular. Converta para MP3 no bitrate que você escolher, direto no seu navegador. O MP3 tem perdas, então guarde o FLAC como cópia master. Sua música nunca sai do seu dispositivo.",
+  "mediatool.faqFlac1Q": "Converter FLAC para MP3 perde qualidade?",
+  "mediatool.faqFlac1A":
+    "Sim, o MP3 é um formato com perdas, então algum detalhe sempre é descartado. A 320 kbps a maioria das pessoas não ouve a diferença. Guarde o arquivo FLAC como master sem perdas e use o MP3 no celular e para compartilhar.",
+  "mediatool.faqFlac2Q": "Qual bitrate de MP3 devo escolher?",
+  "mediatool.faqFlac2A":
+    "320 kbps para a melhor qualidade, 192 kbps para um bom equilíbrio e 128 kbps para os arquivos menores. Um álbum FLAC de 400 MB fica em torno de 100 MB em MP3s de 320 kbps.",
+  "mediatool.faqFlac3Q": "Minha música é enviada para um servidor?",
+  "mediatool.faqFlac3A":
+    "Não. A conversão roda inteiramente no seu navegador, então seus arquivos nunca saem do seu dispositivo. Arquivos de até 200 MB são aceitos, grátis e sem cadastro.",
+  "tools.cardWavMp3": "WAV para MP3",
+  "tools.descWavMp3": "Transforme exportações WAV brutas em MP3s pequenos.",
+  "mediatool.titleWav": "Conversor de WAV para MP3",
+  "mediatool.subtitleWav":
+    "Arquivos WAV são áudio bruto sem compressão: uma exportação de três minutos pode passar de 30 MB, grande demais para e-mail ou mensagem. Converta para MP3 no bitrate que você escolher, direto no seu navegador. O MP3 tem perdas, então guarde o WAV se pretende editar o áudio de novo.",
+  "mediatool.faqWav1Q": "Quanto um WAV encolhe ao virar MP3?",
+  "mediatool.faqWav1A":
+    "Bastante. Um WAV estéreo de 16 bits ocupa cerca de 10 MB por minuto; o mesmo áudio fica em torno de 2,4 MB por minuto a 320 kbps e 1 MB por minuto a 128 kbps, uma redução de 4 a 10 vezes.",
+  "mediatool.faqWav2Q": "Converter WAV para MP3 reduz a qualidade?",
+  "mediatool.faqWav2A":
+    "Sim, o MP3 tem perdas, então algum detalhe é descartado. A 320 kbps a diferença é inaudível para a maioria. Guarde o WAV como master de edição e use o MP3 para compartilhar.",
+  "mediatool.faqWav3Q": "Meus arquivos de áudio são enviados para algum lugar?",
+  "mediatool.faqWav3A":
+    "Não. A conversão acontece inteiramente no seu navegador e o arquivo nunca sai do seu dispositivo. Arquivos de até 200 MB são aceitos, grátis, sem cadastro e sem anúncios.",
 };
 
 export default pt;

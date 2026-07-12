@@ -528,6 +528,88 @@ const ja: Record<keyof typeof en, string> = {
   "vidtool.faqDiscord3A": "いいえ。圧縮はすべてブラウザ内で行われるため、クリップがデバイスから外に出ることはありません。",
   "vidtool.faqDiscord4Q": "無料ですか？ウォーターマークは付きますか？",
   "vidtool.faqDiscord4A": "はい、無料です。ウォーターマークも登録も広告もありません。",
+  "vidtool.titleWhatsapp": "WhatsApp用に動画を圧縮",
+  "vidtool.subtitleWhatsapp": "WhatsAppの16 MB共有制限に収まるように動画を圧縮します。どこにもアップロードせず、ウォーターマークもありません。",
+  "vidtool.whatsappNote": "WhatsAppでは、再生可能なメディアとして共有できる動画はほとんどのバージョンで16 MBまでです。それより大きいファイルはドキュメントとして送る必要があり、チャット内では直接再生されません。16 MBが安全な目標です。",
+  "tools.cardWhatsapp": "WhatsApp用に圧縮",
+  "tools.descWhatsapp": "WhatsAppの16MB共有制限に収まる動画を作成。",
+  "vidtool.faqWhatsapp1Q": "WhatsAppの動画サイズ制限はどれくらいですか？",
+  "vidtool.faqWhatsapp1A":
+    "チャットで再生可能なメディアとして共有できる動画は、ほとんどのWhatsAppバージョンで16 MBまでです。より大きいファイルはドキュメントとして送れますが、チャット内で再生されず添付ファイルとして届きます。",
+  "vidtool.faqWhatsapp2Q": "WhatsAppで長い動画を送るには？",
+  "vidtool.faqWhatsapp2A":
+    "上のプリセットで16 MB未満に圧縮し、通常の動画として送信してください。再生のしやすさより画質を優先するなら、元のファイルをドキュメントとして送りましょう。",
+  "vidtool.faqWhatsapp3Q": "動画はサーバーにアップロードされますか？",
+  "vidtool.faqWhatsapp3A": "いいえ。圧縮はすべてブラウザ内で行われるため、動画がデバイスから外に出ることはありません。",
+  "vidtool.faqWhatsapp4Q": "WhatsApp用の圧縮で画質は落ちますか？",
+  "vidtool.faqWhatsapp4A":
+    "目標サイズに収まるまでビットレートを下げるため、ある程度の画質低下は避けられません。短いクリップの方が16 MBの上限でもきれいに残ります。",
+  "tools.cardPdfSplit": "PDFを分割",
+  "tools.descPdfSplit": "ページ範囲を新しいPDFに抽出。",
+  "pdftool.titleSplit": "PDFを分割",
+  "pdftool.subtitleSplit": "PDFからページ範囲を取り出して新しいファイルを作成します。すべてブラウザ内で処理され、何もアップロードされません。",
+  "pdftool.dropPdf": "ここにPDFをドロップ（最大{size}）",
+  "pdftool.pageCount": "{count}ページ",
+  "pdftool.fromPage": "開始ページ",
+  "pdftool.toPage": "終了ページ",
+  "pdftool.extract": "ページを抽出",
+  "pdftool.rangeInvalid": "ページ範囲を確認してください。開始は1ページ目以降、終了は最終ページ以前で、終了が開始より前にはできません。",
+  "tools.cardMkvMp4": "MKVからMP4へ",
+  "tools.descMkvMp4": "リップやOBS録画をMP4に変換。",
+  "mediatool.titleMkv": "MKV MP4変換ツール",
+  "mediatool.subtitleMkv":
+    "MKVはリップ、OBS録画、ダウンロードで広く使われるコンテナですが、多くのプレイヤーやスマホ、編集ソフトが開けません。ブラウザ内でどこでも再生できるMP4に変換しましょう。ファイルがデバイスから外に出ることはありません。",
+  "mediatool.faqMkv1Q": "MKVファイルが再生できないのはなぜですか？",
+  "mediatool.faqMkv1A":
+    "MKVはコーデックではなくコンテナで、多くのプレイヤー、テレビ、スマホ、編集アプリが読み込めません。H.264映像とAAC音声のMP4に変換すれば、ほぼどこでも再生できるファイルになります。",
+  "mediatool.faqMkv2Q": "MKVからMP4への変換で画質は落ちますか？",
+  "mediatool.faqMkv2A":
+    "映像は高品質設定のH.264で再エンコードされるため、わずかな、通常は見分けられない程度の劣化があります。その引き換えに、ほぼすべてのデバイスで再生できるようになります。",
+  "mediatool.faqMkv3Q": "MKVはサーバーにアップロードされますか？",
+  "mediatool.faqMkv3A":
+    "いいえ。変換はすべてブラウザ内で行われるため、ファイルがデバイスから外に出ることはありません。最大500 MBまで対応、無料でウォーターマークもありません。",
+  "tools.cardMovMp4": "MOVからMP4へ",
+  "tools.descMovMp4": "iPhoneやQuickTimeのクリップをMP4に変換。",
+  "mediatool.titleMov": "MOV MP4変換ツール",
+  "mediatool.subtitleMov":
+    "MOVはiPhoneやMacが録画に使うQuickTime形式で、WindowsやAndroid、ウェブでは再生できないことがよくあります。ブラウザ内でどこでも動くMP4に変換しましょう。ファイルがデバイスから外に出ることはありません。",
+  "mediatool.faqMov1Q": "iPhoneの動画がMOVファイルなのはなぜですか？",
+  "mediatool.faqMov1A":
+    "iPhoneとMacはAppleのQuickTime MOV形式で動画を録画します。Appleデバイスでは問題なく再生できますが、WindowsやAndroid、多くのウェブサイトはMP4を想定しています。",
+  "mediatool.faqMov2Q": "MOVからMP4への変換で画質は落ちますか？",
+  "mediatool.faqMov2A":
+    "クリップは高品質設定のH.264で再エンコードされるため、劣化はわずかで通常は見分けられません。変換後はほぼすべてのデバイスやプラットフォームで再生できます。",
+  "mediatool.faqMov3Q": "動画はどこかにアップロードされますか？",
+  "mediatool.faqMov3A":
+    "いいえ。変換はすべてブラウザ内で行われるため、クリップがデバイスから外に出ることはありません。最大500 MBまで対応、無料でウォーターマークもありません。",
+  "tools.cardFlacMp3": "FLACからMP3へ",
+  "tools.descFlacMp3": "ロスレス音源を持ち運べるMP3に。",
+  "mediatool.titleFlac": "FLAC MP3変換ツール",
+  "mediatool.subtitleFlac":
+    "FLACは元の録音を1ビットも損なわず保存できる反面、スマホには重すぎます。ブラウザ内で好きなビットレートのMP3に変換しましょう。MP3は非可逆形式なので、FLACはマスターとして残しておいてください。音楽ファイルがデバイスから外に出ることはありません。",
+  "mediatool.faqFlac1Q": "FLACからMP3への変換で音質は落ちますか？",
+  "mediatool.faqFlac1A":
+    "はい。MP3は非可逆形式のため、細部の情報が必ず削られます。320 kbpsならほとんどの人は違いを聞き分けられません。FLACをロスレスのマスターとして残し、MP3はスマホや共有に使いましょう。",
+  "mediatool.faqFlac2Q": "どのMP3ビットレートを選べばいいですか？",
+  "mediatool.faqFlac2A":
+    "最高音質なら320 kbps、バランス重視なら192 kbps、最小ファイルなら128 kbpsです。400 MBのFLACアルバムは320 kbpsのMP3で約100 MBになります。",
+  "mediatool.faqFlac3Q": "音楽はサーバーにアップロードされますか？",
+  "mediatool.faqFlac3A":
+    "いいえ。変換はすべてブラウザ内で行われるため、ファイルがデバイスから外に出ることはありません。最大200 MBまで対応、無料で登録も不要です。",
+  "tools.cardWavMp3": "WAVからMP3へ",
+  "tools.descWavMp3": "生のWAV書き出しを小さなMP3に。",
+  "mediatool.titleWav": "WAV MP3変換ツール",
+  "mediatool.subtitleWav":
+    "WAVは無圧縮の生音声で、3分の書き出しが30 MBを超えることもあり、メールやメッセージで送るには大きすぎます。ブラウザ内で好きなビットレートのMP3に変換しましょう。MP3は非可逆形式なので、後で編集する予定があるならWAVも残しておいてください。",
+  "mediatool.faqWav1Q": "WAVをMP3にするとどれくらい小さくなりますか？",
+  "mediatool.faqWav1A":
+    "大幅に小さくなります。16ビットステレオのWAVは1分あたり約10 MBですが、同じ音声が320 kbpsなら1分あたり約2.4 MB、128 kbpsなら約1 MBと、4分の1から10分の1になります。",
+  "mediatool.faqWav2Q": "WAVからMP3への変換で音質は落ちますか？",
+  "mediatool.faqWav2A":
+    "はい。MP3は非可逆形式のため、細部の情報が削られます。320 kbpsならほとんどの人には違いが分かりません。WAVを編集用マスターとして残し、MP3は共有に使いましょう。",
+  "mediatool.faqWav3Q": "音声ファイルはアップロードされますか？",
+  "mediatool.faqWav3A":
+    "いいえ。変換はすべてブラウザ内で行われ、ファイルがデバイスから外に出ることはありません。最大200 MBまで対応、無料で登録も広告もありません。",
 };
 
 export default ja;

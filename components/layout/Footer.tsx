@@ -49,12 +49,18 @@ export function Footer() {
           <Link href="/resize-image-for-instagram">{t("tools.cardInstagram")}</Link>
           <Link href="/compress-image-to-100kb">{t("tools.card100kb")}</Link>
           <Link href="/merge-pdf">{t("tools.cardPdfMerge")}</Link>
+          <Link href="/split-pdf">{t("tools.cardPdfSplit")}</Link>
           <Link href="/jpg-to-pdf">{t("tools.cardJpgToPdf")}</Link>
           <Link href="/unzip-files">{t("tools.cardZip")}</Link>
           <Link href="/compress-video">{t("tools.cardVideo")}</Link>
           <Link href="/compress-video-for-discord">{t("tools.cardDiscord")}</Link>
+          <Link href="/compress-video-for-whatsapp">{t("tools.cardWhatsapp")}</Link>
           <Link href="/video-converter">{t("tools.cardVideoConvert")}</Link>
           <Link href="/audio-converter">{t("tools.cardAudioConvert")}</Link>
+          <Link href="/mkv-to-mp4">{t("tools.cardMkvMp4")}</Link>
+          <Link href="/mov-to-mp4">{t("tools.cardMovMp4")}</Link>
+          <Link href="/flac-to-mp3">{t("tools.cardFlacMp3")}</Link>
+          <Link href="/wav-to-mp3">{t("tools.cardWavMp3")}</Link>
         </nav>
         {/* English guide articles; next/link prefetches these full navigations. */}
         <nav className="site-footer-tools site-footer-guides" aria-label={t("footer.guides")}>

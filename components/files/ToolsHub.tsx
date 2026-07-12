@@ -13,12 +13,18 @@ const FILE_TOOLS: { href: string; nameKey: DictKey; descKey: DictKey }[] = [
   { href: "/resize-image-for-instagram", nameKey: "tools.cardInstagram", descKey: "tools.descInstagram" },
   { href: "/compress-image-to-100kb", nameKey: "tools.card100kb", descKey: "tools.desc100kb" },
   { href: "/merge-pdf", nameKey: "tools.cardPdfMerge", descKey: "tools.descPdfMerge" },
+  { href: "/split-pdf", nameKey: "tools.cardPdfSplit", descKey: "tools.descPdfSplit" },
   { href: "/jpg-to-pdf", nameKey: "tools.cardJpgToPdf", descKey: "tools.descJpgToPdf" },
   { href: "/unzip-files", nameKey: "tools.cardZip", descKey: "tools.descZip" },
   { href: "/compress-video", nameKey: "tools.cardVideo", descKey: "tools.descVideo" },
   { href: "/compress-video-for-discord", nameKey: "tools.cardDiscord", descKey: "tools.descDiscord" },
+  { href: "/compress-video-for-whatsapp", nameKey: "tools.cardWhatsapp", descKey: "tools.descWhatsapp" },
   { href: "/video-converter", nameKey: "tools.cardVideoConvert", descKey: "tools.descVideoConvert" },
   { href: "/audio-converter", nameKey: "tools.cardAudioConvert", descKey: "tools.descAudioConvert" },
+  { href: "/mkv-to-mp4", nameKey: "tools.cardMkvMp4", descKey: "tools.descMkvMp4" },
+  { href: "/mov-to-mp4", nameKey: "tools.cardMovMp4", descKey: "tools.descMovMp4" },
+  { href: "/flac-to-mp3", nameKey: "tools.cardFlacMp3", descKey: "tools.descFlacMp3" },
+  { href: "/wav-to-mp3", nameKey: "tools.cardWavMp3", descKey: "tools.descWavMp3" },
 ];
 
 export function ToolsHub({ extra }: { extra?: { href: string; nameKey: DictKey; descKey: DictKey }[] }) {

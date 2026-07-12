@@ -528,6 +528,88 @@ const it: Record<keyof typeof en, string> = {
   "vidtool.faqDiscord3A": "No. La compressione avviene interamente nel tuo browser, quindi il clip non lascia mai il tuo dispositivo.",
   "vidtool.faqDiscord4Q": "È gratuito? C'è una filigrana?",
   "vidtool.faqDiscord4A": "Sì, è gratuito, e non ci sono filigrane, registrazioni o pubblicità.",
+  "vidtool.titleWhatsapp": "Comprimi video per WhatsApp",
+  "vidtool.subtitleWhatsapp": "Porta il tuo video sotto il limite di condivisione di 16 MB di WhatsApp senza caricarlo da nessuna parte e senza filigrana.",
+  "vidtool.whatsappNote": "WhatsApp limita i video condivisi come media riproducibile a 16 MB sulla maggior parte delle versioni. I file più grandi devono passare come documento, che non si riproduce direttamente nella chat. 16 MB è l'obiettivo sicuro.",
+  "tools.cardWhatsapp": "Comprimi per WhatsApp",
+  "tools.descWhatsapp": "Porta un video sotto il limite di 16MB di WhatsApp.",
+  "vidtool.faqWhatsapp1Q": "Qual è il limite di dimensione video di WhatsApp?",
+  "vidtool.faqWhatsapp1A":
+    "I video condivisi come media riproducibile in una chat sono limitati a 16 MB sulla maggior parte delle versioni di WhatsApp. Puoi inviare file più grandi come documento, ma arrivano come allegato invece di riprodursi nella chat.",
+  "vidtool.faqWhatsapp2Q": "Come invio un video lungo su WhatsApp?",
+  "vidtool.faqWhatsapp2A":
+    "Comprimilo sotto i 16 MB con il preset qui sopra e invialo come un video normale. Se la qualità conta più della riproduzione diretta, invia il file originale come documento.",
+  "vidtool.faqWhatsapp3Q": "Il mio video viene caricato su un server?",
+  "vidtool.faqWhatsapp3A": "No. La compressione avviene interamente nel tuo browser, quindi il video non lascia mai il tuo dispositivo.",
+  "vidtool.faqWhatsapp4Q": "Comprimere per WhatsApp riduce la qualità?",
+  "vidtool.faqWhatsapp4A":
+    "Una certa perdita di qualità è inevitabile, perché lo strumento abbassa il bitrate finché il video non rientra nell'obiettivo. I clip brevi reggono il limite di 16 MB molto meglio di quelli lunghi.",
+  "tools.cardPdfSplit": "Dividi PDF",
+  "tools.descPdfSplit": "Estrai un intervallo di pagine in un nuovo PDF.",
+  "pdftool.titleSplit": "Dividi PDF",
+  "pdftool.subtitleSplit": "Estrai un intervallo di pagine da un PDF in un nuovo file. Tutto avviene nel tuo browser, nulla viene caricato online.",
+  "pdftool.dropPdf": "Trascina un PDF qui (fino a {size})",
+  "pdftool.pageCount": "{count} pagine",
+  "pdftool.fromPage": "Dalla pagina",
+  "pdftool.toPage": "Alla pagina",
+  "pdftool.extract": "Estrai pagine",
+  "pdftool.rangeInvalid": "Controlla l'intervallo di pagine: deve iniziare da pagina 1 o dopo, finire all'ultima pagina o prima, e la fine non può precedere l'inizio.",
+  "tools.cardMkvMp4": "MKV in MP4",
+  "tools.descMkvMp4": "Trasforma rip e registrazioni OBS in MP4.",
+  "mediatool.titleMkv": "Convertitore da MKV a MP4",
+  "mediatool.subtitleMkv":
+    "MKV è il contenitore dietro la maggior parte dei rip, delle registrazioni OBS e dei download, e molti lettori, telefoni ed editor si rifiutano di aprirlo. Convertilo in un MP4 che si riproduce ovunque, direttamente nel tuo browser. Il file non lascia mai il tuo dispositivo.",
+  "mediatool.faqMkv1Q": "Perché il mio file MKV non si riproduce?",
+  "mediatool.faqMkv1A":
+    "MKV è un contenitore, non un codec, e molti lettori, TV, telefoni e app di montaggio semplicemente non lo leggono. Convertirlo in MP4 con video H.264 e audio AAC produce un file che si riproduce quasi ovunque.",
+  "mediatool.faqMkv2Q": "Convertire da MKV a MP4 fa perdere qualità?",
+  "mediatool.faqMkv2A":
+    "Il video viene ricodificato con H.264 a un'impostazione di alta qualità, quindi c'è una perdita piccola e di solito invisibile. È questo compromesso a rendere il risultato compatibile con quasi ogni dispositivo.",
+  "mediatool.faqMkv3Q": "Il mio MKV viene caricato su un server?",
+  "mediatool.faqMkv3A":
+    "No. La conversione avviene interamente nel tuo browser, quindi il file non lascia mai il tuo dispositivo. Sono supportati file fino a 500 MB, gratis e senza filigrana.",
+  "tools.cardMovMp4": "MOV in MP4",
+  "tools.descMovMp4": "Trasforma i clip di iPhone e QuickTime in MP4.",
+  "mediatool.titleMov": "Convertitore da MOV a MP4",
+  "mediatool.subtitleMov":
+    "MOV è il formato QuickTime in cui registrano gli iPhone e i Mac, e spesso si rifiuta di riprodursi su Windows, Android o sul web. Convertilo in un MP4 che funziona ovunque, direttamente nel tuo browser. Il file non lascia mai il tuo dispositivo.",
+  "mediatool.faqMov1Q": "Perché il mio video da iPhone è un file MOV?",
+  "mediatool.faqMov1A":
+    "iPhone e Mac registrano i video nel formato QuickTime MOV di Apple. Si riproduce bene sui dispositivi Apple, ma Windows, Android e molti siti web si aspettano MP4.",
+  "mediatool.faqMov2Q": "Convertire da MOV a MP4 fa perdere qualità?",
+  "mediatool.faqMov2A":
+    "Il clip viene ricodificato con H.264 a un'impostazione di alta qualità, quindi la perdita è piccola e di solito invisibile. Il risultato si riproduce praticamente su qualsiasi dispositivo o piattaforma.",
+  "mediatool.faqMov3Q": "I miei video vengono caricati da qualche parte?",
+  "mediatool.faqMov3A":
+    "No. La conversione avviene interamente nel tuo browser, quindi il clip non lascia mai il tuo dispositivo. Sono supportati file fino a 500 MB, gratis e senza filigrana.",
+  "tools.cardFlacMp3": "FLAC in MP3",
+  "tools.descFlacMp3": "Riduci l'audio lossless in MP3 portatili.",
+  "mediatool.titleFlac": "Convertitore da FLAC a MP3",
+  "mediatool.subtitleFlac":
+    "Il FLAC conserva ogni bit della registrazione originale, perfetto per un archivio ma pesante per un telefono. Convertilo in MP3 al bitrate che scegli, direttamente nel tuo browser. L'MP3 è un formato con perdita, quindi tieni il FLAC come copia master. La tua musica non lascia mai il tuo dispositivo.",
+  "mediatool.faqFlac1Q": "Convertire da FLAC a MP3 fa perdere qualità?",
+  "mediatool.faqFlac1A":
+    "Sì, l'MP3 è un formato con perdita, quindi una parte del dettaglio viene sempre scartata. A 320 kbps la maggior parte delle persone non sente la differenza. Tieni il file FLAC come master lossless e usa l'MP3 per il telefono e la condivisione.",
+  "mediatool.faqFlac2Q": "Quale bitrate MP3 dovrei scegliere?",
+  "mediatool.faqFlac2A":
+    "320 kbps per la qualità migliore, 192 kbps per un buon equilibrio e 128 kbps per i file più piccoli. Un album FLAC da 400 MB scende intorno ai 100 MB in MP3 a 320 kbps.",
+  "mediatool.faqFlac3Q": "La mia musica viene caricata su un server?",
+  "mediatool.faqFlac3A":
+    "No. La conversione avviene interamente nel tuo browser, quindi i tuoi file non lasciano mai il tuo dispositivo. Sono supportati file fino a 200 MB, gratis e senza registrazione.",
+  "tools.cardWavMp3": "WAV in MP3",
+  "tools.descWavMp3": "Trasforma gli export WAV grezzi in piccoli MP3.",
+  "mediatool.titleWav": "Convertitore da WAV a MP3",
+  "mediatool.subtitleWav":
+    "I file WAV sono audio grezzo non compresso: un export di tre minuti può superare i 30 MB, troppo per una mail o un messaggio. Convertilo in MP3 al bitrate che scegli, direttamente nel tuo browser. L'MP3 è un formato con perdita, quindi tieni il WAV se pensi di rieditare l'audio in seguito.",
+  "mediatool.faqWav1Q": "Quanto si riduce un WAV convertito in MP3?",
+  "mediatool.faqWav1A":
+    "Molto. Un WAV stereo a 16 bit occupa circa 10 MB al minuto; lo stesso audio è intorno a 2,4 MB al minuto a 320 kbps e 1 MB al minuto a 128 kbps, una riduzione da 4 a 10 volte.",
+  "mediatool.faqWav2Q": "Convertire da WAV a MP3 riduce la qualità?",
+  "mediatool.faqWav2A":
+    "Sì, l'MP3 è un formato con perdita, quindi una parte del dettaglio viene scartata. A 320 kbps la differenza è impercettibile per la maggior parte delle persone. Tieni il WAV come master di editing e usa l'MP3 per condividere.",
+  "mediatool.faqWav3Q": "I miei file audio vengono caricati da qualche parte?",
+  "mediatool.faqWav3A":
+    "No. La conversione avviene interamente nel tuo browser e il file non lascia mai il tuo dispositivo. Sono supportati file fino a 200 MB, gratis, senza registrazione e senza pubblicità.",
 };
 
 export default it;
