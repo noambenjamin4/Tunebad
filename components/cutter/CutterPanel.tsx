@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type DragEvent } fro
 import { decodeAudioFileCached } from "@/lib/audio/decode-cache";
 import { computeWaveformBars } from "@/lib/audio/waveform";
 import { encodeMp3FromChannels, encodeWavFromChannels, downloadBlob } from "@/lib/audio/mp3-encoder";
-import { SeekableWaveform } from "@/components/ui/SeekableWaveform";
+import { TrimWaveform } from "./TrimWaveform";
 import { CheckRow } from "@/components/ui/CheckRow";
 import { FormatPicker, type OutputFormat } from "@/components/converter/QualityPicker";
 import { useI18n } from "@/lib/i18n";
@@ -88,10 +88,16 @@ export function CutterPanel() {
 
   const getCurrentTime = useCallback(() => audioRef.current?.currentTime ?? 0, []);
 
+  // Play previews the SELECTION: starts at the trim start and auto-pauses at
+  // the trim end (checked on timeupdate below), so what you hear is exactly
+  // what you'd export.
   const togglePlayback = async () => {
     const audio = audioRef.current;
     if (!audio) return;
     if (audio.paused) {
+      if (audio.currentTime < start || audio.currentTime >= end) {
+        audio.currentTime = start;
+      }
       await audio.play();
       setPlaying(true);
     } else {
@@ -100,9 +106,13 @@ export function CutterPanel() {
     }
   };
 
-  const handleSeek = useCallback((seconds: number) => {
-    if (audioRef.current) audioRef.current.currentTime = seconds;
-  }, []);
+  const handleTimeUpdate = () => {
+    const audio = audioRef.current;
+    if (audio && !audio.paused && audio.currentTime >= end) {
+      audio.pause();
+      setPlaying(false);
+    }
+  };
 
   const resetAll = useCallback(() => {
     if (audioRef.current) audioRef.current.pause();
@@ -282,13 +292,16 @@ export function CutterPanel() {
           </div>
 
           <div className="wave-card cutter-wave-card">
-            <SeekableWaveform
+            <TrimWaveform
               bars={bars}
               duration={duration}
+              start={start}
+              end={end}
               playing={playing}
               getCurrentTime={getCurrentTime}
+              onChangeStart={handleStartChange}
+              onChangeEnd={handleEndChange}
               onTogglePlay={() => void togglePlayback()}
-              onSeek={handleSeek}
             />
             <audio
               ref={audioRef}
@@ -296,6 +309,7 @@ export function CutterPanel() {
               onPlay={() => setPlaying(true)}
               onPause={() => setPlaying(false)}
               onEnded={() => setPlaying(false)}
+              onTimeUpdate={handleTimeUpdate}
             />
           </div>
 

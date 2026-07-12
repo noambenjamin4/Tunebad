@@ -3686,11 +3686,82 @@ tbody tr:last-child td {
 }
 
 .vidtool-attribution {
-  margin: 14px 0 0;
+  /* Direct child of .hero-tool (overflow:hidden) — needs its own inset so the
+     descenders don't get clipped by the card's rounded bottom edge. */
+  margin: 4px 0 0;
+  padding: 0 clamp(20px, 4vw, 40px) clamp(20px, 4vw, 40px);
   font-size: 12px;
+  line-height: 1.5;
   color: var(--muted);
 }
 
 .vidtool-attribution a {
   color: var(--muted);
+}
+
+/* Trim waveform (MP3 cutter): dark shades mark the discarded ends, the light
+   middle band is the kept selection, thin line = playhead. */
+.trim-wave-track {
+  cursor: ew-resize;
+  touch-action: none;
+}
+
+.trim-shade {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: var(--ink);
+  opacity: 0.6;
+  border-radius: var(--radius-inner) 0 0 var(--radius-inner);
+  pointer-events: none;
+}
+
+.trim-shade-right {
+  border-radius: 0 var(--radius-inner) var(--radius-inner) 0;
+}
+
+.trim-handle {
+  position: absolute;
+  top: -6px;
+  bottom: -6px;
+  width: 22px;
+  transform: translateX(-50%);
+  cursor: ew-resize;
+  pointer-events: none; /* the track handles pointers; these are focus/aria stops */
+}
+
+.trim-handle::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 4px;
+  transform: translateX(-50%);
+  border-radius: var(--radius-pill);
+  background: var(--ink);
+}
+
+.trim-handle:focus-visible {
+  outline: none;
+}
+
+.trim-handle:focus-visible::after {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.trim-head {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--trim-head-pct, 0%);
+  width: 2px;
+  background: var(--muted);
+  pointer-events: none;
+}
+
+.trim-wave-times {
+  display: flex;
+  justify-content: space-between;
 }
