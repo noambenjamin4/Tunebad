@@ -11,6 +11,11 @@ const CARDS = [
   ["resize-image", "RESIZE", "IMAGES"],
   ["resize-image-instagram", "RESIZE FOR", "INSTAGRAM"],
   ["compress-image-100kb", "COMPRESS", "TO 100KB"],
+  ["compress-video", "COMPRESS", "VIDEO"],
+  ["compress-video-discord", "COMPRESS FOR", "DISCORD"],
+  ["merge-pdf", "MERGE", "PDF FILES"],
+  ["jpg-to-pdf", "JPG TO", "PDF"],
+  ["unzip-files", "UNZIP", "FILES"],
 ];
 
 const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");

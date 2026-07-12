@@ -70,6 +70,9 @@ const nextConfig = {
       { source: "/apple-touch-icon.png", headers: [immutable] },
       { source: "/lame.min.js", headers: [immutable] },
       { source: "/og/:name", headers: [immutable] },
+      // ffmpeg.wasm core: 31MB served same-origin (CSP blocks CDNs); immutable
+      // so repeat visits to the video tools never re-download it.
+      { source: "/vendor/:path*", headers: [immutable] },
     ];
   },
 };

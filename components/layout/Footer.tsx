@@ -48,6 +48,11 @@ export function Footer() {
           <Link href="/resize-image">{t("tools.cardImageResize")}</Link>
           <Link href="/resize-image-for-instagram">{t("tools.cardInstagram")}</Link>
           <Link href="/compress-image-to-100kb">{t("tools.card100kb")}</Link>
+          <Link href="/merge-pdf">{t("tools.cardPdfMerge")}</Link>
+          <Link href="/jpg-to-pdf">{t("tools.cardJpgToPdf")}</Link>
+          <Link href="/unzip-files">{t("tools.cardZip")}</Link>
+          <Link href="/compress-video">{t("tools.cardVideo")}</Link>
+          <Link href="/compress-video-for-discord">{t("tools.cardDiscord")}</Link>
         </nav>
         {/* English guide articles; next/link prefetches these full navigations. */}
         <nav className="site-footer-tools site-footer-guides" aria-label={t("footer.guides")}>

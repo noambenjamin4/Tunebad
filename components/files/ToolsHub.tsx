@@ -12,6 +12,11 @@ const FILE_TOOLS: { href: string; nameKey: DictKey; descKey: DictKey }[] = [
   { href: "/resize-image", nameKey: "tools.cardImageResize", descKey: "tools.descImageResize" },
   { href: "/resize-image-for-instagram", nameKey: "tools.cardInstagram", descKey: "tools.descInstagram" },
   { href: "/compress-image-to-100kb", nameKey: "tools.card100kb", descKey: "tools.desc100kb" },
+  { href: "/merge-pdf", nameKey: "tools.cardPdfMerge", descKey: "tools.descPdfMerge" },
+  { href: "/jpg-to-pdf", nameKey: "tools.cardJpgToPdf", descKey: "tools.descJpgToPdf" },
+  { href: "/unzip-files", nameKey: "tools.cardZip", descKey: "tools.descZip" },
+  { href: "/compress-video", nameKey: "tools.cardVideo", descKey: "tools.descVideo" },
+  { href: "/compress-video-for-discord", nameKey: "tools.cardDiscord", descKey: "tools.descDiscord" },
 ];
 
 export function ToolsHub({ extra }: { extra?: { href: string; nameKey: DictKey; descKey: DictKey }[] }) {

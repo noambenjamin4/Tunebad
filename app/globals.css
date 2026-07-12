@@ -3650,3 +3650,47 @@ tbody tr:last-child td {
   align-items: center;
   gap: 8px 12px;
 }
+
+/* Reorder/remove button group on PDF file rows. */
+.pdftool-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-left: auto;
+}
+
+/* Video tool */
+.vidtool-note {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0 0 14px;
+}
+
+.vidtool-progress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.vidtool-progress .stat-meter {
+  flex: 1;
+}
+
+.vidtool-progress-label {
+  font-size: 13px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  min-width: 40px;
+}
+
+.vidtool-attribution {
+  margin: 14px 0 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.vidtool-attribution a {
+  color: var(--muted);
+}
