@@ -43,6 +43,7 @@ const STATIC_ENTRIES: ToolEntry[] = [
   { path: "/resize-image", changefreq: "weekly", priority: 0.9 },
   { path: "/resize-image-for-instagram", changefreq: "weekly", priority: 0.9 },
   { path: "/compress-image-to-100kb", changefreq: "weekly", priority: 0.9 },
+  { path: "/heic-to-jpg", changefreq: "weekly", priority: 0.9 },
   { path: "/compress-video", changefreq: "weekly", priority: 0.9 },
   { path: "/compress-video-for-discord", changefreq: "weekly", priority: 0.9 },
   { path: "/compress-video-for-whatsapp", changefreq: "weekly", priority: 0.9 },
