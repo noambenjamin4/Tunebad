@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { fadeEnvelopeGain } from "@/lib/audio/fade";
 import { formatTimeTenths } from "@/lib/format";
 import { useI18n } from "@/lib/i18n";
 
@@ -10,20 +11,26 @@ function clamp(value: number, min: number, max: number): number {
 
 const MIN_SELECTION_SECONDS = 0.1;
 const KEY_STEP_SECONDS = 1;
+/** Pointer must land within this many CSS px of a grip bar to drag it. */
+const HANDLE_GRAB_PX = 22;
+/** Seeks stop just shy of the end so playback always has something to play. */
+const SEEK_END_GAP_SECONDS = 0.05;
 
 /**
- * The cutter's waveform IS the trim control: the regions outside the
- * start/end selection are shaded dark, so the light middle band reads as
- * "this is the part you keep". Press or drag anywhere on the wave and the
- * NEAREST bound snaps to the pointer — tap at 0:40 near the left and the
- * start becomes 0:40; drag near the right edge and you're moving the end.
- * The selection edges render as chunky grip bars; the fade in/out toggles
- * sit ON the wave at the selection's top corners (like the reference
- * cutter), and the playhead is a thin line driven by a CSS var (no
- * re-renders). Under the wave: absolute start/end times pinned under the
- * selection edges plus the selection length centered beneath.
- * `headSignal` forces a playhead reposition after a programmatic seek while
- * paused (e.g. the back-to-start button).
+ * The cutter's waveform IS both the trim control and the scrubber: the kept
+ * selection renders as bright full-ink bars while the discarded ends fade
+ * toward the card background. Press within ~22px of a grip bar and you drag
+ * that bound (with pointer capture + arrow-key support); press anywhere ELSE
+ * on the wave and the playhead jumps there and playback starts (`onSeek`) —
+ * dragging after a seek-press keeps scrubbing the playhead, never a bound.
+ * When a fade is toggled on, the bars inside its window are scaled by the
+ * same linear envelope the export bakes in, so the taper is visible on the
+ * wave itself. The fade in/out toggles sit ON the wave at the selection's
+ * top corners (like the reference cutter), and the playhead is a thin line
+ * driven by a CSS var (no re-renders). Under the wave: absolute start/end
+ * times pinned under the selection edges plus the selection length centered
+ * beneath. `headSignal` forces a playhead reposition after a programmatic
+ * seek while paused (e.g. the back-to-start button).
  */
 export function TrimWaveform({
   bars,
@@ -34,6 +41,7 @@ export function TrimWaveform({
   getCurrentTime,
   onChangeStart,
   onChangeEnd,
+  onSeek,
   fadeIn,
   fadeOut,
   onToggleFadeIn,
@@ -49,6 +57,7 @@ export function TrimWaveform({
   getCurrentTime: () => number;
   onChangeStart: (seconds: number) => void;
   onChangeEnd: (seconds: number) => void;
+  onSeek: (seconds: number) => void;
   fadeIn: boolean;
   fadeOut: boolean;
   onToggleFadeIn: () => void;
@@ -58,7 +67,7 @@ export function TrimWaveform({
 }) {
   const { t } = useI18n();
   const trackRef = useRef<HTMLDivElement>(null);
-  const draggingRef = useRef<"start" | "end" | null>(null);
+  const draggingRef = useRef<"start" | "end" | "seek" | null>(null);
   const rafRef = useRef<number | null>(null);
   const getCurrentTimeRef = useRef(getCurrentTime);
   getCurrentTimeRef.current = getCurrentTime;
@@ -96,24 +105,53 @@ export function TrimWaveform({
     else onChangeEnd(clamp(seconds, start + MIN_SELECTION_SECONDS, duration));
   };
 
+  // A plain press on the open wave = scrub: jump the playhead there (clamped
+  // inside the selection) and hand the time to the panel, which starts
+  // playback. The head line moves immediately via the CSS var — no waiting
+  // on a re-render.
+  const seekTo = (clientX: number) => {
+    const seconds = clamp(
+      secondsFromClientX(clientX),
+      start,
+      Math.max(start, end - SEEK_END_GAP_SECONDS),
+    );
+    applyHead(seconds);
+    onSeek(seconds);
+  };
+
   const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     if (disabled || duration <= 0) return;
-    const seconds = secondsFromClientX(event.clientX);
-    // Nearest bound wins; ties go to the start handle.
-    const bound: "start" | "end" =
-      Math.abs(seconds - start) <= Math.abs(seconds - end) ? "start" : "end";
-    draggingRef.current = bound;
+    const track = trackRef.current;
+    if (!track) return;
+    // Dispatch on PIXEL distance to the grip bars: within HANDLE_GRAB_PX of
+    // one you drag that bound (nearest wins, ties to start); anywhere else
+    // on the wave is a seek, never a trim edit.
+    const rect = track.getBoundingClientRect();
+    const startX = rect.left + (start / duration) * rect.width;
+    const endX = rect.left + (end / duration) * rect.width;
+    const startDist = Math.abs(event.clientX - startX);
+    const endDist = Math.abs(event.clientX - endX);
+    const mode: "start" | "end" | "seek" =
+      Math.min(startDist, endDist) <= HANDLE_GRAB_PX
+        ? startDist <= endDist
+          ? "start"
+          : "end"
+        : "seek";
+    draggingRef.current = mode;
     try {
       event.currentTarget.setPointerCapture(event.pointerId);
     } catch {
       // Synthetic pointers can't always be captured; drag still works.
     }
-    moveBound(bound, seconds);
+    if (mode === "seek") seekTo(event.clientX);
+    else moveBound(mode, secondsFromClientX(event.clientX));
   };
 
   const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (!draggingRef.current) return;
-    moveBound(draggingRef.current, secondsFromClientX(event.clientX));
+    const mode = draggingRef.current;
+    if (!mode) return;
+    if (mode === "seek") seekTo(event.clientX);
+    else moveBound(mode, secondsFromClientX(event.clientX));
   };
 
   const handlePointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
@@ -157,12 +195,20 @@ export function TrimWaveform({
         onPointerCancel={handlePointerUp}
       >
         <div className="seek-wave-bars" aria-hidden="true">
-          {bars.map((bar, index) => (
-            <i key={index} style={{ height: `${Math.max(8, (bar / max) * 100)}%` }} />
-          ))}
+          {bars.map((bar, index) => {
+            // Each bar's height is scaled by the export's fade envelope at
+            // the bar's center time, so an enabled fade tapers the wave
+            // exactly where (and how) the exported audio will taper.
+            const barTime = bars.length ? ((index + 0.5) / bars.length) * duration : 0;
+            const gain = fadeEnvelopeGain(barTime, start, end, fadeIn, fadeOut);
+            return (
+              <i key={index} style={{ height: `${Math.max(8, (bar / max) * 100) * gain}%` }} />
+            );
+          })}
         </div>
 
-        {/* Shaded = discarded; the light middle band is what gets kept. */}
+        {/* Scrimmed toward the background = discarded; the bright full-ink
+            middle band is what gets kept. */}
         <div className="trim-shade" style={{ left: 0, width: `${startPct}%` }} aria-hidden="true" />
         <div
           className="trim-shade trim-shade-right"

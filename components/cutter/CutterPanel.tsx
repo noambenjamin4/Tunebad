@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type DragEvent } fro
 import { decodeAudioFileCached } from "@/lib/audio/decode-cache";
 import { computeWaveformBars } from "@/lib/audio/waveform";
 import { encodeMp3FromChannels, encodeWavFromChannels, downloadBlob } from "@/lib/audio/mp3-encoder";
+import { FADE_SECONDS, fadeEnvelopeGain } from "@/lib/audio/fade";
 import { TrimWaveform } from "./TrimWaveform";
 import type { OutputFormat } from "@/components/converter/QualityPicker";
 import { useI18n } from "@/lib/i18n";
@@ -14,12 +15,13 @@ import { formatTimeTenths } from "@/lib/format";
 const NOW_PLAYING_SOURCE = "cutter-preview";
 const MIN_SELECTION_SECONDS = 0.1;
 const STEP_SECONDS = 0.1;
-const FADE_SECONDS = 0.5;
 
 type Status = { title: string; message: string; tone: "neutral" | "success" | "warning" };
 
 // Applies a linear fade in/out in place on each channel. Ramp length is
-// clamped to half the selection so short clips still fade sensibly.
+// clamped to half the selection so short clips still fade sensibly. This is
+// the sample-domain twin of lib/audio/fade's fadeEnvelopeGain, which drives
+// the preview volume and the waveform's tapered bars.
 function applyFades(channels: Float32Array[], sampleRate: number, fadeIn: boolean, fadeOut: boolean): void {
   const length = channels[0]?.length ?? 0;
   if (!length) return;
@@ -107,6 +109,58 @@ export function CutterPanel() {
       setPlaying(false);
     }
   };
+
+  // Click-to-play from the waveform: pressing the open wave (away from the
+  // grip bars) jumps the playhead there and starts playback — no trip to the
+  // transport button. If we're already playing, it just relocates. The
+  // play() rejection guard covers autoplay policies (e.g. an untrusted
+  // synthetic event): the seek still lands, playback simply waits for a
+  // real gesture.
+  const handleSeek = useCallback((seconds: number) => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.currentTime = seconds;
+    setHeadSignal((n) => n + 1);
+    if (audio.paused) {
+      audio.play().then(
+        () => setPlaying(true),
+        () => {
+          /* Autoplay blocked; the moved playhead is kept. */
+        },
+      );
+    }
+  }, []);
+
+  // AUDIBLE fades: while playing with a fade enabled, ride audio.volume
+  // along the same envelope the export bakes into the samples, every frame.
+  // Volume snaps back to 1 whenever playback stops, a fade is toggled off,
+  // or the component unmounts, so nothing else ever hears a stale fade.
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (!playing || (!fadeIn && !fadeOut)) {
+      audio.volume = 1;
+      return;
+    }
+    let raf = 0;
+    const apply = () => {
+      audio.volume = fadeEnvelopeGain(audio.currentTime, start, end, fadeIn, fadeOut);
+    };
+    const tick = () => {
+      apply();
+      raf = requestAnimationFrame(tick);
+    };
+    tick();
+    // rAF pauses in background tabs while audio keeps playing; timeupdate
+    // (~4 Hz) keeps the envelope tracking so a tab switch mid-fade can't
+    // freeze the volume low.
+    audio.addEventListener("timeupdate", apply);
+    return () => {
+      cancelAnimationFrame(raf);
+      audio.removeEventListener("timeupdate", apply);
+      audio.volume = 1;
+    };
+  }, [playing, start, end, fadeIn, fadeOut]);
 
   const resetAll = useCallback(() => {
     if (audioRef.current) audioRef.current.pause();
@@ -308,6 +362,7 @@ export function CutterPanel() {
               getCurrentTime={getCurrentTime}
               onChangeStart={handleStartChange}
               onChangeEnd={handleEndChange}
+              onSeek={handleSeek}
               fadeIn={fadeIn}
               fadeOut={fadeOut}
               onToggleFadeIn={() => setFadeIn((v) => !v)}

@@ -3944,10 +3944,13 @@ tbody tr:last-child td {
   color: var(--muted);
 }
 
-/* Trim waveform (MP3 cutter): the hero trim control. Dark shades mark the
-   discarded ends, the light middle band is the kept selection, chunky grip
-   bars mark the bounds, the fade toggles sit on the wave's top corners, and
-   the thin line is the playhead. */
+/* Trim waveform (MP3 cutter): the hero trim control. The kept selection is
+   bright full-ink bars (white in dark mode, black in light); the discarded
+   ends sit under a surface-colored scrim so they fade toward the card
+   background in BOTH themes. Chunky grip bars mark the bounds, the fade
+   toggles sit on the wave's top corners, and the thin line is the playhead.
+   Pressing the open wave seeks-and-plays, so the track cursor is a pointer;
+   only the grip bars advertise ew-resize. */
 .trim-wave {
   display: flex;
   flex-direction: column;
@@ -3958,7 +3961,7 @@ tbody tr:last-child td {
 
 .trim-wave-track {
   height: 140px;
-  cursor: ew-resize;
+  cursor: pointer;
   touch-action: none;
 }
 
@@ -3968,12 +3971,18 @@ tbody tr:last-child td {
   }
 }
 
+/* The kept region reads at FULL ink strength — the shared seek wave renders
+   bars at 0.25, but here bright = "this is your cut". */
+.trim-wave-track .seek-wave-bars i {
+  opacity: 1;
+}
+
 .trim-shade {
   position: absolute;
   top: 0;
   bottom: 0;
-  background: var(--ink);
-  opacity: 0.6;
+  background: var(--surface);
+  opacity: 0.75;
   border-radius: var(--radius-inner) 0 0 var(--radius-inner);
   pointer-events: none;
 }
@@ -3990,7 +3999,9 @@ tbody tr:last-child td {
   width: 26px;
   transform: translateX(-50%);
   cursor: ew-resize;
-  pointer-events: none; /* the track handles pointers; these are focus/aria stops */
+  /* Pointer events BUBBLE to the track, which owns all drag/seek dispatch;
+     keeping these interactive just surfaces the ew-resize cursor over the
+     grips (the rest of the track shows the seek pointer). */
 }
 
 .trim-handle::after {
