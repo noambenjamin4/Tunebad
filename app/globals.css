@@ -4067,6 +4067,22 @@ tbody tr:last-child td {
   outline-offset: 2px;
 }
 
+/* Envelope overlay for an enabled fade: two lines tracing the taper the
+   bars follow across the fade window, so the ramp reads at a glance even on
+   long tracks where the window is only a sliver of the wave. */
+.trim-fade-ramp {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  height: 100%;
+  color: var(--ink);
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  opacity: 0.9;
+  pointer-events: none;
+}
+
 /* Fade in/out toggles pinned to the selection's top corners. Pressed =
    filled ink with a surface icon. */
 .trim-fade-btn {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { fadeEnvelopeGain } from "@/lib/audio/fade";
+import { fadeEnvelopeGain, fadeRampSeconds } from "@/lib/audio/fade";
 import { formatTimeTenths } from "@/lib/format";
 import { useI18n } from "@/lib/i18n";
 
@@ -183,6 +183,9 @@ export function TrimWaveform({
   const startPct = duration > 0 ? (start / duration) * 100 : 0;
   const endPct = duration > 0 ? (end / duration) * 100 : 100;
   const max = bars.length ? Math.max(...bars) : 1;
+  // Width of the fade window as a % of the track — the envelope overlays
+  // span exactly the region whose bars (and export samples) the ramp scales.
+  const rampPct = duration > 0 ? (fadeRampSeconds(end - start) / duration) * 100 : 0;
 
   return (
     <div className="trim-wave">
@@ -215,6 +218,34 @@ export function TrimWaveform({
           style={{ left: `${endPct}%`, width: `${100 - endPct}%` }}
           aria-hidden="true"
         />
+
+        {/* Envelope overlays: two lines converging on the vertical center at
+            the silent edge, opening to full height where the ramp ends —
+            tracing exactly the taper the bars (and the export) follow. */}
+        {fadeIn && rampPct > 0 && (
+          <svg
+            className="trim-fade-ramp"
+            style={{ left: `${startPct}%`, width: `${rampPct}%` }}
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+            aria-hidden="true"
+          >
+            <line x1="0" y1="50" x2="100" y2="0" vectorEffect="non-scaling-stroke" />
+            <line x1="0" y1="50" x2="100" y2="100" vectorEffect="non-scaling-stroke" />
+          </svg>
+        )}
+        {fadeOut && rampPct > 0 && (
+          <svg
+            className="trim-fade-ramp"
+            style={{ left: `${endPct - rampPct}%`, width: `${rampPct}%` }}
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+            aria-hidden="true"
+          >
+            <line x1="0" y1="0" x2="100" y2="50" vectorEffect="non-scaling-stroke" />
+            <line x1="0" y1="100" x2="100" y2="50" vectorEffect="non-scaling-stroke" />
+          </svg>
+        )}
 
         {/* Fade toggles pinned to the selection's top corners. */}
         <button

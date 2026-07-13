@@ -5,7 +5,7 @@
  * windows), so what you see and hear is exactly what you download.
  */
 
-export const FADE_SECONDS = 0.5;
+export const FADE_SECONDS = 2;
 
 /** Ramp length, clamped to half the selection so short clips still fade sensibly. */
 export function fadeRampSeconds(selectionSeconds: number): number {
