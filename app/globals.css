@@ -3440,7 +3440,8 @@ tbody tr:last-child td {
   color: var(--ink);
   margin: 0 0 16px;
 }
-.seo-heading-faq {
+.seo-heading-faq,
+.seo-heading-tour {
   margin-top: 64px;
 }
 .seo-lede {
@@ -3476,6 +3477,28 @@ tbody tr:last-child td {
   font-size: 0.95rem;
   line-height: 1.6;
   margin: 0;
+}
+.seo-tour {
+  grid-template-columns: repeat(3, 1fr);
+}
+.seo-tour-item {
+  display: flex;
+  flex-direction: column;
+}
+.seo-tour-item p {
+  flex-grow: 1;
+}
+.seo-tour-link {
+  display: inline-block;
+  margin-top: 12px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  color: var(--ink);
+}
+.seo-tour-link:hover {
+  color: var(--muted);
 }
 .seo-faq {
   border-top: 1px solid var(--line);
@@ -3526,6 +3549,11 @@ tbody tr:last-child td {
   margin: 0;
   padding: 0 44px 20px 0;
   max-width: 760px;
+}
+@media (max-width: 860px) {
+  .seo-tour {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 @media (max-width: 640px) {
   .seo-values {

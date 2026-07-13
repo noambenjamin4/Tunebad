@@ -18,14 +18,25 @@ const ROWS: { label: string; tunebad: string; tunebat: string }[] = [
   { label: "Ads", tunebad: "None", tunebat: "Ads on the free tier" },
   { label: "Sign-up", tunebad: "Never required", tunebat: "Optional account" },
   { label: "How it finds key and BPM", tunebad: "Analyzes the actual audio you give it", tunebat: "Looks the song up in its database" },
+  { label: "Find a song by name", tunebad: "Yes, just type the title, no link or file needed", tunebat: "Yes, that's its main search" },
   { label: "Works on unreleased or private tracks", tunebad: "Yes, analyze any file", tunebat: "Only if the song is in the database" },
-  { label: "Harmonic mixing (Camelot)", tunebad: "Camelot code on every result, key hubs, and a compatible-key section on every song page", tunebat: "Camelot code and key search" },
+  {
+    label: "Harmonic mixing (Camelot)",
+    tunebad: "Camelot code on every result, a clickable interactive Camelot wheel, key hubs, and a compatible-key section on every song page",
+    tunebat: "Camelot code and key search",
+  },
   { label: "Similar song suggestions", tunebad: "Compatible-key and same-key tracks linked on every song page", tunebat: "Related tracks from its database" },
+  { label: "Whole-playlist analysis", tunebad: "Paste a Spotify or YouTube playlist, get every key and BPM, sort in Camelot order", tunebat: "Per-track lookup" },
   { label: "Data freshness", tunebad: "Measured from the audio at analysis time", tunebat: "Stored values (Spotify retired the audio-features API behind most databases in late 2024)" },
   { label: "Song database size", tunebad: "Growing, from tracks people analyze", tunebat: "Tens of millions of songs" },
-  { label: "Whole-playlist analysis", tunebad: "Paste a Spotify or YouTube playlist, get every key and BPM, sort in Camelot order", tunebat: "Per-track lookup" },
+  { label: "Cutting an MP3", tunebad: "Built-in cutter with a live, audible fade in and out, export as MP3 or WAV", tunebat: "Not part of Tunebat" },
+  {
+    label: "Video & audio conversion",
+    tunebad: "Any-to-any converters for video (MP4, WebM, MKV, MOV, AVI, FLV, WMV) and audio (MP3, WAV, FLAC, OGG, M4A), plus turning a YouTube, Spotify, or SoundCloud link into MP3, WAV, or MP4",
+    tunebat: "Not part of Tunebat",
+  },
+  { label: "Loudness (LUFS)", tunebad: "Measures LUFS, shows the penalty each streaming platform applies, and can normalize and export to a target", tunebat: "Not part of Tunebat" },
   { label: "Your files leave your device", tunebad: "No, analysis runs in your browser", tunebat: "You search, you do not upload" },
-  { label: "Extra tools", tunebad: "Loudness, slowed + reverb, pitch, delay, MP3 cutter, converter", tunebat: "Search filters, playlists, key/BPM database" },
   { label: "Languages", tunebad: "8", tunebat: "English" },
 ];
 

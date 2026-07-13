@@ -13,13 +13,13 @@ Key facts:
 
 ## Tools
 
-- [Key & BPM Finder](https://www.tunebad.com/key-bpm-finder): Search a song by name, upload an audio file, or paste a YouTube, Spotify, or SoundCloud link, and get the key, tempo, Camelot code, energy, and loudness in a few seconds.
+- [Key & BPM Finder](https://www.tunebad.com/key-bpm-finder): Search a song by name, upload an audio file, or paste a YouTube, Spotify, or SoundCloud link, and get the key, tempo, Camelot code, energy, and loudness in a few seconds, plus a list of songs that mix well with it.
 - [Camelot Wheel](https://www.tunebad.com/camelot-wheel): Interactive chart of all 24 Camelot codes (1A-12A minor, 1B-12B major). Click a code to see its musical key, which codes mix cleanly with it, and real songs in that key.
 - [Playlist Analyzer](https://www.tunebad.com/playlist-analyzer): Paste a Spotify or YouTube playlist link and get the key, BPM, and Camelot code for every track in one table, ready to export as CSV or sort into Camelot-wheel order for DJ sets.
-- [MP3 Cutter](https://www.tunebad.com/mp3-cutter): Trim a song to the part you want, add a fade, and save it as an MP3 or WAV ringtone.
+- [MP3 Cutter](https://www.tunebad.com/mp3-cutter): Trim a song to the part you want, with click-to-play scrubbing and a live, audible fade in and out, then save it as an MP3 or WAV ringtone.
 - [Converter](https://www.tunebad.com/converter): Turn a YouTube, Spotify, or SoundCloud link into an MP3, WAV, or MP4 file. Also converts local audio files in the browser.
-- [Loudness Penalty & LUFS Meter](https://www.tunebad.com/loudness): Measure a track's loudness and see how much Spotify, Apple Music, YouTube, TIDAL, Amazon, and Deezer will turn it down.
-- [Slowed + Reverb Maker](https://www.tunebad.com/slowed-reverb): Slow a track down and add reverb (or speed it up for nightcore), then export it.
+- [Loudness Penalty & LUFS Meter](https://www.tunebad.com/loudness): Measure a track's loudness with the BS.1770 standard, see how much Spotify, Apple Music, YouTube, TIDAL, Amazon, and Deezer will turn it down, then normalize and export to a target loudness.
+- [Slowed + Reverb Maker](https://www.tunebad.com/slowed-reverb): Slow a track down (or speed it up for nightcore) and add one of five reverb types with a draggable parametric EQ, then export it.
 - [Pitch Shifter](https://www.tunebad.com/pitch-shifter): Change the pitch or key of an audio file without changing its tempo.
 - [Delay & Reverb Calculator](https://www.tunebad.com/delay-reverb-calculator): Enter a BPM and get delay times in milliseconds and Hz, from 1/1 down to 1/64, including dotted and triplet values.
 - [BPM Tap Tempo & Metronome](https://www.tunebad.com/bpm-tap): Tap along to find a song's BPM, or use the built-in metronome.
@@ -52,7 +52,7 @@ Key facts:
 
 ## Pages
 
-- [Home](https://www.tunebad.com/): Overview of every tool with a FAQ.
+- [Home](https://www.tunebad.com/): Overview of every tool, a one-line tour of each one, and a FAQ.
 - [Song Key & BPM Database](https://www.tunebad.com/songs): Browse the key, BPM, and Camelot code for songs analyzed on TuneBad. Each song has its own page at /song/<slug> with a harmonic-mixing section (which Camelot codes mix with it, plus linked compatible-key and same-key songs), every musical key has a hub at /songs/key/<key> (for example /songs/key/g-sharp-minor), and common tempos have hubs at /songs/bpm/<n> (for example /songs/bpm/140). Values are measured from official 30-second previews with the essentia engine.
 - [TuneBad vs Tunebat](https://www.tunebad.com/tunebad-vs-tunebat): Honest comparison. TuneBad analyzes the actual audio (any file or link, free, no ads, no signup); Tunebat looks songs up in a large database. Use TuneBad for remixes, edits, and unreleased tracks a database will not have.
 - [Copyright Disclaimer](https://www.tunebad.com/copyright): Terms of use and the policy on copyrighted material.

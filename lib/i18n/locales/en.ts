@@ -301,18 +301,39 @@ const en = {
   // Homepage landing / FAQ section
   "landing.heading": "Free tools for producers and DJs",
   "landing.lede":
-    "TuneBad is a free set of tools for anyone who works with music. Find a song's key, BPM, and loudness, turn a YouTube or Spotify link into an MP3, slow a track down and add reverb, change the pitch, or work out delay times for your mix. It all runs in your browser, with no ads and no account.",
+    "TuneBad is a free toolkit for anyone who works with music. Drop in a file, paste a link, or just type a song's name, and you'll get its key, BPM, and Camelot code, plus real songs that mix well with it. There's also a whole set of tools for cutting, converting, and reshaping audio, all free, with no ads and no account, and it runs right in your browser.",
   "landing.dbProof": "{count} songs analyzed and counting, each with its key, BPM, and Camelot code.",
   "landing.dbBrowse": "Browse the song database",
   "landing.dbWheel": "Explore the Camelot wheel",
   "landing.value1Title": "100% free",
-  "landing.value1Body": "Every tool is free to use. No trial, no paywall, nothing to upgrade.",
-  "landing.value2Title": "No ads, no sign-up",
-  "landing.value2Body": "You don't need an account, and nothing pops up to get in the way.",
-  "landing.value3Title": "Stays on your device",
-  "landing.value3Body": "The analysis runs in your browser, so your files never get uploaded.",
-  "landing.value4Title": "All in one place",
-  "landing.value4Body": "Key and BPM, the converter, loudness, slowed + reverb, the MP3 cutter, pitch, and delay times.",
+  "landing.value1Body": "Every tool here is free, no trial that runs out and nothing to unlock.",
+  "landing.value2Title": "Analyze almost anything",
+  "landing.value2Body":
+    "Drop in an audio file, paste a YouTube, Spotify, or SoundCloud link, or just type a song's name. TuneBad finds the key, BPM, and Camelot code any of those three ways.",
+  "landing.value3Title": "Built for harmonic mixing",
+  "landing.value3Body":
+    "Every result comes from a growing database of analyzed songs and includes real tracks that mix well with it, matched by Camelot-compatible key and BPM.",
+  "landing.value4Title": "Stays on your device",
+  "landing.value4Body": "Analysis runs right in your browser on the Essentia audio engine, so your files never get uploaded anywhere.",
+  "landing.tourHeading": "What's on TuneBad",
+  "landing.tour1Title": "Analyzer",
+  "landing.tour1Body": "Drop in a file, paste a link, or just type a song's name to get its key, BPM, and Camelot code.",
+  "landing.tour1Link": "Try the analyzer",
+  "landing.tour2Title": "Song database & Camelot wheel",
+  "landing.tour2Body": "Browse thousands of analyzed songs, or click through an interactive wheel to see what mixes with any key.",
+  "landing.tour2Link": "Browse the database",
+  "landing.tour3Title": "MP3 cutter",
+  "landing.tour3Body": "Trim a track down, add a fade in or out, and export it as an MP3 or WAV, good for ringtones.",
+  "landing.tour3Link": "Open the cutter",
+  "landing.tour4Title": "Slowed + reverb",
+  "landing.tour4Body": "Slow a track down, add one of five reverb types, and shape it with a draggable EQ.",
+  "landing.tour4Link": "Open the studio",
+  "landing.tour5Title": "Loudness",
+  "landing.tour5Body": "Measure a track's LUFS, see the penalty each streaming platform applies, and normalize it to a target.",
+  "landing.tour5Link": "Check your loudness",
+  "landing.tour6Title": "Converters",
+  "landing.tour6Body": "Convert video, audio, images, and PDFs between formats, all inside your browser.",
+  "landing.tour6Link": "See the converters",
   "landing.faqHeading": "Frequently asked questions",
   "landing.faq1Q": "How do I find the key and BPM of a song?",
   "landing.faq1A":
@@ -331,6 +352,29 @@ const en = {
   "landing.faq6Q": "What is slowed + reverb?",
   "landing.faq6A":
     "It's that dreamy, spaced-out remix style where a track is slowed down with a lot of reverb on top. You can make one in the Slowed + Reverb studio and export it when it sounds right.",
+  "landing.faq7Q": "What is a Camelot code?",
+  "landing.faq7A":
+    "It's a short code, like 8A or 5B, that stands in for a song's musical key. Songs with neighboring or matching Camelot codes tend to mix cleanly, which is why DJs use the code instead of key names.",
+  "landing.faq7Link": "Try the Camelot wheel",
+  "landing.faq8Q": "Can I analyze a whole playlist at once?",
+  "landing.faq8A":
+    "Yes. Paste a Spotify or YouTube playlist link and the playlist analyzer reads the key, BPM, and Camelot code for every track, then you can sort the whole thing into Camelot-wheel order.",
+  "landing.faq8Link": "Open the playlist analyzer",
+  "landing.faq9Q": "Do I have to paste a link, or can I search by name?",
+  "landing.faq9A":
+    "You can just type the song's name. TuneBad looks it up, pulls a preview, and analyzes it the same way it would a pasted link.",
+  "landing.faq10Q": "How do I cut an MP3 for a ringtone?",
+  "landing.faq10A":
+    "Upload the track to the MP3 cutter, drag the start and end points to the part you want, add a fade in or out, and export it as an MP3 or WAV.",
+  "landing.faq10Link": "Open the MP3 cutter",
+  "landing.faq11Q": "How do I get my track to the right loudness for Spotify?",
+  "landing.faq11A":
+    "Upload it to the loudness tool. It measures LUFS the same way Spotify does, shows how much the platform will turn your track down, and can normalize and export it at the target level.",
+  "landing.faq11Link": "Check your loudness",
+  "landing.faq12Q": "How is TuneBad different from Tunebat?",
+  "landing.faq12A":
+    "Tunebat has a much bigger song database to search. TuneBad is free with no ads, analyzes any file or link you give it instead of only looking songs up, and recommends harmonic matches for whatever you analyze.",
+  "landing.faq12Link": "See the full comparison",
 
   // MP3 Cutter
   "cutter.title": "MP3 Cutter",
