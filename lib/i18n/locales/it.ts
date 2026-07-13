@@ -777,6 +777,12 @@ const it: Record<keyof typeof en, string> = {
   "audiomasteringtool.referenceRemove": "Rimuovi riferimento",
   "audiomasteringtool.referenceOverrides": "Un riferimento sostituisce lo stile timbrico.",
   "audiomasteringtool.referenceError": "Impossibile leggere quella traccia di riferimento. Prova un altro file.",
+  "audiomasteringtool.before": "Prima (originale)",
+  "audiomasteringtool.after": "Dopo (masterizzato)",
+  "audiomasteringtool.compareLabel": "Confronta",
+  "audiomasteringtool.compareHint": "Alterna tra Prima e Dopo per sentire e vedere cosa cambia il mastering.",
+  "audiomasteringtool.applying": "Applicazione del mastering...",
+  "audiomasteringtool.exportFormat": "Esporta {format}",
   "audiomasteringtool.note":
     "Questo è un mastering automatico. Il risultato dipende dal tuo mix e non sostituisce un tecnico di mastering.",
   "audiomasteringtool.faq1Q": "Cosa fa davvero questo strumento di mastering?",

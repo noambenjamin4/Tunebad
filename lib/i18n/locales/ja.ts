@@ -776,6 +776,12 @@ const ja: Record<keyof typeof en, string> = {
   "audiomasteringtool.referenceRemove": "リファレンスを削除",
   "audiomasteringtool.referenceOverrides": "リファレンスはトーンのスタイルより優先されます。",
   "audiomasteringtool.referenceError": "そのリファレンス曲を読み込めませんでした。別のファイルをお試しください。",
+  "audiomasteringtool.before": "処理前（オリジナル）",
+  "audiomasteringtool.after": "処理後（マスタリング済み）",
+  "audiomasteringtool.compareLabel": "比較",
+  "audiomasteringtool.compareHint": "処理前／処理後を切り替えて、マスタリングによる変化を聴いて確認できます。",
+  "audiomasteringtool.applying": "マスタリングを適用中...",
+  "audiomasteringtool.exportFormat": "{format}で書き出し",
   "audiomasteringtool.note":
     "これは自動マスタリングです。結果はミックスによって変わり、人間のマスタリングエンジニアの代わりにはなりません。",
   "audiomasteringtool.faq1Q": "このマスタリングツールは実際に何をしますか？",

@@ -826,6 +826,12 @@ const en = {
   "audiomasteringtool.referenceRemove": "Remove reference",
   "audiomasteringtool.referenceOverrides": "A reference overrides the tone style.",
   "audiomasteringtool.referenceError": "That reference track couldn't be read. Try another file.",
+  "audiomasteringtool.before": "Before (original)",
+  "audiomasteringtool.after": "After (mastered)",
+  "audiomasteringtool.compareLabel": "Compare",
+  "audiomasteringtool.compareHint": "Toggle Before / After to hear and see what the master changed.",
+  "audiomasteringtool.applying": "Applying the master...",
+  "audiomasteringtool.exportFormat": "Export {format}",
   "audiomasteringtool.note":
     "This is an automated master. Results depend on your mix, and it's not a substitute for a human mastering engineer.",
   "audiomasteringtool.faq1Q": "What does this mastering tool actually do?",

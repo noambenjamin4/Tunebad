@@ -777,6 +777,12 @@ const de: Record<keyof typeof en, string> = {
   "audiomasteringtool.referenceRemove": "Referenz entfernen",
   "audiomasteringtool.referenceOverrides": "Eine Referenz ersetzt den Klangstil.",
   "audiomasteringtool.referenceError": "Dieser Referenztrack konnte nicht gelesen werden. Versuche eine andere Datei.",
+  "audiomasteringtool.before": "Vorher (Original)",
+  "audiomasteringtool.after": "Nachher (gemastert)",
+  "audiomasteringtool.compareLabel": "Vergleichen",
+  "audiomasteringtool.compareHint": "Zwischen Vorher und Nachher wechseln, um zu hören und zu sehen, was das Mastering ändert.",
+  "audiomasteringtool.applying": "Mastering wird angewendet...",
+  "audiomasteringtool.exportFormat": "{format} exportieren",
   "audiomasteringtool.note":
     "Dies ist ein automatisches Mastering. Das Ergebnis hängt von deinem Mix ab und ersetzt keinen Mastering-Ingenieur.",
   "audiomasteringtool.faq1Q": "Was macht dieses Mastering-Tool eigentlich?",

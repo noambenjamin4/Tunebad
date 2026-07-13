@@ -775,6 +775,12 @@ const zh: Record<keyof typeof en, string> = {
   "audiomasteringtool.referenceRemove": "移除参考",
   "audiomasteringtool.referenceOverrides": "参考音轨会覆盖音色风格。",
   "audiomasteringtool.referenceError": "无法读取该参考音轨。请换一个文件。",
+  "audiomasteringtool.before": "处理前（原始）",
+  "audiomasteringtool.after": "处理后（母带处理）",
+  "audiomasteringtool.compareLabel": "对比",
+  "audiomasteringtool.compareHint": "在处理前/处理后之间切换，即可听到并看到母带处理带来的变化。",
+  "audiomasteringtool.applying": "正在应用母带处理...",
+  "audiomasteringtool.exportFormat": "导出 {format}",
   "audiomasteringtool.note":
     "这是自动母带处理。结果取决于你的混音，并不能替代人工母带工程师。",
   "audiomasteringtool.faq1Q": "这个母带工具到底做了什么？",

@@ -777,6 +777,12 @@ const pt: Record<keyof typeof en, string> = {
   "audiomasteringtool.referenceRemove": "Remover referência",
   "audiomasteringtool.referenceOverrides": "Uma referência substitui o estilo tonal.",
   "audiomasteringtool.referenceError": "Não foi possível ler essa faixa de referência. Tente outro arquivo.",
+  "audiomasteringtool.before": "Antes (original)",
+  "audiomasteringtool.after": "Depois (masterizado)",
+  "audiomasteringtool.compareLabel": "Comparar",
+  "audiomasteringtool.compareHint": "Alterne entre Antes e Depois para ouvir e ver o que a masterização muda.",
+  "audiomasteringtool.applying": "Aplicando a masterização...",
+  "audiomasteringtool.exportFormat": "Exportar {format}",
   "audiomasteringtool.note":
     "Esta é uma masterização automática. O resultado depende da sua mixagem e não substitui um engenheiro de masterização.",
   "audiomasteringtool.faq1Q": "O que essa ferramenta de masterização faz de verdade?",
