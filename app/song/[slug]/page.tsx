@@ -7,7 +7,14 @@ import {
   readSongsByCamelot,
   type CachedAnalysis,
 } from "@/lib/server/link-analysis";
-import { compatibleCodes, relationLabel, keyToSlug, slugToKey } from "@/lib/audio/harmonic";
+import {
+  compatibleCodes,
+  relationLabel,
+  keyToSlug,
+  slugToKey,
+  camelotNeighbors,
+} from "@/lib/audio/harmonic";
+import { rankMixMatches } from "@/lib/server/mix-matches";
 
 // Programmatic per-song pages, one for every track in the shared link-analysis
 // cache. Statically generated for the songs known at build time and filled in
@@ -114,13 +121,18 @@ async function SongPageInner({ params }: { params: Promise<{ slug: string }> }) 
   const bpmAlt = song.bpm_alt ? Math.round(song.bpm_alt) : null;
   const camelot = song.camelot ?? null;
 
-  // Harmonic-mix neighbours (real songs the DJ can beatmatch into).
+  // Harmonic-mix neighbours (real songs the DJ can beatmatch into). One
+  // readSongsByCamelot call serves the key-only sections below *and* the
+  // BPM-matched "Mixes well with" section, via rankMixMatches — same scoring
+  // rules as /api/similar, kept in lib/server/mix-matches.ts.
   const compat = camelot ? compatibleCodes(camelot) : [];
   const relatedByKey = camelot
-    ? await readSongsByCamelot([camelot, ...compat], song.slug, 14)
+    ? await readSongsByCamelot(camelotNeighbors(camelot), song.slug, 60)
     : [];
   const sameKey = relatedByKey.filter((s) => s.camelot === camelot).slice(0, 6);
   const mixable = relatedByKey.filter((s) => s.camelot !== camelot).slice(0, 6);
+  const mixMatches =
+    camelot && Number.isFinite(song.bpm) ? rankMixMatches(relatedByKey, camelot, song.bpm, 8) : [];
 
   // A general fallback set so the page always has outbound links.
   const others =
@@ -144,6 +156,21 @@ async function SongPageInner({ params }: { params: Promise<{ slug: string }> }) 
       { "@type": "ListItem", position: 2, name, item: `${SITE_URL}/song/${song.slug}` },
     ],
   };
+  const mixMatchesJsonLd =
+    mixMatches.length >= 2
+      ? {
+          "@context": "https://schema.org",
+          "@type": "ItemList",
+          name: `Songs that mix well with ${name}`,
+          numberOfItems: mixMatches.length,
+          itemListElement: mixMatches.map((m, i) => ({
+            "@type": "ListItem",
+            position: i + 1,
+            url: `${SITE_URL}/song/${m.slug}`,
+            name: m.artist ? `${m.title} by ${m.artist}` : m.title,
+          })),
+        }
+      : null;
 
   return (
     <div className="app-shell">
@@ -205,6 +232,33 @@ async function SongPageInner({ params }: { params: Promise<{ slug: string }> }) 
             </section>
           )}
 
+          {mixMatches.length >= 2 && (
+            <section className="song-section">
+              <h2>Mixes well with {song.title}</h2>
+              <p>
+                Real tracks from the database that are both harmonically compatible and close enough
+                in tempo to beatmatch &mdash; ±6% on a pitch fader, or half/double time. Same key first,
+                then the nearest energy step on the wheel.
+              </p>
+              <ul className="song-index">
+                {mixMatches.map((m) => (
+                  <li key={m.slug}>
+                    <Link href={`/song/${m.slug}`}>
+                      <span className="song-index-name">
+                        {m.title}
+                        {m.artist ? <span className="song-index-artist"> — {m.artist}</span> : null}
+                      </span>
+                      <span className="song-index-meta font-mono">
+                        {m.key}
+                        {m.camelot ? ` · ${m.camelot}` : ""} · {Math.round(m.bpm)} BPM
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
           {mixable.length > 0 && (
             <section className="song-section">
               <h2>Tracks to mix into it</h2>
@@ -248,6 +302,7 @@ async function SongPageInner({ params }: { params: Promise<{ slug: string }> }) 
               <Link href={`/songs/key/${keyToSlug(song.key)}`}>All songs in {song.key} →</Link>
             ) : null}
             <Link href={`/songs/bpm/${bpm}`}>All songs at {bpm} BPM →</Link>
+            <Link href="/camelot-wheel">Camelot wheel →</Link>
           </p>
 
           <p className="song-note">
@@ -304,6 +359,9 @@ async function SongPageInner({ params }: { params: Promise<{ slug: string }> }) 
 
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(musicJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      {mixMatchesJsonLd && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(mixMatchesJsonLd) }} />
+      )}
     </div>
   );
 }

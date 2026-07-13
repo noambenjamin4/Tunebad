@@ -49,6 +49,7 @@ Key facts:
 - [The Camelot Wheel, Explained](https://www.tunebad.com/guides/camelot-wheel-harmonic-mixing): How the Camelot code system works and how DJs use it for harmonic mixing.
 - [How to Make a Slowed + Reverb Edit](https://www.tunebad.com/guides/how-to-make-slowed-and-reverb): Making a slowed + reverb (or nightcore) edit for free in the browser.
 - [What Is LUFS? Streaming Loudness, Explained](https://www.tunebad.com/guides/what-is-lufs-streaming-loudness): What LUFS means, how streaming loudness normalization works, and what to master to.
+- [How to Make a Ringtone From Any Song](https://www.tunebad.com/guides/how-to-make-a-ringtone): Picking the right 20-30 second section, trimming with fades, and exporting an MP3/WAV ringtone in the browser, plus the honest steps for getting it onto an iPhone as m4r.
 
 ## Pages
 

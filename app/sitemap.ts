@@ -25,9 +25,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   });
 
-  // Sitemap protocol caps a single file at 50k URLs; 20k leaves headroom for
-  // every other route while the seeded catalog keeps growing.
-  const songs = await readAllSongs(20000);
+  // Sitemap protocol caps a single file at 50k URLs total. This alone is
+  // basically the whole budget once the catalog is this large — if the
+  // combined song + hub + static route count ever tips past 50k, this needs
+  // sharding (multiple sitemap files + a sitemap index), not a higher cap.
+  const songs = await readAllSongs(50000);
   const songRoutes: MetadataRoute.Sitemap = songs.map((s) => ({
     url: `${base}/song/${s.slug}`,
     lastModified: now,
@@ -77,6 +79,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     guide("/guides/camelot-wheel-harmonic-mixing"),
     guide("/guides/what-is-lufs-streaming-loudness"),
     guide("/guides/how-to-make-slowed-and-reverb"),
+    guide("/guides/how-to-make-a-ringtone"),
     guide("/tunebad-vs-tunebat"),
     { url: `${base}/tools`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
     tool("/image-converter"),

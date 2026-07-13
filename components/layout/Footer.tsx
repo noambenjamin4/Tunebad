@@ -72,6 +72,7 @@ export function Footer() {
           <Link href="/guides/camelot-wheel-harmonic-mixing">Camelot wheel</Link>
           <Link href="/guides/what-is-lufs-streaming-loudness">What is LUFS</Link>
           <Link href="/guides/how-to-make-slowed-and-reverb">Slowed + reverb guide</Link>
+          <Link href="/guides/how-to-make-a-ringtone">Ringtone guide</Link>
         </nav>
         <p className="site-footer-copyright">{t("footer.copyright")}</p>
         <p className="site-footer-legal">

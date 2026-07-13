@@ -25,6 +25,7 @@ const CARDS = [
   ["flac-to-mp3", "FLAC TO", "MP3"],
   ["wav-to-mp3", "WAV TO", "MP3"],
   ["camelot-wheel", "CAMELOT", "WHEEL"],
+  ["guide-ringtone", "MAKE A", "RINGTONE"],
 ];
 
 const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
