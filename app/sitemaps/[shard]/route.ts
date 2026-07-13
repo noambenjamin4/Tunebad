@@ -67,10 +67,6 @@ const STATIC_ENTRIES: ToolEntry[] = [
   { path: "/audio-joiner", changefreq: "weekly", priority: 0.9 },
   { path: "/songs", changefreq: "daily", priority: 0.7 },
   { path: "/copyright", changefreq: "yearly", priority: 0.3 },
-  // Fixed set of activity/tempo landing pages (not derived from the
-  // catalog — see lib/server/activities.ts), so they register here
-  // alongside the rest of the static routes rather than in "hubs".
-  ...ACTIVITIES.map((a) => ({ path: `/songs/bpm-for/${a.slug}`, changefreq: "monthly", priority: 0.5 })),
 ];
 
 export async function GET(_req: Request, { params }: { params: Promise<{ shard: string }> }) {
@@ -160,6 +156,18 @@ export async function GET(_req: Request, { params }: { params: Promise<{ shard: 
         priority: 0.55,
       }));
 
+    // Same >=3-songs gate as app/songs/bpm-for/[activity]/page.tsx, so an
+    // activity whose BPM window is still thin (e.g. sleep at 50-70 in a
+    // chart-heavy catalog) stays out of the sitemap until it resolves.
+    const activityUrls = ACTIVITIES.filter(
+      (a) => songs.filter((s) => s.bpm != null && s.bpm >= a.min && s.bpm <= a.max).length >= 3,
+    ).map((a) => ({
+      loc: `${SITE_URL}/songs/bpm-for/${a.slug}`,
+      lastmod: now,
+      changefreq: "monthly",
+      priority: 0.5,
+    }));
+
     // Same >=2-songs rule as app/artist/[slug]/page.tsx, so every URL here
     // resolves to a real page (no dynamicParams surprises for the crawler).
     const artistUrls = [...groupSongsByArtist(songs).values()]
@@ -171,7 +179,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ shard: 
         priority: 0.5,
       }));
 
-    const xml = urlsetXml([...keyUrls, ...camelotUrls, ...bpmUrls, ...artistUrls]);
+    const xml = urlsetXml([...keyUrls, ...camelotUrls, ...bpmUrls, ...activityUrls, ...artistUrls]);
     return xmlResponse(xml);
   }
 

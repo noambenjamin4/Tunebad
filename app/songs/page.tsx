@@ -132,7 +132,12 @@ export default async function SongsPage() {
           <section className="song-section">
             <h2>Browse by activity</h2>
             <ul className="song-keychips">
-              {ACTIVITIES.map((a) => (
+              {ACTIVITIES.filter(
+                // Same >=3-songs gate as the activity page itself, so this
+                // never links to a notFound() (e.g. sleep's 50-70 window
+                // while the catalog is still chart-heavy).
+                (a) => songs.filter((s) => s.bpm != null && s.bpm >= a.min && s.bpm <= a.max).length >= 3,
+              ).map((a) => (
                 <li key={a.slug}>
                   <Link href={`/songs/bpm-for/${a.slug}`} className="song-keychip-rel">
                     {a.label} ({a.min}-{a.max} BPM)
