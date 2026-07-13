@@ -905,13 +905,24 @@ meter {
    they sit flush against the panel border. Match the heading's clamp inset
    and give the card's controls more air than the compact hub-grid cards. */
 .hero-tool > .utility-card {
-  margin: clamp(20px, 3vw, 28px) clamp(20px, 4vw, 40px) 4px;
+  margin: clamp(20px, 3vw, 28px) clamp(20px, 4vw, 40px) 0;
   padding: clamp(24px, 3.5vw, 36px);
   gap: 20px;
 }
 
+/* When the card is the panel's last element (e.g. the Pitch tool has no
+   status box beneath it), inset it from the bottom border too so the panel
+   breathes symmetrically instead of the card hugging the edge. */
+.hero-tool > .utility-card:last-child {
+  margin-bottom: clamp(20px, 3vw, 28px);
+}
+
+/* The status box gets equal top and bottom insets: its top margin collapses
+   with the card's bottom (0) to leave one clean gap above, and its bottom
+   margin lifts it off the panel border — overflow:hidden makes .hero-tool a
+   block formatting context, so a bottom margin of 0 would sit flush. */
 .hero-tool > .status-box {
-  margin: 16px clamp(20px, 4vw, 40px) 0;
+  margin: clamp(20px, 3vw, 28px) clamp(20px, 4vw, 40px);
 }
 
 .tool-heading {
