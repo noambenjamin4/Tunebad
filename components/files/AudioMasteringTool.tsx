@@ -121,16 +121,30 @@ export function AudioMasteringTool() {
             {hasReference ? <p className="tool-note">{t("audiomasteringtool.referenceOverrides")}</p> : null}
           </fieldset>
 
-          <label className="field-label">
-            {t("audiomasteringtool.referenceLabel")}
+          <div className="field-label">
+            <span>{t("audiomasteringtool.referenceLabel")}</span>
+            {/* Native file input is hidden; a styled button triggers it so the
+                control matches the site's own file pickers (FileDrop) instead
+                of showing the OS default "Choose File" button. */}
             <input
               ref={referenceInputRef}
               type="file"
               accept={REFERENCE_ACCEPT}
               disabled={busy}
               onChange={onReferenceChange}
+              aria-label={t("audiomasteringtool.referenceLabel")}
+              style={{ position: "absolute", width: 1, height: 1, padding: 0, opacity: 0, pointerEvents: "none" }}
             />
-          </label>
+            <button
+              type="button"
+              className="secondary-button"
+              style={{ justifySelf: "start" }}
+              disabled={busy}
+              onClick={() => referenceInputRef.current?.click()}
+            >
+              {t("files.browse")}
+            </button>
+          </div>
           {referenceName ? (
             <p className="imgtool-single-result">
               {t("audiomasteringtool.referenceLoaded")}: {referenceName}{" "}
