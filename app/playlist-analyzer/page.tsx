@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { I18nProvider } from "@/lib/i18n";
+import { ToolPageNav } from "@/components/layout/ToolPageNav";
 import { PlaylistAnalyzer } from "@/components/playlist/PlaylistAnalyzer";
 
 export const metadata: Metadata = {
@@ -50,19 +51,9 @@ export default function PlaylistAnalyzerPage() {
   };
   return (
     <div className="app-shell">
-      <header className="legal-topbar">
-        <Link href="/" className="brand" aria-label="TuneBad, back to home">
-          <span className="brand-logo-wrap">
-            <picture>
-              <source media="(prefers-color-scheme: dark)" srcSet="/logo-dark.png" />
-              <img src="/logo-light.png" alt="" width={34} height={34} className="brand-logo" />
-            </picture>
-          </span>
-          <span className="brand-wordmark">TUNEBAD</span>
-        </Link>
-      </header>
-
-      <main>
+      <I18nProvider>
+        <ToolPageNav />
+        <main>
         <article className="song-page pa-page">
           <h1 className="song-title">Playlist key &amp; BPM analyzer</h1>
           <p className="song-lede">
@@ -71,12 +62,7 @@ export default function PlaylistAnalyzerPage() {
             engine as the <Link href="/key-bpm-finder">Key &amp; BPM Finder</Link>. No uploads, no signup.
           </p>
 
-          {/* Wrapped in its own I18nProvider (this page lives outside TunebadApp).
-              SSR renders English; the provider picks up the visitor's saved
-              locale after hydration, same pattern as the homepage FAQ. */}
-          <I18nProvider>
-            <PlaylistAnalyzer />
-          </I18nProvider>
+          <PlaylistAnalyzer />
 
           <section className="song-section pa-about">
             <h2>How it works</h2>
@@ -114,6 +100,7 @@ export default function PlaylistAnalyzerPage() {
           <p className="site-footer-copyright">© 2026 TuneBad</p>
         </div>
       </footer>
+      </I18nProvider>
     </div>
   );
 }

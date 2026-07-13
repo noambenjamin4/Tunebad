@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { I18nProvider } from "@/lib/i18n";
+import { ToolPageNav } from "@/components/layout/ToolPageNav";
 import { camelot } from "@/lib/audio/constants";
 import { compatibleCodes, keyToSlug } from "@/lib/audio/harmonic";
 import { CamelotWheel } from "./CamelotWheel";
@@ -75,17 +77,9 @@ export default function CamelotWheelPage() {
 
   return (
     <div className="app-shell">
-      <header className="legal-topbar">
-        <Link href="/" className="brand" aria-label="TuneBad, back to home">
-          <span className="brand-logo-wrap">
-            <picture>
-              <source media="(prefers-color-scheme: dark)" srcSet="/logo-dark.png" />
-              <img src="/logo-light.png" alt="" width={34} height={34} className="brand-logo" />
-            </picture>
-          </span>
-          <span className="brand-wordmark">TUNEBAD</span>
-        </Link>
-      </header>
+      <I18nProvider>
+        <ToolPageNav />
+      </I18nProvider>
 
       <main>
         <article className="song-page">

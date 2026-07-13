@@ -1,7 +1,7 @@
-import Link from "next/link";
 import type { ReactNode } from "react";
 import { I18nProvider } from "@/lib/i18n";
 import { Footer } from "@/components/layout/Footer";
+import { ToolPageNav } from "@/components/layout/ToolPageNav";
 
 const SITE_URL = "https://www.tunebad.com";
 
@@ -34,24 +34,13 @@ export function ToolPageShell({
   };
   return (
     <div className="app-shell">
-      <header className="legal-topbar">
-        <Link href="/" className="brand" aria-label="TuneBad, back to home">
-          <span className="brand-logo-wrap">
-            <picture>
-              <source media="(prefers-color-scheme: dark)" srcSet="/logo-dark.png" />
-              <img src="/logo-light.png" alt="" width={34} height={34} className="brand-logo" />
-            </picture>
-          </span>
-          <span className="brand-wordmark">TUNEBAD</span>
-        </Link>
-      </header>
-
-      <main>
-        <I18nProvider>
+      <I18nProvider>
+        <ToolPageNav />
+        <main>
           <div className="tool-page">{children}</div>
           <Footer />
-        </I18nProvider>
-      </main>
+        </main>
+      </I18nProvider>
 
       <script
         type="application/ld+json"
