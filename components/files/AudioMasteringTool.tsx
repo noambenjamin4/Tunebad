@@ -103,6 +103,18 @@ export function AudioMasteringTool() {
   matchLoudnessRef.current = matchLoudness;
   const targetLufsRef = useRef(-14);
   targetLufsRef.current = targetLufs;
+  // Latest-value refs so playback restarted from the debounced master effect
+  // reads the fresh mastered audio and the master's actual output loudness,
+  // not a value captured in a stale closure.
+  const masteredChannelsRef = useRef<Float32Array[] | null>(null);
+  masteredChannelsRef.current = masteredChannels;
+  const outputLufsRef = useRef<number | null>(null);
+  outputLufsRef.current = metrics?.outputLufs ?? null;
+  const tRef = useRef(t);
+  tRef.current = t;
+  // Bumped on every dropped file so a slower earlier measurement can't
+  // overwrite a newer file's input loudness.
+  const fileTokenRef = useRef(0);
 
   // A/B + playback
   const [ab, setAb] = useState<AbMode>("before");
@@ -145,6 +157,9 @@ export function AudioMasteringTool() {
 
   const beforeBars = useMemo(() => (original ? computeWaveformBars(original) : []), [original]);
   const afterBars = useMemo(() => (masteredChannels ? barsFromChannels(masteredChannels) : []), [masteredChannels]);
+  // The source's tonal balance only depends on the file, so measure it once
+  // (a whole-track FFT) instead of on every re-master.
+  const sourceCurve = useMemo(() => (original ? analyzeBandCurve(original) : null), [original]);
   const activeBars = ab === "after" && afterBars.length ? afterBars : beforeBars;
 
   const getElapsed = useCallback(() => {
@@ -181,9 +196,10 @@ export function AudioMasteringTool() {
       void ctx.resume();
 
       let buf: AudioBuffer | null = null;
-      if (which === "after" && masteredChannels) {
-        buf = ctx.createBuffer(masteredChannels.length, masteredChannels[0].length, masteredRateRef.current);
-        for (let c = 0; c < masteredChannels.length; c += 1) buf.copyToChannel(masteredChannels[c] as Float32Array<ArrayBuffer>, c);
+      const chans = masteredChannelsRef.current;
+      if (which === "after" && chans) {
+        buf = ctx.createBuffer(chans.length, chans[0].length, masteredRateRef.current);
+        for (let c = 0; c < chans.length; c += 1) buf.copyToChannel(chans[c] as Float32Array<ArrayBuffer>, c);
       } else if (original) {
         buf = original;
       }
@@ -195,11 +211,13 @@ export function AudioMasteringTool() {
       const source = ctx.createBufferSource();
       source.buffer = buf;
       // Loudness-matched compare: raise the (quieter) original to the master's
-      // loudness target so Before/After differ in TONE, not just volume. The
-      // mastered "after" is already at target, so it needs no gain.
+      // ACTUAL output loudness so Before/After differ in TONE, not volume. Using
+      // the measured output (not just the target) keeps them level-matched even
+      // when the pre-gain clamp or limiter leaves the master short of the target.
       let matchGain = 1;
       if (which === "before" && matchLoudnessRef.current && inputLufsRef.current != null) {
-        const db = targetLufsRef.current - inputLufsRef.current;
+        const matchTo = outputLufsRef.current ?? targetLufsRef.current;
+        const db = matchTo - inputLufsRef.current;
         matchGain = Math.min(8, Math.max(0.125, 10 ** (db / 20)));
       }
       if (matchGain !== 1) {
@@ -211,8 +229,15 @@ export function AudioMasteringTool() {
         source.connect(ctx.destination);
       }
       source.onended = () => {
+        // Only fire for a natural end (manual stops null sourceRef first). Close
+        // the context here too, or playing to completion repeatedly leaks one
+        // AudioContext per playthrough until the browser's limit throws.
         if (sourceRef.current === source) {
           sourceRef.current = null;
+          if (audioCtxRef.current === ctx) {
+            void ctx.close();
+            audioCtxRef.current = null;
+          }
           setPlaying(false);
           setStartOffset(0);
           startOffsetRef.current = 0;
@@ -227,7 +252,8 @@ export function AudioMasteringTool() {
       durationRef.current = buf.duration;
       setPlaying(true);
     },
-    [masteredChannels, original],
+    // Reads mastered audio + output loudness via refs, so it only needs `original`.
+    [original],
   );
 
   const togglePlayback = useCallback(() => {
@@ -310,6 +336,7 @@ export function AudioMasteringTool() {
         setStatus({ title: t("files.tooLarge"), message: formatBytes(MAX_BYTES), tone: "warning" });
         return;
       }
+      const token = ++fileTokenRef.current;
       resetPlayback();
       setMasteredChannels(null);
       setMetrics(null);
@@ -319,12 +346,18 @@ export function AudioMasteringTool() {
       setStatus({ title: t("files.processing"), message: audioFile.name, tone: "neutral" });
       try {
         const { buffer } = await decodeAudioFileCached(audioFile);
+        if (fileTokenRef.current !== token) return; // a newer file superseded this one
         if (!buffer.length || !buffer.numberOfChannels) throw new Error("Empty audio buffer.");
         setOriginal(buffer);
         // Measure the untouched loudness once for the readout + level-matched A/B.
+        // Guarded so a slower earlier file can't overwrite a newer file's value.
         measureIntegratedLufs(buffer)
-          .then((lufs) => setInputLufs(lufs))
-          .catch(() => setInputLufs(null));
+          .then((lufs) => {
+            if (fileTokenRef.current === token) setInputLufs(lufs);
+          })
+          .catch(() => {
+            if (fileTokenRef.current === token) setInputLufs(null);
+          });
         // The master itself is computed by the effect below (also re-runs when
         // the target/style/reference/width change).
       } catch {
@@ -345,7 +378,7 @@ export function AudioMasteringTool() {
     debounceRef.current = setTimeout(() => {
       void (async () => {
         try {
-          const curve = referenceCurve ? differenceCurve(referenceCurve, analyzeBandCurve(original)) : null;
+          const curve = referenceCurve && sourceCurve ? differenceCurve(referenceCurve, sourceCurve) : null;
           const { channels, sampleRate, outputLufs, truePeakDb, dynamicRangeDb } = await renderMaster(original, {
             targetLufs,
             style,
@@ -355,9 +388,13 @@ export function AudioMasteringTool() {
           });
           if (processTokenRef.current !== token) return;
           masteredRateRef.current = sampleRate;
+          // Update the refs before any playback restart below so it reads the
+          // fresh master + its real loudness, not stale closure values.
+          masteredChannelsRef.current = channels;
+          outputLufsRef.current = outputLufs;
           setMasteredChannels(channels);
           setMetrics({ outputLufs, truePeakDb, dynamicRangeDb });
-          setStatus({ title: t("files.done"), message: t("audiomasteringtool.compareHint"), tone: "success" });
+          setStatus({ title: tRef.current("files.done"), message: tRef.current("audiomasteringtool.compareHint"), tone: "success" });
           // First master for this file: jump to "After" so the result is heard
           // immediately; restart playback on the new master if already playing.
           if (!autoSwitchedRef.current) {
@@ -375,7 +412,7 @@ export function AudioMasteringTool() {
             startAt(offset, "after");
           }
         } catch {
-          if (processTokenRef.current === token) setStatus({ title: t("files.failed"), message: "", tone: "warning" });
+          if (processTokenRef.current === token) setStatus({ title: tRef.current("files.failed"), message: "", tone: "warning" });
         } finally {
           if (processTokenRef.current === token) setProcessing(false);
         }
@@ -384,10 +421,11 @@ export function AudioMasteringTool() {
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
-    // startAt/getElapsed/stopPreview are stable-enough refs; re-running on them
-    // would restart the master unnecessarily.
+    // startAt/getElapsed/stopPreview and t are read via refs; `t` is intentionally
+    // NOT a dep so switching site language doesn't trigger a full re-master.
+    // sourceCurve only changes with `original`, already a dep.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [original, targetLufs, style, genre, widen, referenceCurve, t]);
+  }, [original, targetLufs, style, genre, widen, referenceCurve]);
 
   const onReferenceChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const refFile = event.target.files?.[0];
