@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { GuideShell } from "@/components/guides/GuideShell";
 
-const TITLE = "How to Make a Slowed + Reverb Edit (Free, in Your Browser)";
+const TITLE = "How to Make a Slowed + Reverb Edit (Free)";
 const DESCRIPTION =
   "The settings behind the slowed + reverb sound, how to make your own edit in about a minute, and how to do nightcore with the same tool.";
 

@@ -17,6 +17,7 @@ export const metadata: Metadata = {
   description:
     "Browse the key, BPM, and Camelot code for songs analyzed on TuneBad, or analyze any track yourself for free.",
   alternates: { canonical: "/songs" },
+  openGraph: { images: [{ url: "/og/songs.png", width: 1200, height: 630 }] },
 };
 
 // The hub/count computations want the full catalog, but rendering every row

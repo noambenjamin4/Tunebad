@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description:
     "Paste a Spotify or YouTube playlist link and get the key, BPM, and Camelot code for every track, in one table. Free, no signup, export to CSV.",
   alternates: { canonical: "/playlist-analyzer" },
-  openGraph: { images: [{ url: "/og/key-bpm-finder.png", width: 1200, height: 630 }] },
+  openGraph: { images: [{ url: "/og/playlist-analyzer.png", width: 1200, height: 630 }] },
 };
 
 export default function PlaylistAnalyzerPage() {

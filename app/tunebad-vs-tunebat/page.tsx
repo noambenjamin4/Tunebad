@@ -9,8 +9,9 @@ const SITE_URL = "https://www.tunebad.com";
 export const metadata: Metadata = {
   title: "TuneBad vs Tunebat: An Honest Comparison",
   description:
-    "How TuneBad and Tunebat compare for finding the key and BPM of a song. TuneBad is free with no ads or signup and analyzes any file or link; Tunebat has a huge song database. Here is when to use each.",
+    "How TuneBad and Tunebat compare for finding a song's key and BPM. TuneBad is free with no ads and analyzes any file or link; Tunebat has a bigger song database.",
   alternates: { canonical: "/tunebad-vs-tunebat" },
+  openGraph: { images: [{ url: "/og/tunebad-vs-tunebat.png", width: 1200, height: 630 }] },
 };
 
 const ROWS: { label: string; tunebad: string; tunebat: string }[] = [

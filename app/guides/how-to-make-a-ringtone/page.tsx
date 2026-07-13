@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { GuideShell } from "@/components/guides/GuideShell";
 
-const TITLE = "How to Make a Ringtone From Any Song (Free, in Your Browser)";
+const TITLE = "How to Make a Ringtone From Any Song (Free)";
 const DESCRIPTION =
-  "Pick the right 20-30 second section, trim it with fades, and export a ringtone from any song for free, no app install and no upload. Includes the honest answer on getting it onto an iPhone.";
+  "Pick the right 20-30 second section, trim it with fades, and export a ringtone from any song, free, no upload. Includes getting it onto an iPhone.";
 
 export const metadata: Metadata = {
   title: TITLE,

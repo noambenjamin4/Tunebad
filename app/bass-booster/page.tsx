@@ -7,7 +7,7 @@ import { BassBoosterTool } from "@/components/files/BassBoosterTool";
 export const metadata: Metadata = {
   title: "Bass Booster: Add Bass to a Song Online",
   description:
-    "Boost the low end of any audio file in your browser with a low-shelf bass boost and a built-in safety limiter so the output never clips. Free, no upload, no sign-up.",
+    "Boost the low end of any audio file in your browser with a low-shelf bass boost and a safety limiter so the output never clips. Free, no upload, no sign-up.",
   alternates: { canonical: "/bass-booster" },
   openGraph: { images: [{ url: "/og/bass-booster.png", width: 1200, height: 630 }] },
 };

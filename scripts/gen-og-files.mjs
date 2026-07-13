@@ -31,6 +31,9 @@ const CARDS = [
   ["bass-booster", "BASS", "BOOSTER"],
   ["8d-audio", "8D AUDIO", "MAKER"],
   ["audio-joiner", "AUDIO", "JOINER"],
+  ["songs", "KEY & BPM", "DATABASE"],
+  ["tunebad-vs-tunebat", "TUNEBAD VS", "TUNEBAT"],
+  ["playlist-analyzer", "PLAYLIST", "ANALYZER"],
 ];
 
 const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");

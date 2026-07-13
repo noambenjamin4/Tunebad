@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { GuideShell } from "@/components/guides/GuideShell";
 
-const TITLE = "The Camelot Wheel, Explained (Harmonic Mixing for DJs)";
+const TITLE = "Camelot Wheel Explained: Harmonic Mixing for DJs";
 const DESCRIPTION =
   "How the Camelot wheel works, the three moves that always sound good, and how to find any song's Camelot code for free.";
 
@@ -77,9 +77,9 @@ export default function Page() {
       <p className="legal-updated">Updated 2026-07-05</p>
 
       <p>
-        Harmonic mixing is the trick behind DJ sets that feel seamless: when two songs share compatible keys, they
-        blend instead of clashing. The Camelot wheel turns music theory into a number and a letter, so you never
-        have to think about circle-of-fifths relationships mid-set.
+        Harmonic mixing is why some DJ sets blend two songs cleanly and others clash: when the songs share
+        compatible keys, they sit well together. The Camelot wheel turns music theory into a number and a letter,
+        so you never have to think about circle-of-fifths relationships mid-set.
       </p>
 
       <CamelotWheelSvg />

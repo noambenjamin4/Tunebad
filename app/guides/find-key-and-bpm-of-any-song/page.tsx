@@ -4,7 +4,7 @@ import { GuideShell } from "@/components/guides/GuideShell";
 
 const TITLE = "How to Find the Key and BPM of Any Song";
 const DESCRIPTION =
-  "Three free ways to find a song's key and BPM: paste a link, upload the audio file, or tap along. What the results mean and why half-time and double-time both count.";
+  "Three free ways to find a song's key and BPM: paste a link, upload the file, or tap along. What the results mean, and why half-time and double-time both count.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -25,8 +25,8 @@ export default function Page() {
       <p className="legal-updated">Updated 2026-07-05</p>
 
       <p>
-        Whether you want to rap over a beat, mix two tracks together, or figure out what to sample, the first two
-        things you need are the tempo and the key. Here are three ways to get them, all free.
+        Rapping over a beat, mixing two tracks together, figuring out what to sample: all three start with the
+        same two numbers, tempo and key. Here are three free ways to get them.
       </p>
 
       <h2>1. Paste a link</h2>

@@ -14,7 +14,7 @@ const SITE_URL = "https://www.tunebad.com";
 export const metadata: Metadata = {
   title: "Camelot Wheel: Interactive Harmonic Mixing Chart",
   description:
-    "A free interactive Camelot wheel. Click any of the 24 codes (1A-12A minor, 1B-12B major) to see its musical key, which codes mix cleanly with it, and real songs in that key.",
+    "A free interactive Camelot wheel. Click any of the 24 codes to see its musical key, which codes mix cleanly with it, and real analyzed songs in that key.",
   alternates: { canonical: "/camelot-wheel" },
   openGraph: { images: [{ url: "/og/camelot-wheel.png", width: 1200, height: 630 }] },
 };

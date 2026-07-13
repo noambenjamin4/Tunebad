@@ -29,6 +29,17 @@ export async function generateStaticParams() {
   return topArtistsByCount(songs, STATIC_PARAM_COUNT, MIN_SONGS).map((a) => ({ slug: a.slug }));
 }
 
+// Keeps the rendered <title> (this string plus the layout's " | TuneBad"
+// template, 10 chars) at or under Google's ~60-char display budget. Most
+// artist names fit; a handful of long featuring-credit strings don't, so
+// hard-truncate those rather than let Google rewrite the tag itself.
+function artistMetaTitle(name: string): string {
+  const tail = " — Songs, Key & BPM";
+  const nameBudget = 60 - 10 - tail.length;
+  const trimmed = name.length > nameBudget ? `${name.slice(0, nameBudget - 1).trimEnd()}…` : name;
+  return `${trimmed}${tail}`;
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -42,7 +53,7 @@ export async function generateMetadata({
   const { bpmMin, bpmMax } = artistStats(artist.songs);
   const bpmRange = bpmMin === bpmMax ? `${bpmMin} BPM` : `${bpmMin}-${bpmMax} BPM`;
   return {
-    title: `${artist.name} — Songs with Key & BPM`,
+    title: artistMetaTitle(artist.name),
     description: `The key, BPM, and Camelot code for ${artist.songs.length} songs by ${artist.name}, ranging ${bpmRange}. Useful for DJs building sets and producers sampling ${artist.name} tracks.`,
     alternates: { canonical: `/artist/${slug}` },
   };

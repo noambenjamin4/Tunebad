@@ -47,7 +47,7 @@ export async function generateMetadata({
   const key = code ? CODE_TO_KEY[code] : null;
   if (!code || !key) return { title: "Not found | TuneBad", robots: { index: false, follow: true } };
   return {
-    title: `Songs in Camelot ${code} (${key}) — Harmonic Mixing List`,
+    title: `Songs in Camelot ${code} (${key}) — Harmonic Mixing`,
     description: `A list of songs in Camelot ${code}, the DJ-friendly code for ${key}. See which Camelot codes mix cleanly with ${code} and browse real tracks with their BPM.`,
     alternates: { canonical: `/songs/camelot/${code.toLowerCase()}` },
   };

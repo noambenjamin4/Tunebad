@@ -6,7 +6,7 @@ import { ZipTool } from "@/components/files/ZipTool";
 export const metadata: Metadata = {
   title: "Unzip Files Online (ZIP, TAR, TAR.GZ)",
   description:
-    "Open a ZIP, TAR, or TAR.GZ archive and download its contents, or bundle files into a new ZIP or TAR.GZ. Runs in your browser, nothing gets uploaded. No sign-up, no ads, free.",
+    "Open a ZIP, TAR, or TAR.GZ archive and download its contents, or bundle files into a new archive. Runs in your browser, nothing uploaded. No sign-up, free.",
   alternates: { canonical: "/unzip-files" },
   openGraph: { images: [{ url: "/og/unzip-files.png", width: 1200, height: 630 }] },
 };

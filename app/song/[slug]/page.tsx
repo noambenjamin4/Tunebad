@@ -35,6 +35,20 @@ function displayTitle(song: CachedAnalysis): string {
   return song.artist ? `${song.title} by ${song.artist}` : song.title;
 }
 
+// Keeps the rendered <title> (this string plus the layout's " | TuneBad"
+// template, 10 chars) at or under Google's ~60-char display budget. "Title by
+// Artist" routinely blows past that on real catalog data, so drop the artist
+// first, then hard-truncate the bare song title as a last resort (rare: a
+// handful of very long remix/edit titles).
+function metaTitle(song: CachedAnalysis): string {
+  const tail = " — Key, BPM & Camelot";
+  const nameBudget = 60 - 10 - tail.length;
+  const withArtist = displayTitle(song);
+  if (withArtist.length <= nameBudget) return `${withArtist}${tail}`;
+  if (song.title.length <= nameBudget) return `${song.title}${tail}`;
+  return `${song.title.slice(0, nameBudget - 1).trimEnd()}…${tail}`;
+}
+
 function tempoFeel(bpm: number): string {
   if (bpm < 90) return "a relaxed, downtempo pace";
   if (bpm < 110) return "a mid-tempo groove";
@@ -54,7 +68,7 @@ export async function generateMetadata({
   const name = displayTitle(song);
   const alt = song.bpm_alt ? ` (or ${Math.round(song.bpm_alt)})` : "";
   return {
-    title: `${name} — Key, BPM & Camelot`,
+    title: metaTitle(song),
     description: `${name} is in the key of ${song.key} at ${Math.round(song.bpm)} BPM${alt}, Camelot ${song.camelot ?? "N/A"}. See its energy, danceability, loudness, and harmonically compatible tracks to mix with.`,
     alternates: { canonical: `/song/${song.slug}` },
     openGraph: {
