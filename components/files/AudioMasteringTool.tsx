@@ -420,26 +420,31 @@ export function AudioMasteringTool() {
             hint={t("mediatool.dropAudio", { size: formatBytes(MAX_BYTES) })}
           />
         ) : (
-          <div className="wave-card">
-            <div className="quality-options" role="group" aria-label={t("audiomasteringtool.compareLabel")}>
-              <button
-                type="button"
-                className={`quality-button${ab === "before" ? " active" : ""}`}
-                aria-pressed={ab === "before"}
-                onClick={() => switchAb("before")}
-              >
-                <strong>{t("audiomasteringtool.before")}</strong>
-              </button>
-              <button
-                type="button"
-                className={`quality-button${ab === "after" ? " active" : ""}`}
-                aria-pressed={ab === "after"}
-                disabled={!hasMaster}
-                onClick={() => switchAb("after")}
-              >
-                <strong>{t("audiomasteringtool.after")}</strong>
-              </button>
-            </div>
+          <div className="master-preview">
+            <fieldset className="quality-field">
+              <legend>{t("audiomasteringtool.compareLabel")}</legend>
+              <div className="quality-options format-options" role="group" aria-label={t("audiomasteringtool.compareLabel")}>
+                <button
+                  type="button"
+                  className={`quality-button${ab === "before" ? " active" : ""}`}
+                  aria-pressed={ab === "before"}
+                  onClick={() => switchAb("before")}
+                >
+                  <strong>{t("audiomasteringtool.before")}</strong>
+                  <span>{t("audiomasteringtool.beforeSub")}</span>
+                </button>
+                <button
+                  type="button"
+                  className={`quality-button${ab === "after" ? " active" : ""}`}
+                  aria-pressed={ab === "after"}
+                  disabled={!hasMaster}
+                  onClick={() => switchAb("after")}
+                >
+                  <strong>{t("audiomasteringtool.after")}</strong>
+                  <span>{t("audiomasteringtool.afterSub")}</span>
+                </button>
+              </div>
+            </fieldset>
 
             <SeekableWaveform
               bars={activeBars}

@@ -1218,6 +1218,18 @@ label.check-row,
   background: var(--surface);
 }
 
+/* Audio mastering before/after studio: stacks the A/B toggle, the full-width
+   waveform, and the compare hint vertically (unlike .wave-card, which is a
+   flex row). min-width:0 lets the waveform shrink instead of forcing the
+   card to overflow on narrow screens. */
+.master-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  margin-top: 18px;
+}
+
 /* Seekable waveform: full-width click/drag/keyboard seek bar with a
    played-vs-unplayed fill and a playhead line. Used by the analyzer preview
    and the Slowed + Reverb studio. */
