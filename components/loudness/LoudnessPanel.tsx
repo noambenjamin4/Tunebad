@@ -1,10 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type DragEvent } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useFileDrop } from "@/hooks/useFileDrop";
 import { getAudioContextClass } from "@/lib/audio/decode";
 import { decodeAudioFileCached } from "@/lib/audio/decode-cache";
 import { PLATFORM_TARGETS } from "@/lib/audio/lufs";
-import { downloadBlob, encodeMp3FromChannels, encodeWavFromChannels } from "@/lib/audio/mp3-encoder";
+import { encodeMp3FromChannels, encodeWavFromChannels } from "@/lib/audio/mp3-encoder";
+import { downloadBlob } from "@/lib/files/download";
 import { useI18n } from "@/lib/i18n";
 import { GaugeIcon } from "@/components/ui/icons";
 import { setNowPlaying } from "@/lib/audio/now-playing";
@@ -68,7 +70,6 @@ async function resampleTo48k(channels: Float32Array[], sampleRate: number): Prom
 
 export function LoudnessPanel() {
   const { t } = useI18n();
-  const [dragging, setDragging] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [measuring, setMeasuring] = useState(false);
@@ -80,7 +81,6 @@ export function LoudnessPanel() {
   const [customTarget, setCustomTarget] = useState("-14");
   const [exporting, setExporting] = useState(false);
 
-  const inputRef = useRef<HTMLInputElement>(null);
   const previewUrlRef = useRef<string | null>(null);
   const workerRef = useRef<Worker | null>(null);
   const requestIdRef = useRef(0);
@@ -202,10 +202,9 @@ export function LoudnessPanel() {
     [measure, reset, t],
   );
 
-  const handleDrag = (event: DragEvent, active: boolean) => {
-    event.preventDefault();
-    setDragging(active);
-  };
+  const { dragging, dropZoneProps, inputProps, openPicker } = useFileDrop({
+    onFiles: (files) => void handleFiles(files),
+  });
 
   const ensureAudioGraph = useCallback(() => {
     if (gainRef.current) return gainRef.current;
@@ -320,29 +319,12 @@ export function LoudnessPanel() {
       </div>
 
       {!file && (
-        <div
-          className={`drop-zone${dragging ? " dragging" : ""}`}
-          onDragEnter={(event) => handleDrag(event, true)}
-          onDragOver={(event) => handleDrag(event, true)}
-          onDragLeave={(event) => handleDrag(event, false)}
-          onDrop={(event) => {
-            handleDrag(event, false);
-            void handleFiles([...event.dataTransfer.files]);
-          }}
-        >
-          <input
-            ref={inputRef}
-            type="file"
-            accept="audio/*,.mp3,.wav,.m4a,.ogg,.flac"
-            onChange={(event) => {
-              void handleFiles([...(event.target.files || [])]);
-              event.target.value = "";
-            }}
-          />
+        <div className={`drop-zone${dragging ? " dragging" : ""}`} {...dropZoneProps}>
+          <input {...inputProps} accept="audio/*,.mp3,.wav,.m4a,.ogg,.flac" />
           <div className="upload-copy">
             <small>{t("common.dropAudioFile")}</small>
             <span>{t("loudness.dropHint")}</span>
-            <button className="secondary-button" type="button" onClick={() => inputRef.current?.click()}>
+            <button className="secondary-button" type="button" onClick={openPicker}>
               {t("common.browseFiles")}
             </button>
           </div>

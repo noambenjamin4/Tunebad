@@ -5,13 +5,15 @@ import { ToolPageNav } from "@/components/layout/ToolPageNav";
 import { camelot } from "@/lib/audio/constants";
 import { compatibleCodes, keyToSlug } from "@/lib/audio/harmonic";
 import { CamelotWheel } from "./CamelotWheel";
+import { MinimalFooter } from "@/components/layout/MinimalFooter";
+import { SITE_URL } from "@/lib/site";
+import { breadcrumbJsonLd, faqPageJsonLd } from "@/lib/seo/jsonld";
 
 // Standalone, crawlable Camelot wheel page: an interactive chart (client
 // island) on top of fully server-rendered reference content — the 24-code
 // table linking every key hub is the mesh that makes this page rank for
 // "camelot wheel". English server component, copyright-shell pattern like
 // /tunebad-vs-tunebat.
-const SITE_URL = "https://www.tunebad.com";
 
 export const metadata: Metadata = {
   title: "Camelot Wheel: Interactive Harmonic Mixing Chart",
@@ -57,23 +59,11 @@ const FAQS: { q: string; a: string }[] = [
 ];
 
 export default function CamelotWheelPage() {
-  const faqJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: FAQS.map((f) => ({
-      "@type": "Question",
-      name: f.q,
-      acceptedAnswer: { "@type": "Answer", text: f.a },
-    })),
-  };
-  const breadcrumbJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: "TuneBad", item: `${SITE_URL}/` },
-      { "@type": "ListItem", position: 2, name: "Camelot Wheel", item: `${SITE_URL}/camelot-wheel` },
-    ],
-  };
+  const faqJsonLd = faqPageJsonLd(FAQS);
+  const breadcrumbs = breadcrumbJsonLd([
+    { name: "TuneBad", item: `${SITE_URL}/` },
+    { name: "Camelot Wheel", item: `${SITE_URL}/camelot-wheel` },
+  ]);
 
   return (
     <div className="app-shell">
@@ -174,21 +164,10 @@ export default function CamelotWheelPage() {
         </article>
       </main>
 
-      <footer className="site-footer">
-        <div className="site-footer-inner">
-          <div className="site-footer-brand">
-            <picture>
-              <source media="(prefers-color-scheme: dark)" srcSet="/logo-dark.png" />
-              <img src="/logo-light.png" alt="" width={24} height={24} className="site-footer-logo" loading="lazy" />
-            </picture>
-            <span className="site-footer-wordmark">TUNEBAD</span>
-          </div>
-          <p className="site-footer-copyright">© 2026 TuneBad</p>
-        </div>
-      </footer>
+      <MinimalFooter />
 
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }} />
     </div>
   );
 }

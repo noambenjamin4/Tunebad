@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { readAllSongs } from "@/lib/server/link-analysis";
 import { readSongsByArtist, topArtistsByCount, artistStats } from "@/lib/server/artists";
+import { SITE_URL } from "@/lib/site";
 
 // Artist hub pages: /artist/<slug>, one per artist with enough analyzed songs
 // to be worth a page. Mirrors the /songs/key/[slug] hub structure and copy
@@ -14,7 +15,6 @@ import { readSongsByArtist, topArtistsByCount, artistStats } from "@/lib/server/
 export const revalidate = 3600;
 export const dynamicParams = true;
 
-const SITE_URL = "https://www.tunebad.com";
 // Render rule (kept consistent everywhere an artist link can appear — this
 // page, /song/[slug], /songs, and the sitemap hubs shard): an artist page
 // only exists with >=2 analyzed songs. Below that it 404s rather than

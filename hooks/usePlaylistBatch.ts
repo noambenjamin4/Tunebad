@@ -51,7 +51,6 @@ export function usePlaylistBatch(items: PlaylistItem[], { format, quality }: Bat
     cancelledRef.current = false;
     // Only reset when the underlying item set changes — format/quality
     // changes are captured by the runBatch closure below, not here.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items]);
 
   const updateRow = useCallback((id: string, patch: Partial<PlaylistRowState>) => {

@@ -2,13 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { readSongsByBpmRange, readAllSongs } from "@/lib/server/link-analysis";
+import { SITE_URL } from "@/lib/site";
 
 // BPM hub pages: /songs/bpm/140 etc. Each lists analyzed songs within ±2 BPM —
 // the "140 bpm songs" search intent DJs and runners actually type.
 export const revalidate = 3600;
 export const dynamicParams = true;
 
-const SITE_URL = "https://www.tunebad.com";
 const BPM_MIN = 40;
 const BPM_MAX = 220;
 const WINDOW = 2;

@@ -5,7 +5,10 @@
 // Route handlers can't use next-sitemap's MetadataRoute typed helpers, so
 // these emit raw XML strings directly per the sitemaps.org schema.
 
-export const SITE_URL = "https://www.tunebad.com";
+import { SITE_URL } from "@/lib/site";
+
+// Re-exported so the sitemap route handlers keep their existing import.
+export { SITE_URL };
 
 // Song URLs per shard. 20,000 keeps each shard file comfortably under the
 // sitemap protocol's 50k-URL / 50MB-uncompressed caps with headroom.

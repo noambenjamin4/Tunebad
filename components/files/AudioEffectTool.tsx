@@ -3,7 +3,8 @@
 import { useState, type ReactNode } from "react";
 import { useI18n } from "@/lib/i18n";
 import type { DictKey } from "@/lib/i18n/locales/en";
-import { downloadBlob, encodeMp3FromChannels, encodeWavFromChannels } from "@/lib/audio/mp3-encoder";
+import { encodeMp3FromChannels, encodeWavFromChannels } from "@/lib/audio/mp3-encoder";
+import { downloadBlob } from "@/lib/files/download";
 import { decodeAudioFile } from "@/lib/audio/decode";
 import { formatBytes } from "@/lib/files/image";
 import { FileDrop } from "./FileDrop";

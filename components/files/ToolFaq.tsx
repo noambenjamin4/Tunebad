@@ -8,20 +8,13 @@
 import { useI18n } from "@/lib/i18n";
 import en from "@/lib/i18n/locales/en";
 import type { DictKey } from "@/lib/i18n/locales/en";
+import { faqPageJsonLd } from "@/lib/seo/jsonld";
 
 export type FaqEntry = { q: DictKey; a: DictKey };
 
 export function ToolFaq({ faqs }: { faqs: FaqEntry[] }) {
   const { t } = useI18n();
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: faqs.map((f) => ({
-      "@type": "Question",
-      name: en[f.q],
-      acceptedAnswer: { "@type": "Answer", text: en[f.a] },
-    })),
-  };
+  const jsonLd = faqPageJsonLd(faqs.map((f) => ({ q: en[f.q], a: en[f.a] })));
   return (
     <section className="tool-faq" aria-label="Frequently asked questions">
       <h2 className="tool-faq-heading">{t("landing.faqHeading")}</h2>

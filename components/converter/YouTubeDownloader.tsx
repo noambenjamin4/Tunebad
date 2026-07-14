@@ -100,7 +100,6 @@ export function YouTubeDownloader() {
     setPlaylistItems(null);
     setPlaylistBatchConfig(null);
     setPlaylistError(null);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [url]);
 
   const onFormatChange = (nextFormat: OutputFormat) => {

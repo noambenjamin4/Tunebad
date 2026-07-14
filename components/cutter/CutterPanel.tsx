@@ -1,9 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState, type DragEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useFileDrop } from "@/hooks/useFileDrop";
 import { decodeAudioFileCached } from "@/lib/audio/decode-cache";
 import { computeWaveformBars } from "@/lib/audio/waveform";
-import { encodeMp3FromChannels, encodeWavFromChannels, downloadBlob } from "@/lib/audio/mp3-encoder";
+import { encodeMp3FromChannels, encodeWavFromChannels } from "@/lib/audio/mp3-encoder";
+import { downloadBlob } from "@/lib/files/download";
 import { FADE_SECONDS, fadeEnvelopeGain } from "@/lib/audio/fade";
 import { TrimWaveform } from "./TrimWaveform";
 import type { OutputFormat } from "@/components/converter/QualityPicker";
@@ -48,7 +50,6 @@ function applyFades(channels: Float32Array[], sampleRate: number, fadeIn: boolea
 export function CutterPanel() {
   const { t } = useI18n();
   const [file, setFile] = useState<File | null>(null);
-  const [dragging, setDragging] = useState(false);
   const [buffer, setBuffer] = useState<AudioBuffer | null>(null);
 
   const [playing, setPlaying] = useState(false);
@@ -65,7 +66,6 @@ export function CutterPanel() {
   // repositions (its rAF loop only runs during playback).
   const [headSignal, setHeadSignal] = useState(0);
 
-  const inputRef = useRef<HTMLInputElement>(null);
   const previewUrlRef = useRef<string | null>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
 
@@ -214,10 +214,9 @@ export function CutterPanel() {
     [t],
   );
 
-  const handleDrag = (event: DragEvent, active: boolean) => {
-    event.preventDefault();
-    setDragging(active);
-  };
+  const { dragging, dropZoneProps, inputProps, openPicker } = useFileDrop({
+    onFiles: (files) => void handleFiles(files),
+  });
 
   const handleStartChange = (value: number) => {
     const clamped = Math.min(value, end - MIN_SELECTION_SECONDS);
@@ -321,29 +320,15 @@ export function CutterPanel() {
       </div>
 
       {!file && (
-        <div
-          className={`drop-zone${dragging ? " dragging" : ""}`}
-          onDragEnter={(event) => handleDrag(event, true)}
-          onDragOver={(event) => handleDrag(event, true)}
-          onDragLeave={(event) => handleDrag(event, false)}
-          onDrop={(event) => {
-            handleDrag(event, false);
-            void handleFiles([...event.dataTransfer.files]);
-          }}
-        >
+        <div className={`drop-zone${dragging ? " dragging" : ""}`} {...dropZoneProps}>
           <input
-            ref={inputRef}
-            type="file"
+            {...inputProps}
             aria-label={t("common.browseFiles")}
             accept="audio/*,.mp3,.wav,.m4a,.ogg,.flac"
-            onChange={(event) => {
-              void handleFiles([...(event.target.files || [])]);
-              event.target.value = "";
-            }}
           />
           <div className="upload-copy">
             <small>{t("common.dropAudioFile")}</small>
-            <button className="secondary-button" type="button" onClick={() => inputRef.current?.click()}>
+            <button className="secondary-button" type="button" onClick={openPicker}>
               {t("common.browseFiles")}
             </button>
           </div>

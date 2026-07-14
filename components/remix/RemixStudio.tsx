@@ -1,9 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState, type DragEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useFileDrop } from "@/hooks/useFileDrop";
 import { getAudioContextClass } from "@/lib/audio/decode";
 import { decodeAudioFileCached } from "@/lib/audio/decode-cache";
-import { encodeMp3FromChannels, encodeWavFromChannels, downloadBlob } from "@/lib/audio/mp3-encoder";
+import { encodeMp3FromChannels, encodeWavFromChannels } from "@/lib/audio/mp3-encoder";
+import { downloadBlob } from "@/lib/files/download";
 import { FormatPicker, type OutputFormat } from "@/components/converter/QualityPicker";
 import { useI18n } from "@/lib/i18n";
 import { CheckRow } from "@/components/ui/CheckRow";
@@ -62,7 +64,6 @@ function formatSemitones(value: number): string {
 export function RemixStudio() {
   const { t } = useI18n();
   const [file, setFile] = useState<File | null>(null);
-  const [dragging, setDragging] = useState(false);
   const [buffer, setBuffer] = useState<AudioBuffer | null>(null);
 
   const [speed, setSpeed] = useState(0.8);
@@ -89,7 +90,6 @@ export function RemixStudio() {
   // so we don't need a per-frame setState here.
   const [startOffset, setStartOffset] = useState(0);
 
-  const inputRef = useRef<HTMLInputElement>(null);
   const previewUrlRef = useRef<string | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const graphRef = useRef<RemixGraph | null>(null);
@@ -207,10 +207,9 @@ export function RemixStudio() {
     [stopPreview, t],
   );
 
-  const handleDrag = (event: DragEvent, active: boolean) => {
-    event.preventDefault();
-    setDragging(active);
-  };
+  const { dragging, dropZoneProps, inputProps, openPicker } = useFileDrop({
+    onFiles: (files) => void handleFiles(files),
+  });
 
   // Keeps a stretched copy of the buffer ready whenever lock-pitch (or its
   // semitone/speed inputs) change. Debounced so slider drags don't trigger a
@@ -415,29 +414,12 @@ export function RemixStudio() {
       </div>
 
       {!file && (
-        <div
-          className={`drop-zone${dragging ? " dragging" : ""}`}
-          onDragEnter={(event) => handleDrag(event, true)}
-          onDragOver={(event) => handleDrag(event, true)}
-          onDragLeave={(event) => handleDrag(event, false)}
-          onDrop={(event) => {
-            handleDrag(event, false);
-            void handleFiles([...event.dataTransfer.files]);
-          }}
-        >
-          <input
-            ref={inputRef}
-            type="file"
-            accept="audio/*,.mp3,.wav,.m4a,.ogg,.flac"
-            onChange={(event) => {
-              void handleFiles([...(event.target.files || [])]);
-              event.target.value = "";
-            }}
-          />
+        <div className={`drop-zone${dragging ? " dragging" : ""}`} {...dropZoneProps}>
+          <input {...inputProps} accept="audio/*,.mp3,.wav,.m4a,.ogg,.flac" />
           <div className="upload-copy">
             <small>{t("common.dropAudioFile")}</small>
             <span>{t("remix.dropHint")}</span>
-            <button className="secondary-button" type="button" onClick={() => inputRef.current?.click()}>
+            <button className="secondary-button" type="button" onClick={openPicker}>
               {t("common.browseFiles")}
             </button>
           </div>

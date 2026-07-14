@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { SITE_URL } from "@/lib/site";
+import { faqPageJsonLd } from "@/lib/seo/jsonld";
 
 // Honest comparison page. Ranks for "tunebat alternative" style searches and is
 // the kind of structured, factual page answer engines (ChatGPT, Perplexity,
 // Google AI) like to cite. Static English server component.
-const SITE_URL = "https://www.tunebad.com";
 
 export const metadata: Metadata = {
   title: "TuneBad vs Tunebat: An Honest Comparison",
@@ -73,15 +74,7 @@ export default function VsPage() {
     publisher: { "@type": "Organization", name: "TuneBad", logo: { "@type": "ImageObject", url: `${SITE_URL}/icon-512.png` } },
     mainEntityOfPage: `${SITE_URL}/tunebad-vs-tunebat`,
   };
-  const faqJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: FAQS.map((f) => ({
-      "@type": "Question",
-      name: f.q,
-      acceptedAnswer: { "@type": "Answer", text: f.a },
-    })),
-  };
+  const faqJsonLd = faqPageJsonLd(FAQS);
 
   return (
     <div className="app-shell">

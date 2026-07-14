@@ -3,6 +3,8 @@ import Link from "next/link";
 import { I18nProvider } from "@/lib/i18n";
 import { ToolPageNav } from "@/components/layout/ToolPageNav";
 import { PlaylistAnalyzer } from "@/components/playlist/PlaylistAnalyzer";
+import { MinimalFooter } from "@/components/layout/MinimalFooter";
+import { faqPageJsonLd } from "@/lib/seo/jsonld";
 
 export const metadata: Metadata = {
   title: "Free Playlist Analyzer: Key & BPM of Every Track",
@@ -40,15 +42,7 @@ const FAQS: { q: string; a: string }[] = [
 ];
 
 export default function PlaylistAnalyzerPage() {
-  const faqJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: FAQS.map((f) => ({
-      "@type": "Question",
-      name: f.q,
-      acceptedAnswer: { "@type": "Answer", text: f.a },
-    })),
-  };
+  const faqJsonLd = faqPageJsonLd(FAQS);
   return (
     <div className="app-shell">
       <I18nProvider>
@@ -88,18 +82,7 @@ export default function PlaylistAnalyzerPage() {
         </article>
       </main>
 
-      <footer className="site-footer">
-        <div className="site-footer-inner">
-          <div className="site-footer-brand">
-            <picture>
-              <source media="(prefers-color-scheme: dark)" srcSet="/logo-dark.png" />
-              <img src="/logo-light.png" alt="" width={24} height={24} className="site-footer-logo" loading="lazy" />
-            </picture>
-            <span className="site-footer-wordmark">TUNEBAD</span>
-          </div>
-          <p className="site-footer-copyright">© 2026 TuneBad</p>
-        </div>
-      </footer>
+      <MinimalFooter />
       </I18nProvider>
     </div>
   );

@@ -1,8 +1,9 @@
 "use client";
 
-import { useRef, useState, type DragEvent, type KeyboardEvent } from "react";
+import type { KeyboardEvent } from "react";
 import { formatFileSize } from "@/lib/format";
 import { useI18n } from "@/lib/i18n";
+import { useFileDrop } from "@/hooks/useFileDrop";
 
 export function FilePicker({
   file,
@@ -16,33 +17,19 @@ export function FilePicker({
   disabled?: boolean;
 }) {
   const { t } = useI18n();
-  const inputRef = useRef<HTMLInputElement>(null);
-  const [dragging, setDragging] = useState(false);
-
-  const openPicker = () => {
-    if (disabled) return;
-    inputRef.current?.click();
-  };
+  const { dragging, dropZoneProps, inputProps, openPicker } = useFileDrop({
+    disabled,
+    onFiles: (files) => {
+      const dropped = files[0];
+      if (dropped) onFile(dropped);
+    },
+  });
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
       openPicker();
     }
-  };
-
-  const handleDrag = (event: DragEvent, active: boolean) => {
-    event.preventDefault();
-    if (disabled) return;
-    setDragging(active);
-  };
-
-  const handleDrop = (event: DragEvent) => {
-    event.preventDefault();
-    setDragging(false);
-    if (disabled) return;
-    const dropped = event.dataTransfer.files?.[0];
-    if (dropped) onFile(dropped);
   };
 
   return (
@@ -53,17 +40,16 @@ export function FilePicker({
       aria-disabled={disabled}
       onClick={openPicker}
       onKeyDown={handleKeyDown}
-      onDragEnter={(event) => handleDrag(event, true)}
-      onDragOver={(event) => handleDrag(event, true)}
-      onDragLeave={(event) => handleDrag(event, false)}
-      onDrop={handleDrop}
+      {...dropZoneProps}
     >
       <input
-        ref={inputRef}
+        {...inputProps}
         className="sr-only"
-        type="file"
         accept={accept}
         disabled={disabled}
+        // Unlike the drop path (first file or nothing), a change event with no
+        // file selected clears the current pick, so keep the null-forwarding
+        // handler instead of the hook's list-based one.
         onChange={(event) => {
           onFile(event.target.files?.[0] || null);
           event.target.value = "";

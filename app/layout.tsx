@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Baloo_2 } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
+import { SITE_URL } from "@/lib/site";
+import { ClientErrorReporter } from "@/components/layout/ClientErrorReporter";
 
 const geistSans = Geist({
   // 900 was loaded but never referenced in any stylesheet — dropping it removes
@@ -29,11 +31,6 @@ const baloo2 = Baloo_2({
 const TITLE = "Free Key & BPM Finder for Any Song | TuneBad";
 const DESCRIPTION =
   "Find the key, BPM, and loudness of any song for free. Upload a file or paste a YouTube, Spotify, or SoundCloud link and convert it to MP3, WAV, or MP4, all in your browser.";
-// The production primary domain (Vercel serves www; bare tunebad.com 308s to it).
-// Must match the Google Search Console property. Keep app/sitemaps/[shard]/route.ts
-// (and app/sitemap.xml/route.ts) + robots.txt in sync.
-const SITE_URL = "https://www.tunebad.com";
-
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   applicationName: "TuneBad",
@@ -187,6 +184,9 @@ export default function RootLayout({
         {/* Cookieless, anonymous page-view counts (no-op in dev). Audio never
             leaves the visitor's device; this does not change that. */}
         <Analytics />
+        {/* Reports uncaught client errors to our own API (no third party —
+            the CSP allows no external beacon). Message + stack only. */}
+        <ClientErrorReporter />
       </body>
     </html>
   );

@@ -2,8 +2,8 @@ import type { ReactNode } from "react";
 import { I18nProvider } from "@/lib/i18n";
 import { Footer } from "@/components/layout/Footer";
 import { ToolPageNav } from "@/components/layout/ToolPageNav";
-
-const SITE_URL = "https://www.tunebad.com";
+import { SITE_URL } from "@/lib/site";
+import { breadcrumbJsonLd } from "@/lib/seo/jsonld";
 
 // Standalone page shell for the file tools (image/video/pdf/zip). These pages
 // live OUTSIDE the TunebadApp SPA (the top nav is over budget), so each wraps
@@ -21,17 +21,11 @@ export function ToolPageShell({
   children: ReactNode;
   tool?: { name: string; path: string };
 }) {
-  const breadcrumbJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: `${SITE_URL}/` },
-      { "@type": "ListItem", position: 2, name: "More tools", item: `${SITE_URL}/tools` },
-      ...(tool
-        ? [{ "@type": "ListItem", position: 3, name: tool.name, item: `${SITE_URL}${tool.path}` }]
-        : []),
-    ],
-  };
+  const breadcrumbs = breadcrumbJsonLd([
+    { name: "Home", item: `${SITE_URL}/` },
+    { name: "More tools", item: `${SITE_URL}/tools` },
+    ...(tool ? [{ name: tool.name, item: `${SITE_URL}${tool.path}` }] : []),
+  ]);
   return (
     <div className="app-shell">
       <I18nProvider>
@@ -44,7 +38,7 @@ export function ToolPageShell({
 
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }}
       />
     </div>
   );

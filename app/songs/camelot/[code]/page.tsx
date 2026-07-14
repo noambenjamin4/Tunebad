@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { readSongsByCamelotCode } from "@/lib/server/link-analysis";
 import { compatibleCodes, relationLabel } from "@/lib/audio/harmonic";
 import { camelot } from "@/lib/audio/constants";
+import { SITE_URL } from "@/lib/site";
 
 // Camelot browse pages: /songs/camelot/8a etc. One per canonical Camelot
 // code (24 total), listing every analyzed song in that code — the
@@ -11,8 +12,6 @@ import { camelot } from "@/lib/audio/constants";
 // structure of /songs/key/[slug] (see that file) but keyed off the code
 // instead of the key name.
 export const revalidate = 3600;
-
-const SITE_URL = "https://www.tunebad.com";
 
 const ALL_CODES = [
   ...Array.from({ length: 12 }, (_, i) => `${i + 1}A`),

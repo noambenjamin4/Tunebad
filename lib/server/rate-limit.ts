@@ -13,11 +13,26 @@ const MAX_ENUMERATE = 20;
 // preview streams) — cheap but outbound, so a moderate dedicated bucket.
 const MAX_LOOKUPS = 40;
 
-type Buckets = { starts: Map<string, number[]>; enumerate: Map<string, number[]>; lookups: Map<string, number[]> };
+// Client error reports: one page can only legitimately produce a handful,
+// so keep this tight — it's a write endpoint anyone can hit.
+const MAX_ERROR_REPORTS = 20;
+
+type Buckets = {
+  starts: Map<string, number[]>;
+  enumerate: Map<string, number[]>;
+  lookups: Map<string, number[]>;
+  errors: Map<string, number[]>;
+};
 const globalStore = globalThis as unknown as { __tunebadRateLimit?: Buckets };
-const buckets = (globalStore.__tunebadRateLimit ??= { starts: new Map(), enumerate: new Map(), lookups: new Map() });
-// HMR-persisted stores from before this bucket existed need the new map.
+const buckets = (globalStore.__tunebadRateLimit ??= {
+  starts: new Map(),
+  enumerate: new Map(),
+  lookups: new Map(),
+  errors: new Map(),
+});
+// HMR-persisted stores from before these buckets existed need the new maps.
 buckets.lookups ??= new Map();
+buckets.errors ??= new Map();
 
 function allow(store: Map<string, number[]>, key: string, max: number): boolean {
   const now = Date.now();
@@ -41,6 +56,10 @@ export function allowEnumerate(key: string): boolean {
 
 export function allowLookup(key: string): boolean {
   return allow(buckets.lookups, key, MAX_LOOKUPS);
+}
+
+export function allowErrorReport(key: string): boolean {
+  return allow(buckets.errors, key, MAX_ERROR_REPORTS);
 }
 
 // Periodic sweep so buckets don't grow unbounded under many distinct IPs. Only

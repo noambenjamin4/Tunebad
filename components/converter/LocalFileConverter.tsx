@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { convertFileToMp3, convertFileToWav, downloadBlob } from "@/lib/audio/mp3-encoder";
+import { convertFileToMp3, convertFileToWav } from "@/lib/audio/mp3-encoder";
+import { downloadBlob } from "@/lib/files/download";
 import { formatFileSize } from "@/lib/format";
 import { useI18n } from "@/lib/i18n";
 import { CheckRow } from "@/components/ui/CheckRow";

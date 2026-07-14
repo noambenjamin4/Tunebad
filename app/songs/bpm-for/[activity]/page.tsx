@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { readSongsByBpmRangeAll } from "@/lib/server/link-analysis";
 import { ACTIVITIES, findActivity } from "@/lib/server/activities";
+import { SITE_URL } from "@/lib/site";
 
 // Activity/tempo landing pages: /songs/bpm-for/running etc. A fixed,
 // curated set of BPM windows for real search intents (running, workout,
@@ -10,7 +11,6 @@ import { ACTIVITIES, findActivity } from "@/lib/server/activities";
 // English-only, like the other /songs hubs.
 export const revalidate = 3600;
 
-const SITE_URL = "https://www.tunebad.com";
 // A hub page below this many songs is thin; the fixed activity list keeps
 // this from ever firing today, but it's here as the catalog is still
 // growing and some windows (sleep, yoga) start narrow.

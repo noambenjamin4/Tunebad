@@ -17,14 +17,13 @@ import {
 } from "@/lib/audio/harmonic";
 import { rankMixMatches } from "@/lib/server/mix-matches";
 import { artistSlug } from "@/lib/server/artists";
+import { SITE_URL } from "@/lib/site";
 
 // Programmatic per-song pages, one for every track in the shared link-analysis
 // cache. Statically generated for the songs known at build time and filled in
 // on demand (ISR) as the cache grows from live "analyze from link" usage.
 export const revalidate = 3600;
 export const dynamicParams = true;
-
-const SITE_URL = "https://www.tunebad.com";
 
 export async function generateStaticParams() {
   const songs = await readAllSongs(2000);

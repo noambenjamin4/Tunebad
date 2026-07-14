@@ -8,6 +8,7 @@
 import { useI18n } from "@/lib/i18n";
 import en from "@/lib/i18n/locales/en";
 import type { DictKey } from "@/lib/i18n/locales/en";
+import { faqPageJsonLd } from "@/lib/seo/jsonld";
 
 const VALUE_KEYS: { title: DictKey; body: DictKey }[] = [
   { title: "landing.value1Title", body: "landing.value1Body" },
@@ -48,15 +49,7 @@ const FAQ_KEYS: { q: DictKey; a: DictKey; linkHref?: string; linkText?: DictKey 
 ];
 
 // Canonical English schema, independent of the visitor's UI language.
-const FAQ_JSON_LD = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: FAQ_KEYS.map((k) => ({
-    "@type": "Question",
-    name: en[k.q],
-    acceptedAnswer: { "@type": "Answer", text: en[k.a] },
-  })),
-};
+const FAQ_JSON_LD = faqPageJsonLd(FAQ_KEYS.map((k) => ({ q: en[k.q], a: en[k.a] })));
 
 export function LandingSeo({ songCount }: { songCount?: number }) {
   const { t } = useI18n();

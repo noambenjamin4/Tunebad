@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useI18n } from "@/lib/i18n";
-import { downloadBlob } from "@/lib/audio/mp3-encoder";
+import { downloadBlob } from "@/lib/files/download";
 import { formatBytes } from "@/lib/files/image";
 import {
   HEIC_MAX_BYTES,

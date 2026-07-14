@@ -157,11 +157,3 @@ export async function convertFileToMp3(file: File, kbps: number, trimSilence: bo
   const { channels, sampleRate } = await decodeAndTrim(file, trimSilence);
   return encodeMp3FromChannels(channels, sampleRate, kbps);
 }
-
-export function downloadBlob(blob: Blob, fileName: string): void {
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = fileName;
-  link.click();
-  setTimeout(() => URL.revokeObjectURL(link.href), 1000);
-}

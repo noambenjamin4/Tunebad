@@ -109,7 +109,7 @@ export default function Page() {
         three moves are safe.
       </p>
 
-      <h2>Finding a song's Camelot code</h2>
+      <h2>Finding a song&#39;s Camelot code</h2>
       <p>
         The <Link href="/key-bpm-finder">Key &amp; BPM Finder</Link> shows the Camelot code with every analysis.
         Paste a YouTube or Spotify link, or drop the audio file, and you get the key, the code, and the tempo

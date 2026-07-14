@@ -4,12 +4,11 @@ import { notFound } from "next/navigation";
 import { readSongsByKey } from "@/lib/server/link-analysis";
 import { ALL_KEYS, keyToSlug, slugToKey, compatibleCodes, relationLabel } from "@/lib/audio/harmonic";
 import { camelot } from "@/lib/audio/constants";
+import { SITE_URL } from "@/lib/site";
 
 // Key hub pages: /songs/key/g-sharp-minor etc. One per canonical key, listing
 // every analyzed song in that key — the "songs in G# minor" search intent.
 export const revalidate = 3600;
-
-const SITE_URL = "https://www.tunebad.com";
 
 export function generateStaticParams() {
   return ALL_KEYS.map((k) => ({ slug: keyToSlug(k) }));

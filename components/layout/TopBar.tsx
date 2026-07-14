@@ -50,6 +50,9 @@ export function TopBar() {
       <div ref={sentinelRef} aria-hidden="true" className="scroll-sentinel" />
       <header className={`topbar${scrolled ? " scrolled" : ""}`}>
         <div className="topbar-inner">
+          {/* Intentional hard navigation: a full page load on the brand link stops any
+              playing audio and resets in-progress tool state, unlike a client-side <Link />. */}
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
           <a className="brand" href="/" aria-label="TuneBad home" onClick={() => setMenuOpen(false)}>
             <span className={`brand-logo-wrap${playing ? " spinning" : ""}`}>
               <picture>
