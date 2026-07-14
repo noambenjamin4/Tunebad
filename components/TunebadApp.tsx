@@ -75,12 +75,6 @@ export function TunebadApp({
   landingSlot,
 }: { initialView?: ViewName; landingSlot?: ReactNode } = {}) {
   const [view, setView] = useState<ViewName>(initialView);
-  // Gates the first-load cascade (header + active panel's children fading up
-  // in a stagger). True only for the very first paint; flipped off shortly
-  // after so revisiting a tab later doesn't replay the mount-in stagger —
-  // CSS animations would otherwise re-run every time `display` flips from
-  // `none` back to `block` on a `.page-view`.
-  const [initialReveal, setInitialReveal] = useState(true);
   const [delayBpm, setDelayBpm] = useState("124.00");
   const [metronomeBpm, setMetronomeBpmState] = useState(124);
   const [lastAnalyzedBpm, setLastAnalyzedBpm] = useState<number | null>(null);
@@ -100,12 +94,6 @@ export function TunebadApp({
     if (VIEW_NAMES.includes(initial as ViewName)) setView(initial as ViewName);
   }, []);
 
-  useEffect(() => {
-    // Well past the longest cascade delay + animation duration, so the
-    // stagger always finishes before this flips off.
-    const timer = window.setTimeout(() => setInitialReveal(false), 1200);
-    return () => window.clearTimeout(timer);
-  }, []);
 
   const showView = useCallback((next: ViewName) => {
     setView(next);
@@ -181,7 +169,7 @@ export function TunebadApp({
   return (
     <TunebadContext.Provider value={contextValue}>
       <I18nProvider>
-        <div className={`app-shell${initialReveal ? " initial-reveal" : ""}`}>
+        <div className="app-shell">
           <div className="grain-overlay" aria-hidden="true" />
           <GlobalDropCatcher view={view} />
           <TopBar />

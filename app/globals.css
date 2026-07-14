@@ -613,66 +613,9 @@ main {
   margin-top: 64px;
 }
 
-/* Tab switches change views instantly, with no view-in / heading-rise
-   animation (removed at Noam's request). The initial page-load reveal
-   below is separate and still runs once on first mount. */
-
-/* First-load cascade: header, then the active panel's major direct
-   children, fade up in a short stagger. Scoped to `.initial-reveal`, a class
-   TunebadApp applies only for ~1.2s after first mount — CSS animations
-   re-trigger any time a `.page-view` flips `display: none` -> `block`, so
-   without this gate the stagger would replay on every tab switch, not just
-   the first load. */
-@media (prefers-reduced-motion: no-preference) {
-  .initial-reveal .topbar {
-    animation: cascade-in 480ms cubic-bezier(0.16, 1, 0.3, 1) both;
-  }
-
-  /* Skip the first two children (the heading block and the dropzone): they
-     are the LCP candidates and must paint immediately — the stagger only
-     lifts the secondary content below them. */
-  .initial-reveal .page-view.active > .panel > *:nth-child(n + 3),
-  .initial-reveal .page-view.active > .hero-tool > *:nth-child(n + 3) {
-    animation: cascade-in 480ms cubic-bezier(0.16, 1, 0.3, 1) both;
-    animation-delay: calc(80ms + var(--i, 0) * 70ms);
-  }
-
-  .initial-reveal .page-view.active > .panel > *:nth-child(1),
-  .initial-reveal .page-view.active > .hero-tool > *:nth-child(1) {
-    --i: 0;
-  }
-  .initial-reveal .page-view.active > .panel > *:nth-child(2),
-  .initial-reveal .page-view.active > .hero-tool > *:nth-child(2) {
-    --i: 1;
-  }
-  .initial-reveal .page-view.active > .panel > *:nth-child(3),
-  .initial-reveal .page-view.active > .hero-tool > *:nth-child(3) {
-    --i: 2;
-  }
-  .initial-reveal .page-view.active > .panel > *:nth-child(4),
-  .initial-reveal .page-view.active > .hero-tool > *:nth-child(4) {
-    --i: 3;
-  }
-  .initial-reveal .page-view.active > .panel > *:nth-child(5),
-  .initial-reveal .page-view.active > .hero-tool > *:nth-child(5) {
-    --i: 4;
-  }
-  .initial-reveal .page-view.active > .panel > *:nth-child(6),
-  .initial-reveal .page-view.active > .hero-tool > *:nth-child(6) {
-    --i: 5;
-  }
-}
-
-@keyframes cascade-in {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+/* Pages render with no entry animation: tab switches and the initial page
+   load both appear instantly, with no fade or rise (removed at Noam's
+   request — he wants zero motion when a new page/view appears). */
 
 .primary-button,
 .convert-button {
