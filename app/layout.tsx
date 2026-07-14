@@ -28,7 +28,12 @@ const baloo2 = Baloo_2({
   variable: "--font-display",
 });
 
-const TITLE = "Free Key & BPM Finder for Any Song | TuneBad";
+// Brand FIRST on the homepage. Google autocorrects the query "tunebad" to
+// "tunebat" (a far older, higher-authority brand one letter away), and with the
+// brand buried at the end of the title the pages that actually surfaced for our
+// own brand query were /tunebad-vs-tunebat and /songs — not the homepage, which
+// should own it. Every keyword is still in the title, just reordered.
+const TITLE = "TuneBad — Free Key & BPM Finder for Any Song";
 const DESCRIPTION =
   "Find the key, BPM, and loudness of any song for free. Upload a file or paste a YouTube, Spotify, or SoundCloud link and convert it to MP3, WAV, or MP4, all in your browser.";
 export const metadata: Metadata = {
@@ -129,9 +134,20 @@ const STRUCTURED_DATA = {
       inLanguage: "en",
     },
     {
+      // Entity signals. Google has to decide whether "TuneBad" is a real,
+      // distinct thing or a typo for "Tunebat" — these are what it reads to
+      // tell them apart. alternateName covers the spaced/lowercase spellings
+      // people actually type.
+      //   NOTE: `sameAs` (links to owned social/knowledge profiles) is the
+      // strongest signal here and is deliberately ABSENT: TuneBad has no
+      // profiles yet, and pointing sameAs at URLs that don't exist or aren't
+      // ours would be invalid markup and a false claim. Add it the day the
+      // accounts exist.
       "@type": "Organization",
       "@id": `${SITE_URL}/#org`,
       name: "TuneBad",
+      alternateName: ["Tune Bad", "tunebad", "tunebad.com"],
+      description: DESCRIPTION,
       url: `${SITE_URL}/`,
       logo: `${SITE_URL}/icon-512.png`,
     },
