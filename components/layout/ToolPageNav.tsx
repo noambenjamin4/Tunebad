@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useI18n } from "@/lib/i18n";
 import type { DictKey } from "@/lib/i18n/locales/en";
@@ -63,12 +64,13 @@ export function ToolPageNav() {
   }, [menuOpen]);
 
   // Fresh elements per call so the desktop nav and the mobile drawer don't share
-  // element instances.
+  // element instances. next/link (not <a>) so switching tools is a client-side
+  // transition with prefetch instead of a full document reload.
   const renderLinks = () =>
     LINKS.map((link) => {
       const active = pathname === link.href || (link.href === "/tools" && !KNOWN_HREFS.has(pathname));
       return (
-        <a
+        <Link
           key={link.href}
           className={`ghost-button${active ? " active" : ""}`}
           href={link.href}
@@ -76,7 +78,7 @@ export function ToolPageNav() {
           onClick={() => setMenuOpen(false)}
         >
           {t(link.labelKey)}
-        </a>
+        </Link>
       );
     });
 
@@ -85,7 +87,7 @@ export function ToolPageNav() {
       <div ref={sentinelRef} aria-hidden="true" className="scroll-sentinel" />
       <header className={`topbar${scrolled ? " scrolled" : ""}`}>
         <div className="topbar-inner">
-          <a className="brand" href="/" aria-label="TuneBad home" onClick={() => setMenuOpen(false)}>
+          <Link className="brand" href="/" aria-label="TuneBad home" onClick={() => setMenuOpen(false)}>
             <span className="brand-logo-wrap">
               <picture>
                 <source media="(prefers-color-scheme: dark)" srcSet="/logo-dark.png" />
@@ -93,7 +95,7 @@ export function ToolPageNav() {
               </picture>
             </span>
             <span className="brand-wordmark">TUNEBAD</span>
-          </a>
+          </Link>
 
           <nav className="top-actions" aria-label="TuneBad tools">
             {renderLinks()}
