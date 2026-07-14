@@ -98,7 +98,9 @@ export function AnalysisSummary({ result }: { result: AnalysisResult }) {
   ];
 
   return (
-    <div className="analysis-summary">
+    // role="status" (implicit aria-live polite) so screen readers announce
+    // the key/BPM result when it lands — otherwise analysis completes silently.
+    <div className="analysis-summary" role="status" aria-live="polite">
       <div className="summary-title">
         <h2>{t("analysis.resultsHeading")}</h2>
         {result.engine === "basic" ? <span className="engine-tag">{t("analysis.engineTagBasic")}</span> : null}

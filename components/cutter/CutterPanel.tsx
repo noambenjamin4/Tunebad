@@ -11,6 +11,7 @@ import { useI18n } from "@/lib/i18n";
 import { WaveformIcon } from "@/components/ui/icons";
 import { setNowPlaying } from "@/lib/audio/now-playing";
 import { formatTimeTenths } from "@/lib/format";
+import { useUnloadGuard } from "@/hooks/useUnloadGuard";
 
 const NOW_PLAYING_SOURCE = "cutter-preview";
 const MIN_SELECTION_SECONDS = 0.1;
@@ -58,6 +59,7 @@ export function CutterPanel() {
 
   const [format, setFormat] = useState<OutputFormat>("mp3");
   const [working, setWorking] = useState(false);
+  useUnloadGuard(working);
   const [status, setStatus] = useState<Status | null>(null);
   // Bumped after programmatic seeks while paused so the waveform playhead
   // repositions (its rAF loop only runs during playback).
@@ -203,8 +205,8 @@ export function CutterPanel() {
       } catch (error) {
         console.error(error);
         setStatus({
-          title: t("cutter.tooShort"),
-          message: error instanceof Error ? error.message : t("cutter.tooShort"),
+          title: t("cutter.decodeFailedTitle"),
+          message: t("cutter.decodeFailedFallback"),
           tone: "warning",
         });
       }
@@ -290,8 +292,8 @@ export function CutterPanel() {
     } catch (error) {
       console.error(error);
       setStatus({
-        title: t("cutter.tooShort"),
-        message: error instanceof Error ? error.message : t("cutter.tooShort"),
+        title: t("cutter.exportFailedTitle"),
+        message: t("cutter.exportFailedFallback"),
         tone: "warning",
       });
     } finally {

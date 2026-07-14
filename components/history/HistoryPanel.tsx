@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { useTunebad } from "../TunebadApp";
 import { useI18n } from "@/lib/i18n";
 import { HistoryIcon } from "@/components/ui/icons";
@@ -7,6 +8,25 @@ import { HistoryIcon } from "@/components/ui/icons";
 export function HistoryPanel() {
   const { history, clearHistory, setMainBpm, showView } = useTunebad();
   const { t } = useI18n();
+
+  // Clearing wipes local AND synced history permanently, so it takes two
+  // clicks: the first flips the button into a confirm state (auto-resets
+  // after a few seconds), the second actually clears.
+  const [confirming, setConfirming] = useState(false);
+  const confirmTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => {
+    if (confirmTimerRef.current) clearTimeout(confirmTimerRef.current);
+  }, []);
+  const handleClear = () => {
+    if (!confirming) {
+      setConfirming(true);
+      confirmTimerRef.current = setTimeout(() => setConfirming(false), 4000);
+      return;
+    }
+    if (confirmTimerRef.current) clearTimeout(confirmTimerRef.current);
+    setConfirming(false);
+    clearHistory();
+  };
 
   return (
     <article className="panel hero-tool history-panel" id="history">
@@ -18,9 +38,15 @@ export function HistoryPanel() {
           </h1>
           <p>{t("history.subtitle")}</p>
         </div>
-        <button className="text-button" type="button" onClick={clearHistory}>
-          {t("history.clearHistory")}
-        </button>
+        {history.length ? (
+          <button
+            className={`text-button${confirming ? " danger-pill" : ""}`}
+            type="button"
+            onClick={handleClear}
+          >
+            {confirming ? t("history.clearConfirm") : t("history.clearHistory")}
+          </button>
+        ) : null}
       </div>
       <div className="history-list" id="historyList">
         {!history.length ? (

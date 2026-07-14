@@ -49,9 +49,14 @@ export function DelayCalculator() {
         )}, ${t("delay.decay")} ${formatMs(preset.decayMs)}`,
     );
     const text = [...tableLines, "", t("delay.reverbSuggestions"), ...reverbLines].join("\n");
-    await navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1200);
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1200);
+    } catch {
+      // Clipboard blocked (permissions/insecure context) — just don't flip
+      // the label to "Copied" when nothing was copied.
+    }
   };
 
   return (

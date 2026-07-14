@@ -194,7 +194,7 @@ export function LoudnessPanel() {
         setPeakDb(result.peakDb ?? null);
       } catch (err) {
         console.error("Loudness measurement failed", err);
-        setError(err instanceof Error ? err.message : t("loudness.errorTitle"));
+        setError(t("loudness.errorTitle"));
       } finally {
         setMeasuring(false);
       }
@@ -477,6 +477,9 @@ export function LoudnessPanel() {
                   disabled={exporting}
                   onChange={(event) => setCustomTarget(event.target.value)}
                 />
+                {targetLufs === null ? (
+                  <p className="loudness-export-note">{t("loudness.exportCustomHint")}</p>
+                ) : null}
               </label>
             )}
 

@@ -10,6 +10,7 @@ import { CheckRow } from "@/components/ui/CheckRow";
 import { SeekableWaveform } from "@/components/ui/SeekableWaveform";
 import { computeWaveformBars } from "@/lib/audio/waveform";
 import { SlowedIcon } from "@/components/ui/icons";
+import { useUnloadGuard } from "@/hooks/useUnloadGuard";
 import {
   applyReverbEqParams,
   buildRemixGraph,
@@ -75,6 +76,7 @@ export function RemixStudio() {
   const [playing, setPlaying] = useState(false);
   const [reprocessing, setReprocessing] = useState(false);
   const [working, setWorking] = useState(false);
+  useUnloadGuard(working);
   const [format, setFormat] = useState<OutputFormat>("mp3");
   // null = idle; the idle status is derived at render time so it follows the active locale.
   const [status, setStatus] = useState<Status | null>(null);
@@ -197,7 +199,7 @@ export function RemixStudio() {
         console.error(error);
         setStatus({
           title: t("remix.decodeFailedTitle"),
-          message: error instanceof Error ? error.message : t("remix.decodeFailedFallback"),
+          message: t("remix.decodeFailedFallback"),
           tone: "warning",
         });
       }
@@ -380,7 +382,7 @@ export function RemixStudio() {
       console.error(error);
       setStatus({
         title: t("remix.exportFailedTitle"),
-        message: error instanceof Error ? error.message : t("remix.exportFailedFallback"),
+        message: t("remix.exportFailedFallback"),
         tone: "warning",
       });
     } finally {

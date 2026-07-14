@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useTunebad } from "../TunebadApp";
 import { useYouTubeJob } from "@/hooks/useYouTubeJob";
+import { useUnloadGuard } from "@/hooks/useUnloadGuard";
 import { validateMediaUrl, validateSpotifyUrl } from "@/lib/media-url";
 import { delayDivisions } from "@/lib/audio/delay";
 import { useI18n } from "@/lib/i18n";
@@ -80,6 +81,7 @@ export function YouTubeDownloader() {
   const [playlistBatchConfig, setPlaylistBatchConfig] = useState<{ format: OutputFormat; quality: string } | null>(null);
 
   const busy = state.phase === "starting" || state.phase === "working";
+  useUnloadGuard(busy);
   const isVideo = format === "mp4";
   const hasPlaylistParam = /[?&]list=/.test(url);
   const spotify = validateSpotifyUrl(url);

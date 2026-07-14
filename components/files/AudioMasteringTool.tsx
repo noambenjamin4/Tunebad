@@ -14,6 +14,7 @@ import { analyzeBandCurve, measureIntegratedLufs, renderMaster, type MasterBandC
 import { CheckRow } from "@/components/ui/CheckRow";
 import { FileDrop } from "./FileDrop";
 import { AudioFormatPicker, type AudioOutputFormat } from "./AudioFormatPicker";
+import { useUnloadGuard } from "@/hooks/useUnloadGuard";
 
 const MAX_BYTES = 200 * 1024 * 1024;
 const ACCEPT = "audio/*,.mp3,.wav,.flac,.ogg,.oga,.m4a,.aac,.opus,.wma,.aiff,.aif,.weba";
@@ -125,6 +126,7 @@ export function AudioMasteringTool() {
 
   // Progress
   const [processing, setProcessing] = useState(false);
+  useUnloadGuard(processing);
   const [working, setWorking] = useState(false);
   const [status, setStatus] = useState<Status | null>(null);
   const [format, setFormat] = useState<AudioOutputFormat>("mp3");

@@ -214,6 +214,7 @@ const ja: Record<keyof typeof en, string> = {
   "loudness.exportTargetAria": "ノーマライズ目標",
   "loudness.exportCustom": "カスタム",
   "loudness.exportCustomLabel": "カスタム目標（LUFS）",
+  "loudness.exportCustomHint": "-24〜-6 LUFSの目標値を入力すると書き出せます。",
   "loudness.exportWav": "WAVで書き出す",
   "loudness.exportMp3": "MP3で書き出す",
   "loudness.exporting": "書き出し中…",
@@ -271,6 +272,7 @@ const ja: Record<keyof typeof en, string> = {
   "history.title": "解析履歴",
   "history.subtitle": "最近の結果はこの端末に保存されます。",
   "history.clearHistory": "履歴をクリア",
+  "history.clearConfirm": "もう一度クリックして確定",
   "history.noSavedYet": "保存された解析はまだありません。",
 
   "lang.selectLabel": "言語",
@@ -360,6 +362,10 @@ const ja: Record<keyof typeof en, string> = {
   "cutter.export": "選択範囲を書き出す",
   "cutter.exporting": "書き出し中...",
   "cutter.tooShort": "選択範囲が短すぎます。",
+  "cutter.decodeFailedTitle": "このファイルをデコードできませんでした",
+  "cutter.decodeFailedFallback": "MP3、WAV、M4A、OGG、FLACのいずれかをお試しください。",
+  "cutter.exportFailedTitle": "書き出しに失敗しました",
+  "cutter.exportFailedFallback": "レンダリング中に問題が発生しました。",
   "cutter.ready": "準備完了。開始と終了を設定して書き出してください。",
   "cutter.exported": "保存しました。ダウンロードフォルダをご確認ください。",
 

@@ -9,6 +9,7 @@ import { FormEvent, useMemo, useState } from "react";
 import Link from "next/link";
 import { useI18n } from "@/lib/i18n";
 import { usePlaylistAnalyzer, type PlaylistTrackInput } from "@/hooks/usePlaylistAnalyzer";
+import { useUnloadGuard } from "@/hooks/useUnloadGuard";
 
 type Phase = "idle" | "looking" | "ready";
 type ErrorKey = "playlist.rateLimited" | "playlist.invalidLink" | "playlist.notFound" | "playlist.error";
@@ -51,6 +52,7 @@ export function PlaylistAnalyzer() {
   const [sortByCamelot, setSortByCamelot] = useState(false);
 
   const { rows, totalCount, analyzedCount, cachedCount, busy } = usePlaylistAnalyzer(tracks);
+  useUnloadGuard(busy || phase === "looking");
 
   const shownRows = useMemo(() => {
     if (!sortByCamelot) return rows;

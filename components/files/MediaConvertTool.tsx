@@ -7,6 +7,7 @@ import { downloadBlob } from "@/lib/audio/mp3-encoder";
 import { formatBytes } from "@/lib/files/image";
 import { FileDrop } from "./FileDrop";
 import { VIDEO_IOS_WARN_BYTES, VIDEO_MAX_BYTES, isIos, loadFFmpeg, resetFFmpeg } from "@/lib/files/video";
+import { useUnloadGuard } from "@/hooks/useUnloadGuard";
 import {
   CONVERT_AUDIO_MAX_BYTES,
   ConvertError,
@@ -46,6 +47,7 @@ export function MediaConvertTool({
   const [format, setFormat] = useState<MediaFormat>(mode === "video" ? "mp4" : "mp3");
   const [mp3Kbps, setMp3Kbps] = useState(320);
   const [working, setWorking] = useState(false);
+  useUnloadGuard(working);
   const [progress, setProgress] = useState<number | null>(null);
   const [status, setStatus] = useState<Status | null>(null);
   const [result, setResult] = useState<{ name: string; blob: Blob; beforeBytes: number } | null>(null);

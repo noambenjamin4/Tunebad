@@ -214,6 +214,7 @@ const pt: Record<keyof typeof en, string> = {
   "loudness.exportTargetAria": "Meta de normalização",
   "loudness.exportCustom": "Personalizado",
   "loudness.exportCustomLabel": "Meta personalizada (LUFS)",
+  "loudness.exportCustomHint": "Insira um alvo entre -24 e -6 LUFS para ativar a exportação.",
   "loudness.exportWav": "Exportar WAV",
   "loudness.exportMp3": "Exportar MP3",
   "loudness.exporting": "Exportando…",
@@ -271,6 +272,7 @@ const pt: Record<keyof typeof en, string> = {
   "history.title": "Histórico de análises",
   "history.subtitle": "Os resultados recentes ficam salvos neste dispositivo.",
   "history.clearHistory": "Limpar histórico",
+  "history.clearConfirm": "Clique novamente para confirmar",
   "history.noSavedYet": "Ainda não há análises salvas.",
 
   "lang.selectLabel": "Idioma",
@@ -360,6 +362,10 @@ const pt: Record<keyof typeof en, string> = {
   "cutter.export": "Exportar seleção",
   "cutter.exporting": "Exportando...",
   "cutter.tooShort": "A seleção é curta demais.",
+  "cutter.decodeFailedTitle": "Não foi possível decodificar este arquivo",
+  "cutter.decodeFailedFallback": "Tente um arquivo MP3, WAV, M4A, OGG ou FLAC.",
+  "cutter.exportFailedTitle": "Falha na exportação",
+  "cutter.exportFailedFallback": "Algo deu errado durante a renderização.",
   "cutter.ready": "Pronto. Defina o início e o fim e depois exporte.",
   "cutter.exported": "Salvo. Confira seus downloads.",
 

@@ -225,6 +225,7 @@ const en = {
   "loudness.exportTargetAria": "Normalization target",
   "loudness.exportCustom": "Custom",
   "loudness.exportCustomLabel": "Custom target (LUFS)",
+  "loudness.exportCustomHint": "Enter a target loudness between -24 and -6 LUFS to enable export.",
   "loudness.exportWav": "Export WAV",
   "loudness.exportMp3": "Export MP3",
   "loudness.exporting": "Exporting…",
@@ -284,6 +285,7 @@ const en = {
   "history.title": "Analysis History",
   "history.subtitle": "Recent local results stay on this device.",
   "history.clearHistory": "Clear History",
+  "history.clearConfirm": "Click again to confirm",
   "history.noSavedYet": "No saved analyses yet.",
 
   // Language selector
@@ -390,6 +392,10 @@ const en = {
   "cutter.export": "Export selection",
   "cutter.exporting": "Exporting...",
   "cutter.tooShort": "Selection is too short.",
+  "cutter.decodeFailedTitle": "Could not decode this file",
+  "cutter.decodeFailedFallback": "Try an MP3, WAV, M4A, OGG, or FLAC file.",
+  "cutter.exportFailedTitle": "Export failed",
+  "cutter.exportFailedFallback": "Something went wrong while rendering.",
   "cutter.ready": "Ready. Set the start and end, then export.",
   "cutter.exported": "Saved. Check your downloads.",
 

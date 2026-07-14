@@ -213,6 +213,7 @@ const zh: Record<keyof typeof en, string> = {
   "loudness.exportTargetAria": "归一化目标",
   "loudness.exportCustom": "自定义",
   "loudness.exportCustomLabel": "自定义目标（LUFS）",
+  "loudness.exportCustomHint": "输入 -24 到 -6 LUFS 之间的目标值以启用导出。",
   "loudness.exportWav": "导出WAV",
   "loudness.exportMp3": "导出MP3",
   "loudness.exporting": "导出中…",
@@ -270,6 +271,7 @@ const zh: Record<keyof typeof en, string> = {
   "history.title": "分析历史",
   "history.subtitle": "最近的结果会保存在此设备上。",
   "history.clearHistory": "清除历史记录",
+  "history.clearConfirm": "再次点击以确认",
   "history.noSavedYet": "尚无已保存的分析。",
 
   "lang.selectLabel": "语言",
@@ -359,6 +361,10 @@ const zh: Record<keyof typeof en, string> = {
   "cutter.export": "导出选区",
   "cutter.exporting": "导出中...",
   "cutter.tooShort": "选区太短。",
+  "cutter.decodeFailedTitle": "无法解码此文件",
+  "cutter.decodeFailedFallback": "请尝试MP3、WAV、M4A、OGG或FLAC文件。",
+  "cutter.exportFailedTitle": "导出失败",
+  "cutter.exportFailedFallback": "渲染过程中出现问题。",
   "cutter.ready": "已就绪。设置开始和结束位置，然后导出。",
   "cutter.exported": "已保存。请查看你的下载文件夹。",
 
