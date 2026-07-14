@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { readAllSongs } from "@/lib/server/link-analysis";
+import { readSongsByBpmRangeAll } from "@/lib/server/link-analysis";
 import { ACTIVITIES, findActivity } from "@/lib/server/activities";
 
 // Activity/tempo landing pages: /songs/bpm-for/running etc. A fixed,
@@ -41,18 +41,19 @@ export default async function ActivityBpmPage({ params }: { params: Promise<{ ac
   const activity = findActivity(slug);
   if (!activity) notFound();
 
-  // One full-catalog read powers both the song list and the "specific BPM
-  // hub" links below — cached by Next's Data Cache (revalidate 3600), same
-  // pattern /songs and the sitemap "hubs" shard already rely on.
-  const allSongs = await readAllSongs(100000);
-  const songs = allSongs.filter((s) => s.bpm >= activity.min && s.bpm <= activity.max);
+  // Read only the activity's BPM band (±2 so the hub-link counts below see
+  // every song that can contribute to a window inside the range) instead of
+  // the whole catalog — same Data Cache semantics (revalidate 3600), a
+  // fraction of the rows.
+  const bandSongs = await readSongsByBpmRangeAll(activity.min - 2, activity.max + 2);
+  const songs = bandSongs.filter((s) => s.bpm >= activity.min && s.bpm <= activity.max);
   if (songs.length < MIN_SONGS) notFound();
 
   // Specific BPM hub pages worth linking to: the ±2 window the /songs/bpm/[n]
-  // route itself requires (see MIN_SONGS there), computed from the full
-  // catalog so a link here never points at a thin/404 hub.
+  // route itself requires (see MIN_SONGS there). Every song that can count
+  // toward a window inside [min, max] has bpm within the band read above.
   const bpmCounts = new Map<number, number>();
-  for (const s of allSongs) {
+  for (const s of bandSongs) {
     const b = Math.round(s.bpm);
     for (let n = b - 2; n <= b + 2; n += 1) bpmCounts.set(n, (bpmCounts.get(n) ?? 0) + 1);
   }

@@ -169,6 +169,41 @@ export async function readSongsByBpmRange(min: number, max: number, limit = 300)
   }
 }
 
+/** Every cached song inside a BPM window, paged past Supabase's silent
+ *  1000-row cap the same way readAllSongs is (parallel 1000-row pages).
+ *  Backs the /songs/bpm-for/[activity] pages, which previously pulled the
+ *  ENTIRE catalog just to keep a band of it — this reads only the band. */
+export async function readSongsByBpmRangeAll(min: number, max: number, limit = 20000): Promise<CachedAnalysis[]> {
+  if (!isLinkAnalysisConfigured) return [];
+  const PAGE = 1000;
+  const BATCH = 10;
+  const all: CachedAnalysis[] = [];
+  const fetchPage = async (offset: number): Promise<CachedAnalysis[]> => {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/link_analysis?select=*&bpm=gte.${min}&bpm=lte.${max}&order=created_at.desc&limit=${Math.min(PAGE, limit - offset)}&offset=${offset}`,
+      { headers: restHeaders(), signal: AbortSignal.timeout(FETCH_TIMEOUT_MS), next: { revalidate: 3600 } },
+    );
+    if (!res.ok) return [];
+    return (await res.json()) as CachedAnalysis[];
+  };
+  try {
+    for (let batchStart = 0; batchStart < limit; batchStart += PAGE * BATCH) {
+      const offsets: number[] = [];
+      for (let o = batchStart; o < Math.min(batchStart + PAGE * BATCH, limit); o += PAGE) offsets.push(o);
+      const pages = await Promise.all(offsets.map(fetchPage));
+      let done = false;
+      for (const page of pages) {
+        all.push(...page);
+        if (page.length < PAGE) done = true;
+      }
+      if (done) break;
+    }
+    return all;
+  } catch {
+    return all;
+  }
+}
+
 /** All cached songs (slug + title + artist) for the sitemap and /songs index.
  *  Supabase silently caps any single query at 1000 rows (db-max-rows), so this
  *  pages through in 1000-row chunks until a short page or `limit` is reached —

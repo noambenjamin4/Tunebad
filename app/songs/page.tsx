@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { readAllSongs } from "@/lib/server/link-analysis";
+import { countSongs, readAllSongs } from "@/lib/server/link-analysis";
 import { SongBrowser } from "@/components/songs/SongBrowser";
 import { SongSearch } from "@/components/songs/SongSearch";
 import { ALL_KEYS, keyToSlug } from "@/lib/audio/harmonic";
@@ -27,7 +27,10 @@ export const metadata: Metadata = {
 const LIST_CAP = 2000;
 
 export default async function SongsPage() {
-  const songs = await readAllSongs(100000);
+  // Exact catalog count for the headline (header-only query — the capped
+  // read below would understate it once the catalog passes its cap), plus
+  // the rows that power the facet chips and the browsable table.
+  const [totalCount, songs] = await Promise.all([countSongs(), readAllSongs(100000)]);
 
   // Crawlable browse links: keys that actually have songs, and the most
   // common integer BPMs (the hub pages 404 below 3 songs, so mirror that).
@@ -77,7 +80,7 @@ export default async function SongsPage() {
         <article className="song-page">
           <h1 className="song-title">Song key &amp; BPM database</h1>
           <p className="song-lede">
-            The key, BPM, and Camelot code for {songs.length} songs, analyzed from official previews.
+            The key, BPM, and Camelot code for {totalCount || songs.length} songs, analyzed from official previews.
             Want a track that is not here? <Link href="/key-bpm-finder">Analyze it yourself</Link>.
           </p>
 
