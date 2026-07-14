@@ -2275,6 +2275,27 @@ tbody tr:last-child td {
   gap: 10px;
 }
 
+/* Record transport: button + a static readout of elapsed time / captured
+   moves. Deliberately motionless — no recording indicator, the button's
+   pressed state and the readout carry the state. */
+.remix-record-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.remix-record-row .secondary-button {
+  width: auto;
+}
+
+.remix-record-readout {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
 .remix-slider-row {
   display: grid;
   gap: 8px;

@@ -6,6 +6,7 @@ import { getAudioContextClass } from "@/lib/audio/decode";
 import { clearDecodeCache, decodeAudioFileCached } from "@/lib/audio/decode-cache";
 import { encodeMp3FromChannels, encodeWavFromChannels } from "@/lib/audio/mp3-encoder";
 import { downloadBlob } from "@/lib/files/download";
+import { formatTime } from "@/lib/format";
 import { FormatPicker, type OutputFormat } from "@/components/converter/QualityPicker";
 import { useTunebad } from "../TunebadApp";
 import { useI18n } from "@/lib/i18n";
@@ -15,12 +16,16 @@ import { computeWaveformBars } from "@/lib/audio/waveform";
 import { SlowedIcon } from "@/components/ui/icons";
 import { useUnloadGuard } from "@/hooks/useUnloadGuard";
 import {
+  applyEffectParams,
   applyReverbEqParams,
   buildRemixGraph,
   coupledSemitones,
   NEUTRAL_REVERB_EQ,
   renderRemix,
+  renderRemixAutomated,
   timeStretch,
+  type AutomationEvent,
+  type EffectId,
   type RemixGraph,
   type RemixParams,
   type ReverbEqParams,
@@ -52,6 +57,21 @@ const REVERB_TYPE_OPTIONS = [
   { type: "saturated", labelKey: "remix.typeSaturated" },
 ] as const;
 
+// Character-effect pills; the values feed EFFECTS in lib/audio/remix.ts.
+const EFFECT_OPTIONS = [
+  { effect: "none", labelKey: "remix.effectNone" },
+  { effect: "underwater", labelKey: "remix.effectUnderwater" },
+  { effect: "phone", labelKey: "remix.effectPhone" },
+  { effect: "radio", labelKey: "remix.effectRadio" },
+  { effect: "megaphone", labelKey: "remix.effectMegaphone" },
+] as const;
+
+// `Omit` over a union collapses it to the common keys, which would let a
+// "speed" move carry a ReverbType. Distributing keeps each member's kind/value
+// pair correlated.
+type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omit<T, K> : never;
+type AutomationMove = DistributiveOmit<AutomationEvent, "t">;
+
 function matchesPreset(preset: Preset, speed: number, reverb: number, bassBoostDb: number): boolean {
   return Math.abs(preset.speed - speed) < 0.005 && preset.reverb === reverb && preset.bassBoostDb === bassBoostDb;
 }
@@ -75,6 +95,17 @@ export function RemixStudio() {
   const [pitchSemitones, setPitchSemitones] = useState(0);
   const [reverbType, setReverbType] = useState<ReverbType>("hall");
   const [reverbEq, setReverbEq] = useState<ReverbEqParams>(NEUTRAL_REVERB_EQ);
+  const [effect, setEffect] = useState<EffectId>("none");
+
+  // Remix recording. `recordedBase` is the param snapshot taken the moment
+  // Record was hit — the export replays `events` on top of it, so it must not
+  // drift with the live controls afterward. Non-null means a recording exists
+  // (in progress or finished).
+  const [recording, setRecording] = useState(false);
+  const [events, setEvents] = useState<AutomationEvent[]>([]);
+  const [recordedBase, setRecordedBase] = useState<RemixParams | null>(null);
+  const [recordedDuration, setRecordedDuration] = useState(0);
+  const [recordElapsed, setRecordElapsed] = useState(0);
 
   const [playing, setPlaying] = useState(false);
   const [reprocessing, setReprocessing] = useState(false);
@@ -101,11 +132,45 @@ export function RemixStudio() {
   const startedAtRef = useRef(0);
   const startOffsetRef = useRef(0);
   const bufferDurationRef = useRef(0);
+  const recordingRef = useRef(false);
+  // Output seconds banked before the CURRENT AudioContext. Changing the reverb
+  // type mid-recording rebuilds the graph on a fresh context (whose clock
+  // restarts at ~0), so the recording clock can't just be
+  // `ctx.currentTime - startedAt` — it accumulates across rebuilds instead.
+  const recordBaseRef = useRef(0);
+  // The recording clock's own origin. Deliberately NOT startedAtRef: that one
+  // gets re-based to "now" on every speed change so the waveform playhead
+  // doesn't jump, which would silently restart the recording clock at each
+  // speed move and stamp every later event too early.
+  const recordStartedAtRef = useRef(0);
 
   const params: RemixParams = useMemo(
-    () => ({ speed, reverb, bassBoostDb, lockPitch, pitchSemitones, reverbType, reverbEq }),
-    [speed, reverb, bassBoostDb, lockPitch, pitchSemitones, reverbType, reverbEq],
+    () => ({ speed, reverb, bassBoostDb, lockPitch, pitchSemitones, reverbType, reverbEq, effect }),
+    [speed, reverb, bassBoostDb, lockPitch, pitchSemitones, reverbType, reverbEq, effect],
   );
+
+  // Elapsed OUTPUT time: seconds of playback since Record was hit. Distinct
+  // from `getElapsed()` (song position), which advances at `speed` and so
+  // diverges the moment speed is automated. Automation timestamps are in
+  // output time because that's the reference that reproduces what was heard.
+  const getOutputTime = useCallback(() => {
+    const ctx = audioCtxRef.current;
+    if (!ctx || !graphRef.current) return recordBaseRef.current;
+    return recordBaseRef.current + (ctx.currentTime - recordStartedAtRef.current);
+  }, []);
+
+  const recordMove = useCallback(
+    (move: AutomationMove) => {
+      if (!recordingRef.current) return;
+      const t = getOutputTime();
+      setEvents((prev) => [...prev, { ...move, t } as AutomationEvent]);
+    },
+    [getOutputTime],
+  );
+
+  // A recording exists and is finished — Export replays it instead of
+  // rendering the live control positions.
+  const hasRecording = !recording && recordedBase !== null;
 
   const bars = useMemo(() => (buffer ? computeWaveformBars(buffer) : []), [buffer]);
   const bufferDuration = buffer?.duration ?? 0;
@@ -160,9 +225,16 @@ export function RemixStudio() {
     setPitchSemitones(0);
     setReverbType("hall");
     setReverbEq(NEUTRAL_REVERB_EQ);
+    setEffect("none");
     setStatus(null);
     setStartOffset(0);
     startOffsetRef.current = 0;
+    recordingRef.current = false;
+    recordBaseRef.current = 0;
+    setRecording(false);
+    setEvents([]);
+    setRecordedBase(null);
+    setRecordedDuration(0);
   }, [stopPreview]);
 
   // Cleanup on unmount.
@@ -280,10 +352,26 @@ export function RemixStudio() {
   // EQ changes apply live to the current graph's wet-path filters — no
   // rebuild needed (the BiquadFilterNodes stay in place; only their values
   // move).
-  const handleReverbEqChange = useCallback((eq: ReverbEqParams) => {
-    setReverbEq(eq);
-    if (graphRef.current) applyReverbEqParams(graphRef.current.reverbEq, eq);
-  }, []);
+  const handleReverbEqChange = useCallback(
+    (eq: ReverbEqParams) => {
+      setReverbEq(eq);
+      if (graphRef.current) applyReverbEqParams(graphRef.current.reverbEq, eq);
+      recordMove({ kind: "reverbEq", value: eq });
+    },
+    [recordMove],
+  );
+
+  // Effects apply live too: the chain is fixed, so switching a character is
+  // just new filter/drive values plus the clean/fx crossfade gains — never a
+  // rebuild (unlike reverb TYPE, which has to swap an impulse response).
+  const handleEffectChange = useCallback(
+    (next: EffectId) => {
+      setEffect(next);
+      if (graphRef.current) applyEffectParams(graphRef.current.effect, next);
+      recordMove({ kind: "effect", value: next });
+    },
+    [recordMove],
+  );
 
   // Changing the reverb TYPE swaps the convolver's impulse response, which
   // requires rebuilding the playback graph — the same stop-and-restart
@@ -292,23 +380,39 @@ export function RemixStudio() {
   useEffect(() => {
     if (!graphRef.current || !audioCtxRef.current) return;
     const offset = getElapsed();
+    // The rebuild lands on a new AudioContext whose clock starts at ~0. Bank
+    // the output time reached so far, or the recording timeline would restart
+    // from zero here and every later move would be timestamped too early.
+    recordBaseRef.current = getOutputTime();
     stopPreview();
     startAt(offset);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reverbType]);
 
+  const handleReverbTypeChange = (next: ReverbType) => {
+    setReverbType(next);
+    recordMove({ kind: "reverbType", value: next });
+  };
+
   const applyPreset = (preset: Preset) => {
     setSpeed(preset.speed);
     setReverb(preset.reverb);
     setBassBoostDb(preset.bassBoostDb);
+    recordMove({ kind: "speed", value: preset.speed });
+    recordMove({ kind: "reverb", value: preset.reverb });
+    recordMove({ kind: "bassBoostDb", value: preset.bassBoostDb });
   };
 
   // Starts (or restarts) playback at `offset` seconds into the source
   // buffer. Used both by the transport button and by seeking while playing
   // (seeking an AudioBufferSourceNode requires tearing down and rebuilding
   // the graph — it has no in-place seek).
+  // `override` exists for the Record path: it turns lock-pitch off and starts
+  // playback in the same tick, so the `lockPitch`/`params` captured in this
+  // closure are still the pre-Record values. Passing the intended params
+  // explicitly avoids starting one render behind.
   const startAt = useCallback(
-    (offset: number) => {
+    (offset: number, override?: { params: RemixParams }) => {
       if (!buffer) return;
       const AudioContextClass = getAudioContextClass();
       if (!AudioContextClass) {
@@ -316,30 +420,106 @@ export function RemixStudio() {
         return;
       }
 
-      const playBuffer = lockPitch ? stretchedBufferRef.current ?? buffer : buffer;
+      const effectiveParams = override?.params ?? params;
+      const effectiveLock = effectiveParams.lockPitch;
+      const playBuffer = effectiveLock ? stretchedBufferRef.current ?? buffer : buffer;
       const ctx = new AudioContextClass();
-      const graph = buildRemixGraph(ctx, playBuffer, params, offset);
+      const graph = buildRemixGraph(ctx, playBuffer, effectiveParams, offset);
       graph.source.onended = () => {
         if (graphRef.current === graph) {
           graphRef.current = null;
           setPlaying(false);
           setStartOffset(0);
           startOffsetRef.current = 0;
+          // The track ran out: bank the final clock reading and close the
+          // recording, keeping whatever was captured.
+          if (recordingRef.current) {
+            setRecordedDuration(recordBaseRef.current + (ctx.currentTime - recordStartedAtRef.current));
+            recordingRef.current = false;
+            setRecording(false);
+          }
         }
       };
       audioCtxRef.current = ctx;
       graphRef.current = graph;
       startedAtRef.current = ctx.currentTime;
+      recordStartedAtRef.current = ctx.currentTime;
       startOffsetRef.current = offset;
-      speedMultiplierRef.current = lockPitch ? 1 : speed;
+      speedMultiplierRef.current = effectiveLock ? 1 : effectiveParams.speed;
       bufferDurationRef.current = playBuffer.duration;
       setPlaying(true);
     },
-    [buffer, lockPitch, params, speed, t],
+    [buffer, params, t],
   );
+
+  const stopRecording = useCallback(() => {
+    if (!recordingRef.current) return;
+    setRecordedDuration(getOutputTime());
+    recordingRef.current = false;
+    setRecording(false);
+  }, [getOutputTime]);
+
+  // Recording always plays from the top: automation timestamps are output
+  // time from zero, so a render can only reproduce them if the source starts
+  // at the same place the recording did.
+  const startRecording = useCallback(() => {
+    if (!buffer) return;
+    // lockPitch routes through SoundTouch offline rather than an AudioParam,
+    // so it cannot be automated. Rather than fake it, turn it off and say so —
+    // with it off, speed and pitch couple, which IS the slowed/nightcore move
+    // and does automate (via source.playbackRate).
+    const lockWasOn = lockPitch;
+    const base: RemixParams = { ...params, lockPitch: false, speed, reverb, bassBoostDb, reverbType, reverbEq, effect };
+    if (lockWasOn) setLockPitch(false);
+
+    stopPreview();
+    setEvents([]);
+    setRecordedBase(base);
+    setRecordedDuration(0);
+    setRecordElapsed(0);
+    recordBaseRef.current = 0;
+    setStartOffset(0);
+    startOffsetRef.current = 0;
+    recordingRef.current = true;
+    setRecording(true);
+    startAt(0, { params: base });
+
+    setStatus(
+      lockWasOn
+        ? { title: t("remix.lockPitchOffTitle"), message: t("remix.lockPitchOffMessage"), tone: "warning" }
+        : { title: t("remix.recordingTitle"), message: t("remix.recordingMessage"), tone: "neutral" },
+    );
+  }, [buffer, lockPitch, params, speed, reverb, bassBoostDb, reverbType, reverbEq, effect, stopPreview, startAt, t]);
+
+  const discardRecording = useCallback(() => {
+    setEvents([]);
+    setRecordedBase(null);
+    setRecordedDuration(0);
+    setRecordElapsed(0);
+    recordingRef.current = false;
+    recordBaseRef.current = 0;
+    setRecording(false);
+  }, []);
+
+  // Static text, ticked a few times a second — no animation, just a readout.
+  useEffect(() => {
+    if (!recording) return;
+    const id = setInterval(() => setRecordElapsed(getOutputTime()), 250);
+    return () => clearInterval(id);
+  }, [recording, getOutputTime]);
+
+  const toggleRecording = () => {
+    if (recording) {
+      stopRecording();
+      stopPreview();
+      return;
+    }
+    startRecording();
+  };
 
   const togglePlayback = async () => {
     if (playing) {
+      stopRecording();
       stopPreview();
       return;
     }
@@ -365,6 +545,24 @@ export function RemixStudio() {
     setWorking(true);
     setStatus({ title: t("remix.rendering"), message: t("remix.renderingMessage"), tone: "neutral" });
     try {
+      // A finished recording exports the moves; otherwise it's the plain
+      // static render of wherever the controls currently sit.
+      if (hasRecording && recordedBase) {
+        setStatus({ title: t("remix.rendering"), message: t("remix.renderingMovesMessage"), tone: "neutral" });
+        const { channels, sampleRate } = await renderRemixAutomated(buffer, recordedBase, events);
+        const baseName = file.name.replace(/\.[^.]+$/, "") || "tunebad-audio";
+        let blob: Blob;
+        if (format === "wav") {
+          blob = encodeWavFromChannels(channels, sampleRate);
+          downloadBlob(blob, `${baseName}-remix.wav`);
+        } else {
+          blob = await encodeMp3FromChannels(channels, sampleRate, 320);
+          downloadBlob(blob, `${baseName}-remix.mp3`);
+        }
+        setStatus({ title: t("remix.doneTitle"), message: t("remix.doneMessage", { format: format.toUpperCase() }), tone: "success" });
+        return;
+      }
+
       let renderSource = buffer;
       let renderParams = params;
       if (lockPitch) {
@@ -455,8 +653,39 @@ export function RemixStudio() {
               playing={playing}
               onTogglePlay={() => void togglePlayback()}
               onSeek={handleSeek}
-              disabled={reprocessing}
+              disabled={reprocessing || recording}
             />
+          </div>
+
+          {/* Recording transport. Seeking is disabled above while recording:
+              the timeline is output seconds from zero, and a mid-recording
+              seek would put the render's source somewhere the timestamps
+              can't describe. */}
+          <div className="remix-record-row">
+            <button
+              className="secondary-button"
+              type="button"
+              onClick={toggleRecording}
+              disabled={!buffer || working || reprocessing}
+              aria-pressed={recording}
+            >
+              {recording ? t("remix.stopRecording") : t("remix.record")}
+            </button>
+            {recording && (
+              <span className="remix-record-readout" role="status">
+                {t("remix.recordingReadout", { time: formatTime(recordElapsed), count: events.length })}
+              </span>
+            )}
+            {hasRecording && (
+              <>
+                <span className="remix-record-readout" role="status">
+                  {t("remix.recordingReadyReadout", { time: formatTime(recordedDuration), count: events.length })}
+                </span>
+                <button className="text-button danger-pill" type="button" onClick={discardRecording} disabled={working}>
+                  {t("remix.discardRecording")}
+                </button>
+              </>
+            )}
           </div>
 
           <div className="remix-presets">
@@ -486,7 +715,11 @@ export function RemixStudio() {
               max={1.5}
               step={0.01}
               value={speed}
-              onChange={(event) => setSpeed(Number.parseFloat(event.target.value))}
+              onChange={(event) => {
+                const next = Number.parseFloat(event.target.value);
+                setSpeed(next);
+                recordMove({ kind: "speed", value: next });
+              }}
             />
             <span className="remix-pitch-readout">{pitchReadout}</span>
           </div>
@@ -503,7 +736,11 @@ export function RemixStudio() {
               max={100}
               step={1}
               value={reverb}
-              onChange={(event) => setReverb(Number.parseInt(event.target.value, 10))}
+              onChange={(event) => {
+                const next = Number.parseInt(event.target.value, 10);
+                setReverb(next);
+                recordMove({ kind: "reverb", value: next });
+              }}
             />
           </div>
 
@@ -518,7 +755,24 @@ export function RemixStudio() {
                   type="button"
                   className={`quality-button${reverbType === type ? " active" : ""}`}
                   aria-pressed={reverbType === type}
-                  onClick={() => setReverbType(type)}
+                  onClick={() => handleReverbTypeChange(type)}
+                >
+                  <strong>{t(labelKey)}</strong>
+                </button>
+              ))}
+            </div>
+
+            <span className="field-label" id="effectLegend">
+              {t("remix.effectLegend")}
+            </span>
+            <div className="quality-options reverb-eq-types" role="group" aria-labelledby="effectLegend">
+              {EFFECT_OPTIONS.map(({ effect: id, labelKey }) => (
+                <button
+                  key={id}
+                  type="button"
+                  className={`quality-button${effect === id ? " active" : ""}`}
+                  aria-pressed={effect === id}
+                  onClick={() => handleEffectChange(id)}
                 >
                   <strong>{t(labelKey)}</strong>
                 </button>
@@ -546,12 +800,19 @@ export function RemixStudio() {
               max={12}
               step={0.5}
               value={bassBoostDb}
-              onChange={(event) => setBassBoostDb(Number.parseFloat(event.target.value))}
+              onChange={(event) => {
+                const next = Number.parseFloat(event.target.value);
+                setBassBoostDb(next);
+                recordMove({ kind: "bassBoostDb", value: next });
+              }}
             />
           </div>
 
+          {/* Lock-pitch is unavailable while recording: it time-stretches the
+              buffer through SoundTouch rather than driving an AudioParam, so
+              there is nothing to automate. */}
           <div className="remix-pitch-row">
-            <CheckRow checked={lockPitch} onChange={setLockPitch}>
+            <CheckRow checked={lockPitch} onChange={setLockPitch} disabled={recording}>
               {t("remix.lockPitch")}
             </CheckRow>
             <input
@@ -561,7 +822,7 @@ export function RemixStudio() {
               max={12}
               step={1}
               value={pitchSemitones}
-              disabled={!lockPitch}
+              disabled={!lockPitch || recording}
               onChange={(event) => setPitchSemitones(Number.parseInt(event.target.value, 10))}
               aria-label={t("remix.pitchSemitoneShift")}
             />
@@ -577,8 +838,17 @@ export function RemixStudio() {
 
           <div className="remix-export-row">
             <FormatPicker value={format} onChange={setFormat} />
-            <button className="convert-button" type="button" onClick={() => void onExport()} disabled={working || reprocessing}>
-              {working ? t("remix.rendering") : t("remix.exportFormat", { format: format.toUpperCase() })}
+            <button
+              className="convert-button"
+              type="button"
+              onClick={() => void onExport()}
+              disabled={working || reprocessing || recording}
+            >
+              {working
+                ? t("remix.rendering")
+                : hasRecording
+                  ? t("remix.exportRemixFormat", { format: format.toUpperCase() })
+                  : t("remix.exportFormat", { format: format.toUpperCase() })}
             </button>
           </div>
         </article>
