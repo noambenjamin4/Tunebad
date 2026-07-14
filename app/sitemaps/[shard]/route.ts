@@ -3,6 +3,7 @@ import { groupSongsByArtist } from "@/lib/server/artists";
 import { ALL_KEYS, keyToSlug } from "@/lib/audio/harmonic";
 import { ACTIVITIES } from "@/lib/server/activities";
 import { SITE_URL, SONGS_CAP, SONGS_PER_SHARD, urlsetXml, xmlResponse } from "@/lib/server/sitemap";
+import { readSongFacets, readSongSlugRange } from "@/lib/server/link-analysis";
 
 // Individual sitemap shards, listed by app/sitemap.xml/route.ts's index:
 //   - "static": tools/guides/landing/static pages (ported 1:1 from the old
@@ -89,9 +90,12 @@ export async function GET(_req: Request, { params }: { params: Promise<{ shard: 
   const songShardMatch = /^songs-(\d+)$/.exec(shard);
   if (songShardMatch) {
     const shardIndex = Number(songShardMatch[1]);
-    const songs = await readAllSongs(SONGS_CAP);
+    // Read ONLY this shard's window, slug column only. Previously every shard
+    // read the whole catalog (select=*, up to SONGS_CAP rows) and sliced 20k
+    // out of it — 10x the rows and ~10x the bytes per shard, and it got worse
+    // with every song added.
     const start = shardIndex * SONGS_PER_SHARD;
-    const slice = songs.slice(start, start + SONGS_PER_SHARD);
+    const slice = start >= SONGS_CAP ? [] : await readSongSlugRange(start, SONGS_PER_SHARD);
     // Shard 0 always resolves (even to an empty urlset pre-launch); any
     // higher shard index that's out of range is a stale/guessed URL, 404 it.
     // (notFound() from next/navigation only works inside the React render
@@ -111,7 +115,8 @@ export async function GET(_req: Request, { params }: { params: Promise<{ shard: 
   }
 
   if (shard === "hubs") {
-    const songs = await readAllSongs(SONGS_CAP);
+    // Facet columns only — the counts never touch title/artist/energy/etc.
+    const songs = await readSongFacets(SONGS_CAP);
 
     const keyCounts = new Map<string, number>();
     const bpmCounts = new Map<number, number>();

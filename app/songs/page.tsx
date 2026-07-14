@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { countSongs, readAllSongs } from "@/lib/server/link-analysis";
+import { countSongs, readAllSongs, readSongFacets, SONG_READ_CAP } from "@/lib/server/link-analysis";
 import { SongBrowser } from "@/components/songs/SongBrowser";
 import { SongSearch } from "@/components/songs/SongSearch";
 import { ALL_KEYS, keyToSlug } from "@/lib/audio/harmonic";
@@ -30,14 +30,25 @@ export default async function SongsPage() {
   // Exact catalog count for the headline (header-only query — the capped
   // read below would understate it once the catalog passes its cap), plus
   // the rows that power the facet chips and the browsable table.
-  const [totalCount, songs] = await Promise.all([countSongs(), readAllSongs(100000)]);
+  // Three different needs, three right-sized reads (this page used to pull
+  // every column of every song and then render only LIST_CAP of them):
+  //   - headline: an exact count, header-only, zero rows
+  //   - facet chips / artist + activity counts: slim columns, whole catalog
+  //   - the table: full rows, but only the LIST_CAP it renders
+  const [totalCount, facets, songs] = await Promise.all([
+    countSongs(),
+    readSongFacets(SONG_READ_CAP),
+    readAllSongs(LIST_CAP),
+  ]);
 
   // Crawlable browse links: keys that actually have songs, and the most
   // common integer BPMs (the hub pages 404 below 3 songs, so mirror that).
   const keyCounts = new Map<string, number>();
   const bpmCounts = new Map<number, number>();
   const camelotCounts = new Map<string, number>();
-  for (const s of songs) {
+  // Counted over the WHOLE catalog (facets), not the LIST_CAP rows the table
+  // renders — these gates decide which hub links exist.
+  for (const s of facets) {
     keyCounts.set(s.key, (keyCounts.get(s.key) ?? 0) + 1);
     const b = Math.round(s.bpm);
     for (let n = b - 2; n <= b + 2; n += 1) bpmCounts.set(n, (bpmCounts.get(n) ?? 0) + 1);
@@ -60,7 +71,9 @@ export default async function SongsPage() {
     ...Array.from({ length: 12 }, (_, i) => `${i + 1}B`),
   ];
   const camelotHubs = allCamelotCodes.filter((c) => (camelotCounts.get(c) ?? 0) > 0);
-  const topArtists = topArtistsByCount(songs, 30);
+  // Whole catalog, not the LIST_CAP rows: the top-30 artists must reflect
+  // all 118k+ songs, not just the newest 2000.
+  const topArtists = topArtistsByCount(facets, 30);
 
   return (
     <div className="app-shell">
@@ -140,7 +153,7 @@ export default async function SongsPage() {
                 // Same >=3-songs gate as the activity page itself, so this
                 // never links to a notFound() (e.g. sleep's 50-70 window
                 // while the catalog is still chart-heavy).
-                (a) => songs.filter((s) => s.bpm != null && s.bpm >= a.min && s.bpm <= a.max).length >= 3,
+                (a) => facets.filter((s) => s.bpm != null && s.bpm >= a.min && s.bpm <= a.max).length >= 3,
               ).map((a) => (
                 <li key={a.slug}>
                   <Link href={`/songs/bpm-for/${a.slug}`} className="song-keychip-rel">

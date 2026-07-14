@@ -19,7 +19,7 @@ export const SONGS_PER_SHARD = 20000;
 // round-trips); 200k bounds shard-generation cost at 10 song shards while
 // leaving months of headroom over the perpetual seeder. Raise it (and
 // re-check shard math + function memory) if the catalog outgrows it.
-export const SONGS_CAP = 200000;
+export const SONGS_CAP = 1000000;
 
 type UrlEntry = {
   loc: string;

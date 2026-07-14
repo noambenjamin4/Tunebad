@@ -17,14 +17,16 @@
 // client-side algorithm.
 import { readAllSongs, type CachedAnalysis } from "./link-analysis";
 
-export type ArtistGroup = {
+// Generic over the row shape: the grouper only reads `artist`, so both a full
+// CachedAnalysis and a slim projection (e.g. the sitemap's facet columns) work.
+export type ArtistGroup<T = CachedAnalysis> = {
   slug: string;
   /** Canonical display name for this slug — the most recently added exact
    *  spelling wins (readAllSongs orders newest first). Arbitrary but
    *  deterministic; different capitalizations/spacing of the same artist
    *  collapse into one group instead of one page each. */
   name: string;
-  songs: CachedAnalysis[];
+  songs: T[];
 };
 
 /**
@@ -48,8 +50,10 @@ export function artistSlug(name: string): string {
 
 /** Groups a song list by artistSlug(artist). Songs with no artist are dropped
  *  — there is no page for "unknown artist". */
-export function groupSongsByArtist(songs: CachedAnalysis[]): Map<string, ArtistGroup> {
-  const groups = new Map<string, ArtistGroup>();
+export function groupSongsByArtist<T extends { artist: string | null }>(
+  songs: T[],
+): Map<string, ArtistGroup<T>> {
+  const groups = new Map<string, ArtistGroup<T>>();
   for (const s of songs) {
     const raw = s.artist?.trim();
     if (!raw) continue;
@@ -76,11 +80,11 @@ export async function readSongsByArtist(slug: string, cap = 50000): Promise<Arti
  *  "Browse by artist" section. `minSongs` mirrors the page's own render rule
  *  (an artist page only renders with >=2 songs — see app/artist/[slug]/page.tsx)
  *  so this never surfaces a link that would 404. */
-export function topArtistsByCount(
-  songs: CachedAnalysis[],
+export function topArtistsByCount<T extends { artist: string | null }>(
+  songs: T[],
   limit: number,
   minSongs = 2,
-): ArtistGroup[] {
+): ArtistGroup<T>[] {
   const groups = [...groupSongsByArtist(songs).values()].filter((g) => g.songs.length >= minSongs);
   groups.sort((a, b) => b.songs.length - a.songs.length || a.name.localeCompare(b.name));
   return groups.slice(0, limit);

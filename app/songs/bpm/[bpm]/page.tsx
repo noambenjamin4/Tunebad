@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { readSongsByBpmRange, readAllSongs } from "@/lib/server/link-analysis";
+import { readSongsByBpmRange, readSongFacets, SONG_READ_CAP } from "@/lib/server/link-analysis";
 import { SITE_URL } from "@/lib/site";
 
 // BPM hub pages: /songs/bpm/140 etc. Each lists analyzed songs within ±2 BPM —
@@ -32,7 +32,9 @@ function tempoContext(bpm: number): string {
 
 export async function generateStaticParams() {
   // Pre-render every BPM that has enough songs; others resolve via ISR.
-  const songs = await readAllSongs(100000);
+  // Facet columns only: this histogram reads nothing but s.bpm, so pulling
+  // every column of every song here was ~10x the bytes for no reason.
+  const songs = await readSongFacets(SONG_READ_CAP);
   const counts = new Map<number, number>();
   for (const s of songs) {
     const b = Math.round(s.bpm);

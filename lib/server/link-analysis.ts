@@ -10,6 +10,10 @@ const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
 
 export const isLinkAnalysisConfigured = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
 
+// Ceiling for the full-row readers. The catalog passed 100k on 2026-07-14 and
+// grows ~55k/day, so the old hard-coded 100000 was silently truncating.
+export const SONG_READ_CAP = 1000000;
+
 export type CachedAnalysis = {
   id: string;
   slug: string;
@@ -215,6 +219,60 @@ export async function readSongsByBpmRangeAll(min: number, max: number, limit = 2
  *  seconds. Each 1000-row page stays its own request on purpose — Vercel's
  *  data cache stores small GET responses per-URL, so warm renders skip the
  *  network entirely, which one giant response would be too large to do. */
+// A slim projection for the crawl surfaces. The sitemap only needs a slug
+// (and hub counts only need key/bpm/camelot) — pulling `select=*` dragged
+// title/artist/energy/danceability/loudness/duration for every row, ~10x the
+// bytes for data that is then thrown away.
+export type SongSlug = Pick<CachedAnalysis, "slug" | "created_at">;
+export type SongFacet = Pick<CachedAnalysis, "key" | "bpm" | "camelot" | "artist">;
+
+// Parallel-paged reader with an explicit column projection and a start offset,
+// so a caller that wants rows [offset, offset+limit) fetches ONLY those rows.
+// readAllSongs always started at 0, which meant a sitemap shard asking for
+// rows 40k-60k still had to read the first 40k and slice them off.
+async function readSongRange<T>(columns: string, offset: number, limit: number): Promise<T[]> {
+  if (!isLinkAnalysisConfigured) return [];
+  const PAGE = 1000;
+  const BATCH = 10;
+  const all: T[] = [];
+  const fetchPage = async (pageOffset: number, pageLimit: number): Promise<T[]> => {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/link_analysis?select=${columns}&order=created_at.desc&limit=${pageLimit}&offset=${pageOffset}`,
+      { headers: restHeaders(), signal: AbortSignal.timeout(FETCH_TIMEOUT_MS), next: { revalidate: 3600 } },
+    );
+    if (!res.ok) return [];
+    return (await res.json()) as T[];
+  };
+  try {
+    for (let batchStart = 0; batchStart < limit; batchStart += PAGE * BATCH) {
+      const reqs: Promise<T[]>[] = [];
+      for (let o = batchStart; o < Math.min(batchStart + PAGE * BATCH, limit); o += PAGE) {
+        reqs.push(fetchPage(offset + o, Math.min(PAGE, limit - o)));
+      }
+      const pages = await Promise.all(reqs);
+      let done = false;
+      for (const page of pages) {
+        all.push(...page);
+        if (page.length < PAGE) done = true;
+      }
+      if (done) break;
+    }
+    return all;
+  } catch {
+    return all;
+  }
+}
+
+/** Slugs for one sitemap shard: reads only that window, only the slug column. */
+export async function readSongSlugRange(offset: number, limit: number): Promise<SongSlug[]> {
+  return readSongRange<SongSlug>("slug,created_at", offset, limit);
+}
+
+/** key/bpm/camelot only — for the hub-count facets. */
+export async function readSongFacets(limit: number): Promise<SongFacet[]> {
+  return readSongRange<SongFacet>("key,bpm,camelot,artist", 0, limit);
+}
+
 export async function readAllSongs(limit = 10000): Promise<CachedAnalysis[]> {
   if (!isLinkAnalysisConfigured) return [];
   const PAGE = 1000;

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { readAllSongs } from "@/lib/server/link-analysis";
+import { readAllSongs, SONG_READ_CAP } from "@/lib/server/link-analysis";
 import { readSongsByArtist, topArtistsByCount, artistStats } from "@/lib/server/artists";
 import { SITE_URL } from "@/lib/site";
 
@@ -25,7 +25,7 @@ const MIN_SONGS = 2;
 const STATIC_PARAM_COUNT = 500;
 
 export async function generateStaticParams() {
-  const songs = await readAllSongs(100000);
+  const songs = await readAllSongs(SONG_READ_CAP);
   return topArtistsByCount(songs, STATIC_PARAM_COUNT, MIN_SONGS).map((a) => ({ slug: a.slug }));
 }
 
