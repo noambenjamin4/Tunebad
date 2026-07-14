@@ -9,7 +9,6 @@
 
 import {
   useCallback,
-  useEffect,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -120,6 +119,10 @@ interface ResponseKit {
   freqs: Float32Array<ArrayBuffer>;
   mag: Float32Array<ArrayBuffer>;
   phase: Float32Array<ArrayBuffer>;
+  // 1-point buffers for probing a single frequency during drags.
+  probeFreq: Float32Array<ArrayBuffer>;
+  probeMag: Float32Array<ArrayBuffer>;
+  probePhase: Float32Array<ArrayBuffer>;
 }
 
 let responseKit: ResponseKit | null = null;
@@ -145,7 +148,15 @@ function getResponseKit(): ResponseKit | null {
     for (let i = 0; i < CURVE_POINTS; i += 1) {
       freqs[i] = F_MIN * Math.pow(F_MAX / F_MIN, i / (CURVE_POINTS - 1));
     }
-    responseKit = { nodes, freqs, mag: new Float32Array(CURVE_POINTS), phase: new Float32Array(CURVE_POINTS) };
+    responseKit = {
+      nodes,
+      freqs,
+      mag: new Float32Array(CURVE_POINTS),
+      phase: new Float32Array(CURVE_POINTS),
+      probeFreq: new Float32Array(1),
+      probeMag: new Float32Array(1),
+      probePhase: new Float32Array(1),
+    };
   }
   return responseKit;
 }
@@ -162,6 +173,26 @@ function computeResponseDb(eq: ReverbEqParams): number[] | null {
     for (let i = 0; i < CURVE_POINTS; i += 1) combined[i] *= kit.mag[i];
   }
   return combined.map((magnitude) => 20 * Math.log10(Math.max(magnitude, 1e-6)));
+}
+
+// Exact combined dB of the chain at ONE frequency with the given node's gain
+// zeroed out — i.e. everything EXCEPT that node's contribution. Used while
+// dragging to solve "what gain puts the curve under the pointer" from the
+// CURRENT params. (Reading the neighbors off the last rendered curve instead
+// fed each move a stale value, which oscillated — the twitch.)
+function neighborsDbAt(eq: ReverbEqParams, id: EqNodeId, hz: number): number {
+  const kit = getResponseKit();
+  if (!kit) return 0;
+  const { hz: ownHz } = nodeValue(eq, id);
+  applyReverbEqParams(kit.nodes, withNode(eq, id, ownHz, 0));
+  kit.probeFreq[0] = hz;
+  let magnitude = 1;
+  const filters = [kit.nodes.highpass, kit.nodes.lowShelf, kit.nodes.peak, kit.nodes.highShelf, kit.nodes.lowpass];
+  for (const filter of filters) {
+    filter.getFrequencyResponse(kit.probeFreq, kit.probeMag, kit.probePhase);
+    magnitude *= kit.probeMag[0];
+  }
+  return 20 * Math.log10(Math.max(magnitude, 1e-6));
 }
 
 // Combined-curve dB at an arbitrary frequency, interpolated between the
@@ -205,8 +236,6 @@ export function ReverbEq({ eq, onChange, disabled = false }: ReverbEqProps) {
   const { t } = useI18n();
   const svgRef = useRef<SVGSVGElement>(null);
   const activeRef = useRef<EqNodeId | null>(null);
-  const rafRef = useRef(0);
-  const [curve, setCurve] = useState<{ line: string; fill: string; db: number[] } | null>(null);
   const curveDbRef = useRef<number[] | null>(null);
 
   // The viewBox width tracks the rendered width so SVG units stay 1:1 with
@@ -236,33 +265,16 @@ export function ReverbEq({ eq, onChange, disabled = false }: ReverbEqProps) {
   const eqRef = useRef(eq);
   eqRef.current = eq;
 
-  // Recompute the response curve on param changes. Discrete changes (mount,
-  // keyboard, reset, double-click) compute immediately; bursts of updates
-  // during a drag are coalesced to at most one recompute per animation frame.
-  const lastComputeRef = useRef(0);
-  const lastGeoRef = useRef<Geometry | null>(null);
-  useEffect(() => {
-    const compute = () => {
-      lastComputeRef.current = performance.now();
-      const db = computeResponseDb(eq);
-      if (db) {
-        curveDbRef.current = db;
-        setCurve({ ...curvePath(geo, db), db });
-      }
-    };
-    // Geometry changes (resize, initial measure) always compute immediately:
-    // ResizeObserver already batches per frame, and a stale-width curve would
-    // otherwise linger until the next eq change in a hidden tab.
-    const geoChanged = lastGeoRef.current !== geo;
-    lastGeoRef.current = geo;
-    if (geoChanged || performance.now() - lastComputeRef.current > 32) {
-      compute();
-      return;
-    }
-    cancelAnimationFrame(rafRef.current);
-    rafRef.current = requestAnimationFrame(compute);
-    return () => cancelAnimationFrame(rafRef.current);
+  // The response curve is computed synchronously in render (5 filters x 120
+  // points is well under a millisecond), so the curve and the dots riding it
+  // always reflect THIS render's params. The old effect + rAF coalescing put
+  // the curve one frame behind the pointer, which read as twitching — and
+  // pointer events are already frame-aligned, so it never saved any work.
+  const curve = useMemo(() => {
+    const db = computeResponseDb(eq);
+    return db ? { ...curvePath(geo, db), db } : null;
   }, [eq, geo]);
+  curveDbRef.current = curve ? curve.db : null;
 
   // Maps a pointer event to SVG coordinates (1:1 with CSS pixels).
   const toLocal = useCallback((clientX: number, clientY: number) => {
@@ -306,12 +318,12 @@ export function ReverbEq({ eq, onChange, disabled = false }: ReverbEqProps) {
       if (!def || !local) return;
       const hz = clamp(hzOf(geoRef.current, local.x), def.minHz, def.maxHz);
       // The dot renders on the COMBINED curve, so dragging targets the curve
-      // height at the pointer: subtract the neighbors' contribution (curve
-      // minus own gain) to get the gain that puts the curve under the pointer.
+      // height at the pointer: subtract everything-but-this-node's exact
+      // contribution (probed from the CURRENT params, never the rendered
+      // curve) to get the gain that puts the curve under the pointer.
       let db = 0;
       if (def.hasGain) {
-        const current = nodeValue(eqRef.current, def.id);
-        const neighbors = curveDbRef.current ? curveDbAt(curveDbRef.current, hz) - current.db : 0;
+        const neighbors = neighborsDbAt(eqRef.current, def.id, hz);
         db = clamp(dbOf(local.y) - neighbors, -GAIN_LIMIT, GAIN_LIMIT);
       }
       onChange(withNode(eqRef.current, id, Math.round(hz), Math.round(db * 10) / 10));
