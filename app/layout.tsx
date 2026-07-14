@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Baloo_2 } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
-import { SITE_URL } from "@/lib/site";
+import { SITE_URL, SOCIAL_PROFILES } from "@/lib/site";
 import { ClientErrorReporter } from "@/components/layout/ClientErrorReporter";
 
 const geistSans = Geist({
@@ -150,6 +150,8 @@ const STRUCTURED_DATA = {
       description: DESCRIPTION,
       url: `${SITE_URL}/`,
       logo: `${SITE_URL}/icon-512.png`,
+      // Omitted entirely until real owned profiles exist (see lib/site.ts).
+      ...(SOCIAL_PROFILES.length > 0 ? { sameAs: SOCIAL_PROFILES } : {}),
     },
     {
       "@type": ["WebApplication", "SoftwareApplication"],
