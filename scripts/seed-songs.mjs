@@ -46,8 +46,28 @@ if (!SUPABASE_URL || !SUPABASE_ANON_KEY) throw new Error("Missing Supabase creds
 
 // ---- analysis constants (mirror workers/analysis.worker.ts) ----------------
 const ANALYSIS_RATE = 16000;
-const FOLD_MIN = 105;
-const FOLD_MAX = 210;
+// Fold window. Percival reports the perceptual pulse, which for most records is
+// the true tempo — so the window's job is only to reject genuine outliers, NOT
+// to force everything up into dance territory.
+//
+// This used to be [105, 210). That doubled every song slower than 105 BPM, which
+// is most hip-hop, R&B and ballads: the catalog ended up with ZERO songs under
+// 100 BPM and 22% claiming over 180 — both impossible for real music. In Da Club
+// (90) read 181; Lose Yourself (86) read 172.
+//
+// Measured on 61 songs with known tempos (scripts/bpm-truth.mjs, run
+// scripts/bpm-experiment.mjs): [105,210) scored 44% exact and 0% on slow songs;
+// [60,180) scores 69% exact and 66% on slow.
+//
+// The honest cost: genuinely fast records where Percival reports the half-time
+// pulse (Blinding Lights raw ~85, truly ~171) now read low — the fast band drops
+// 100% -> 25%. There is no window that gets both: raw 85.2 is Bitter Sweet
+// Symphony (86) AND Blinding Lights (171), same evidence, opposite truth. The
+// other octave stays available in bpm_alt. Danceability was tested
+// as a discriminator and rejected (it overlaps completely between the two cases);
+// RhythmExtractor2013 was tested and scored 0%.
+const FOLD_MIN = 60;
+const FOLD_MAX = 180;
 const FLAT_TO_SHARP = { Ab: "G#", Bb: "A#", Cb: "B", Db: "C#", Eb: "D#", Fb: "E", Gb: "F#" };
 const CAMELOT = {
   "C Major": "8B", "G Major": "9B", "D Major": "10B", "A Major": "11B", "E Major": "12B", "B Major": "1B",
