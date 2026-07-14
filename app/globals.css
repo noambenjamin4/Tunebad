@@ -490,7 +490,9 @@ input[type="number"] {
   gap: 4px;
   width: 44px;
   height: 44px;
-  margin-left: auto;
+  /* No margin-left:auto here — .lang-slot already carries the auto margin that
+     pushes the right-hand group over. A second auto margin would split the
+     free space between the two, stranding the language trigger in the middle. */
   border: 0;
   border-radius: var(--radius-pill);
   background: transparent;
