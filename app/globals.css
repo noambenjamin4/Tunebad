@@ -4484,3 +4484,49 @@ tbody tr:last-child td {
   gap: 8px;
   flex-wrap: wrap;
 }
+
+/* Hub pagination (key hubs, page 2+). Plain links — these exist so crawlers
+   and readers can walk past the newest 300 songs into the long tail. */
+.song-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 24px 0 8px;
+}
+
+.song-page-link,
+.song-page-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  min-width: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  color: inherit;
+  text-decoration: none;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.song-page-numbers {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.song-page-link:hover,
+.song-page-num:hover {
+  background: var(--hover);
+}
+
+.song-page-num.active {
+  background: var(--fill);
+  color: var(--fill-ink);
+  border-color: var(--fill);
+}

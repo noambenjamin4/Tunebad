@@ -128,11 +128,11 @@ export async function readSongsByCamelot(
 }
 
 /** Cached songs in one musical key — backs the /songs/key/<slug> hub pages. */
-export async function readSongsByKey(key: string, limit = 300): Promise<CachedAnalysis[]> {
+export async function readSongsByKey(key: string, limit = 300, offset = 0): Promise<CachedAnalysis[]> {
   if (!isLinkAnalysisConfigured) return [];
   try {
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/link_analysis?key=eq.${encodeURIComponent(key)}&order=created_at.desc&limit=${limit}`,
+      `${SUPABASE_URL}/rest/v1/link_analysis?key=eq.${encodeURIComponent(key)}&order=created_at.desc&limit=${limit}&offset=${offset}`,
       { headers: restHeaders(), signal: AbortSignal.timeout(FETCH_TIMEOUT_MS), next: { revalidate: 3600 } },
     );
     if (!res.ok) return [];
@@ -307,6 +307,27 @@ export async function readAllSongs(limit = 10000): Promise<CachedAnalysis[]> {
 }
 
 /** Total number of analyzed songs, without fetching rows (PostgREST exact count). */
+/** Exact number of songs in one key — header-only, drives hub pagination. */
+export async function countSongsByKey(key: string): Promise<number> {
+  if (!isLinkAnalysisConfigured) return 0;
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/link_analysis?select=id&key=eq.${encodeURIComponent(key)}&limit=1`,
+      {
+        headers: { ...restHeaders(), Prefer: "count=exact", Range: "0-0" },
+        signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+        next: { revalidate: 3600 },
+      },
+    );
+    if (!res.ok) return 0;
+    const range = res.headers.get("content-range");
+    const total = range?.split("/")[1];
+    return total && total !== "*" ? Number(total) : 0;
+  } catch {
+    return 0;
+  }
+}
+
 export async function countSongs(): Promise<number | null> {
   if (!isLinkAnalysisConfigured) return null;
   try {
