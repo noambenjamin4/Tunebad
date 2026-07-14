@@ -41,8 +41,11 @@ export function ToolPageNav() {
   useEffect(() => {
     const sentinel = sentinelRef.current;
     if (!sentinel || typeof IntersectionObserver === "undefined") return;
+    // No rootMargin: the 8px sentinel is visible at scroll 0 (not scrolled)
+    // and leaves the viewport once you scroll past it. A negative top margin
+    // here made the 1px sentinel unobservable, so "scrolled" engaged on every
+    // page load and animated the header immediately.
     const observer = new IntersectionObserver(([entry]) => setScrolled(!entry.isIntersecting), {
-      rootMargin: "-8px 0px 0px 0px",
       threshold: 0,
     });
     observer.observe(sentinel);
@@ -86,7 +89,7 @@ export function ToolPageNav() {
             <span className="brand-logo-wrap">
               <picture>
                 <source media="(prefers-color-scheme: dark)" srcSet="/logo-dark.png" />
-                <img src="/logo-light.png" alt="" width={40} height={40} className="brand-logo" loading="eager" />
+                <img src="/logo-light.png" alt="" width={38} height={38} className="brand-logo" loading="eager" />
               </picture>
             </span>
             <span className="brand-wordmark">TUNEBAD</span>

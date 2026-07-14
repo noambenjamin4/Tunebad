@@ -262,10 +262,15 @@ input[type="number"] {
 /* ---------------------------------------------------------------------
    4. Header
    --------------------------------------------------------------------- */
+/* 8px tall so it is genuinely visible at the top of the page: the observer
+   (no rootMargin) then reports intersecting at scroll 0 and stops
+   intersecting once you scroll past it. The old 1px sentinel combined with
+   rootMargin -8px could never intersect, so every fresh page load flipped
+   the header straight into its scrolled state — an animation on load. */
 .scroll-sentinel {
   position: absolute;
   top: 0;
-  height: 1px;
+  height: 8px;
   width: 1px;
   pointer-events: none;
 }
@@ -307,18 +312,14 @@ input[type="number"] {
   flex: 0 0 auto;
 }
 
+/* No scrolled-state shrink: the observer marked the header "scrolled" on
+   every fresh page load, so the disc flashed full-size then animated down
+   0.92x on each navigation. The logo stays one size, always. */
 .brand-logo-wrap {
   display: block;
   flex: none;
   width: 38px;
   height: 38px;
-  transform-origin: center center;
-  transition: transform 200ms ease;
-}
-
-.topbar.scrolled .brand-logo-wrap,
-.topbar.scrolled .brand-wordmark {
-  transform: scale(0.92);
 }
 
 .brand-logo {
@@ -357,7 +358,6 @@ input[type="number"] {
   font-size: 20px;
   text-transform: uppercase;
   letter-spacing: 0.01em;
-  transition: transform 200ms ease;
 }
 
 .top-actions {
