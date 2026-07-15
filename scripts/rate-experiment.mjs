@@ -107,7 +107,8 @@ const CONFIGS = [
   // BeatTracker. Otherwise keep Percival, which is the better slow estimator.
   // This is not a threshold fit to the data; it is a mechanism read off the
   // synthetic octave map (Percival's hard ceiling) and tested here.
-  ["E ensemble", 44100, 1024, 2048, 128, 128, "ensemble"],
+  ["E ensemble (old rule)", 44100, 1024, 2048, 128, 128, "ensemble"],
+  ["F ceiling rule", 44100, 1024, 2048, 128, 128, "ceiling"],
 ];
 
 /** Percival, except: if BeatTracker independently says "twice that", believe it. */
@@ -117,6 +118,31 @@ function ensembleBpm(engine, sig, rate) {
   try { b = beatTrackerBpm(engine, sig); } catch { b = null; }
   if (p && b && Math.abs(b - 2 * p) / (2 * p) < 0.06) return b;
   return p;
+}
+
+// THE CEILING RULE. Built from the proven mechanism rather than fitted to the
+// data: Percival CANNOT report above ~134 (identical halving at 136+ on
+// synthetic clicks at both 16k and 44.1k). So:
+//   - Percival's opinion is only trustworthy BELOW the ceiling.
+//   - Above it, Percival is silent by construction, so BeatTracker is the only
+//     witness — and only there do we defer to it.
+// The previous ensemble failed because it deferred whenever BeatTracker said
+// ~2x ANYTHING, which let BeatTracker's own opposite bias (it DOUBLES slow
+// tracks) wreck the slow band. This rule never lets BeatTracker touch a song
+// Percival can actually see.
+const CEILING = 134;
+function ceilingBpm(engine, sig, rate) {
+  const p = engine.PercivalBpmEstimator(sig, 1024, 2048, 128, 128, 210, 50, rate).bpm;
+  if (!p) return null;
+  let b = null;
+  try { b = beatTrackerBpm(engine, sig); } catch { b = null; }
+  if (!b) return p;
+  // Only consider an override when BeatTracker claims a tempo Percival is
+  // structurally unable to report, AND that claim is consistent with Percival
+  // having halved it (b ~= 2p). Both conditions, or we keep Percival.
+  const beatTrackerSeesFast = b >= CEILING;
+  const consistentWithHalving = Math.abs(b - 2 * p) / (2 * p) < 0.08;
+  return beatTrackerSeesFast && consistentWithHalving ? b : p;
 }
 
 /** Tempo from BeatTrackerMultiFeature ticks: median inter-beat interval. */
@@ -157,7 +183,9 @@ async function main() {
           ? beatTrackerBpm(engine, sig)
           : est === "ensemble"
             ? ensembleBpm(engine, sig, rate)
-            : engine.PercivalBpmEstimator(sig, fs, fsOss, hs, hsOss, 210, 50, rate).bpm;
+            : est === "ceiling"
+              ? ceilingBpm(engine, sig, rate)
+              : engine.PercivalBpmEstimator(sig, fs, fsOss, hs, hsOss, 210, 50, rate).bpm;
         sig.delete?.();
         bpm = raw == null ? null : fold(raw);
       } catch { bpm = null; }
