@@ -12,7 +12,12 @@ import { SITE_URL } from "@/lib/site";
 // filter on that), so this pages through the full catalog and groups by slug
 // — see lib/server/artists.ts for why that's the correct tradeoff at this
 // scale, not just the simplest one.
-export const revalidate = 3600;
+// 7 days (REVALIDATE_ARTIST in lib/cache-policy.ts — must be a literal here;
+// Next.js statically analyses route segment config). The facts are static; only
+// the song LIST grows as the seeder runs, which a week captures fine. This
+// window matters twice over: each regeneration pages through the whole catalog
+// (see below), so an hourly window burned Fluid CPU as well as ISR writes.
+export const revalidate = 604800;
 export const dynamicParams = true;
 
 // Render rule (kept consistent everywhere an artist link can appear — this

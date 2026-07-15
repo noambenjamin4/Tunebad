@@ -6,7 +6,10 @@ import { SITE_URL } from "@/lib/site";
 
 // BPM hub pages: /songs/bpm/140 etc. Each lists analyzed songs within ±2 BPM —
 // the "140 bpm songs" search intent DJs and runners actually type.
-export const revalidate = 3600;
+// 1 day (REVALIDATE_HUB in lib/cache-policy.ts — must be a literal here;
+// Next.js statically analyses route segment config). Grows with the catalog,
+// but a few thousand new rows a day does not make a day-old listing wrong.
+export const revalidate = 86400;
 export const dynamicParams = true;
 
 const BPM_MIN = 40;

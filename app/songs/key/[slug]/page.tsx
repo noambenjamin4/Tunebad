@@ -6,7 +6,10 @@ import { KeyHubPage, keyHubMeta } from "@/components/songs/KeyHubPage";
 // songs in that key — the "songs in G# minor" search intent. Page 2+ lives at
 // /songs/key/<slug>/page/<n> and shares the same renderer, which is what makes
 // the whole catalog internally reachable (see components/songs/KeyHubPage.tsx).
-export const revalidate = 3600;
+// 1 day (REVALIDATE_HUB in lib/cache-policy.ts — must be a literal here;
+// Next.js statically analyses route segment config). Grows with the catalog,
+// but a few thousand new rows a day does not make a day-old listing wrong.
+export const revalidate = 86400;
 
 export function generateStaticParams() {
   return ALL_KEYS.map((k) => ({ slug: keyToSlug(k) }));

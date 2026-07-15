@@ -9,7 +9,10 @@ import { KeyHubPage, keyHubMeta } from "@/components/songs/KeyHubPage";
 // catalog and ~109,000 song pages had no internal inbound links at all. Not
 // prerendered (there are ~400 of them and they change as the catalog grows) —
 // dynamicParams + ISR resolves each on first request, same as /song/[slug].
-export const revalidate = 3600;
+// 1 day (REVALIDATE_HUB in lib/cache-policy.ts — must be a literal here;
+// Next.js statically analyses route segment config). Grows with the catalog,
+// but a few thousand new rows a day does not make a day-old listing wrong.
+export const revalidate = 86400;
 
 export async function generateMetadata({
   params,

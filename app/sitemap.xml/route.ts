@@ -7,7 +7,10 @@ import { SITE_URL, SONGS_CAP, SONGS_PER_SHARD, sitemapIndexXml, xmlResponse } fr
 // literal route handler so it can return a SITEMAP INDEX instead of a single
 // oversized urlset: the catalog is headed past the 50k-URL cap a single
 // sitemap file allows once songs + artist pages are both counted.
-export const revalidate = 3600;
+// 1 day (REVALIDATE_SITEMAP in lib/cache-policy.ts — must be a literal here;
+// Next.js statically analyses route segment config). Crawlers re-fetch sitemaps
+// constantly, which is exactly why they must not regenerate on every fetch.
+export const revalidate = 86400;
 
 export async function GET() {
   // Same call the "songs-N" shards make (see app/sitemaps/[shard]/route.ts) —

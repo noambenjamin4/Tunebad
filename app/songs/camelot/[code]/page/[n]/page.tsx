@@ -4,7 +4,10 @@ import { CamelotHubPage, camelotHubMeta } from "@/components/songs/CamelotHubPag
 
 // /songs/camelot/<code>/page/<n> — pages 2+ of a Camelot hub. Exists for crawl
 // reach: see components/songs/HubPagination.tsx.
-export const revalidate = 3600;
+// 1 day (REVALIDATE_HUB in lib/cache-policy.ts — must be a literal here;
+// Next.js statically analyses route segment config). Grows with the catalog,
+// but a few thousand new rows a day does not make a day-old listing wrong.
+export const revalidate = 86400;
 
 export async function generateMetadata({
   params,

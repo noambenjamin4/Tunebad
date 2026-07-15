@@ -18,7 +18,10 @@ import { readSongFacets, readSongSlugRange } from "@/lib/server/link-analysis";
 //     emptiness rules as the pages themselves (key/Camelot hubs need >0
 //     songs, BPM hubs need >=3 in the ±2 window, artist pages need >=2
 //     songs) so this never links to a 404.
-export const revalidate = 3600;
+// 1 day (REVALIDATE_SITEMAP in lib/cache-policy.ts — must be a literal here;
+// Next.js statically analyses route segment config). Crawlers re-fetch sitemaps
+// constantly, which is exactly why they must not regenerate on every fetch.
+export const revalidate = 86400;
 
 type ToolEntry = { path: string; changefreq: string; priority: number };
 

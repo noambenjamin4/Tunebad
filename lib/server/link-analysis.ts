@@ -4,6 +4,7 @@
 // catalogs, and results are cached in a Supabase table (server-only env vars;
 // the browser never talks to Supabase directly).
 import { canonicalYouTubeUrl, validateSpotifyUrl, validateMediaUrl } from "@/lib/media-url";
+import { REVALIDATE_DATA } from "@/lib/cache-policy";
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
@@ -96,7 +97,7 @@ export async function readAnalysisBySlug(slug: string): Promise<CachedAnalysis |
   try {
     const res = await fetch(
       `${SUPABASE_URL}/rest/v1/link_analysis?slug=eq.${encodeURIComponent(slug)}&limit=1`,
-      { headers: restHeaders(), signal: AbortSignal.timeout(FETCH_TIMEOUT_MS), next: { revalidate: 3600 } },
+      { headers: restHeaders(), signal: AbortSignal.timeout(FETCH_TIMEOUT_MS), next: { revalidate: REVALIDATE_DATA } },
     );
     if (!res.ok) return null;
     const rows = (await res.json()) as CachedAnalysis[];
@@ -118,7 +119,7 @@ export async function readSongsByCamelot(
     const inList = codes.map((c) => `"${encodeURIComponent(c)}"`).join(",");
     const res = await fetch(
       `${SUPABASE_URL}/rest/v1/link_analysis?camelot=in.(${inList})&slug=neq.${encodeURIComponent(exclude)}&order=created_at.desc&limit=${limit}`,
-      { headers: restHeaders(), signal: AbortSignal.timeout(FETCH_TIMEOUT_MS), next: { revalidate: 3600 } },
+      { headers: restHeaders(), signal: AbortSignal.timeout(FETCH_TIMEOUT_MS), next: { revalidate: REVALIDATE_DATA } },
     );
     if (!res.ok) return [];
     return (await res.json()) as CachedAnalysis[];
@@ -133,7 +134,7 @@ export async function readSongsByKey(key: string, limit = 300, offset = 0): Prom
   try {
     const res = await fetch(
       `${SUPABASE_URL}/rest/v1/link_analysis?key=eq.${encodeURIComponent(key)}&order=created_at.desc&limit=${limit}&offset=${offset}`,
-      { headers: restHeaders(), signal: AbortSignal.timeout(FETCH_TIMEOUT_MS), next: { revalidate: 3600 } },
+      { headers: restHeaders(), signal: AbortSignal.timeout(FETCH_TIMEOUT_MS), next: { revalidate: REVALIDATE_DATA } },
     );
     if (!res.ok) return [];
     return (await res.json()) as CachedAnalysis[];
@@ -149,7 +150,7 @@ export async function readSongsByCamelotCode(code: string, limit = 300, offset =
   try {
     const res = await fetch(
       `${SUPABASE_URL}/rest/v1/link_analysis?camelot=ilike.${encodeURIComponent(code)}&order=bpm.asc,created_at.desc&limit=${limit}&offset=${offset}`,
-      { headers: restHeaders(), signal: AbortSignal.timeout(FETCH_TIMEOUT_MS), next: { revalidate: 3600 } },
+      { headers: restHeaders(), signal: AbortSignal.timeout(FETCH_TIMEOUT_MS), next: { revalidate: REVALIDATE_DATA } },
     );
     if (!res.ok) return [];
     return (await res.json()) as CachedAnalysis[];
@@ -164,7 +165,7 @@ export async function readSongsByBpmRange(min: number, max: number, limit = 300,
   try {
     const res = await fetch(
       `${SUPABASE_URL}/rest/v1/link_analysis?bpm=gte.${min}&bpm=lte.${max}&order=created_at.desc&limit=${limit}&offset=${offset}`,
-      { headers: restHeaders(), signal: AbortSignal.timeout(FETCH_TIMEOUT_MS), next: { revalidate: 3600 } },
+      { headers: restHeaders(), signal: AbortSignal.timeout(FETCH_TIMEOUT_MS), next: { revalidate: REVALIDATE_DATA } },
     );
     if (!res.ok) return [];
     return (await res.json()) as CachedAnalysis[];
@@ -185,7 +186,7 @@ export async function readSongsByBpmRangeAll(min: number, max: number, limit = 2
   const fetchPage = async (offset: number): Promise<CachedAnalysis[]> => {
     const res = await fetch(
       `${SUPABASE_URL}/rest/v1/link_analysis?select=*&bpm=gte.${min}&bpm=lte.${max}&order=created_at.desc&limit=${Math.min(PAGE, limit - offset)}&offset=${offset}`,
-      { headers: restHeaders(), signal: AbortSignal.timeout(FETCH_TIMEOUT_MS), next: { revalidate: 3600 } },
+      { headers: restHeaders(), signal: AbortSignal.timeout(FETCH_TIMEOUT_MS), next: { revalidate: REVALIDATE_DATA } },
     );
     if (!res.ok) return [];
     return (await res.json()) as CachedAnalysis[];
@@ -238,7 +239,7 @@ async function readSongRange<T>(columns: string, offset: number, limit: number):
   const fetchPage = async (pageOffset: number, pageLimit: number): Promise<T[]> => {
     const res = await fetch(
       `${SUPABASE_URL}/rest/v1/link_analysis?select=${columns}&order=created_at.desc&limit=${pageLimit}&offset=${pageOffset}`,
-      { headers: restHeaders(), signal: AbortSignal.timeout(FETCH_TIMEOUT_MS), next: { revalidate: 3600 } },
+      { headers: restHeaders(), signal: AbortSignal.timeout(FETCH_TIMEOUT_MS), next: { revalidate: REVALIDATE_DATA } },
     );
     if (!res.ok) return [];
     return (await res.json()) as T[];
@@ -281,7 +282,7 @@ export async function readAllSongs(limit = 10000): Promise<CachedAnalysis[]> {
   const fetchPage = async (offset: number): Promise<CachedAnalysis[]> => {
     const res = await fetch(
       `${SUPABASE_URL}/rest/v1/link_analysis?select=*&order=created_at.desc&limit=${Math.min(PAGE, limit - offset)}&offset=${offset}`,
-      { headers: restHeaders(), signal: AbortSignal.timeout(FETCH_TIMEOUT_MS), next: { revalidate: 3600 } },
+      { headers: restHeaders(), signal: AbortSignal.timeout(FETCH_TIMEOUT_MS), next: { revalidate: REVALIDATE_DATA } },
     );
     if (!res.ok) return [];
     return (await res.json()) as CachedAnalysis[];
@@ -329,7 +330,7 @@ async function countWithFilter(filter: string): Promise<number> {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/link_analysis?select=id&${filter}&limit=1`, {
       headers: { ...restHeaders(), Prefer: "count=exact", Range: "0-0" },
       signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
-      next: { revalidate: 3600 },
+      next: { revalidate: REVALIDATE_DATA },
     });
     if (!res.ok) return 0;
     const total = res.headers.get("content-range")?.split("/")[1];
@@ -345,7 +346,7 @@ export async function countSongs(): Promise<number | null> {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/link_analysis?select=id&limit=1`, {
       headers: { ...restHeaders(), Prefer: "count=exact", Range: "0-0" },
       signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
-      next: { revalidate: 3600 },
+      next: { revalidate: REVALIDATE_DATA },
     });
     if (!res.ok) return null;
     const range = res.headers.get("content-range");
@@ -384,7 +385,7 @@ export async function readSongsByArtistNames(names: string[]): Promise<CachedAna
   try {
     const res = await fetch(
       `${SUPABASE_URL}/rest/v1/link_analysis?select=*&artist=in.(${encodeURIComponent(list)})&order=created_at.desc&limit=1000`,
-      { headers: restHeaders(), signal: AbortSignal.timeout(FETCH_TIMEOUT_MS), next: { revalidate: 3600 } },
+      { headers: restHeaders(), signal: AbortSignal.timeout(FETCH_TIMEOUT_MS), next: { revalidate: REVALIDATE_DATA } },
     );
     if (!res.ok) return [];
     return (await res.json()) as CachedAnalysis[];
@@ -399,7 +400,7 @@ export async function countSongsByArtistName(name: string): Promise<number> {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/link_analysis?select=id&artist=eq.${encodeURIComponent(name)}&limit=1`, {
       headers: { ...restHeaders(), Prefer: "count=exact", Range: "0-0" },
       signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
-      next: { revalidate: 3600 },
+      next: { revalidate: REVALIDATE_DATA },
     });
     if (!res.ok) return 0;
     const range = res.headers.get("content-range");

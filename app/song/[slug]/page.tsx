@@ -22,7 +22,12 @@ import { SITE_URL } from "@/lib/site";
 // Programmatic per-song pages, one for every track in the shared link-analysis
 // cache. Statically generated for the songs known at build time and filled in
 // on demand (ISR) as the cache grows from live "analyze from link" usage.
-export const revalidate = 3600;
+// 30 days (REVALIDATE_SONG in lib/cache-policy.ts — must be a literal here;
+// Next.js statically analyses route segment config). A track's BPM and key are
+// fixed once analysed, and there are ~130k of these pages on dynamicParams, so
+// an hourly window turned every crawler visit into an ISR write and paused the
+// account at 695% of the limit. A deploy still refreshes them.
+export const revalidate = 2592000;
 export const dynamicParams = true;
 
 export async function generateStaticParams() {

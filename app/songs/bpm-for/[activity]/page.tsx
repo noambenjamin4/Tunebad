@@ -9,7 +9,10 @@ import { SITE_URL } from "@/lib/site";
 // curated set of BPM windows for real search intents (running, workout,
 // study music...), each backed by real analyzed songs in that range.
 // English-only, like the other /songs hubs.
-export const revalidate = 3600;
+// 1 day (REVALIDATE_HUB in lib/cache-policy.ts — must be a literal here;
+// Next.js statically analyses route segment config). Grows with the catalog,
+// but a few thousand new rows a day does not make a day-old listing wrong.
+export const revalidate = 86400;
 
 // A hub page below this many songs is thin; the fixed activity list keeps
 // this from ever firing today, but it's here as the catalog is still
