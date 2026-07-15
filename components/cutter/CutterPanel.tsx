@@ -21,6 +21,12 @@ const MIN_SELECTION_SECONDS = 0.1;
 const STEP_SECONDS = 0.1;
 /** Bars across the wave at 1x. Scaled BY the zoom so density stays constant. */
 const BARS_AT_1X = 240;
+// Ceiling on rendered bars. Each bar is a DOM node, so 240 * 32 would be 7,680
+// of them; past ~4k the extra bars are narrower than a pixel anyway, so they
+// cost layout without adding any visible detail. Bars-per-pixel stays constant
+// up to 16x and degrades gracefully at 32x, where the point is the finer
+// TIME scale (6ms/px) rather than more peaks.
+const MAX_BARS = 3840;
 
 type Status = { title: string; message: string; tone: "neutral" | "success" | "warning" };
 
@@ -79,7 +85,7 @@ export function CutterPanel() {
   // at 240 * zoom keeps bars-per-pixel constant and actually resolves finer peaks.
   const [zoom, setZoom] = useState<ZoomLevel>(1);
   const bars = useMemo(
-    () => (buffer ? computeWaveformBars(buffer, BARS_AT_1X * zoom) : []),
+    () => (buffer ? computeWaveformBars(buffer, Math.min(BARS_AT_1X * zoom, MAX_BARS)) : []),
     [buffer, zoom],
   );
   const duration = buffer?.duration ?? 0;

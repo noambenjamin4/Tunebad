@@ -15,8 +15,19 @@ const KEY_STEP_SECONDS = 1;
 const HANDLE_GRAB_PX = 22;
 /** Seeks stop just shy of the end so playback always has something to play. */
 const SEEK_END_GAP_SECONDS = 0.05;
-/** Track widths, as a multiple of the visible scroller. 1x = the whole song. */
-export const ZOOM_LEVELS = [1, 2, 4, 8] as const;
+// Track widths, as a multiple of the visible scroller. 1x = the whole song.
+//
+// The ceiling matters: at 1x a 3-minute song is ~186ms per pixel and the 26px
+// grip physically covers ~4.8 SECONDS of audio, which is why the handle appears
+// to sit over the waveform and you can't see where the cut lands. Each step
+// halves that. Measured on a 180s track at 967px:
+//   1x  186ms/px   grip hides 4.8s
+//   8x   23ms/px   grip hides 0.6s
+//  32x    6ms/px   grip hides 0.15s
+// 32x is the point where the grip covers less than a frame of audio you could
+// hear, and it keeps a 10-minute track usable (~19ms/px) rather than only
+// short ones.
+export const ZOOM_LEVELS = [1, 2, 4, 8, 16, 32] as const;
 export type ZoomLevel = (typeof ZOOM_LEVELS)[number];
 
 /**
