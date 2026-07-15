@@ -19,6 +19,31 @@
 //
 // Read-only. Changes nothing.
 //   node scripts/rate-experiment.mjs [limit]
+//
+// ================= RESULT (114 songs, 22 in the fast class) ==================
+//   config                   exact  slow  fast
+//   A 16k percival             61%   70%   10%
+//   B 44.1k percival (SHIPS)   64%   74%   14%   <- best measured
+//   D 44.1k beattracker        56%   49%   19%
+//   E ensemble (b ~= 2p)       57%   49%   29%
+//   F ceiling rule             57%   49%   29%   <- identical to E
+//
+// THE ENSEMBLE IS DEAD, AND NOT FOR LACK OF DATA. F was built on the proven
+// mechanism (defer to BeatTracker only above Percival's 134 ceiling, and only
+// when b ~= 2p). It scored identically to the naive rule because the two
+// estimators' OPPOSITE biases are OBSERVATIONALLY IDENTICAL:
+//
+//   Blinding Lights  truth 171  percival  85 (halved)   beattracker 171 (right)
+//   Clint Eastwood   truth  82  percival  84 (right)    beattracker 167 (DOUBLED)
+//
+// Both show b ~= 2p AND b >= 134. Percival-halving-a-fast-track and
+// BeatTracker-doubling-a-slow-track produce the SAME signature, so their
+// disagreement carries no information. There is no threshold, and no amount of
+// extra truth data, that separates them — the two cases are degenerate.
+//
+// DO NOT rebuild this ensemble. Beating 64% needs an estimator whose failure
+// mode is not a mirror of Percival's, or a source of truth outside the audio.
+// =============================================================================
 
 import { spawn } from "node:child_process";
 import { resolve, dirname } from "node:path";
