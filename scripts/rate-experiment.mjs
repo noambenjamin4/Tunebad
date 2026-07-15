@@ -24,7 +24,14 @@ import { spawn } from "node:child_process";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createRequire } from "node:module";
-import { TRUTH } from "./bpm-truth.mjs";
+import { TRUTH as TRUTH_BASE } from "./bpm-truth.mjs";
+import { TRUTH_FAST } from "./bpm-truth-fast.mjs";
+
+// The combined set. bpm-truth.mjs alone had only 5 songs in the class that
+// matters (tracks Percival halves), which is why every previous experiment
+// died on noise. bpm-truth-fast.mjs adds 17 more, deliberately spread across
+// dnb / punk / trance / house so a "fix" cannot pass by overfitting one genre.
+const TRUTH = [...TRUTH_BASE, ...TRUTH_FAST];
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const FFMPEG = resolve(ROOT, "node_modules/ffmpeg-static/ffmpeg");
