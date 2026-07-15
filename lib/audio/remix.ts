@@ -115,11 +115,25 @@ export const EFFECTS: Record<EffectId, EffectPreset> = {
   none: { highpassHz: 20, lowpassHz: 20000, drive: 1, level: 0 },
   underwater: { highpassHz: 20, lowpassHz: 500, drive: 1, level: 0.42 },
   phone: { highpassHz: 400, lowpassHz: 3000, drive: 1.5, level: 0.36 },
-  // Lo-fi: the tape/vinyl character — roll the sub off so it stops thumping,
-  // roll the air off so it stops sparkling, and drive it enough to round the
-  // transients. Deliberately gentler bounds than `phone`: lo-fi should still
-  // sound like the song, just older and softer, where phone is a caricature.
-  lofi: { highpassHz: 120, lowpassHz: 3800, drive: 2.2, level: 0.38 },
+  // Lo-fi = DULL, not dirty. The character is the 3.8kHz roll-off (no air, like
+  // tape); the saturation is only meant to round transients.
+  //
+  // Numbers are measured, not felt — see scripts/thd-experiment.mjs. `drive` is
+  // a gain into a FIXED tanh(3x) curve, so THD climbs fast:
+  //     drive 0.2 -> 1.45% THD at peaks   (subtle warmth — real tape is ~1-3%)
+  //     drive 1.5 -> 26.3%                (phone: a caricature, intentional)
+  //     drive 2.2 -> 32.7%                (what this shipped as — a fuzz pedal)
+  // The old `level: 0.38` didn't hide that; it only turned the distortion down.
+  // Worse, the shaper sits AFTER the lowpass, so its harmonics land above
+  // 3.8kHz — the exact air the filter just removed. That's why it read as fizz
+  // rather than warmth.
+  //   `level` 1.67 is the measured unity gain for drive 0.2 (the shaper loses
+  // 4.4dB there). It exceeds 1 but cannot clip: at drive 0.2 the shaper's own
+  // output maxes at 0.54, so the worst case is 0.90.
+  //   highpass stays at 20Hz: Noam asked for the low end left alone, and a
+  // sub roll-off is the one lo-fi cliche that makes it stop sounding like the
+  // same song.
+  lofi: { highpassHz: 20, lowpassHz: 3800, drive: 0.2, level: 1.67 },
 };
 
 export interface RemixParams {
