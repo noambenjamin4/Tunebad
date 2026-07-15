@@ -18,6 +18,7 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
 import { createRequire } from "node:module";
+import { foldBpm } from "./bpm-fold.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
@@ -66,8 +67,6 @@ const ANALYSIS_RATE = 16000;
 // other octave stays available in bpm_alt. Danceability was tested
 // as a discriminator and rejected (it overlaps completely between the two cases);
 // RhythmExtractor2013 was tested and scored 0%.
-const FOLD_MIN = 60;
-const FOLD_MAX = 180;
 const FLAT_TO_SHARP = { Ab: "G#", Bb: "A#", Cb: "B", Db: "C#", Eb: "D#", Fb: "E", Gb: "F#" };
 const CAMELOT = {
   "C Major": "8B", "G Major": "9B", "D Major": "10B", "A Major": "11B", "E Major": "12B", "B Major": "1B",
@@ -76,15 +75,6 @@ const CAMELOT = {
   "D# Minor": "2A", "A# Minor": "3A", "F Minor": "4A", "C Minor": "5A", "G Minor": "6A", "D Minor": "7A",
 };
 
-function foldBpm(rawBpm) {
-  let folded = rawBpm;
-  let dir = null;
-  while (folded > 0 && folded < FOLD_MIN) { folded *= 2; dir = "up"; }
-  while (folded >= FOLD_MAX) { folded /= 2; dir = "down"; }
-  const bpm = Math.round(folded);
-  const alt = dir === "up" ? Math.round(folded / 2) : dir === "down" ? Math.round(folded * 2) : null;
-  return { bpm, alt };
-}
 
 // ---- essentia (same ES builds as the worker) -------------------------------
 // Some emscripten globals are browser-shaped; shim before importing the wasm.
