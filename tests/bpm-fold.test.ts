@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
-// @ts-expect-error - plain .mjs shared with the Node seeder, typed via JSDoc
+// Plain .mjs so the Node seeder can import it too; JSDoc carries the types.
 import { foldBpm, FOLD_MIN, FOLD_MAX } from "../scripts/bpm-fold.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
