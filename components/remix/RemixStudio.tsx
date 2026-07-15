@@ -341,7 +341,28 @@ export function RemixStudio() {
         try {
           const stretched = await timeStretch(buffer, speed, pitchSemitones);
           if (stretchTokenRef.current !== token) return;
+
+          // The OLD play buffer's length, read before the swap — needed below.
+          const prevDuration = bufferDurationRef.current;
           stretchedBufferRef.current = stretched;
+
+          // Storing the ref is not enough: the graph that's PLAYING was built
+          // from the previous buffer and keeps playing it, so moving pitch (or
+          // speed) with lock-pitch on changed the readout but not the sound
+          // until some unrelated control — a reverb type — forced a rebuild.
+          // Swap it in the same way seeking does: stop and restart in place.
+          if (graphRef.current && audioCtxRef.current) {
+            // Carry the FRACTION, not the seconds. A re-stretch at a new speed
+            // gives a buffer of a different length, so the same elapsed time
+            // would land on a different part of the song.
+            const elapsed = getElapsed();
+            const fraction = prevDuration > 0 ? Math.min(1, elapsed / prevDuration) : 0;
+            // The rebuild lands on a fresh AudioContext whose clock starts at
+            // ~0; bank the output time so a recording timeline can't restart.
+            recordBaseRef.current = getOutputTime();
+            stopPreview();
+            startAt(fraction * stretched.duration);
+          }
         } catch (error) {
           console.error("Time-stretch failed", error);
         } finally {
@@ -352,6 +373,11 @@ export function RemixStudio() {
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
+    // Intentionally keyed only on what should trigger a RE-STRETCH. The
+    // rebuild helpers (getElapsed/stopPreview/startAt) are called inside, but
+    // listing them would re-stretch whenever their identity changed — the same
+    // reason the reverb-type rebuild below opts out.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [buffer, lockPitch, speed, pitchSemitones]);
 
   // Live-update the playing graph's params in place (no restart needed) for
