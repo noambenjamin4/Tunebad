@@ -19,3 +19,6 @@ tsconfig.tsbuildinfo
 scripts/tunebad-bridge.env
 logs/
 AUTONOMOUS-QUEUE.md
+
+# Local DB backups (4MB+ dumps, never commit)
+backups/
