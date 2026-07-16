@@ -41,14 +41,30 @@
 // the page too — `grep -rn "export const revalidate" app/`.
 
 /**
- * Per-song and per-artist facts: BPM, key, camelot, duration.
+ * Per-song facts: BPM, key, camelot, duration. `/song/[slug]` uses `false`
+ * (never expire), NOT a number — see the literal in that file.
  *
- * These are immutable properties of the recording — once analysed, a track's
- * tempo does not change. 30 days is a formality; in practice a deploy refreshes
- * these long before the window expires. This is the setting that matters: these
- * two routes are ~130k of the site's ~130k ISR pages.
+ * WHY `false` AND NOT "A LONG WINDOW". These are immutable properties of the
+ * recording: once analysed, a track's tempo does not change. So there is no
+ * such thing as a stale song page, and ANY expiry buys a rewrite of ~163k
+ * pages in exchange for nothing. The arithmetic decides the plan:
+ *
+ *     1 hour   -> every crawl rewrites   -> 1.4M writes/mo   (paused the account)
+ *     30 days  -> every page, monthly    -> ~163k writes/mo  (82% of budget, forever)
+ *     false    -> written once, then free -> ~0 writes/mo     (what ships)
+ *
+ * The 30-day version was the first fix and it was not good enough: it still
+ * consumed the entire free budget every month, just quietly. `false` is what
+ * makes a 163k-page catalog fit inside a 200k-write plan with room to spare.
+ *
+ * THE TRADE, stated plainly: a page written under `false` will NOT pick up a
+ * database correction (e.g. the BPM backfill) until the next deploy, because a
+ * deploy is the only thing that invalidates it. That is the right trade for
+ * immutable facts — but it means DB-only data fixes must be followed by a
+ * deploy to become visible. Do not "solve" that by adding an expiry back; that
+ * makes every crawler poll for a change that almost never comes.
  */
-export const REVALIDATE_SONG = 2_592_000; // 30 days
+export const REVALIDATE_SONG = false;
 
 /**
  * Artist pages: the facts are static, but an artist gains songs as the seeder

@@ -22,12 +22,18 @@ import { SITE_URL } from "@/lib/site";
 // Programmatic per-song pages, one for every track in the shared link-analysis
 // cache. Statically generated for the songs known at build time and filled in
 // on demand (ISR) as the cache grows from live "analyze from link" usage.
-// 30 days (REVALIDATE_SONG in lib/cache-policy.ts — must be a literal here;
-// Next.js statically analyses route segment config). A track's BPM and key are
-// fixed once analysed, and there are ~130k of these pages on dynamicParams, so
-// an hourly window turned every crawler visit into an ISR write and paused the
-// account at 695% of the limit. A deploy still refreshes them.
-export const revalidate = 2592000;
+// Cache permanently — see lib/cache-policy.ts. A track's BPM and key are FIXED
+// the moment it is analysed, so there is no such thing as a stale song page;
+// any expiry at all just buys a rewrite of ~163k pages for nothing. `false`
+// means "never expire", so each page is written ONCE and then serves free
+// forever. A deploy still invalidates everything, which is the only refresh
+// this content needs (and the backfill's corrected BPMs will land that way).
+//
+// This is the single line that decides whether the site fits the free plan. An
+// hourly window here billed 1.4M ISR writes against a 200k budget and paused
+// the whole account on 2026-07-15; a 30-day window would still rewrite every
+// page monthly (~82% of the budget, forever). `false` makes steady-state ~0.
+export const revalidate = false;
 export const dynamicParams = true;
 
 export async function generateStaticParams() {
