@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { SeekableWaveform } from "@/components/ui/SeekableWaveform";
 import { useI18n } from "@/lib/i18n";
-import { setNowPlaying } from "@/lib/audio/now-playing";
+import { useNowPlaying } from "@/hooks/useNowPlaying";
 
 const NOW_PLAYING_SOURCE = "analyzer-preview";
 
@@ -24,11 +24,12 @@ export function WaveformPreview({
     setPlaying(false);
   }, [previewUrl]);
 
-  useEffect(() => {
-    setNowPlaying(NOW_PLAYING_SOURCE, playing);
-  }, [playing]);
-
-  useEffect(() => () => setNowPlaying(NOW_PLAYING_SOURCE, false), []);
+  // Report playback and hand over the stop switch, so starting another tool
+  // silences this preview rather than doubling up on the speakers.
+  useNowPlaying(NOW_PLAYING_SOURCE, playing, useCallback(() => {
+    audioRef.current?.pause();
+    setPlaying(false);
+  }, []));
 
   const getCurrentTime = useCallback(() => audioRef.current?.currentTime ?? 0, []);
 

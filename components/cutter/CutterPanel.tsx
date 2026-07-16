@@ -12,7 +12,7 @@ import type { OutputFormat } from "@/components/converter/QualityPicker";
 import { useTunebad } from "../TunebadApp";
 import { useI18n } from "@/lib/i18n";
 import { WaveformIcon } from "@/components/ui/icons";
-import { setNowPlaying } from "@/lib/audio/now-playing";
+import { useNowPlaying } from "@/hooks/useNowPlaying";
 import { formatTimeTenths } from "@/lib/format";
 import { useUnloadGuard } from "@/hooks/useUnloadGuard";
 
@@ -90,11 +90,13 @@ export function CutterPanel() {
   );
   const duration = buffer?.duration ?? 0;
 
-  useEffect(() => {
-    setNowPlaying(NOW_PLAYING_SOURCE, playing);
-  }, [playing]);
-
-  useEffect(() => () => setNowPlaying(NOW_PLAYING_SOURCE, false), []);
+  // Report playback and hand over the stop switch, so starting another tool
+  // silences this preview instead of stacking a second song over it. Pausing
+  // the element fires onPause, which settles the `playing` state from there.
+  useNowPlaying(NOW_PLAYING_SOURCE, playing, useCallback(() => {
+    audioRef.current?.pause();
+    setPlaying(false);
+  }, []));
 
   useEffect(() => {
     return () => {

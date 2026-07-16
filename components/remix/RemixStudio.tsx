@@ -32,7 +32,7 @@ import {
   type ReverbType,
 } from "@/lib/audio/remix";
 import { ReverbEq } from "@/components/remix/ReverbEq";
-import { setNowPlaying } from "@/lib/audio/now-playing";
+import { useNowPlaying } from "@/hooks/useNowPlaying";
 
 const NOW_PLAYING_SOURCE = "remix-preview";
 
@@ -289,11 +289,10 @@ export function RemixStudio() {
   // Cleanup on unmount.
   useEffect(() => stopPreview, [stopPreview]);
 
-  useEffect(() => {
-    setNowPlaying(NOW_PLAYING_SOURCE, playing);
-  }, [playing]);
-
-  useEffect(() => () => setNowPlaying(NOW_PLAYING_SOURCE, false), []);
+  // Report playback and hand over the stop switch, so starting any other tool
+  // silences this one instead of layering a second song over it. stopPreview
+  // stops the source node synchronously, which is what the registry needs.
+  useNowPlaying(NOW_PLAYING_SOURCE, playing, stopPreview);
 
   const handleFiles = useCallback(
     async (files: File[]) => {

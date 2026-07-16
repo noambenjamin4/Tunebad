@@ -11,7 +11,7 @@ import { downloadBlob } from "@/lib/files/download";
 import { useTunebad } from "../TunebadApp";
 import { useI18n } from "@/lib/i18n";
 import { GaugeIcon } from "@/components/ui/icons";
-import { setNowPlaying } from "@/lib/audio/now-playing";
+import { useNowPlaying } from "@/hooks/useNowPlaying";
 
 const NOW_PLAYING_SOURCE = "loudness-preview";
 
@@ -87,6 +87,10 @@ export function LoudnessPanel() {
   const [exportTarget, setExportTarget] = useState<string>("spotify");
   const [customTarget, setCustomTarget] = useState("-14");
   const [exporting, setExporting] = useState(false);
+  // Mirrors the <audio> element's own play/pause state. This panel uses native
+  // controls rather than a custom transport, so the element is the source of
+  // truth and this only exists to report into the playback registry.
+  const [playing, setPlaying] = useState(false);
 
   const previewUrlRef = useRef<string | null>(null);
   const workerRef = useRef<Worker | null>(null);
@@ -103,10 +107,17 @@ export function LoudnessPanel() {
       workerRef.current?.terminate();
       if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
       audioCtxRef.current?.close();
-      setNowPlaying(NOW_PLAYING_SOURCE, false);
     },
     [],
   );
+
+  // Report playback and hand over the stop switch, so starting another tool
+  // silences this preview instead of running two songs at once. useNowPlaying
+  // handles the unmount deregistration this effect used to do by hand.
+  useNowPlaying(NOW_PLAYING_SOURCE, playing, useCallback(() => {
+    audioElRef.current?.pause();
+    setPlaying(false);
+  }, []));
 
   const getWorker = useCallback((): Worker | null => {
     if (workerRef.current) return workerRef.current;
@@ -170,7 +181,7 @@ export function LoudnessPanel() {
     gainRef.current = null;
     sourceRef.current = null;
     audioElRef.current = null;
-    setNowPlaying(NOW_PLAYING_SOURCE, false);
+    setPlaying(false);
   }, []);
 
   const handleFiles = useCallback(
@@ -419,10 +430,10 @@ export function LoudnessPanel() {
               onPlay={() => {
                 if (!gainRef.current) ensureAudioGraph();
                 if (audioCtxRef.current?.state === "suspended") void audioCtxRef.current.resume();
-                setNowPlaying(NOW_PLAYING_SOURCE, true);
+                setPlaying(true);
               }}
-              onPause={() => setNowPlaying(NOW_PLAYING_SOURCE, false)}
-              onEnded={() => setNowPlaying(NOW_PLAYING_SOURCE, false)}
+              onPause={() => setPlaying(false)}
+              onEnded={() => setPlaying(false)}
             />
             <div className="loudness-preview-actions">
               <button

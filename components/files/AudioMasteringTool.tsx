@@ -9,7 +9,7 @@ import { encodeMp3FromChannels, encodeWavFromChannels } from "@/lib/audio/mp3-en
 import { downloadBlob } from "@/lib/files/download";
 import { computeWaveformBars } from "@/lib/audio/waveform";
 import { SeekableWaveform } from "@/components/ui/SeekableWaveform";
-import { setNowPlaying } from "@/lib/audio/now-playing";
+import { useNowPlaying } from "@/hooks/useNowPlaying";
 import { formatBytes } from "@/lib/files/image";
 import { analyzeBandCurve, measureIntegratedLufs, renderMaster, type MasterBandCurve, type MasterMetrics, type MasterStyle } from "@/lib/audio/master";
 import { STAGE_LABELS, type AudioStage } from "@/lib/audio/stages";
@@ -336,10 +336,9 @@ export function AudioMasteringTool() {
   }, [resetPlayback]);
 
   useEffect(() => stopPreview, [stopPreview]);
-  useEffect(() => {
-    setNowPlaying(NOW_PLAYING_SOURCE, playing);
-  }, [playing]);
-  useEffect(() => () => setNowPlaying(NOW_PLAYING_SOURCE, false), []);
+  // Report playback and hand over the stop switch, so starting another tool
+  // silences this A/B preview instead of layering it under a second song.
+  useNowPlaying(NOW_PLAYING_SOURCE, playing, stopPreview);
 
   const handleFiles = useCallback(
     async (files: File[]) => {

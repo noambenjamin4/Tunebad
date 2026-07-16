@@ -1,24 +1,20 @@
 "use client";
 
-import { useEffect } from "react";
 import { useTunebad } from "../TunebadApp";
 import { useMetronome } from "@/hooks/useMetronome";
 import { clampBpm } from "@/lib/format";
 import { useI18n } from "@/lib/i18n";
-import { setNowPlaying } from "@/lib/audio/now-playing";
+import { useNowPlaying } from "@/hooks/useNowPlaying";
 
 const NOW_PLAYING_SOURCE = "metronome";
 
 export function MetronomeCard() {
   const { metronomeBpm, setMetronomeBpm, delayBpm } = useTunebad();
-  const { running, beat, lightOn, toggle } = useMetronome(metronomeBpm);
+  const { running, beat, lightOn, toggle, stop } = useMetronome(metronomeBpm);
   const { t } = useI18n();
 
-  useEffect(() => {
-    setNowPlaying(NOW_PLAYING_SOURCE, running);
-  }, [running]);
-
-  useEffect(() => () => setNowPlaying(NOW_PLAYING_SOURCE, false), []);
+  // The click counts as audio: starting a song stops it, and vice versa.
+  useNowPlaying(NOW_PLAYING_SOURCE, running, stop);
 
   return (
     <article className="utility-card metronome-card">

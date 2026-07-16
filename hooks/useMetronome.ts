@@ -85,5 +85,12 @@ export function useMetronome(bpm: number) {
 
   const toggle = useCallback(() => setRunning((current) => !current), []);
 
-  return { running, beat, lightOn, toggle };
+  // Unconditional stop, for when something else takes over the speakers (see
+  // lib/audio/now-playing.ts). `toggle` can't serve: it would START a stopped
+  // metronome. Clicks already scheduled inside the lookahead window still play
+  // — a tail of up to SCHEDULE_AHEAD_SECONDS that would only be avoidable by
+  // tracking every oscillator, which is not worth it for a 100ms click.
+  const stop = useCallback(() => setRunning(false), []);
+
+  return { running, beat, lightOn, toggle, stop };
 }
