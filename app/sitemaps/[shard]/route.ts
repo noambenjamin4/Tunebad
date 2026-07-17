@@ -106,10 +106,23 @@ export async function GET(_req: Request, { params }: { params: Promise<{ shard: 
     if (slice.length === 0 && shardIndex > 0) {
       return new Response("Not found", { status: 404 });
     }
+    // Per-song lastmod from the row's own created_at, NOT the shard's render
+    // time. A lastmod that is always "now" is worse than none: Google learns
+    // the signal is untrustworthy and ignores it. Song pages are
+    // revalidate=false — their content is fixed at analysis time — so
+    // created_at IS the true last-modified date, and it never churns. This is
+    // one of the few honest levers for moving pages from "discovered" to
+    // "indexed". created_at is already selected by readSongSlugRange, so this
+    // costs zero extra query. Date.parse guards a malformed value (never
+    // observed — 0 nulls — but one bad row must not 500 the whole shard).
+    const songLastmod = (raw: string | undefined): string => {
+      const t = raw ? Date.parse(raw) : NaN;
+      return Number.isNaN(t) ? now : new Date(t).toISOString();
+    };
     const xml = urlsetXml(
       slice.map((s) => ({
         loc: `${SITE_URL}/song/${s.slug}`,
-        lastmod: now,
+        lastmod: songLastmod(s.created_at),
         changefreq: "monthly",
         priority: 0.5,
       })),
