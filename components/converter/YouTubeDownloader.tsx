@@ -54,6 +54,13 @@ export function YouTubeDownloader() {
   const { state, start, reset } = useYouTubeJob();
   const { t } = useI18n();
   const [url, setUrl] = useState("");
+  // /converter?url=<link> pre-fills the field — the TuneBad extension's
+  // "YouTube -> MP3" handoff button lands here with the tab's video URL.
+  // Only ever a prefill: nothing auto-starts, the user still hits Convert.
+  useEffect(() => {
+    const shared = new URLSearchParams(window.location.search).get("url");
+    if (shared && validateMediaUrl(shared)) setUrl(shared);
+  }, []);
   // A single `quality` field is shared by both pickers — kbps values while
   // format is mp3/wav, resolution values while format is mp4 — so it's always
   // valid for whatever format is currently selected (see onFormatChange).
