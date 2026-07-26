@@ -871,6 +871,7 @@ const de: Record<keyof typeof en, string> = {
   "studio.zoomHint": "Pinch oder Strg+Scrollen zoomt dort, wo der Cursor steht",
   "studio.undo": "Rückgängig",
   "studio.mute": "Stumm",
+  "studio.exportLoopOnly": "Nur den Loop exportieren",
   "studio.lockPitch": "Tonhöhe halten",
   "studio.lockPitchHint": "Tempo ändern ohne Tonhöhe zu ändern. Bewegungen aufnehmen ist dabei nicht möglich.",
   "studio.lockPitchFailed": "Audio konnte für „Tonhöhe halten“ nicht gedehnt werden.",

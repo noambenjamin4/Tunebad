@@ -13,6 +13,7 @@ import {
   splitClip,
   isSoloing,
   loopPassEnd,
+  sliceClipsToWindow,
   snapCandidates,
 } from "../lib/studio/timeline";
 import {
@@ -344,4 +345,35 @@ test("lock pitch: clips point at the stretched buffer for that exact speed", () 
 test("lock pitch: speed 1 is a no-op — nothing to stretch", () => {
   const clips = [clip({ id: "a" }), clip({ id: "b", timelineStart: 5 })];
   assert.equal(scaleClipsForLock(clips, 1), clips);
+});
+
+test("export the loop: the window is rebased to zero and clips are trimmed", () => {
+  const a = clip({ id: "a", timelineStart: 0, clipStart: 0, clipEnd: 20 });
+  const b = clip({ id: "b", timelineStart: 15, clipStart: 5, clipEnd: 25 });
+  const sliced = sliceClipsToWindow([a, b], 10, 18);
+
+  const outA = sliced.find((c) => c.id === "a")!;
+  assert.equal(outA.timelineStart, 0);      // window start becomes zero
+  assert.equal(outA.clipStart, 10);         // head cut moves INTO the source
+  assert.equal(outA.clipEnd, 18);           // tail cut trims the source end
+  const outB = sliced.find((c) => c.id === "b")!;
+  assert.equal(outB.timelineStart, 5);      // 15 - 10
+  assert.equal(outB.clipStart, 5);          // starts inside the window: untouched
+  assert.equal(outB.clipEnd, 8);            // 20 - 15 = 3s of it survives
+  assert.equal(timelineDuration(sliced), 8);
+});
+
+test("export the loop: clips entirely outside the window are dropped", () => {
+  const before = clip({ id: "before", timelineStart: 0, clipStart: 0, clipEnd: 5 });
+  const after = clip({ id: "after", timelineStart: 40, clipStart: 0, clipEnd: 5 });
+  const inside = clip({ id: "inside", timelineStart: 12, clipStart: 0, clipEnd: 4 });
+  const sliced = sliceClipsToWindow([before, after, inside], 10, 20);
+  assert.deepEqual(sliced.map((c) => c.id), ["inside"]);
+});
+
+test("export the loop: a sliver thinner than the minimum clip is dropped", () => {
+  const sliver = clip({ id: "sliver", timelineStart: 9.95, clipStart: 0, clipEnd: 5 });
+  assert.deepEqual(sliceClipsToWindow([sliver], 10, 20).map((c) => c.id), ["sliver"]);
+  // Only 0.05s pokes into the window — below MIN_CLIP_SECONDS, so nothing.
+  assert.deepEqual(sliceClipsToWindow([sliver], 14.9, 20), []);
 });

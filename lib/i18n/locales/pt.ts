@@ -871,6 +871,7 @@ const pt: Record<keyof typeof en, string> = {
   "studio.zoomHint": "Pince ou ctrl+rolagem para aproximar onde está o cursor",
   "studio.undo": "Desfazer",
   "studio.mute": "Mudo",
+  "studio.exportLoopOnly": "Exportar apenas o loop",
   "studio.lockPitch": "Travar tom",
   "studio.lockPitchHint": "Mudar a velocidade sem mudar o tom. Gravar movimentos fica indisponível enquanto estiver ligado.",
   "studio.lockPitchFailed": "Não foi possível esticar o áudio para travar o tom.",

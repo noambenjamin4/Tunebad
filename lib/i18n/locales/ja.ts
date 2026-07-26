@@ -869,6 +869,7 @@ const ja: Record<keyof typeof en, string> = {
   "studio.zoomHint": "ピンチまたは Ctrl+スクロールでカーソル位置を拡大",
   "studio.undo": "元に戻す",
   "studio.mute": "ミュート",
+  "studio.exportLoopOnly": "ループだけを書き出す",
   "studio.lockPitch": "ピッチ固定",
   "studio.lockPitchHint": "ピッチを変えずに速度を変更。オンの間は動きの記録は使えません。",
   "studio.lockPitchFailed": "ピッチ固定用の音声を伸縮できませんでした。",

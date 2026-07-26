@@ -64,6 +64,7 @@
   "62": "page.tsx",
   "63": "CamelotHubPage.tsx",
   "64": "downloadBlob",
+  "65": "route.ts",
   "66": "CutterPanel.tsx",
   "67": "constants.ts",
   "68": "page.tsx",
@@ -72,6 +73,7 @@
   "71": "page.tsx",
   "72": "useWindowFileDrop",
   "73": "PAGE_SIZE",
+  "74": "LandingSeo.tsx",
   "75": "page.tsx",
   "76": "analysis.ts",
   "77": "VideoTool.tsx",
@@ -80,8 +82,9 @@
   "80": "getEnvStrings",
   "81": "octave-map.mjs",
   "82": "page.tsx",
+  "83": "FileDrop.tsx",
   "84": "page.tsx",
   "86": "BassBoosterTool.tsx",
   "87": "page.tsx",
-  "91": "useNowPlaying"
+  "88": "page.tsx"
 }

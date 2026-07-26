@@ -182,6 +182,37 @@ export function loopPassEnd(
   return { at: duration, wrap: false };
 }
 
+/**
+ * Restrict clips to a time window and rebase it to zero — how "export just
+ * the loop" works. Clips are trimmed to the window (their source offsets
+ * move with the cut, so the audio inside is untouched) and anything outside
+ * is dropped. Fades are left as authored; a clip clipped by the window
+ * simply keeps whatever part of its envelope survives.
+ */
+export function sliceClipsToWindow(
+  clips: StudioClip[],
+  start: number,
+  end: number,
+): StudioClip[] {
+  const out: StudioClip[] = [];
+  for (const clip of clips) {
+    const clipEndTime = clipTimelineEnd(clip);
+    if (clipEndTime <= start + 1e-9 || clip.timelineStart >= end - 1e-9) continue;
+    const headCut = Math.max(0, start - clip.timelineStart);
+    const tailCut = Math.max(0, clipEndTime - end);
+    const nextStart = clip.clipStart + headCut;
+    const nextEnd = clip.clipEnd - tailCut;
+    if (nextEnd - nextStart < MIN_CLIP_SECONDS) continue;
+    out.push({
+      ...clip,
+      timelineStart: Math.max(0, clip.timelineStart - start),
+      clipStart: nextStart,
+      clipEnd: nextEnd,
+    });
+  }
+  return out;
+}
+
 /** True when at least one clip is soloed (and not also muted). */
 export function isSoloing(clips: StudioClip[]): boolean {
   return clips.some((c) => c.soloed && !c.muted);

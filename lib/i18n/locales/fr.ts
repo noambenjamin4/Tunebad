@@ -878,6 +878,7 @@ const fr: Record<keyof typeof en, string> = {
   "studio.zoomHint": "Pincez ou ctrl+molette pour zoomer sur le curseur",
   "studio.undo": "Annuler",
   "studio.mute": "Muet",
+  "studio.exportLoopOnly": "Exporter seulement la boucle",
   "studio.lockPitch": "Verrouiller la hauteur",
   "studio.lockPitchHint": "Changer la vitesse sans changer la hauteur. L'enregistrement des mouvements est indisponible quand c'est actif.",
   "studio.lockPitchFailed": "Impossible d'étirer l'audio pour verrouiller la hauteur.",

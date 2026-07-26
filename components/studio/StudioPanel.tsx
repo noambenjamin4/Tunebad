@@ -32,6 +32,7 @@ import {
   MAX_TIMELINE_SECONDS,
   MAX_TOTAL_CLIPS,
   isSoloing,
+  sliceClipsToWindow,
   moveClip,
   splitClip,
   timelineDuration,
@@ -178,6 +179,7 @@ export function StudioPanel() {
   const [undoDepth, setUndoDepth] = useState(0);
   const [loop, setLoopState] = useState<{ start: number; end: number } | null>(null);
   const [follow, setFollow] = useState(true);
+  const [exportLoopOnly, setExportLoopOnly] = useState(false);
 
   const clipsRef = useRef(clips);
   clipsRef.current = clips;
@@ -313,22 +315,41 @@ export function StudioPanel() {
       // each new clip twice (once in the ref, once in `added`) and stop
       // roughly half-way to the real limit.
       const startingCount = clipsRef.current.length;
-      for (const file of files) {
-        if (startingCount + added >= MAX_CLIPS) {
-          full = true;
-          break;
-        }
-        const key = bufferKey(file);
-        try {
-          if (!bufferMap.has(key)) {
+
+      // Decode ALL of them at once. decodeAudioData is off-thread, so a
+      // serial loop just idles between files; four songs used to cost the
+      // sum of their decodes instead of the slowest one. Failures are kept
+      // per-file so one bad drop can't sink the batch.
+      const accepted = files.slice(0, Math.max(0, MAX_CLIPS - startingCount));
+      if (accepted.length < files.length) full = true;
+      const decoded = await Promise.all(
+        accepted.map(async (file) => {
+          const key = bufferKey(file);
+          if (bufferMap.has(key)) return { file, key, ok: true as const };
+          try {
             const { buffer } = await decodeAudioFile(file);
-            const bytes = buffer.length * buffer.numberOfChannels * 4;
+            return { file, key, ok: true as const, buffer };
+          } catch {
+            return { file, key, ok: false as const };
+          }
+        }),
+      );
+
+      for (const entry of decoded) {
+        const { file, key } = entry;
+        try {
+          if (!entry.ok) throw new Error("decode failed");
+          if (!bufferMap.has(key)) {
+            const fresh = entry.buffer!;
+            const bytes = fresh.length * fresh.numberOfChannels * 4;
+            // Budget is checked as each buffer is ADMITTED, so a batch that
+            // overshoots keeps the files that fit instead of all-or-nothing.
             if (decodedBytes() + bytes > MAX_DECODED_BYTES) {
               setStatus(t("studio.memoryFull"));
               setStatusIsError(true);
               break;
             }
-            bufferMap.set(key, buffer);
+            bufferMap.set(key, fresh);
           }
           const buffer = bufferMap.get(key)!;
           const start = Math.min(cursor, MAX_TIMELINE_SECONDS - buffer.duration);
@@ -739,7 +760,13 @@ export function StudioPanel() {
       const set = await buildPlaybackSet();
       const exportParams =
         set.scale === 1 ? paramsRef.current : { ...paramsRef.current, speed: 1, lockPitch: false };
-      const blob = await exportStudioMix(set.clips, set.buffers, {
+      // The loop is authored in timeline seconds; the playback set may be on
+      // a stretched clock, so the window converts with it.
+      const clipsToBounce =
+        exportLoopOnly && loop
+          ? sliceClipsToWindow(set.clips, loop.start / set.scale, loop.end / set.scale)
+          : set.clips;
+      const blob = await exportStudioMix(clipsToBounce, set.buffers, {
         format,
         params: exportParams,
         take,
@@ -755,7 +782,7 @@ export function StudioPanel() {
       setStage(null);
       setWorking(false);
     }
-  }, [working, format, takes, selectedTakeId, stopPreview, buildPlaybackSet, t]);
+  }, [working, format, takes, selectedTakeId, stopPreview, buildPlaybackSet, exportLoopOnly, loop, t]);
 
   /* ------------------------------ render ------------------------------ */
 
@@ -932,6 +959,17 @@ export function StudioPanel() {
           )}
 
           {soloing && <p className="studio-notice">{t("studio.soloNotice")}</p>}
+          {loop && (
+            <label className="studio-field studio-lock">
+              <input
+                type="checkbox"
+                checked={exportLoopOnly}
+                disabled={working}
+                onChange={(e) => setExportLoopOnly(e.target.checked)}
+              />
+              {t("studio.exportLoopOnly")}
+            </label>
+          )}
 
           <div className="studio-master">
             <label className="studio-field studio-lock" title={t("studio.lockPitchHint")}>

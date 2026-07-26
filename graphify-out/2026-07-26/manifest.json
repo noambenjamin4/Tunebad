@@ -1540,8 +1540,8 @@
     "semantic_hash": ""
   },
   "lib/studio/timeline.ts": {
-    "mtime": 1785044639.7080376,
-    "ast_hash": "985f56df4af82e74907409ff8824aaef",
+    "mtime": 1785046088.3869958,
+    "ast_hash": "c8658aa3ecc0ef91996f48c877a8b0a2",
     "semantic_hash": ""
   },
   "lib/studio/timeline-math.ts": {
@@ -1555,8 +1555,8 @@
     "semantic_hash": ""
   },
   "tests/studio-timeline.test.ts": {
-    "mtime": 1785045251.3258135,
-    "ast_hash": "2f7a1114a4cd8fe500c93d34f13dee60",
+    "mtime": 1785046088.4551625,
+    "ast_hash": "aaff1f09810b12bb4eebec1e0407620f",
     "semantic_hash": ""
   },
   "lib/studio/render-timeline.ts": {
@@ -1580,8 +1580,8 @@
     "semantic_hash": ""
   },
   "components/studio/StudioPanel.tsx": {
-    "mtime": 1785045232.6855247,
-    "ast_hash": "a062170b593ff01500559dc46c56e5cf",
+    "mtime": 1785046064.2710068,
+    "ast_hash": "41e91d2f3f82b4654fd4a502d4ce1c14",
     "semantic_hash": ""
   },
   "lib/files/tool-handoff.ts": {
@@ -1615,8 +1615,8 @@
     "semantic_hash": ""
   },
   "lib/studio/lock-pitch.ts": {
-    "mtime": 1785045116.6682742,
-    "ast_hash": "08265eb4e48946711008c9e6419b2474",
+    "mtime": 1785046041.7156708,
+    "ast_hash": "7181eb7d298721c3c2672dd496f5a022",
     "semantic_hash": ""
   }
 }

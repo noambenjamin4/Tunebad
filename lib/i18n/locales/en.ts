@@ -920,6 +920,7 @@ const en = {
   "studio.zoomHint": "Pinch or ctrl+scroll to zoom where the cursor is",
   "studio.undo": "Undo",
   "studio.mute": "Mute",
+  "studio.exportLoopOnly": "Export the loop only",
   "studio.lockPitch": "Lock pitch",
   "studio.lockPitchHint": "Change speed without changing pitch. Recording moves is unavailable while it is on.",
   "studio.lockPitchFailed": "Could not stretch the audio for lock pitch.",

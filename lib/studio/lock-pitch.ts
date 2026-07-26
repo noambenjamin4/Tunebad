@@ -23,12 +23,44 @@ export function stretchedIdFor(bufferId: string, speed: number): string {
   return `${bufferId}@${speed.toFixed(2)}`;
 }
 
+/**
+ * Speeds snap to 0.05. At 0.01 a single drag of the speed slider walks
+ * through ~100 distinct values, and each one would cache a full-length
+ * stretched copy of every clip — hundreds of megabytes from one gesture.
+ * 0.05 is finer than anyone rides a slowed edit and bounds that to 20.
+ */
 export function quantiseSpeed(speed: number): number {
-  return Math.round(speed * 100) / 100;
+  return Math.round(speed * 20) / 20;
 }
 
+/**
+ * Stretched audio is BIG — a full copy of every clip, per speed — so the
+ * cache is a byte-budgeted LRU. Counting ENTRIES would be wrong: one speed
+ * across six clips is six entries, so an entry cap would evict the set it
+ * is currently playing and re-stretch forever. Bytes is the real limit.
+ */
+const MAX_STRETCH_BYTES = 250 * 1024 * 1024;
 const cache = new Map<string, AudioBuffer>();
 const pending = new Map<string, Promise<AudioBuffer>>();
+
+function bytesOf(buffer: AudioBuffer): number {
+  return buffer.length * buffer.numberOfChannels * 4;
+}
+
+/** Map preserves insertion order, so the oldest key is the first one. */
+function touch(key: string, buffer: AudioBuffer): void {
+  cache.delete(key);
+  cache.set(key, buffer);
+  let total = 0;
+  for (const b of cache.values()) total += bytesOf(b);
+  while (total > MAX_STRETCH_BYTES && cache.size > 1) {
+    const oldest = cache.keys().next().value;
+    if (oldest === undefined) break;
+    const victim = cache.get(oldest);
+    cache.delete(oldest);
+    total -= victim ? bytesOf(victim) : 0;
+  }
+}
 
 /** Cached pre-stretch. `speed` only — pitch shifting stays out of the DAW. */
 export function getStretchedBuffer(
@@ -38,13 +70,16 @@ export function getStretchedBuffer(
 ): Promise<AudioBuffer> {
   const key = stretchedIdFor(bufferId, speed);
   const hit = cache.get(key);
-  if (hit) return Promise.resolve(hit);
+  if (hit) {
+    touch(key, hit);
+    return Promise.resolve(hit);
+  }
   const inFlight = pending.get(key);
   if (inFlight) return inFlight;
 
   const job = timeStretch(buffer, speed, 0)
     .then((stretched) => {
-      cache.set(key, stretched);
+      touch(key, stretched);
       pending.delete(key);
       return stretched;
     })
@@ -59,6 +94,15 @@ export function getStretchedBuffer(
 export function peekStretchedBuffer(bufferId: string, speed: number): AudioBuffer | null {
   return cache.get(stretchedIdFor(bufferId, speed)) ?? null;
 }
+
+/** Cached bytes — exposed so a test can prove the LRU budget holds. */
+export function stretchCacheBytes(): number {
+  let total = 0;
+  for (const b of cache.values()) total += bytesOf(b);
+  return total;
+}
+
+export const STRETCH_BYTE_BUDGET = MAX_STRETCH_BYTES;
 
 /** Drop every stretched variant of one buffer (its last clip was removed). */
 export function forgetStretched(bufferId: string): void {

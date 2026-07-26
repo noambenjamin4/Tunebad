@@ -871,6 +871,7 @@ const it: Record<keyof typeof en, string> = {
   "studio.zoomHint": "Pizzica o ctrl+rotella per zoomare dove sta il cursore",
   "studio.undo": "Annulla",
   "studio.mute": "Muto",
+  "studio.exportLoopOnly": "Esporta solo il loop",
   "studio.lockPitch": "Blocca intonazione",
   "studio.lockPitchHint": "Cambia la velocità senza cambiare l'intonazione. La registrazione dei movimenti non è disponibile quando è attivo.",
   "studio.lockPitchFailed": "Impossibile allungare l'audio per bloccare l'intonazione.",

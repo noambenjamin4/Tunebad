@@ -871,6 +871,7 @@ const es: Record<keyof typeof en, string> = {
   "studio.zoomHint": "Pellizca o ctrl+rueda para acercar donde está el cursor",
   "studio.undo": "Deshacer",
   "studio.mute": "Silenciar",
+  "studio.exportLoopOnly": "Exportar solo el bucle",
   "studio.lockPitch": "Bloquear tono",
   "studio.lockPitchHint": "Cambiar la velocidad sin cambiar el tono. Grabar movimientos no está disponible mientras está activo.",
   "studio.lockPitchFailed": "No se pudo estirar el audio para bloquear el tono.",

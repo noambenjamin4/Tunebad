@@ -868,6 +868,7 @@ const zh: Record<keyof typeof en, string> = {
   "studio.zoomHint": "双指捏合或 Ctrl+滚轮，以光标位置为中心缩放",
   "studio.undo": "撤销",
   "studio.mute": "静音",
+  "studio.exportLoopOnly": "仅导出循环段",
   "studio.lockPitch": "锁定音高",
   "studio.lockPitchHint": "改变速度而不改变音高。开启时无法录制操作。",
   "studio.lockPitchFailed": "无法为锁定音高拉伸音频。",
