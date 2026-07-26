@@ -24,6 +24,13 @@ export interface StudioClip {
   soloed: boolean;
   /** 0..5, assigned round-robin at add time; drives the clip tint. */
   colorIndex: number;
+  /**
+   * Set when the clip has been beatmatched. Stretched audio is huge and
+   * derivable, so a saved session records the ORIGIN and the factor and
+   * re-runs the stretch on restore instead of storing ~40 MB per clip.
+   */
+  sourceBufferId?: string;
+  tempoRatio?: number;
 }
 
 export const MIN_CLIP_SECONDS = 0.1;

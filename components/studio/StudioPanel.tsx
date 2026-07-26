@@ -48,6 +48,15 @@ import {
 } from "@/lib/studio/display-signal";
 import { StudioEngine } from "@/lib/studio/engine";
 import {
+  MAX_SESSION_BYTES,
+  clearSession,
+  loadArrangement,
+  loadSessionFiles,
+  saveArrangement,
+  saveSessionFile,
+  sessionBytes,
+} from "@/lib/studio/session";
+import {
   type BeatGrid,
   DEFAULT_BEATS_PER_BAR,
   MAX_BPM,
@@ -202,6 +211,10 @@ export function StudioPanel() {
   // same song share one answer and one analysis.
   const [clipBpms, setClipBpms] = useState<Map<string, number>>(new Map());
   const bpmRequestedRef = useRef<Set<string>>(new Set());
+  const [restoring, setRestoring] = useState(false);
+  // Restore runs once and must not be mistaken for user edits: autosave
+  // stays parked until it has finished (or decided there is nothing).
+  const restoredRef = useRef(false);
 
   const clipsRef = useRef(clips);
   clipsRef.current = clips;
@@ -372,6 +385,17 @@ export function StudioPanel() {
               break;
             }
             bufferMap.set(key, fresh);
+            // Keep the original file so a refresh can rebuild this clip.
+            // Compressed source, not decoded audio: a 4-minute MP3 is a few
+            // MB where its PCM is ~40.
+            void (async () => {
+              const stored = await loadSessionFiles();
+              if (sessionBytes(stored) + file.size > MAX_SESSION_BYTES) {
+                setStatus(t("studio.sessionFull"));
+                return;
+              }
+              await saveSessionFile(key, file);
+            })();
           }
           const buffer = bufferMap.get(key)!;
           const start = Math.min(cursor, MAX_TIMELINE_SECONDS - buffer.duration);
@@ -441,12 +465,101 @@ export function StudioPanel() {
     };
   }, [clips, params.effect]);
 
-  // Files handed off from the joiner / cutter / slowed-reverb pages.
+  // Files handed off from the joiner / cutter / slowed-reverb pages take
+  // precedence over a saved session — arriving with a file is an explicit
+  // "work on this", not "carry on where I left off".
   useEffect(() => {
-    const files = takeStudioFiles();
-    if (files && files.length > 0) void addFiles(files);
+    const handoff = takeStudioFiles();
+    if (handoff && handoff.length > 0) {
+      restoredRef.current = true;
+      void addFiles(handoff);
+      return;
+    }
+
+    const saved = loadArrangement();
+    if (!saved) {
+      restoredRef.current = true;
+      return;
+    }
+    let cancelled = false;
+    setRestoring(true);
+    setStatus(t("studio.restoring"));
+    void (async () => {
+      try {
+        const files = await loadSessionFiles();
+        for (const [id, file] of files) {
+          if (cancelled) return;
+          if (bufferMap.has(id)) continue;
+          try {
+            const { buffer } = await decodeAudioFile(file);
+            bufferMap.set(id, buffer);
+          } catch {
+            // A source that no longer decodes drops its clips below.
+          }
+        }
+        // Beatmatched clips reference stretched audio that was never
+        // stored; rebuild it from the origin and the factor.
+        for (const clip of saved.clips) {
+          if (cancelled) return;
+          if (!clip.sourceBufferId || !clip.tempoRatio || bufferMap.has(clip.bufferId)) continue;
+          const origin = bufferMap.get(clip.sourceBufferId);
+          if (!origin) continue;
+          const stretched = await getStretchedBuffer(
+            clip.sourceBufferId,
+            origin,
+            clip.tempoRatio,
+          );
+          bufferMap.set(clip.bufferId, stretched);
+        }
+        if (cancelled) return;
+        // Drop anything whose audio could not be rebuilt rather than
+        // showing silent clips that look fine.
+        const usable = saved.clips.filter((c) => bufferMap.has(c.bufferId));
+        if (usable.length === 0) {
+          clearArrangementSafely();
+          setStatus("");
+          return;
+        }
+        setClips(usable);
+        if (saved.params) setParams(saved.params as RemixParams);
+        if (saved.grid) setGrid(saved.grid as BeatGrid);
+        setGridOn(saved.gridOn !== false);
+        if (saved.loop) applyLoop(saved.loop);
+        if (saved.pxPerSecond) setPxPerSecond(clampZoom(saved.pxPerSecond));
+        setStatus(t("studio.restored"));
+      } catch {
+        setStatus("");
+      } finally {
+        if (!cancelled) {
+          setRestoring(false);
+          restoredRef.current = true;
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const clearArrangementSafely = () => {
+    void clearSession();
+  };
+
+  // Autosave. Debounced because dragging a clip fires this constantly, and
+  // parked until restore has settled so it cannot overwrite a session with
+  // the empty state that exists while it loads.
+  useEffect(() => {
+    if (!restoredRef.current || restoring) return;
+    const timer = window.setTimeout(() => {
+      if (clips.length === 0) {
+        void clearSession();
+        return;
+      }
+      saveArrangement({ clips, params, grid, loop, gridOn, pxPerSecond });
+    }, 600);
+    return () => window.clearTimeout(timer);
+  }, [clips, params, grid, loop, gridOn, pxPerSecond, restoring]);
 
   /* ------------------------------- beat grid ------------------------------- */
 
@@ -755,6 +868,10 @@ export function StudioPanel() {
                 clipStart: nextClipStart,
                 clipEnd: nextClipEnd,
                 timelineStart: nextStart,
+                // Provenance, so a restored session can rebuild this
+                // stretch instead of storing the stretched audio.
+                sourceBufferId: c.sourceBufferId ?? c.bufferId,
+                tempoRatio: (c.tempoRatio ?? 1) * ratio,
               }
             : c,
         ),
@@ -1039,6 +1156,18 @@ export function StudioPanel() {
               title={t("studio.followHint")}
             >
               {t("studio.follow")}
+            </button>
+            <button
+              className="text-button"
+              type="button"
+              onClick={() => {
+                void clearSession();
+                setStatus("");
+              }}
+              disabled={working || clips.length === 0}
+              title={t("studio.clearSession")}
+            >
+              {t("studio.clearSession")}
             </button>
             <button
               className="text-button"
