@@ -38263,7 +38263,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/ClipCanvas.tsx",
-      "source_location": "L89",
+      "source_location": "L94",
       "weight": 1.0,
       "source": "components_studio_clipcanvas_clipcanvas",
       "target": "lib_studio_waveform_pyramid_windowminmax"
@@ -57975,5 +57975,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "37183d29ddb10ad35b3a1fa9b7b3c23b6d46b634"
+  "built_at_commit": "a528629e6ae5bca07e3889b80f001e334e5fea12"
 }

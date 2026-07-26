@@ -15,7 +15,7 @@
 // envelope and its volume, so the wave always looks like what it sounds
 // like.
 
-import { useEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 import type { DisplaySignal } from "@/lib/studio/display-signal";
 import { windowMinMax } from "@/lib/studio/waveform-pyramid";
 
@@ -58,7 +58,12 @@ export function ClipCanvas({
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  useEffect(() => {
+  // useLayoutEffect, not useEffect: React commits the <canvas> element and
+  // only THEN runs passive effects, so with useEffect there is one frame
+  // where the clip box is on screen and empty — a visible flicker on load,
+  // scroll and zoom. Layout effects run before the browser paints, so the
+  // waveform is there the first time the element is seen.
+  useLayoutEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas || widthPx <= 0 || heightPx <= 0 || toSec <= fromSec) return;
     const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));

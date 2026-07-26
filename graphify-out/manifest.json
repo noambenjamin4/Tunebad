@@ -1565,8 +1565,8 @@
     "semantic_hash": ""
   },
   "components/studio/ClipCanvas.tsx": {
-    "mtime": 1785085806.6972897,
-    "ast_hash": "413e94ab68ede2473f12d939a2e6e823",
+    "mtime": 1785086466.5619576,
+    "ast_hash": "ad4d9c1b6ceaba69d525a0c4cfeef3ce",
     "semantic_hash": ""
   },
   "components/studio/Timeline.tsx": {
