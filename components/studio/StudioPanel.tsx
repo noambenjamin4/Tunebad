@@ -35,6 +35,7 @@ import {
   MAX_DECODED_BYTES,
   MAX_TIMELINE_SECONDS,
   MAX_TOTAL_CLIPS,
+  crossfadeOverlap,
   isSoloing,
   sliceClipsToWindow,
   moveClip,
@@ -641,6 +642,27 @@ export function StudioPanel() {
     }
   }, [loop, selectedId, applyLoop]);
 
+  /**
+   * One click turns an overlap into a transition. Deliberately not automatic
+   * on drop: overlapping clips that both play at full level is a legitimate
+   * mix (a beat under a vocal), so blending them has to be asked for.
+   */
+  const handleCrossfade = useCallback(() => {
+    if (!selectedId) return;
+    const next = crossfadeOverlap(clipsRef.current, selectedId);
+    if (!next) return;
+    const faded = next.find((c) => c.id === selectedId);
+    pushUndo();
+    setClips(next);
+    setStatus(
+      t("studio.crossfaded", {
+        seconds: Math.max(faded?.fadeInSec ?? 0, faded?.fadeOutSec ?? 0).toFixed(1),
+      }),
+    );
+    setStatusIsError(false);
+    requestReschedule("now");
+  }, [selectedId, pushUndo, requestReschedule, t]);
+
   const handleToggleMute = useCallback(() => {
     if (!selectedId) return;
     editClip(selectedId, (c) => ({ ...c, muted: !c.muted }));
@@ -937,6 +959,8 @@ export function StudioPanel() {
               onToggleMute={handleToggleMute}
               onToggleSolo={handleToggleSolo}
               onMatchTempo={() => void handleMatchTempo()}
+              onCrossfade={handleCrossfade}
+              canCrossfade={crossfadeOverlap(clips, selectedClip.id) !== null}
               onSplit={handleSplitSelected}
               onDuplicate={handleDuplicate}
               onDelete={handleDeleteSelected}

@@ -254,13 +254,68 @@ export interface EffectNodes {
   fxGain: GainNode;
 }
 
-export function applyEffectParams(nodes: EffectNodes, effect: EffectId): void {
+/**
+ * Long enough to be a fade rather than a step, short enough that the effect
+ * still feels like it lands on the click. Below ~60 ms the gain crossing is
+ * audible as a tick; above ~200 ms it feels laggy under the finger.
+ */
+export const EFFECT_GLIDE_SECONDS = 0.12;
+
+/**
+ * Move the effect chain to a preset.
+ *
+ * Without `glide` every value is assigned outright, which is correct at build
+ * time and wrong the moment audio is already flowing: the clean path drops
+ * from 1 to 0 while the wet path jumps from 0 to full IN THE SAME SAMPLE, and
+ * a discontinuity that size is a click, not a switch. Passing a context makes
+ * every parameter ramp there instead.
+ *
+ * Gains ramp linearly — the two paths carry the same material a filter apart,
+ * so they are strongly correlated and a linear crossing holds level. Cutoffs
+ * ramp exponentially, because a sweep from 20 kHz to 3 kHz only sounds even
+ * when it moves at a constant rate in PITCH.
+ */
+export function applyEffectParams(
+  nodes: EffectNodes,
+  effect: EffectId,
+  glide?: { ctx: BaseAudioContext; seconds?: number },
+): void {
   const preset = EFFECTS[effect] ?? EFFECTS.none;
-  nodes.highpass.frequency.value = preset.highpassHz;
-  nodes.lowpass.frequency.value = preset.lowpassHz;
-  nodes.drive.gain.value = preset.drive;
-  nodes.fxGain.gain.value = preset.level;
-  nodes.cleanGain.gain.value = effect === "none" ? 1 : 0;
+  const clean = effect === "none" ? 1 : 0;
+
+  if (!glide) {
+    nodes.highpass.frequency.value = preset.highpassHz;
+    nodes.lowpass.frequency.value = preset.lowpassHz;
+    nodes.drive.gain.value = preset.drive;
+    nodes.fxGain.gain.value = preset.level;
+    nodes.cleanGain.gain.value = clean;
+    return;
+  }
+
+  const now = glide.ctx.currentTime;
+  const end = now + (glide.seconds ?? EFFECT_GLIDE_SECONDS);
+  // Start each ramp from where the param IS, so switching effects twice in
+  // quick succession bends the in-flight ramp instead of jumping to its
+  // target and starting over.
+  const from = (param: AudioParam) => {
+    param.cancelScheduledValues(now);
+    param.setValueAtTime(param.value, now);
+  };
+  const linear = (param: AudioParam, target: number) => {
+    from(param);
+    param.linearRampToValueAtTime(target, end);
+  };
+  const exponential = (param: AudioParam, target: number) => {
+    from(param);
+    // exponentialRamp cannot touch zero; every cutoff here is >= 20 Hz.
+    param.exponentialRampToValueAtTime(Math.max(1, target), end);
+  };
+
+  exponential(nodes.highpass.frequency, preset.highpassHz);
+  exponential(nodes.lowpass.frequency, preset.lowpassHz);
+  linear(nodes.drive.gain, preset.drive);
+  linear(nodes.fxGain.gain, preset.level);
+  linear(nodes.cleanGain.gain, clean);
 }
 
 // Builds the clean/fx fan-out. `input` feeds both paths; both land on

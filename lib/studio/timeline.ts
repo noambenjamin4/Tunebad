@@ -18,6 +18,11 @@ export interface StudioClip {
   gain: number;
   fadeInSec: number;
   fadeOutSec: number;
+  /**
+   * Shape of both fades. Absent means "linear" — sessions saved before
+   * curves existed must keep sounding the way they were authored.
+   */
+  fadeCurve?: FadeCurve;
   /** Silenced without losing its gain setting; skipped by the scheduler. */
   muted: boolean;
   /** When ANY clip is soloed, only soloed clips play — live AND on export. */
@@ -31,6 +36,78 @@ export interface StudioClip {
    */
   sourceBufferId?: string;
   tempoRatio?: number;
+}
+
+/* ------------------------------ fade shape ------------------------------ */
+
+export type FadeCurve = "linear" | "equalPower";
+
+/**
+ * Points sampled along an equal-power ramp. The consumers interpolate
+ * LINEARLY between fade points, so a curve has to be approximated by a
+ * polyline; 12 segments keeps the worst-case error under 0.9% of full scale
+ * (~0.08 dB), which is far below audible, and costs 12 automation events.
+ */
+const EQUAL_POWER_STEPS = 12;
+
+/**
+ * Clamp a clip's two fades so they cannot pass through each other.
+ *
+ * The rule is that they must TOGETHER fit inside the clip, not that each
+ * must fit in half of it. The difference matters exactly where it is most
+ * useful: a clip with only a fade-out can then fade across its entire
+ * length. Under a half-clip cap, dragging song B a long way over song A
+ * produced a fade-out and a fade-in that were each clamped to the middle of
+ * their own clip and so never met — a "crossfade" with a gap in it.
+ *
+ * When they do conflict both are scaled by the same factor, so the shape the
+ * user asked for is preserved and only its scale changes.
+ */
+export function fitFades(
+  fadeInSec: number,
+  fadeOutSec: number,
+  length: number,
+): { fadeIn: number; fadeOut: number } {
+  const fadeIn = Math.max(0, fadeInSec);
+  const fadeOut = Math.max(0, fadeOutSec);
+  const total = fadeIn + fadeOut;
+  if (total <= length || total === 0) return { fadeIn, fadeOut };
+  const scale = length / total;
+  return { fadeIn: fadeIn * scale, fadeOut: fadeOut * scale };
+}
+
+/**
+ * The clip's fade envelope at `local` seconds into it, 0..1. Excludes the
+ * clip's own gain — callers multiply that in.
+ *
+ * ONE function because the audio and the picture must not disagree: the
+ * scheduler samples it to build automation points and ClipCanvas samples it
+ * to scale the waveform's bar heights. They used to hold separate copies of
+ * the same arithmetic, which was fine only for as long as there was exactly
+ * one shape.
+ *
+ * Why two shapes. A linear fade is the honest default for a clip fading to
+ * silence on its own. But two linear fades crossing — which is what a beat
+ * switch IS — sum to 0.5 amplitude at the midpoint, and for two unrelated
+ * songs that is a 3 dB hole right in the transition. Equal power raises each
+ * side to a quarter-cosine so that gainA² + gainB² stays 1 across a matched
+ * overlap, and the level holds.
+ */
+export function fadeGain(
+  local: number,
+  length: number,
+  fadeInSec: number,
+  fadeOutSec: number,
+  curve: FadeCurve = "linear",
+): number {
+  const { fadeIn, fadeOut } = fitFades(fadeInSec, fadeOutSec, length);
+  let progress = 1;
+  if (fadeIn > 0 && local < fadeIn) progress = Math.min(progress, local / fadeIn);
+  if (fadeOut > 0 && local > length - fadeOut) {
+    progress = Math.min(progress, (length - local) / fadeOut);
+  }
+  progress = Math.max(0, Math.min(1, progress));
+  return curve === "equalPower" ? Math.sin((Math.PI / 2) * progress) : progress;
 }
 
 export const MIN_CLIP_SECONDS = 0.1;
@@ -135,29 +212,31 @@ export function computeClipSchedule(
 
     // Fade envelope, expressed at the clip's local timeline times then mapped
     // to wall clock: wall(t) = (t - position) / speed for t >= position.
-    const fadeIn = Math.min(clip.fadeInSec, duration / 2);
-    const fadeOut = Math.min(clip.fadeOutSec, duration / 2);
+    const { fadeIn, fadeOut } = fitFades(clip.fadeInSec, clip.fadeOutSec, duration);
+    const curve = clip.fadeCurve ?? "linear";
     const points: FadePoint[] = [];
     const toWall = (t: number) => (t - position) / speed;
     if (fadeIn > 0 || fadeOut > 0) {
-      const fadeInEnd = clip.timelineStart + fadeIn;
-      const fadeOutStart = end - fadeOut;
       const startT = clip.timelineStart + intoClip;
-      const gainAt = (t: number) => {
-        let g = 1;
-        if (fadeIn > 0 && t < fadeInEnd) g = Math.min(g, (t - clip.timelineStart) / fadeIn);
-        if (fadeOut > 0 && t > fadeOutStart) g = Math.min(g, (end - t) / fadeOut);
-        return Math.max(0, Math.min(1, g)) * clip.gain;
+      // Sample the envelope at every corner, plus intermediate steps along a
+      // curved ramp since the consumers only interpolate straight lines. A
+      // linear ramp needs its two ends and nothing between them.
+      const times = new Set<number>([startT, end]);
+      const addRamp = (from: number, to: number) => {
+        const steps = curve === "equalPower" ? EQUAL_POWER_STEPS : 1;
+        for (let i = 0; i <= steps; i++) times.add(from + ((to - from) * i) / steps);
       };
-      points.push({ at: toWall(startT), gain: gainAt(startT) });
-      if (fadeIn > 0 && fadeInEnd > startT && fadeInEnd < end) {
-        points.push({ at: toWall(fadeInEnd), gain: gainAt(fadeInEnd) });
+      if (fadeIn > 0) addRamp(clip.timelineStart, clip.timelineStart + fadeIn);
+      if (fadeOut > 0) addRamp(end - fadeOut, end);
+      for (const t of [...times].sort((a, b) => a - b)) {
+        // A seek can land mid-fade, so anything before the resume point is
+        // not scheduled — the first point emitted carries its gain instead.
+        if (t < startT || t > end) continue;
+        points.push({
+          at: toWall(t),
+          gain: fadeGain(t - clip.timelineStart, duration, fadeIn, fadeOut, curve) * clip.gain,
+        });
       }
-      if (fadeOut > 0 && fadeOutStart > startT && fadeOutStart < end) {
-        // Hold at full gain until the fade-out begins…
-        points.push({ at: toWall(fadeOutStart), gain: gainAt(fadeOutStart) });
-      }
-      points.push({ at: toWall(end), gain: gainAt(end) });
     }
 
     out.push({
@@ -305,6 +384,65 @@ export function trimClipStart(clip: StudioClip, newClipStart: number, bufferDura
 export function trimClipEnd(clip: StudioClip, newClipEnd: number, bufferDuration: number): StudioClip {
   const clipEnd = Math.min(bufferDuration, Math.max(newClipEnd, clip.clipStart + MIN_CLIP_SECONDS));
   return { ...clip, clipEnd };
+}
+
+/** Shortest overlap worth crossfading — below this it is a butt join. */
+const MIN_CROSSFADE_SECONDS = 0.05;
+
+/**
+ * Turn an overlap into a crossfade.
+ *
+ * A beat switch is already built by hand here: drag song B over song A's
+ * tail, then fade A out and B in over exactly the region where they overlap.
+ * The second half of that is arithmetic the user should not be doing, and
+ * getting it wrong by half a second is audible. So: find the clip that
+ * overlaps this one the most, and set both fades to the length of the
+ * overlap, on an equal-power curve so the transition holds its level.
+ *
+ * Returns null when nothing overlaps — the caller hides the action rather
+ * than offering something that would silently do nothing.
+ */
+export function crossfadeOverlap(clips: StudioClip[], clipId: string): StudioClip[] | null {
+  const clip = clips.find((c) => c.id === clipId);
+  if (!clip) return null;
+
+  let partner: StudioClip | null = null;
+  let best = MIN_CROSSFADE_SECONDS;
+  for (const other of clips) {
+    if (other.id === clip.id) continue;
+    const overlap =
+      Math.min(clipTimelineEnd(clip), clipTimelineEnd(other)) -
+      Math.max(clip.timelineStart, other.timelineStart);
+    if (overlap > best) {
+      best = overlap;
+      partner = other;
+    }
+  }
+  if (!partner) return null;
+
+  // Whichever starts first is the one going OUT. A tie would make the
+  // direction arbitrary, so the shorter clip yields and fades in.
+  const clipFirst =
+    clip.timelineStart < partner.timelineStart ||
+    (clip.timelineStart === partner.timelineStart && clipDuration(clip) >= clipDuration(partner));
+  const outgoing = clipFirst ? clip : partner;
+  const incoming = clipFirst ? partner : clip;
+
+  // Use the whole overlap, so the two fades land on exactly the same span
+  // and equal power actually holds. The only limit is the room each clip has
+  // left after the fade it already carries at its other end.
+  const seconds = Math.min(
+    best,
+    clipDuration(outgoing) - outgoing.fadeInSec,
+    clipDuration(incoming) - incoming.fadeOutSec,
+  );
+  if (seconds < MIN_CROSSFADE_SECONDS) return null;
+
+  return clips.map((c) => {
+    if (c.id === outgoing.id) return { ...c, fadeOutSec: seconds, fadeCurve: "equalPower" as const };
+    if (c.id === incoming.id) return { ...c, fadeInSec: seconds, fadeCurve: "equalPower" as const };
+    return c;
+  });
 }
 
 /**

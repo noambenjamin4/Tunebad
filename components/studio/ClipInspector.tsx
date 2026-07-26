@@ -21,6 +21,8 @@ export function ClipInspector({
   onToggleMute,
   onToggleSolo,
   onMatchTempo,
+  onCrossfade,
+  canCrossfade,
   onSplit,
   onDuplicate,
   onDelete,
@@ -37,6 +39,9 @@ export function ClipInspector({
   onToggleMute: () => void;
   onToggleSolo: () => void;
   onMatchTempo: () => void;
+  onCrossfade: () => void;
+  /** False when nothing overlaps — the action is hidden, not disabled. */
+  canCrossfade: boolean;
   onSplit: () => void;
   onDuplicate: () => void;
   onDelete: () => void;
@@ -104,6 +109,17 @@ export function ClipInspector({
           title={t("studio.matchHint")}
         >
           {t("studio.match")}
+        </button>
+      )}
+      {canCrossfade && (
+        <button
+          className="text-button"
+          type="button"
+          disabled={working}
+          onClick={onCrossfade}
+          title={t("studio.crossfadeHint")}
+        >
+          {t("studio.crossfade")}
         </button>
       )}
       <button

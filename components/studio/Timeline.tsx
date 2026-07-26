@@ -679,6 +679,7 @@ export function Timeline({
                     toSec={visible.toSec}
                     fadeInSec={clip.fadeInSec}
                     fadeOutSec={clip.fadeOutSec}
+                    fadeCurve={clip.fadeCurve}
                     gain={clip.gain}
                     muted={clip.muted}
                     widthPx={visible.widthPx}

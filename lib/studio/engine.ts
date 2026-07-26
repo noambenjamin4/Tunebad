@@ -32,6 +32,19 @@ import { type StudioClip, computeClipSchedule, loopPassEnd, timelineDuration } f
 /** Long enough to kill the click, short enough to read as instant. */
 const FADE_SECONDS = 0.012;
 
+/**
+ * Time constant for knob glides. setTargetAtTime approaches exponentially,
+ * so it is ~99.9% of the way there after 7x this — 70 ms, well inside the
+ * gap between two pointer-move events, which means a drag still tracks the
+ * finger while each individual step is smoothed.
+ */
+const KNOB_GLIDE_TAU = 0.01;
+
+function glideTo(param: AudioParam, target: number, ctx: BaseAudioContext): void {
+  if (param.value === target) return;
+  param.setTargetAtTime(target, ctx.currentTime, KNOB_GLIDE_TAU);
+}
+
 interface ActiveGraph {
   sources: AudioBufferSourceNode[];
   clipGains: Map<string, GainNode>;
@@ -323,12 +336,19 @@ export class StudioEngine {
     }
 
     const chain = this.chain;
-    if (!chain) return false;
+    const ctx = this.ctx;
+    if (!chain || !ctx) return false;
+    // Every knob GLIDES to its new value rather than jumping. A slider drag
+    // is a stream of discrete steps, and assigning .value on each one puts a
+    // tiny discontinuity in the signal each time — individually inaudible,
+    // but a fast drag is a burst of them, which is the zipper noise you hear
+    // as a knob "crackling". A short time constant removes it and costs
+    // nothing.
     const { wet, dry } = remixGain(next.reverb);
-    chain.wetGain.gain.value = wet;
-    chain.dryGain.gain.value = dry;
-    chain.bassFilter.gain.value = next.bassBoostDb;
-    if (next.effect !== prev.effect) applyEffectParams(chain.effect, next.effect);
+    glideTo(chain.wetGain.gain, wet, ctx);
+    glideTo(chain.dryGain.gain, dry, ctx);
+    glideTo(chain.bassFilter.gain, next.bassBoostDb, ctx);
+    if (next.effect !== prev.effect) applyEffectParams(chain.effect, next.effect, { ctx });
     if (next.reverbEq !== prev.reverbEq) applyReverbEqParams(chain.reverbEq, next.reverbEq);
     return false;
   }

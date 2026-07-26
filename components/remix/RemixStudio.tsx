@@ -506,7 +506,10 @@ export function RemixStudio() {
   const handleEffectChange = useCallback(
     (next: EffectId) => {
       setEffect(next);
-      if (graphRef.current) applyEffectParams(graphRef.current.effect, next);
+      const ctx = audioCtxRef.current;
+      if (graphRef.current) {
+        applyEffectParams(graphRef.current.effect, next, ctx ? { ctx } : undefined);
+      }
       recordMove({ kind: "effect", value: next });
     },
     [recordMove],
@@ -540,7 +543,10 @@ export function RemixStudio() {
     setEffect(preset.effect);
     // The character applies live to the playing graph, exactly as clicking the
     // pill would — otherwise a preset would set the value but not the sound.
-    if (graphRef.current) applyEffectParams(graphRef.current.effect, preset.effect);
+    if (graphRef.current) {
+      const ctx = audioCtxRef.current;
+      applyEffectParams(graphRef.current.effect, preset.effect, ctx ? { ctx } : undefined);
+    }
     recordMove({ kind: "speed", value: preset.speed });
     recordMove({ kind: "reverb", value: preset.reverb });
     recordMove({ kind: "bassBoostDb", value: preset.bassBoostDb });

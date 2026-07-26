@@ -17,6 +17,7 @@
 
 import { useLayoutEffect, useRef } from "react";
 import type { DisplaySignal } from "@/lib/studio/display-signal";
+import { type FadeCurve, fadeGain } from "@/lib/studio/timeline";
 import { windowMinMax } from "@/lib/studio/waveform-pyramid";
 
 // One column per pixel, drawn edge to edge. The old 2px-bar-every-3px grid
@@ -32,6 +33,7 @@ export function ClipCanvas({
   toSec,
   fadeInSec,
   fadeOutSec,
+  fadeCurve,
   gain,
   muted,
   widthPx,
@@ -48,6 +50,7 @@ export function ClipCanvas({
   toSec: number;
   fadeInSec: number;
   fadeOutSec: number;
+  fadeCurve: FadeCurve | undefined;
   gain: number;
   muted: boolean;
   /** Width of the visible slice in CSS px. */
@@ -87,8 +90,6 @@ export function ClipCanvas({
     const secondsPerPx = (toSec - fromSec) / widthPx;
     const mid = heightPx / 2;
     const half = heightPx / 2 - 2;
-    const fadeIn = Math.min(fadeInSec, clipLength / 2);
-    const fadeOut = Math.min(fadeOutSec, clipLength / 2);
 
     // Two passes so the whole outline sits under the whole body — drawing
     // them per column would let each body edge overlap the next outline.
@@ -106,10 +107,10 @@ export function ClipCanvas({
       // Fade envelope at the column's centre, measured from the clip's own
       // start (not the slice's), times volume.
       const local = (t0 + t1) / 2 - clipStart;
-      let level = gain;
-      if (fadeIn > 0 && local < fadeIn) level *= local / fadeIn;
-      if (fadeOut > 0 && local > clipLength - fadeOut) level *= (clipLength - local) / fadeOut;
-      level = Math.max(0, level);
+      const level = Math.max(
+        0,
+        gain * fadeGain(local, clipLength, fadeInSec, fadeOutSec, fadeCurve),
+      );
 
       // Canvas y grows downward: max (positive) is the TOP of the column.
       // Clamp to the box so a boosted clip can't paint outside its lane.
@@ -141,6 +142,7 @@ export function ClipCanvas({
     toSec,
     fadeInSec,
     fadeOutSec,
+    fadeCurve,
     gain,
     muted,
     widthPx,

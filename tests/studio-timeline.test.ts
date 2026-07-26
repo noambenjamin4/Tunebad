@@ -7,6 +7,9 @@ import {
   timelineDuration,
   assignDisplayRows,
   computeClipSchedule,
+  crossfadeOverlap,
+  fadeGain,
+  fitFades,
   moveClip,
   trimClipStart,
   trimClipEnd,
@@ -513,4 +516,132 @@ test("keyboard selection wraps, and reaches the timeline from nothing", () => {
   // A selection that no longer exists behaves like no selection.
   assert.equal(adjacentClipId([a, b], "deleted", 1), "a");
   assert.equal(adjacentClipId([], null, 1), null);
+});
+
+/* ------------------------------ crossfade ------------------------------ */
+
+test("equal power holds level where two linear fades would dip", () => {
+  // A matched crossfade: A fades out over the same span B fades in.
+  const SPAN = 4;
+  let worstLinear = 1;
+  let worstEqual = 1;
+  for (let i = 0; i <= 20; i++) {
+    const u = i / 20;
+    // u walks the overlap: the outgoing clip enters its fade-out at
+    // (length - SPAN) and reaches its end, while the incoming clip walks
+    // its fade-in from zero.
+    const outAt = 10 - SPAN + u * SPAN;
+    const inAt = u * SPAN;
+    const outLin = fadeGain(outAt, 10, 0, SPAN, "linear");
+    const inLin = fadeGain(inAt, 10, SPAN, 0, "linear");
+    const outEq = fadeGain(outAt, 10, 0, SPAN, "equalPower");
+    const inEq = fadeGain(inAt, 10, SPAN, 0, "equalPower");
+    worstLinear = Math.min(worstLinear, Math.hypot(outLin, inLin));
+    worstEqual = Math.min(worstEqual, Math.hypot(outEq, inEq));
+  }
+  // Two linear fades meeting at half amplitude leave a 3 dB hole…
+  assert.ok(worstLinear < 0.72, `linear dipped to ${worstLinear}`);
+  // …equal power keeps the summed power flat across the whole overlap.
+  assert.ok(worstEqual > 0.999, `equal power dipped to ${worstEqual}`);
+});
+
+test("fadeGain is unchanged for clips with no curve recorded", () => {
+  // Sessions saved before curves existed must sound exactly as authored.
+  assert.equal(fadeGain(1, 10, 2, 0), 0.5);
+  assert.equal(fadeGain(9.5, 10, 0, 1), 0.5);
+  assert.equal(fadeGain(5, 10, 2, 2), 1);
+  // A fade longer than the clip stretches across ALL of it rather than
+  // being capped at half — with no fade at the other end there is nothing
+  // for it to collide with.
+  assert.equal(fadeGain(5, 10, 40, 0), 0.5);
+  // Two fades that would collide are scaled down together, keeping their
+  // ratio, so the clip still reaches full level at exactly one instant.
+  const fitted = fitFades(30, 10, 10);
+  assert.equal(fitted.fadeIn + fitted.fadeOut, 10);
+  assert.equal(fitted.fadeIn / fitted.fadeOut, 3);
+});
+
+test("crossfade sets both fades to the length of the overlap", () => {
+  const a = clip({ id: "a", timelineStart: 0, clipStart: 0, clipEnd: 10 }); // 0..10
+  const b = clip({ id: "b", timelineStart: 7, clipStart: 0, clipEnd: 10 }); // 7..17
+  const next = crossfadeOverlap([a, b], "b");
+  assert.ok(next);
+  const [outgoing, incoming] = [next.find((c) => c.id === "a")!, next.find((c) => c.id === "b")!];
+  assert.equal(outgoing.fadeOutSec, 3);
+  assert.equal(incoming.fadeInSec, 3);
+  assert.equal(outgoing.fadeCurve, "equalPower");
+  assert.equal(incoming.fadeCurve, "equalPower");
+  // The clip that starts FIRST is the one going out, whichever was selected.
+  assert.equal(outgoing.fadeInSec, 0);
+  assert.equal(incoming.fadeOutSec, 0);
+});
+
+test("crossfade picks the biggest overlap, and refuses when there is none", () => {
+  const a = clip({ id: "a", timelineStart: 0, clipStart: 0, clipEnd: 10 });
+  const b = clip({ id: "b", timelineStart: 9, clipStart: 0, clipEnd: 10 }); // overlaps a by 1
+  const c = clip({ id: "c", timelineStart: 5, clipStart: 0, clipEnd: 10 }); // overlaps a by 5
+  const next = crossfadeOverlap([a, b, c], "a");
+  assert.ok(next);
+  assert.equal(next.find((x) => x.id === "c")!.fadeInSec, 5);
+  assert.equal(next.find((x) => x.id === "b")!.fadeInSec, 0);
+
+  const far = clip({ id: "far", timelineStart: 100, clipStart: 0, clipEnd: 10 });
+  assert.equal(crossfadeOverlap([a, far], "far"), null);
+  assert.equal(crossfadeOverlap([a], "a"), null);
+});
+
+test("a long overlap crossfades over ALL of it, so the two fades coincide", () => {
+  // This is the case a half-clip cap got wrong: b overlaps a by 6s, so both
+  // fades must span that same 6s or the transition has a gap in the middle.
+  const a = clip({ id: "a", timelineStart: 0, clipStart: 0, clipEnd: 8 });
+  const b = clip({ id: "b", timelineStart: 2, clipStart: 0, clipEnd: 6 }); // 2..8
+  const next = crossfadeOverlap([a, b], "b")!;
+  const outgoing = next.find((c) => c.id === "a")!;
+  const incoming = next.find((c) => c.id === "b")!;
+  assert.equal(outgoing.fadeOutSec, 6);
+  assert.equal(incoming.fadeInSec, 6);
+  // a fades out over timeline 2..8; b fades in over timeline 2..8 — same span.
+  const outStart = outgoing.timelineStart + clipDuration(outgoing) - outgoing.fadeOutSec;
+  const inStart = incoming.timelineStart;
+  assert.equal(outStart, inStart);
+
+  // And the level holds all the way across it.
+  for (let u = 0; u <= 1.0001; u += 0.1) {
+    const gOut = fadeGain(clipDuration(outgoing) - 6 + u * 6, clipDuration(outgoing), 0, 6, "equalPower");
+    const gIn = fadeGain(u * 6, clipDuration(incoming), 6, 0, "equalPower");
+    assert.ok(Math.abs(Math.hypot(gOut, gIn) - 1) < 1e-9, `power dipped at u=${u}`);
+  }
+});
+
+test("a crossfade leaves room for a fade the clip already has", () => {
+  const a = clip({ id: "a", timelineStart: 0, clipStart: 0, clipEnd: 30 });
+  // b already fades OUT for 3s of its 4s length, so its fade-in can take 1s.
+  const b = clip({ id: "b", timelineStart: 5, clipStart: 0, clipEnd: 4, fadeOutSec: 3 });
+  const next = crossfadeOverlap([a, b], "b")!;
+  assert.equal(next.find((c) => c.id === "b")!.fadeInSec, 1);
+});
+
+test("an equal-power fade is scheduled as a curve, a linear one as a line", () => {
+  const linear = computeClipSchedule(
+    [clip({ timelineStart: 0, clipStart: 0, clipEnd: 10, fadeInSec: 4 })],
+    0,
+    1,
+  );
+  // Start, top of the ramp, end.
+  assert.equal(linear[0].fadePoints.length, 3);
+
+  const curved = computeClipSchedule(
+    [clip({ timelineStart: 0, clipStart: 0, clipEnd: 10, fadeInSec: 4, fadeCurve: "equalPower" })],
+    0,
+    1,
+  );
+  assert.ok(curved[0].fadePoints.length > 10, "curve needs intermediate points to interpolate");
+  // Points rise monotonically and land exactly on full gain.
+  const gains = curved[0].fadePoints.map((p) => p.gain);
+  for (let i = 1; i < gains.length; i++) assert.ok(gains[i] >= gains[i - 1] - 1e-9);
+  assert.equal(gains[0], 0);
+  assert.equal(gains[gains.length - 1], 1);
+  // Halfway through an equal-power fade-in is sin(45 deg), not 0.5.
+  const mid = curved[0].fadePoints.find((p) => Math.abs(p.at - 2) < 1e-9);
+  assert.ok(mid && Math.abs(mid.gain - Math.SQRT1_2) < 1e-9);
 });
