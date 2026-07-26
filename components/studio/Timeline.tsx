@@ -115,6 +115,12 @@ export function Timeline({
   zoomRef.current = pxPerSecond;
   // Time badge shown beside a clip while it is being dragged or trimmed.
   const [dragLabel, setDragLabel] = useState<string | null>(null);
+  // The slice of timeline the clip canvases cover. Rendering the whole song
+  // blows past the browser's max canvas width and its memory (see
+  // ClipCanvas), so canvases are viewport-sized and follow the scroll.
+  const [band, setBand] = useState<{ from: number; to: number }>({ from: 0, to: 60 });
+  const bandRef = useRef(band);
+  bandRef.current = band;
 
   const rows = useMemo(() => assignDisplayRows(clips), [clips]);
   const rowCount = Math.max(1, rows.size ? Math.max(...rows.values()) + 1 : 1);
@@ -152,21 +158,47 @@ export function Timeline({
     [pxPerSecond],
   );
 
+  /**
+   * Recompute the drawn band when the view nears its edge. One viewport of
+   * margin each side means scrolling only repaints every half-screen or so,
+   * instead of on every scroll frame.
+   */
+  const syncBand = useCallback(() => {
+    const scroller = scrollRef.current;
+    if (!scroller) return;
+    const viewSec = scroller.clientWidth / pxPerSecond;
+    const from = scroller.scrollLeft / pxPerSecond;
+    const to = from + viewSec;
+    const current = bandRef.current;
+    const covered = current.from <= from - viewSec * 0.25 && current.to >= to + viewSec * 0.25;
+    if (covered) return;
+    setBand({ from: Math.max(0, from - viewSec), to: to + viewSec });
+  }, [pxPerSecond]);
+
+  // Zoom changes the seconds-per-pixel, so the band must be rebuilt too.
+  useEffect(() => {
+    syncBand();
+  }, [syncBand, clips]);
+
   // Manual scrolling suspends follow until the next play/seek — otherwise
   // the view fights the user for control of the scrollbar.
   useEffect(() => {
     const scroller = scrollRef.current;
     if (!scroller) return;
+    let queued = false;
     const onScroll = () => {
-      if (selfScrollRef.current) {
-        selfScrollRef.current = false;
-        return;
-      }
-      followSuspendedRef.current = true;
+      if (selfScrollRef.current) selfScrollRef.current = false;
+      else followSuspendedRef.current = true;
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(() => {
+        queued = false;
+        syncBand();
+      });
     };
     scroller.addEventListener("scroll", onScroll, { passive: true });
     return () => scroller.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [syncBand]);
 
   // A fresh play or seek re-arms following.
   useEffect(() => {
@@ -490,7 +522,20 @@ export function Timeline({
           {clips.map((clip) => {
             const signal = signals.get(clip.bufferId);
             const row = rows.get(clip.id) ?? 0;
-            const widthPx = Math.max(8, clipDuration(clip) * pxPerSecond);
+            const length = clipDuration(clip);
+            const widthPx = Math.max(8, length * pxPerSecond);
+            // Intersect the clip with the drawn band, in clip-local seconds.
+            const localFrom = Math.max(0, band.from - clip.timelineStart);
+            const localTo = Math.min(length, band.to - clip.timelineStart);
+            const visible =
+              localTo > localFrom
+                ? {
+                    fromSec: clip.clipStart + localFrom,
+                    toSec: clip.clipStart + localTo,
+                    offsetPx: localFrom * pxPerSecond,
+                    widthPx: Math.max(1, (localTo - localFrom) * pxPerSecond),
+                  }
+                : null;
             return (
               <div
                 key={clip.id}
@@ -511,17 +556,20 @@ export function Timeline({
                 }}
               >
                 <span className="studio-clip-name">{clip.name}</span>
-                {signal ? (
+                {signal && visible ? (
                   <ClipCanvas
                     signal={signal}
                     clipStart={clip.clipStart}
                     clipEnd={clip.clipEnd}
+                    fromSec={visible.fromSec}
+                    toSec={visible.toSec}
                     fadeInSec={clip.fadeInSec}
                     fadeOutSec={clip.fadeOutSec}
                     gain={clip.gain}
                     muted={clip.muted}
-                    widthPx={widthPx}
+                    widthPx={visible.widthPx}
                     heightPx={WAVE_HEIGHT}
+                    offsetPx={visible.offsetPx}
                   />
                 ) : (
                   <span className="studio-clip-pending" aria-hidden="true" />

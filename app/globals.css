@@ -4705,7 +4705,14 @@ tbody tr:last-child td {
   text-overflow: ellipsis;
   pointer-events: none;
 }
-.studio-clip-canvas { display: block; pointer-events: none; }
+.studio-clip-canvas {
+  display: block;
+  pointer-events: none;
+  /* Positioned at the visible slice: the canvas covers the viewport, not
+     the whole song (see components/studio/ClipCanvas.tsx). */
+  position: absolute;
+  top: 18px;
+}
 .studio-clip-grip {
   position: absolute;
   top: 0; bottom: 0;

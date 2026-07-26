@@ -1,13 +1,19 @@
 "use client";
 
-// One clip's waveform on the DAW timeline. The canvas IS the cache: it
-// re-renders only when the trim window, width, gain, theme, fades, effect
-// signal, or DPR change — dragging a clip around the timeline just moves the
-// element. Bars are exact min/max columns from the display signal's peak
-// pyramid, scaled by BOTH the clip's fade envelope and its volume, so the
-// wave always looks like what it sounds like: quieter clip, smaller wave;
-// phone/underwater on the master, thinner filtered wave (the signal itself
-// is re-rendered through those filters — see lib/studio/display-signal.ts).
+// One clip's waveform — but only the part you can actually see.
+//
+// Sizing a canvas to the whole clip does not survive contact with real
+// songs: a 4-minute track at 83 px/s is a 39,841-pixel backing store, past
+// the ~32,767 limit where browsers stop rendering entirely, and 17.6 MB of
+// canvas EACH. A few clips exhaust canvas memory, the browser drops backing
+// stores, and waveforms blink out at random — the "sometimes blank" bug.
+//
+// So the canvas is viewport-sized and positioned at the visible slice; it
+// re-renders as you scroll. Width is bounded by the window, not the song,
+// so zoom and track length cost nothing. Bars are exact min/max columns
+// from the display signal's peak pyramid, scaled by BOTH the clip's fade
+// envelope and its volume, so the wave always looks like what it sounds
+// like.
 
 import { useEffect, useRef } from "react";
 import type { DisplaySignal } from "@/lib/studio/display-signal";
@@ -20,23 +26,33 @@ export function ClipCanvas({
   signal,
   clipStart,
   clipEnd,
+  fromSec,
+  toSec,
   fadeInSec,
   fadeOutSec,
   gain,
   muted,
   widthPx,
   heightPx,
+  offsetPx,
   themeSignal = 0,
 }: {
   signal: DisplaySignal;
+  /** Full trimmed span of the clip, in source seconds — fades are clip-global. */
   clipStart: number;
   clipEnd: number;
+  /** The visible sub-span to draw, in source seconds. */
+  fromSec: number;
+  toSec: number;
   fadeInSec: number;
   fadeOutSec: number;
   gain: number;
   muted: boolean;
+  /** Width of the visible slice in CSS px. */
   widthPx: number;
   heightPx: number;
+  /** Where the slice sits inside the clip, in CSS px. */
+  offsetPx: number;
   /** Bump to force a repaint after a theme flip. */
   themeSignal?: number;
 }) {
@@ -44,8 +60,8 @@ export function ClipCanvas({
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas || widthPx <= 0 || heightPx <= 0) return;
-    const dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
+    if (!canvas || widthPx <= 0 || heightPx <= 0 || toSec <= fromSec) return;
+    const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
     canvas.width = Math.max(1, Math.round(widthPx * dpr));
     canvas.height = Math.max(1, Math.round(heightPx * dpr));
     const ctx = canvas.getContext("2d");
@@ -59,24 +75,25 @@ export function ClipCanvas({
     ctx.globalAlpha = muted ? 0.28 : 0.85;
 
     const { data, pyramid, sampleRate } = signal;
-    const duration = clipEnd - clipStart;
-    if (duration <= 0) return;
-    const secondsPerPx = duration / widthPx;
+    const clipLength = clipEnd - clipStart;
+    if (clipLength <= 0) return;
+    const secondsPerPx = (toSec - fromSec) / widthPx;
     const mid = heightPx / 2;
     const half = heightPx / 2 - 2;
-    const fadeIn = Math.min(fadeInSec, duration / 2);
-    const fadeOut = Math.min(fadeOutSec, duration / 2);
+    const fadeIn = Math.min(fadeInSec, clipLength / 2);
+    const fadeOut = Math.min(fadeOutSec, clipLength / 2);
 
     for (let x = 0; x < widthPx; x += COLUMN_PX) {
-      const t0 = clipStart + x * secondsPerPx;
-      const t1 = clipStart + Math.min(widthPx, x + COLUMN_PX) * secondsPerPx;
+      const t0 = fromSec + x * secondsPerPx;
+      const t1 = fromSec + Math.min(widthPx, x + COLUMN_PX) * secondsPerPx;
       const { min, max } = windowMinMax(data, pyramid, t0 * sampleRate, t1 * sampleRate);
 
-      // Fade envelope at the column's center, clip-local time, times volume.
+      // Fade envelope at the column's centre, measured from the clip's own
+      // start (not the slice's), times volume.
       const local = (t0 + t1) / 2 - clipStart;
       let level = gain;
       if (fadeIn > 0 && local < fadeIn) level *= local / fadeIn;
-      if (fadeOut > 0 && local > duration - fadeOut) level *= (duration - local) / fadeOut;
+      if (fadeOut > 0 && local > clipLength - fadeOut) level *= (clipLength - local) / fadeOut;
       level = Math.max(0, level);
 
       // Canvas y grows downward: max (positive) is the TOP of the column.
@@ -88,13 +105,26 @@ export function ClipCanvas({
       // One vertical min/max bar per column; floor 1px so silence stays visible.
       ctx.fillRect(x, yTop, BAR_PX, Math.max(1, yBottom - yTop));
     }
-  }, [signal, clipStart, clipEnd, fadeInSec, fadeOutSec, gain, muted, widthPx, heightPx, themeSignal]);
+  }, [
+    signal,
+    clipStart,
+    clipEnd,
+    fromSec,
+    toSec,
+    fadeInSec,
+    fadeOutSec,
+    gain,
+    muted,
+    widthPx,
+    heightPx,
+    themeSignal,
+  ]);
 
   return (
     <canvas
       ref={canvasRef}
       className="studio-clip-canvas"
-      style={{ width: `${widthPx}px`, height: `${heightPx}px` }}
+      style={{ width: `${widthPx}px`, height: `${heightPx}px`, left: `${offsetPx}px` }}
       aria-hidden="true"
     />
   );

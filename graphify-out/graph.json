@@ -5467,7 +5467,7 @@
       "label": "ClipCanvas()",
       "file_type": "code",
       "source_file": "components/studio/ClipCanvas.tsx",
-      "source_location": "L19",
+      "source_location": "L25",
       "_origin": "ast",
       "id": "components_studio_clipcanvas_clipcanvas",
       "community": 6,
@@ -38196,7 +38196,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/studio/ClipCanvas.tsx",
-      "source_location": "L19",
+      "source_location": "L25",
       "weight": 1.0,
       "source": "components_studio_clipcanvas",
       "target": "components_studio_clipcanvas_clipcanvas",
@@ -38207,7 +38207,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "components/studio/ClipCanvas.tsx",
-      "source_location": "L13",
+      "source_location": "L19",
       "weight": 1.0,
       "source": "components_studio_clipcanvas",
       "target": "lib_studio_display_signal",
@@ -38218,7 +38218,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "components/studio/ClipCanvas.tsx",
-      "source_location": "L13",
+      "source_location": "L19",
       "weight": 1.0,
       "source": "components_studio_clipcanvas",
       "target": "lib_studio_display_signal_displaysignal",
@@ -38229,7 +38229,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "components/studio/ClipCanvas.tsx",
-      "source_location": "L14",
+      "source_location": "L20",
       "weight": 1.0,
       "source": "components_studio_clipcanvas",
       "target": "lib_studio_waveform_pyramid",
@@ -38240,7 +38240,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "components/studio/ClipCanvas.tsx",
-      "source_location": "L14",
+      "source_location": "L20",
       "weight": 1.0,
       "source": "components_studio_clipcanvas",
       "target": "lib_studio_waveform_pyramid_windowminmax",
@@ -38263,7 +38263,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/ClipCanvas.tsx",
-      "source_location": "L73",
+      "source_location": "L89",
       "weight": 1.0,
       "source": "components_studio_clipcanvas_clipcanvas",
       "target": "lib_studio_waveform_pyramid_windowminmax"
@@ -39732,7 +39732,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L485",
+      "source_location": "L517",
       "weight": 1.0,
       "source": "components_studio_timeline_timeline",
       "target": "lib_format_formattime"
@@ -39743,7 +39743,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L310",
+      "source_location": "L342",
       "weight": 1.0,
       "source": "components_studio_timeline_timeline",
       "target": "lib_format_formattimetenths"
@@ -39754,7 +39754,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L462",
+      "source_location": "L494",
       "weight": 1.0,
       "source": "components_studio_timeline_timeline",
       "target": "lib_i18n_index_i18ncontextvalue_t"
@@ -39776,7 +39776,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L119",
+      "source_location": "L125",
       "weight": 1.0,
       "source": "components_studio_timeline_timeline",
       "target": "lib_studio_timeline_assigndisplayrows"
@@ -39787,7 +39787,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L247",
+      "source_location": "L279",
       "weight": 1.0,
       "source": "components_studio_timeline_timeline",
       "target": "lib_studio_timeline_clipduration"
@@ -39798,7 +39798,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L568",
+      "source_location": "L616",
       "weight": 1.0,
       "source": "components_studio_timeline_timeline",
       "target": "lib_studio_timeline_math_clampzoom"
@@ -39809,7 +39809,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L444",
+      "source_location": "L476",
       "weight": 1.0,
       "source": "components_studio_timeline_timeline",
       "target": "lib_studio_timeline_math_rulerstepseconds"
@@ -39820,7 +39820,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L349",
+      "source_location": "L381",
       "weight": 1.0,
       "source": "components_studio_timeline_timeline",
       "target": "lib_studio_timeline_math_snapclipstart"
@@ -39831,7 +39831,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L201",
+      "source_location": "L233",
       "weight": 1.0,
       "source": "components_studio_timeline_timeline",
       "target": "lib_studio_timeline_math_zoomatcursor"
@@ -39842,7 +39842,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L257",
+      "source_location": "L289",
       "weight": 1.0,
       "source": "components_studio_timeline_timeline",
       "target": "lib_studio_timeline_math_zoomtofit"
@@ -39853,7 +39853,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L352",
+      "source_location": "L384",
       "weight": 1.0,
       "source": "components_studio_timeline_timeline",
       "target": "lib_studio_timeline_snapcandidates"
@@ -39864,7 +39864,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L121",
+      "source_location": "L127",
       "weight": 1.0,
       "source": "components_studio_timeline_timeline",
       "target": "lib_studio_timeline_timelineduration"
@@ -39875,7 +39875,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L351",
+      "source_location": "L383",
       "weight": 1.0,
       "source": "components_studio_timeline_timeline",
       "target": "tests_studio_timeline_test_clip"
@@ -57975,5 +57975,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "64d69198ae0cf5ea74cc062fc29ff553b9fb5be4"
+  "built_at_commit": "37183d29ddb10ad35b3a1fa9b7b3c23b6d46b634"
 }

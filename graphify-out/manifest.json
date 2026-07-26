@@ -1565,13 +1565,13 @@
     "semantic_hash": ""
   },
   "components/studio/ClipCanvas.tsx": {
-    "mtime": 1785036217.8216531,
-    "ast_hash": "bee6d5ed03265cec2c4fa18b6b9dc16e",
+    "mtime": 1785085806.6972897,
+    "ast_hash": "413e94ab68ede2473f12d939a2e6e823",
     "semantic_hash": ""
   },
   "components/studio/Timeline.tsx": {
-    "mtime": 1785044117.0252984,
-    "ast_hash": "310b4abb312b291f662c5521558b1f78",
+    "mtime": 1785085835.0407336,
+    "ast_hash": "dcdfe0214b3f40a3af81e6822f459272",
     "semantic_hash": ""
   },
   "lib/studio/engine.ts": {
