@@ -9187,7 +9187,7 @@
       "label": "DictKey",
       "file_type": "code",
       "source_file": "lib/i18n/locales/en.ts",
-      "source_location": "L995",
+      "source_location": "L1002",
       "_origin": "ast",
       "id": "lib_i18n_locales_en_dictkey",
       "community": 31,
@@ -39640,7 +39640,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L1370",
+      "source_location": "L1381",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_audio_remix_coupledsemitones"
@@ -39684,7 +39684,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L1443",
+      "source_location": "L1454",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_format_formattimetenths"
@@ -39992,7 +39992,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L1100",
+      "source_location": "L1111",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_studio_timeline_moveclip"
@@ -40036,7 +40036,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L1105",
+      "source_location": "L1116",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_studio_timeline_trimclipend"
@@ -40047,7 +40047,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L1102",
+      "source_location": "L1113",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_studio_timeline_trimclipstart"
@@ -47455,7 +47455,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/i18n/locales/en.ts",
-      "source_location": "L995",
+      "source_location": "L1002",
       "weight": 1.0,
       "source": "lib_i18n_locales_en",
       "target": "lib_i18n_locales_en_dictkey",
@@ -59318,5 +59318,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "f20c66761a0ea5f0837c8accbaf3ec0cb584e352"
+  "built_at_commit": "ee7f76c46b70feee9a6056352b3cd0e5c96e8cbe"
 }

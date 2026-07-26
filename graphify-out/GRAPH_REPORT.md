@@ -1,7 +1,7 @@
 # Graph Report - Tunebad  (2026-07-26)
 
 ## Corpus Check
-- 268 files · ~295,131 words
+- 268 files · ~296,239 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -10,7 +10,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `f20c6676`
+- Built from commit: `ee7f76c4`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 

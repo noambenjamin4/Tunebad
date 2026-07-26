@@ -1082,10 +1082,21 @@ export function StudioPanel() {
         onFiles={(files) => void addFiles(files)}
         hint={
           clips.length === 0
-            ? t("studio.dropTitle")
+            ? t("studio.dropTitle", { count: MAX_CLIPS })
             : t("studio.dropMore", { count: MAX_CLIPS - clips.length })
         }
       />
+
+      {/* First contact. Everything this tool can do lives behind dropping a
+          file, so an empty drop zone teaches nothing — three lines name the
+          moves, and they disappear the moment there is a timeline. */}
+      {clips.length === 0 && (
+        <ul className="studio-intro">
+          <li>{t("studio.introA")}</li>
+          <li>{t("studio.introB")}</li>
+          <li>{t("studio.introC")}</li>
+        </ul>
+      )}
 
       {clips.length > 0 && (
         <>

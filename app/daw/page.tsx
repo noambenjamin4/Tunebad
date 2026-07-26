@@ -21,6 +21,8 @@ export default function Page() {
           { q: "studio.faq1Q", a: "studio.faq1A" },
           { q: "studio.faq2Q", a: "studio.faq2A" },
           { q: "studio.faq3Q", a: "studio.faq3A" },
+          { q: "studio.faq4Q", a: "studio.faq4A" },
+          { q: "studio.faq5Q", a: "studio.faq5A" },
         ]}
       />
       <RelatedTools tools={["audio-joiner", "audio-converter", "wav-to-mp3"]} />

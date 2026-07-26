@@ -150,7 +150,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_playlist_lookup_route",
-      "community": 76,
+      "community": 60,
       "norm_label": "route.ts"
     },
     {
@@ -160,7 +160,7 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "app_api_playlist_lookup_route_queryschema",
-      "community": 76,
+      "community": 60,
       "norm_label": "queryschema"
     },
     {
@@ -170,7 +170,7 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "app_api_playlist_lookup_route_playlistlookuptrack",
-      "community": 76,
+      "community": 60,
       "norm_label": "playlistlookuptrack"
     },
     {
@@ -180,7 +180,7 @@
       "source_location": "L41",
       "_origin": "ast",
       "id": "app_api_playlist_lookup_route_sourcetrack",
-      "community": 76,
+      "community": 60,
       "norm_label": "sourcetrack"
     },
     {
@@ -190,7 +190,7 @@
       "source_location": "L43",
       "_origin": "ast",
       "id": "app_api_playlist_lookup_route_sleep",
-      "community": 76,
+      "community": 60,
       "norm_label": "sleep()"
     },
     {
@@ -200,7 +200,7 @@
       "source_location": "L50",
       "_origin": "ast",
       "id": "app_api_playlist_lookup_route_runpool",
-      "community": 76,
+      "community": 60,
       "norm_label": "runpool()"
     },
     {
@@ -220,7 +220,7 @@
       "source_location": "L82",
       "_origin": "ast",
       "id": "app_api_playlist_lookup_route_get",
-      "community": 76,
+      "community": 15,
       "norm_label": "get()"
     },
     {
@@ -300,7 +300,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_songs_route",
-      "community": 72,
+      "community": 10,
       "norm_label": "route.ts"
     },
     {
@@ -310,7 +310,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "app_api_songs_route_queryschema",
-      "community": 72,
+      "community": 10,
       "norm_label": "queryschema"
     },
     {
@@ -320,7 +320,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "app_api_songs_route_get",
-      "community": 72,
+      "community": 10,
       "norm_label": "get()"
     },
     {
@@ -420,7 +420,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_youtube_playlist_route",
-      "community": 76,
+      "community": 15,
       "norm_label": "route.ts"
     },
     {
@@ -430,7 +430,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "app_api_youtube_playlist_route_playlistrequestschema",
-      "community": 76,
+      "community": 15,
       "norm_label": "playlistrequestschema"
     },
     {
@@ -440,7 +440,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "app_api_youtube_playlist_route_post",
-      "community": 76,
+      "community": 15,
       "norm_label": "post()"
     },
     {
@@ -450,7 +450,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_youtube_route",
-      "community": 79,
+      "community": 32,
       "norm_label": "route.ts"
     },
     {
@@ -460,7 +460,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "app_api_youtube_route_post",
-      "community": 79,
+      "community": 32,
       "norm_label": "post()"
     },
     {
@@ -1090,7 +1090,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_flac_to_mp3_page",
-      "community": 68,
+      "community": 25,
       "norm_label": "page.tsx"
     },
     {
@@ -1100,7 +1100,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "app_flac_to_mp3_page_metadata",
-      "community": 68,
+      "community": 25,
       "norm_label": "metadata"
     },
     {
@@ -1110,7 +1110,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "app_flac_to_mp3_page_page",
-      "community": 68,
+      "community": 25,
       "norm_label": "page()"
     },
     {
@@ -2560,7 +2560,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_video_converter_page",
-      "community": 25,
+      "community": 68,
       "norm_label": "page.tsx"
     },
     {
@@ -2570,7 +2570,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "app_video_converter_page_metadata",
-      "community": 25,
+      "community": 68,
       "norm_label": "metadata"
     },
     {
@@ -2580,7 +2580,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "app_video_converter_page_page",
-      "community": 25,
+      "community": 68,
       "norm_label": "page()"
     },
     {
@@ -2620,7 +2620,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_tunebadapp",
-      "community": 5,
+      "community": 39,
       "norm_label": "tunebadapp.tsx"
     },
     {
@@ -2630,7 +2630,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "components_tunebadapp_viewname",
-      "community": 5,
+      "community": 39,
       "norm_label": "viewname"
     },
     {
@@ -2650,7 +2650,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "components_tunebadapp_view_to_path",
-      "community": 5,
+      "community": 39,
       "norm_label": "view_to_path"
     },
     {
@@ -2660,7 +2660,7 @@
       "source_location": "L46",
       "_origin": "ast",
       "id": "components_tunebadapp_view_to_title",
-      "community": 5,
+      "community": 39,
       "norm_label": "view_to_title"
     },
     {
@@ -2680,7 +2680,7 @@
       "source_location": "L63",
       "_origin": "ast",
       "id": "components_tunebadapp_tunebadcontextvalue",
-      "community": 80,
+      "community": 20,
       "norm_label": "tunebadcontextvalue"
     },
     {
@@ -2690,7 +2690,7 @@
       "source_location": "L65",
       "_origin": "ast",
       "id": "components_tunebadapp_tunebadcontextvalue_showview",
-      "community": 80,
+      "community": 20,
       "norm_label": ".showview()"
     },
     {
@@ -2700,7 +2700,7 @@
       "source_location": "L67",
       "_origin": "ast",
       "id": "components_tunebadapp_tunebadcontextvalue_setdelaybpminput",
-      "community": 80,
+      "community": 20,
       "norm_label": ".setdelaybpminput()"
     },
     {
@@ -2710,7 +2710,7 @@
       "source_location": "L68",
       "_origin": "ast",
       "id": "components_tunebadapp_tunebadcontextvalue_setmainbpm",
-      "community": 80,
+      "community": 39,
       "norm_label": ".setmainbpm()"
     },
     {
@@ -2720,7 +2720,7 @@
       "source_location": "L70",
       "_origin": "ast",
       "id": "components_tunebadapp_tunebadcontextvalue_setmetronomebpm",
-      "community": 80,
+      "community": 20,
       "norm_label": ".setmetronomebpm()"
     },
     {
@@ -2730,7 +2730,7 @@
       "source_location": "L72",
       "_origin": "ast",
       "id": "components_tunebadapp_tunebadcontextvalue_setlastanalyzedbpm",
-      "community": 80,
+      "community": 20,
       "norm_label": ".setlastanalyzedbpm()"
     },
     {
@@ -2740,7 +2740,7 @@
       "source_location": "L74",
       "_origin": "ast",
       "id": "components_tunebadapp_tunebadcontextvalue_setlastanalysis",
-      "community": 80,
+      "community": 20,
       "norm_label": ".setlastanalysis()"
     },
     {
@@ -2750,7 +2750,7 @@
       "source_location": "L76",
       "_origin": "ast",
       "id": "components_tunebadapp_tunebadcontextvalue_rememberresult",
-      "community": 80,
+      "community": 20,
       "norm_label": ".rememberresult()"
     },
     {
@@ -2760,7 +2760,7 @@
       "source_location": "L77",
       "_origin": "ast",
       "id": "components_tunebadapp_tunebadcontextvalue_clearhistory",
-      "community": 80,
+      "community": 20,
       "norm_label": ".clearhistory()"
     },
     {
@@ -2780,7 +2780,7 @@
       "source_location": "L84",
       "_origin": "ast",
       "id": "components_tunebadapp_tunebadcontextvalue_sendfilestotool",
-      "community": 80,
+      "community": 20,
       "norm_label": ".sendfilestotool()"
     },
     {
@@ -2790,7 +2790,7 @@
       "source_location": "L85",
       "_origin": "ast",
       "id": "components_tunebadapp_tunebadcontextvalue_clearpendingfiles",
-      "community": 80,
+      "community": 20,
       "norm_label": ".clearpendingfiles()"
     },
     {
@@ -2800,7 +2800,7 @@
       "source_location": "L88",
       "_origin": "ast",
       "id": "components_tunebadapp_tunebadcontext",
-      "community": 5,
+      "community": 39,
       "norm_label": "tunebadcontext"
     },
     {
@@ -2810,7 +2810,7 @@
       "source_location": "L90",
       "_origin": "ast",
       "id": "components_tunebadapp_usetunebad",
-      "community": 56,
+      "community": 39,
       "norm_label": "usetunebad()"
     },
     {
@@ -2830,7 +2830,7 @@
       "source_location": "L305",
       "_origin": "ast",
       "id": "components_tunebadapp_views_with_own_intake",
-      "community": 5,
+      "community": 39,
       "norm_label": "views_with_own_intake"
     },
     {
@@ -2840,7 +2840,7 @@
       "source_location": "L312",
       "_origin": "ast",
       "id": "components_tunebadapp_views_accepting_handoff",
-      "community": 5,
+      "community": 39,
       "norm_label": "views_accepting_handoff"
     },
     {
@@ -2850,7 +2850,7 @@
       "source_location": "L329",
       "_origin": "ast",
       "id": "components_tunebadapp_globaldropcatcher",
-      "community": 5,
+      "community": 39,
       "norm_label": "globaldropcatcher()"
     },
     {
@@ -2910,7 +2910,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "components_analysis_analyzerpanel_analyzerpanel",
-      "community": 80,
+      "community": 20,
       "norm_label": "analyzerpanel()"
     },
     {
@@ -2920,7 +2920,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_analysis_dropzone",
-      "community": 31,
+      "community": 58,
       "norm_label": "dropzone.tsx"
     },
     {
@@ -2930,7 +2930,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "components_analysis_dropzone_dropzone",
-      "community": 31,
+      "community": 58,
       "norm_label": "dropzone()"
     },
     {
@@ -3040,7 +3040,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_analysis_recentstrip",
-      "community": 31,
+      "community": 20,
       "norm_label": "recentstrip.tsx"
     },
     {
@@ -3050,7 +3050,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "components_analysis_recentstrip_recentrow",
-      "community": 31,
+      "community": 20,
       "norm_label": "recentrow"
     },
     {
@@ -3060,7 +3060,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "components_analysis_recentstrip_recentstrip",
-      "community": 31,
+      "community": 20,
       "norm_label": "recentstrip()"
     },
     {
@@ -3130,7 +3130,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_analysis_waveformpreview",
-      "community": 31,
+      "community": 16,
       "norm_label": "waveformpreview.tsx"
     },
     {
@@ -3140,7 +3140,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "components_analysis_waveformpreview_waveformpreview",
-      "community": 31,
+      "community": 16,
       "norm_label": "waveformpreview()"
     },
     {
@@ -3150,7 +3150,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_bpm_bpmtoolsview",
-      "community": 56,
+      "community": 39,
       "norm_label": "bpmtoolsview.tsx"
     },
     {
@@ -3160,7 +3160,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "components_bpm_bpmtoolsview_bpmtoolsview",
-      "community": 56,
+      "community": 39,
       "norm_label": "bpmtoolsview()"
     },
     {
@@ -3170,7 +3170,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_bpm_metronomecard",
-      "community": 56,
+      "community": 39,
       "norm_label": "metronomecard.tsx"
     },
     {
@@ -3180,7 +3180,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "components_bpm_metronomecard_metronomecard",
-      "community": 56,
+      "community": 39,
       "norm_label": "metronomecard()"
     },
     {
@@ -3190,7 +3190,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_bpm_taptempocard",
-      "community": 56,
+      "community": 39,
       "norm_label": "taptempocard.tsx"
     },
     {
@@ -3200,7 +3200,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "components_bpm_taptempocard_taptempocard",
-      "community": 56,
+      "community": 39,
       "norm_label": "taptempocard()"
     },
     {
@@ -3250,7 +3250,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "components_converter_localfileconverter_localfileconverter",
-      "community": 31,
+      "community": 53,
       "norm_label": "localfileconverter()"
     },
     {
@@ -3460,7 +3460,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_cutter_cutterpanel",
-      "community": 66,
+      "community": 58,
       "norm_label": "cutterpanel.tsx"
     },
     {
@@ -3470,7 +3470,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "components_cutter_cutterpanel_status",
-      "community": 66,
+      "community": 58,
       "norm_label": "status"
     },
     {
@@ -3480,7 +3480,7 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "components_cutter_cutterpanel_applyfades",
-      "community": 66,
+      "community": 58,
       "norm_label": "applyfades()"
     },
     {
@@ -3490,7 +3490,7 @@
       "source_location": "L60",
       "_origin": "ast",
       "id": "components_cutter_cutterpanel_cutterpanel",
-      "community": 66,
+      "community": 58,
       "norm_label": "cutterpanel()"
     },
     {
@@ -3550,7 +3550,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_delay_delaycalculator",
-      "community": 56,
+      "community": 39,
       "norm_label": "delaycalculator.tsx"
     },
     {
@@ -3560,7 +3560,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "components_delay_delaycalculator_formatms",
-      "community": 56,
+      "community": 39,
       "norm_label": "formatms()"
     },
     {
@@ -3570,7 +3570,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "components_delay_delaycalculator_formathz",
-      "community": 56,
+      "community": 39,
       "norm_label": "formathz()"
     },
     {
@@ -3580,7 +3580,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "components_delay_delaycalculator_preset_name_keys",
-      "community": 56,
+      "community": 39,
       "norm_label": "preset_name_keys"
     },
     {
@@ -3590,7 +3590,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "components_delay_delaycalculator_delaycalculator",
-      "community": 56,
+      "community": 39,
       "norm_label": "delaycalculator()"
     },
     {
@@ -3680,7 +3680,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_files_audiojoinertool",
-      "community": 14,
+      "community": 53,
       "norm_label": "audiojoinertool.tsx"
     },
     {
@@ -3690,7 +3690,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "components_files_audiojoinertool_status",
-      "community": 14,
+      "community": 53,
       "norm_label": "status"
     },
     {
@@ -3700,7 +3700,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "components_files_audiojoinertool_queuedfile",
-      "community": 14,
+      "community": 53,
       "norm_label": "queuedfile"
     },
     {
@@ -3710,7 +3710,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "components_files_audiojoinertool_transition",
-      "community": 14,
+      "community": 53,
       "norm_label": "transition"
     },
     {
@@ -3720,7 +3720,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "components_files_audiojoinertool_transition_labels",
-      "community": 14,
+      "community": 53,
       "norm_label": "transition_labels"
     },
     {
@@ -3730,7 +3730,7 @@
       "source_location": "L30",
       "_origin": "ast",
       "id": "components_files_audiojoinertool_nextid",
-      "community": 14,
+      "community": 53,
       "norm_label": "nextid()"
     },
     {
@@ -3740,7 +3740,7 @@
       "source_location": "L35",
       "_origin": "ast",
       "id": "components_files_audiojoinertool_audiojoinertool",
-      "community": 14,
+      "community": 53,
       "norm_label": "audiojoinertool()"
     },
     {
@@ -3920,7 +3920,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_files_filedrop",
-      "community": 14,
+      "community": 6,
       "norm_label": "filedrop.tsx"
     },
     {
@@ -3930,7 +3930,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "components_files_filedrop_filedrop",
-      "community": 14,
+      "community": 6,
       "norm_label": "filedrop()"
     },
     {
@@ -3940,7 +3940,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_files_heictool",
-      "community": 14,
+      "community": 6,
       "norm_label": "heictool.tsx"
     },
     {
@@ -3950,7 +3950,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "components_files_heictool_status",
-      "community": 14,
+      "community": 6,
       "norm_label": "status"
     },
     {
@@ -3960,7 +3960,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "components_files_heictool_resultrow",
-      "community": 14,
+      "community": 6,
       "norm_label": "resultrow"
     },
     {
@@ -3970,7 +3970,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "components_files_heictool_heictool",
-      "community": 14,
+      "community": 6,
       "norm_label": "heictool()"
     },
     {
@@ -4060,7 +4060,7 @@
       "source_location": "L362",
       "_origin": "ast",
       "id": "components_files_imagetool_filedropsection",
-      "community": 31,
+      "community": 6,
       "norm_label": "filedropsection()"
     },
     {
@@ -4150,7 +4150,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_files_pagedropguard",
-      "community": 58,
+      "community": 62,
       "norm_label": "pagedropguard.tsx"
     },
     {
@@ -4160,7 +4160,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "components_files_pagedropguard_pagedropguard",
-      "community": 58,
+      "community": 62,
       "norm_label": "pagedropguard()"
     },
     {
@@ -4170,7 +4170,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_files_pdfsplittool",
-      "community": 14,
+      "community": 6,
       "norm_label": "pdfsplittool.tsx"
     },
     {
@@ -4180,7 +4180,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "components_files_pdfsplittool_status",
-      "community": 14,
+      "community": 6,
       "norm_label": "status"
     },
     {
@@ -4190,7 +4190,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "components_files_pdfsplittool_pdfsplittool",
-      "community": 14,
+      "community": 6,
       "norm_label": "pdfsplittool()"
     },
     {
@@ -4200,7 +4200,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_files_pdftool",
-      "community": 14,
+      "community": 6,
       "norm_label": "pdftool.tsx"
     },
     {
@@ -4210,7 +4210,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "components_files_pdftool_pdftoolmode",
-      "community": 14,
+      "community": 6,
       "norm_label": "pdftoolmode"
     },
     {
@@ -4220,7 +4220,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "components_files_pdftool_status",
-      "community": 14,
+      "community": 6,
       "norm_label": "status"
     },
     {
@@ -4230,7 +4230,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "components_files_pdftool_pdftool",
-      "community": 14,
+      "community": 6,
       "norm_label": "pdftool()"
     },
     {
@@ -4330,7 +4330,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_files_toolshub",
-      "community": 41,
+      "community": 31,
       "norm_label": "toolshub.tsx"
     },
     {
@@ -4340,7 +4340,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "components_files_toolshub_file_tools",
-      "community": 41,
+      "community": 31,
       "norm_label": "file_tools"
     },
     {
@@ -4350,7 +4350,7 @@
       "source_location": "L44",
       "_origin": "ast",
       "id": "components_files_toolshub_toolshub",
-      "community": 41,
+      "community": 31,
       "norm_label": "toolshub()"
     },
     {
@@ -4480,7 +4480,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "components_history_historypanel_historypanel",
-      "community": 80,
+      "community": 39,
       "norm_label": "historypanel()"
     },
     {
@@ -4530,7 +4530,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_layout_footer",
-      "community": 5,
+      "community": 39,
       "norm_label": "footer.tsx"
     },
     {
@@ -4540,7 +4540,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "components_layout_footer_tool_links",
-      "community": 5,
+      "community": 39,
       "norm_label": "tool_links"
     },
     {
@@ -4550,7 +4550,7 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "components_layout_footer_footer",
-      "community": 5,
+      "community": 39,
       "norm_label": "footer()"
     },
     {
@@ -4560,7 +4560,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_layout_landingseo",
-      "community": 79,
+      "community": 9,
       "norm_label": "landingseo.tsx"
     },
     {
@@ -4570,7 +4570,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "components_layout_landingseo_value_keys",
-      "community": 79,
+      "community": 9,
       "norm_label": "value_keys"
     },
     {
@@ -4580,7 +4580,7 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "components_layout_landingseo_tour_keys",
-      "community": 79,
+      "community": 9,
       "norm_label": "tour_keys"
     },
     {
@@ -4590,7 +4590,7 @@
       "source_location": "L36",
       "_origin": "ast",
       "id": "components_layout_landingseo_faq_keys",
-      "community": 79,
+      "community": 9,
       "norm_label": "faq_keys"
     },
     {
@@ -4600,7 +4600,7 @@
       "source_location": "L52",
       "_origin": "ast",
       "id": "components_layout_landingseo_faq_json_ld",
-      "community": 79,
+      "community": 9,
       "norm_label": "faq_json_ld"
     },
     {
@@ -4640,7 +4640,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_layout_navtabs",
-      "community": 5,
+      "community": 39,
       "norm_label": "navtabs.tsx"
     },
     {
@@ -4650,7 +4650,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "components_layout_navtabs_tabs",
-      "community": 5,
+      "community": 39,
       "norm_label": "tabs"
     },
     {
@@ -4660,7 +4660,7 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "components_layout_navtabs_history_tab",
-      "community": 5,
+      "community": 39,
       "norm_label": "history_tab"
     },
     {
@@ -4670,7 +4670,7 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "components_layout_navtabs_navtabs",
-      "community": 80,
+      "community": 20,
       "norm_label": "navtabs()"
     },
     {
@@ -4680,7 +4680,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_layout_toolpagenav",
-      "community": 41,
+      "community": 62,
       "norm_label": "toolpagenav.tsx"
     },
     {
@@ -4690,7 +4690,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "components_layout_toolpagenav_links",
-      "community": 41,
+      "community": 62,
       "norm_label": "links"
     },
     {
@@ -4700,7 +4700,7 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "components_layout_toolpagenav_known_hrefs",
-      "community": 41,
+      "community": 62,
       "norm_label": "known_hrefs"
     },
     {
@@ -4710,7 +4710,7 @@
       "source_location": "L35",
       "_origin": "ast",
       "id": "components_layout_toolpagenav_toolpagenav",
-      "community": 41,
+      "community": 62,
       "norm_label": "toolpagenav()"
     },
     {
@@ -4770,7 +4770,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_loudness_loudnesspanel",
-      "community": 32,
+      "community": 16,
       "norm_label": "loudnesspanel.tsx"
     },
     {
@@ -4780,7 +4780,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "components_loudness_loudnesspanel_export_targets",
-      "community": 32,
+      "community": 16,
       "norm_label": "export_targets"
     },
     {
@@ -4790,7 +4790,7 @@
       "source_location": "L30",
       "_origin": "ast",
       "id": "components_loudness_loudnesspanel_loudnessworkerresult",
-      "community": 32,
+      "community": 16,
       "norm_label": "loudnessworkerresult"
     },
     {
@@ -4800,7 +4800,7 @@
       "source_location": "L37",
       "_origin": "ast",
       "id": "components_loudness_loudnesspanel_formatdb",
-      "community": 32,
+      "community": 16,
       "norm_label": "formatdb()"
     },
     {
@@ -4810,7 +4810,7 @@
       "source_location": "L43",
       "_origin": "ast",
       "id": "components_loudness_loudnesspanel_tonefor",
-      "community": 32,
+      "community": 16,
       "norm_label": "tonefor()"
     },
     {
@@ -4820,7 +4820,7 @@
       "source_location": "L52",
       "_origin": "ast",
       "id": "components_loudness_loudnesspanel_resampleto48k",
-      "community": 32,
+      "community": 16,
       "norm_label": "resampleto48k()"
     },
     {
@@ -4830,7 +4830,7 @@
       "source_location": "L73",
       "_origin": "ast",
       "id": "components_loudness_loudnesspanel_loudnesspanel",
-      "community": 32,
+      "community": 16,
       "norm_label": "loudnesspanel()"
     },
     {
@@ -4930,7 +4930,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_remix_remixstudio",
-      "community": 6,
+      "community": 58,
       "norm_label": "remixstudio.tsx"
     },
     {
@@ -4940,7 +4940,7 @@
       "source_location": "L40",
       "_origin": "ast",
       "id": "components_remix_remixstudio_status",
-      "community": 6,
+      "community": 58,
       "norm_label": "status"
     },
     {
@@ -4950,7 +4950,7 @@
       "source_location": "L42",
       "_origin": "ast",
       "id": "components_remix_remixstudio_preset",
-      "community": 6,
+      "community": 58,
       "norm_label": "preset"
     },
     {
@@ -4960,7 +4960,7 @@
       "source_location": "L44",
       "_origin": "ast",
       "id": "components_remix_remixstudio_presets",
-      "community": 6,
+      "community": 58,
       "norm_label": "presets"
     },
     {
@@ -4970,7 +4970,7 @@
       "source_location": "L61",
       "_origin": "ast",
       "id": "components_remix_remixstudio_reverb_type_options",
-      "community": 6,
+      "community": 58,
       "norm_label": "reverb_type_options"
     },
     {
@@ -4980,7 +4980,7 @@
       "source_location": "L70",
       "_origin": "ast",
       "id": "components_remix_remixstudio_effect_options",
-      "community": 6,
+      "community": 58,
       "norm_label": "effect_options"
     },
     {
@@ -4990,7 +4990,7 @@
       "source_location": "L83",
       "_origin": "ast",
       "id": "components_remix_remixstudio_remixtake",
-      "community": 74,
+      "community": 63,
       "norm_label": "remixtake"
     },
     {
@@ -5000,7 +5000,7 @@
       "source_location": "L95",
       "_origin": "ast",
       "id": "components_remix_remixstudio_distributiveomit",
-      "community": 6,
+      "community": 58,
       "norm_label": "distributiveomit"
     },
     {
@@ -5010,7 +5010,7 @@
       "source_location": "L96",
       "_origin": "ast",
       "id": "components_remix_remixstudio_automationmove",
-      "community": 6,
+      "community": 58,
       "norm_label": "automationmove"
     },
     {
@@ -5020,7 +5020,7 @@
       "source_location": "L98",
       "_origin": "ast",
       "id": "components_remix_remixstudio_matchespreset",
-      "community": 6,
+      "community": 58,
       "norm_label": "matchespreset()"
     },
     {
@@ -5030,7 +5030,7 @@
       "source_location": "L113",
       "_origin": "ast",
       "id": "components_remix_remixstudio_formatsemitones",
-      "community": 6,
+      "community": 58,
       "norm_label": "formatsemitones()"
     },
     {
@@ -5040,7 +5040,7 @@
       "source_location": "L119",
       "_origin": "ast",
       "id": "components_remix_remixstudio_remixstudio",
-      "community": 6,
+      "community": 58,
       "norm_label": "remixstudio()"
     },
     {
@@ -5460,7 +5460,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_studio_clipcanvas",
-      "community": 37,
+      "community": 47,
       "norm_label": "clipcanvas.tsx"
     },
     {
@@ -5470,7 +5470,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "components_studio_clipcanvas_clipcanvas",
-      "community": 37,
+      "community": 47,
       "norm_label": "clipcanvas()"
     },
     {
@@ -5480,7 +5480,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_studio_openindawbutton",
-      "community": 66,
+      "community": 58,
       "norm_label": "openindawbutton.tsx"
     },
     {
@@ -5490,7 +5490,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "components_studio_openindawbutton_openindawbutton",
-      "community": 66,
+      "community": 58,
       "norm_label": "openindawbutton()"
     },
     {
@@ -5570,7 +5570,7 @@
       "source_location": "L110",
       "_origin": "ast",
       "id": "components_studio_studiopanel_studiotake",
-      "community": 74,
+      "community": 63,
       "norm_label": "studiotake"
     },
     {
@@ -5650,7 +5650,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_studio_timeline",
-      "community": 37,
+      "community": 2,
       "norm_label": "timeline.tsx"
     },
     {
@@ -5660,7 +5660,7 @@
       "source_location": "L53",
       "_origin": "ast",
       "id": "components_studio_timeline_dragstate",
-      "community": 37,
+      "community": 2,
       "norm_label": "dragstate"
     },
     {
@@ -5670,7 +5670,7 @@
       "source_location": "L62",
       "_origin": "ast",
       "id": "components_studio_timeline_timeline",
-      "community": 37,
+      "community": 2,
       "norm_label": "timeline()"
     },
     {
@@ -5740,7 +5740,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_ui_seekablewaveform",
-      "community": 31,
+      "community": 58,
       "norm_label": "seekablewaveform.tsx"
     },
     {
@@ -5750,7 +5750,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "components_ui_seekablewaveform_clamp",
-      "community": 31,
+      "community": 58,
       "norm_label": "clamp()"
     },
     {
@@ -5760,7 +5760,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "components_ui_seekablewaveform_seekablewaveform",
-      "community": 31,
+      "community": 58,
       "norm_label": "seekablewaveform()"
     },
     {
@@ -5810,7 +5810,7 @@
       "source_location": "L35",
       "_origin": "ast",
       "id": "components_ui_icons_metronomeicon",
-      "community": 56,
+      "community": 39,
       "norm_label": "metronomeicon()"
     },
     {
@@ -5940,7 +5940,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "hooks_usefiledrop",
-      "community": 14,
+      "community": 58,
       "norm_label": "usefiledrop.ts"
     },
     {
@@ -5950,7 +5950,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "hooks_usefiledrop_usefiledrop",
-      "community": 14,
+      "community": 58,
       "norm_label": "usefiledrop()"
     },
     {
@@ -5960,7 +5960,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "hooks_usehistory",
-      "community": 47,
+      "community": 5,
       "norm_label": "usehistory.ts"
     },
     {
@@ -5970,7 +5970,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "hooks_usehistory_remoterow",
-      "community": 47,
+      "community": 5,
       "norm_label": "remoterow"
     },
     {
@@ -5980,7 +5980,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "hooks_usehistory_readlocal",
-      "community": 47,
+      "community": 5,
       "norm_label": "readlocal()"
     },
     {
@@ -5990,7 +5990,7 @@
       "source_location": "L42",
       "_origin": "ast",
       "id": "hooks_usehistory_writelocal",
-      "community": 47,
+      "community": 5,
       "norm_label": "writelocal()"
     },
     {
@@ -6000,7 +6000,7 @@
       "source_location": "L50",
       "_origin": "ast",
       "id": "hooks_usehistory_entryfromresult",
-      "community": 47,
+      "community": 5,
       "norm_label": "entryfromresult()"
     },
     {
@@ -6010,7 +6010,7 @@
       "source_location": "L65",
       "_origin": "ast",
       "id": "hooks_usehistory_entryfromremoterow",
-      "community": 47,
+      "community": 5,
       "norm_label": "entryfromremoterow()"
     },
     {
@@ -6020,7 +6020,7 @@
       "source_location": "L80",
       "_origin": "ast",
       "id": "hooks_usehistory_ensureanonsession",
-      "community": 47,
+      "community": 5,
       "norm_label": "ensureanonsession()"
     },
     {
@@ -6030,7 +6030,7 @@
       "source_location": "L97",
       "_origin": "ast",
       "id": "hooks_usehistory_usehistory",
-      "community": 47,
+      "community": 5,
       "norm_label": "usehistory()"
     },
     {
@@ -6040,7 +6040,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "hooks_usemetronome",
-      "community": 32,
+      "community": 39,
       "norm_label": "usemetronome.ts"
     },
     {
@@ -6050,7 +6050,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "hooks_usemetronome_clampbpm",
-      "community": 32,
+      "community": 39,
       "norm_label": "clampbpm()"
     },
     {
@@ -6060,7 +6060,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "hooks_usemetronome_usemetronome",
-      "community": 32,
+      "community": 39,
       "norm_label": "usemetronome()"
     },
     {
@@ -6230,7 +6230,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "hooks_usetaptempo",
-      "community": 56,
+      "community": 39,
       "norm_label": "usetaptempo.ts"
     },
     {
@@ -6240,7 +6240,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "hooks_usetaptempo_usetaptempo",
-      "community": 56,
+      "community": 39,
       "norm_label": "usetaptempo()"
     },
     {
@@ -6250,7 +6250,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "hooks_useunloadguard",
-      "community": 66,
+      "community": 58,
       "norm_label": "useunloadguard.ts"
     },
     {
@@ -6260,7 +6260,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "hooks_useunloadguard_useunloadguard",
-      "community": 66,
+      "community": 58,
       "norm_label": "useunloadguard()"
     },
     {
@@ -6270,7 +6270,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "hooks_usewindowfiledrop",
-      "community": 58,
+      "community": 62,
       "norm_label": "usewindowfiledrop.ts"
     },
     {
@@ -6280,7 +6280,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "hooks_usewindowfiledrop_usewindowfiledrop",
-      "community": 58,
+      "community": 62,
       "norm_label": "usewindowfiledrop()"
     },
     {
@@ -6320,7 +6320,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_audio_audio_joiner",
-      "community": 14,
+      "community": 72,
       "norm_label": "audio-joiner.ts"
     },
     {
@@ -6330,7 +6330,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "lib_audio_audio_joiner_joinoptions",
-      "community": 14,
+      "community": 72,
       "norm_label": "joinoptions"
     },
     {
@@ -6340,7 +6340,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "lib_audio_audio_joiner_renderedaudio",
-      "community": 14,
+      "community": 72,
       "norm_label": "renderedaudio"
     },
     {
@@ -6350,7 +6350,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "lib_audio_audio_joiner_resamplebuffer",
-      "community": 14,
+      "community": 72,
       "norm_label": "resamplebuffer()"
     },
     {
@@ -6360,7 +6360,7 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "lib_audio_audio_joiner_channeldatafor",
-      "community": 14,
+      "community": 72,
       "norm_label": "channeldatafor()"
     },
     {
@@ -6370,7 +6370,7 @@
       "source_location": "L39",
       "_origin": "ast",
       "id": "lib_audio_audio_joiner_renderjoin",
-      "community": 14,
+      "community": 72,
       "norm_label": "renderjoin()"
     },
     {
@@ -6450,7 +6450,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "lib_audio_constants_majorprofile",
-      "community": 9,
+      "community": 13,
       "norm_label": "majorprofile"
     },
     {
@@ -6460,7 +6460,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "lib_audio_constants_minorprofile",
-      "community": 9,
+      "community": 13,
       "norm_label": "minorprofile"
     },
     {
@@ -6490,7 +6490,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_audio_decode_cache",
-      "community": 13,
+      "community": 58,
       "norm_label": "decode-cache.ts"
     },
     {
@@ -6500,7 +6500,7 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "lib_audio_decode_cache_keyfor",
-      "community": 13,
+      "community": 58,
       "norm_label": "keyfor()"
     },
     {
@@ -6510,7 +6510,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "lib_audio_decode_cache_bytesof",
-      "community": 13,
+      "community": 58,
       "norm_label": "bytesof()"
     },
     {
@@ -6520,7 +6520,7 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "lib_audio_decode_cache_cleardecodecache",
-      "community": 13,
+      "community": 58,
       "norm_label": "cleardecodecache()"
     },
     {
@@ -6530,7 +6530,7 @@
       "source_location": "L36",
       "_origin": "ast",
       "id": "lib_audio_decode_cache_decodeaudiofilecached",
-      "community": 13,
+      "community": 58,
       "norm_label": "decodeaudiofilecached()"
     },
     {
@@ -6550,7 +6550,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_audio_decode_getaudiocontextclass",
-      "community": 32,
+      "community": 39,
       "norm_label": "getaudiocontextclass()"
     },
     {
@@ -6560,7 +6560,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "lib_audio_decode_decodeaudiofile",
-      "community": 13,
+      "community": 53,
       "norm_label": "decodeaudiofile()"
     },
     {
@@ -6780,7 +6780,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_audio_fallback_analysis",
-      "community": 9,
+      "community": 13,
       "norm_label": "fallback-analysis.ts"
     },
     {
@@ -6790,7 +6790,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "lib_audio_fallback_analysis_getenergyenvelope",
-      "community": 9,
+      "community": 13,
       "norm_label": "getenergyenvelope()"
     },
     {
@@ -6800,7 +6800,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "lib_audio_fallback_analysis_estimatebpm",
-      "community": 9,
+      "community": 13,
       "norm_label": "estimatebpm()"
     },
     {
@@ -6810,7 +6810,7 @@
       "source_location": "L55",
       "_origin": "ast",
       "id": "lib_audio_fallback_analysis_goertzel",
-      "community": 9,
+      "community": 13,
       "norm_label": "goertzel()"
     },
     {
@@ -6820,7 +6820,7 @@
       "source_location": "L69",
       "_origin": "ast",
       "id": "lib_audio_fallback_analysis_estimatekey",
-      "community": 9,
+      "community": 13,
       "norm_label": "estimatekey()"
     },
     {
@@ -6930,7 +6930,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_audio_lufs",
-      "community": 2,
+      "community": 12,
       "norm_label": "lufs.ts"
     },
     {
@@ -6940,7 +6940,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "lib_audio_lufs_platformtarget",
-      "community": 2,
+      "community": 12,
       "norm_label": "platformtarget"
     },
     {
@@ -6950,7 +6950,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "lib_audio_lufs_platform_targets",
-      "community": 32,
+      "community": 16,
       "norm_label": "platform_targets"
     },
     {
@@ -6960,7 +6960,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "lib_audio_lufs_stage1",
-      "community": 2,
+      "community": 12,
       "norm_label": "stage1"
     },
     {
@@ -6970,7 +6970,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "lib_audio_lufs_stage2",
-      "community": 2,
+      "community": 12,
       "norm_label": "stage2"
     },
     {
@@ -6980,7 +6980,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "lib_audio_lufs_biquad",
-      "community": 2,
+      "community": 12,
       "norm_label": "biquad()"
     },
     {
@@ -6990,7 +6990,7 @@
       "source_location": "L57",
       "_origin": "ast",
       "id": "lib_audio_lufs_kweight",
-      "community": 2,
+      "community": 12,
       "norm_label": "kweight()"
     },
     {
@@ -7000,7 +7000,7 @@
       "source_location": "L65",
       "_origin": "ast",
       "id": "lib_audio_lufs_blockpowers",
-      "community": 2,
+      "community": 12,
       "norm_label": "blockpowers()"
     },
     {
@@ -7010,7 +7010,7 @@
       "source_location": "L84",
       "_origin": "ast",
       "id": "lib_audio_lufs_loudnessfrompower",
-      "community": 2,
+      "community": 12,
       "norm_label": "loudnessfrompower()"
     },
     {
@@ -7020,7 +7020,7 @@
       "source_location": "L90",
       "_origin": "ast",
       "id": "lib_audio_lufs_integratedloudness",
-      "community": 2,
+      "community": 12,
       "norm_label": "integratedloudness()"
     },
     {
@@ -7030,7 +7030,7 @@
       "source_location": "L116",
       "_origin": "ast",
       "id": "lib_audio_lufs_samplepeakdb",
-      "community": 2,
+      "community": 12,
       "norm_label": "samplepeakdb()"
     },
     {
@@ -7050,7 +7050,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "lib_audio_master_masterstyle",
-      "community": 58,
+      "community": 12,
       "norm_label": "masterstyle"
     },
     {
@@ -7250,7 +7250,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_audio_mp3_encoder",
-      "community": 63,
+      "community": 53,
       "norm_label": "mp3-encoder.ts"
     },
     {
@@ -7260,7 +7260,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "lib_audio_mp3_encoder_mp3encoder",
-      "community": 63,
+      "community": 53,
       "norm_label": "mp3encoder"
     },
     {
@@ -7270,7 +7270,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "lib_audio_mp3_encoder_loadmp3encoder",
-      "community": 63,
+      "community": 53,
       "norm_label": "loadmp3encoder()"
     },
     {
@@ -7280,7 +7280,7 @@
       "source_location": "L35",
       "_origin": "ast",
       "id": "lib_audio_mp3_encoder_findleadingsilenceend",
-      "community": 63,
+      "community": 53,
       "norm_label": "findleadingsilenceend()"
     },
     {
@@ -7290,7 +7290,7 @@
       "source_location": "L70",
       "_origin": "ast",
       "id": "lib_audio_mp3_encoder_decodeandtrim",
-      "community": 63,
+      "community": 53,
       "norm_label": "decodeandtrim()"
     },
     {
@@ -7300,7 +7300,7 @@
       "source_location": "L83",
       "_origin": "ast",
       "id": "lib_audio_mp3_encoder_encodewavfromchannels",
-      "community": 63,
+      "community": 53,
       "norm_label": "encodewavfromchannels()"
     },
     {
@@ -7310,7 +7310,7 @@
       "source_location": "L120",
       "_origin": "ast",
       "id": "lib_audio_mp3_encoder_convertfiletowav",
-      "community": 63,
+      "community": 53,
       "norm_label": "convertfiletowav()"
     },
     {
@@ -7320,7 +7320,7 @@
       "source_location": "L126",
       "_origin": "ast",
       "id": "lib_audio_mp3_encoder_mp3_bitrates",
-      "community": 63,
+      "community": 53,
       "norm_label": "mp3_bitrates"
     },
     {
@@ -7330,7 +7330,7 @@
       "source_location": "L128",
       "_origin": "ast",
       "id": "lib_audio_mp3_encoder_encodemp3fromchannels",
-      "community": 63,
+      "community": 53,
       "norm_label": "encodemp3fromchannels()"
     },
     {
@@ -7340,7 +7340,7 @@
       "source_location": "L156",
       "_origin": "ast",
       "id": "lib_audio_mp3_encoder_convertfiletomp3",
-      "community": 63,
+      "community": 53,
       "norm_label": "convertfiletomp3()"
     },
     {
@@ -7580,7 +7580,7 @@
       "source_location": "L57",
       "_origin": "ast",
       "id": "lib_audio_remix_reverbtype",
-      "community": 6,
+      "community": 0,
       "norm_label": "reverbtype"
     },
     {
@@ -7610,7 +7610,7 @@
       "source_location": "L78",
       "_origin": "ast",
       "id": "lib_audio_remix_neutral_reverb_eq",
-      "community": 6,
+      "community": 0,
       "norm_label": "neutral_reverb_eq"
     },
     {
@@ -7620,7 +7620,7 @@
       "source_location": "L93",
       "_origin": "ast",
       "id": "lib_audio_remix_effectid",
-      "community": 37,
+      "community": 47,
       "norm_label": "effectid"
     },
     {
@@ -7640,7 +7640,7 @@
       "source_location": "L114",
       "_origin": "ast",
       "id": "lib_audio_remix_effects",
-      "community": 37,
+      "community": 47,
       "norm_label": "effects"
     },
     {
@@ -7650,7 +7650,7 @@
       "source_location": "L139",
       "_origin": "ast",
       "id": "lib_audio_remix_remixparams",
-      "community": 74,
+      "community": 63,
       "norm_label": "remixparams"
     },
     {
@@ -7780,7 +7780,7 @@
       "source_location": "L328",
       "_origin": "ast",
       "id": "lib_audio_remix_remixgraph",
-      "community": 6,
+      "community": 64,
       "norm_label": "remixgraph"
     },
     {
@@ -7820,7 +7820,7 @@
       "source_location": "L444",
       "_origin": "ast",
       "id": "lib_audio_remix_automationevent",
-      "community": 74,
+      "community": 63,
       "norm_label": "automationevent"
     },
     {
@@ -7860,7 +7860,7 @@
       "source_location": "L488",
       "_origin": "ast",
       "id": "lib_audio_remix_automatedoutputduration",
-      "community": 37,
+      "community": 0,
       "norm_label": "automatedoutputduration()"
     },
     {
@@ -7910,7 +7910,7 @@
       "source_location": "L737",
       "_origin": "ast",
       "id": "lib_audio_remix_timestretch",
-      "community": 37,
+      "community": 0,
       "norm_label": "timestretch()"
     },
     {
@@ -7930,7 +7930,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_audio_stages",
-      "community": 32,
+      "community": 16,
       "norm_label": "stages.ts"
     },
     {
@@ -7940,7 +7940,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "lib_audio_stages_audiostage",
-      "community": 32,
+      "community": 16,
       "norm_label": "audiostage"
     },
     {
@@ -7960,7 +7960,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "lib_audio_stages_stage_labels",
-      "community": 32,
+      "community": 16,
       "norm_label": "stage_labels"
     },
     {
@@ -7980,7 +7980,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_audio_waveform",
-      "community": 66,
+      "community": 58,
       "norm_label": "waveform.ts"
     },
     {
@@ -7990,7 +7990,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "lib_audio_waveform_computewaveformbars",
-      "community": 66,
+      "community": 58,
       "norm_label": "computewaveformbars()"
     },
     {
@@ -8140,7 +8140,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_files_download",
-      "community": 14,
+      "community": 6,
       "norm_label": "download.ts"
     },
     {
@@ -8150,7 +8150,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "lib_files_download_downloadblob",
-      "community": 14,
+      "community": 6,
       "norm_label": "downloadblob()"
     },
     {
@@ -8240,7 +8240,7 @@
       "source_location": "L82",
       "_origin": "ast",
       "id": "lib_files_heic_heicoutputname",
-      "community": 14,
+      "community": 6,
       "norm_label": "heicoutputname()"
     },
     {
@@ -8410,7 +8410,7 @@
       "source_location": "L209",
       "_origin": "ast",
       "id": "lib_files_image_formatbytes",
-      "community": 14,
+      "community": 6,
       "norm_label": "formatbytes()"
     },
     {
@@ -8420,7 +8420,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_files_pdf",
-      "community": 14,
+      "community": 6,
       "norm_label": "pdf.ts"
     },
     {
@@ -8430,7 +8430,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "lib_files_pdf_pdflibmodule",
-      "community": 14,
+      "community": 6,
       "norm_label": "pdflibmodule"
     },
     {
@@ -8440,7 +8440,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "lib_files_pdf_loadpdflib",
-      "community": 14,
+      "community": 6,
       "norm_label": "loadpdflib()"
     },
     {
@@ -8450,7 +8450,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "lib_files_pdf_pdfencryptederror",
-      "community": 14,
+      "community": 6,
       "norm_label": "pdfencryptederror"
     },
     {
@@ -8460,7 +8460,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "lib_files_pdf_pdfencryptederror_constructor",
-      "community": 14,
+      "community": 6,
       "norm_label": ".constructor()"
     },
     {
@@ -8470,7 +8470,7 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "lib_files_pdf_pdfparseerror",
-      "community": 14,
+      "community": 6,
       "norm_label": "pdfparseerror"
     },
     {
@@ -8480,7 +8480,7 @@
       "source_location": "L34",
       "_origin": "ast",
       "id": "lib_files_pdf_pdfparseerror_constructor",
-      "community": 14,
+      "community": 6,
       "norm_label": ".constructor()"
     },
     {
@@ -8490,7 +8490,7 @@
       "source_location": "L42",
       "_origin": "ast",
       "id": "lib_files_pdf_isencryptederror",
-      "community": 14,
+      "community": 6,
       "norm_label": "isencryptederror()"
     },
     {
@@ -8500,7 +8500,7 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "lib_files_pdf_mergepdfs",
-      "community": 14,
+      "community": 6,
       "norm_label": "mergepdfs()"
     },
     {
@@ -8510,7 +8510,7 @@
       "source_location": "L70",
       "_origin": "ast",
       "id": "lib_files_pdf_pdfpagecount",
-      "community": 14,
+      "community": 6,
       "norm_label": "pdfpagecount()"
     },
     {
@@ -8520,7 +8520,7 @@
       "source_location": "L86",
       "_origin": "ast",
       "id": "lib_files_pdf_extractpages",
-      "community": 14,
+      "community": 6,
       "norm_label": "extractpages()"
     },
     {
@@ -8530,7 +8530,7 @@
       "source_location": "L108",
       "_origin": "ast",
       "id": "lib_files_pdf_ispng",
-      "community": 14,
+      "community": 6,
       "norm_label": "ispng()"
     },
     {
@@ -8540,7 +8540,7 @@
       "source_location": "L116",
       "_origin": "ast",
       "id": "lib_files_pdf_imagestopdf",
-      "community": 14,
+      "community": 6,
       "norm_label": "imagestopdf()"
     },
     {
@@ -8710,7 +8710,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_files_tool_handoff",
-      "community": 66,
+      "community": 37,
       "norm_label": "tool-handoff.ts"
     },
     {
@@ -8720,7 +8720,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "lib_files_tool_handoff_stashfilesforstudio",
-      "community": 66,
+      "community": 58,
       "norm_label": "stashfilesforstudio()"
     },
     {
@@ -8790,7 +8790,7 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "lib_files_video_loadffmpeg",
-      "community": 68,
+      "community": 85,
       "norm_label": "loadffmpeg()"
     },
     {
@@ -8950,7 +8950,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_format",
-      "community": 20,
+      "community": 39,
       "norm_label": "format.ts"
     },
     {
@@ -9010,7 +9010,7 @@
       "source_location": "L37",
       "_origin": "ast",
       "id": "lib_format_clampbpm",
-      "community": 56,
+      "community": 39,
       "norm_label": "clampbpm()"
     },
     {
@@ -9150,7 +9150,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_i18n_locales_de",
-      "community": 79,
+      "community": 9,
       "norm_label": "de.ts"
     },
     {
@@ -9160,7 +9160,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "lib_i18n_locales_de_de",
-      "community": 79,
+      "community": 9,
       "norm_label": "de"
     },
     {
@@ -9170,7 +9170,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_i18n_locales_en",
-      "community": 79,
+      "community": 9,
       "norm_label": "en.ts"
     },
     {
@@ -9180,17 +9180,17 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_i18n_locales_en_en",
-      "community": 79,
+      "community": 9,
       "norm_label": "en"
     },
     {
       "label": "DictKey",
       "file_type": "code",
       "source_file": "lib/i18n/locales/en.ts",
-      "source_location": "L995",
+      "source_location": "L1002",
       "_origin": "ast",
       "id": "lib_i18n_locales_en_dictkey",
-      "community": 41,
+      "community": 31,
       "norm_label": "dictkey"
     },
     {
@@ -9200,7 +9200,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_i18n_locales_es",
-      "community": 79,
+      "community": 9,
       "norm_label": "es.ts"
     },
     {
@@ -9210,7 +9210,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "lib_i18n_locales_es_es",
-      "community": 79,
+      "community": 9,
       "norm_label": "es"
     },
     {
@@ -9220,7 +9220,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_i18n_locales_fr",
-      "community": 79,
+      "community": 9,
       "norm_label": "fr.ts"
     },
     {
@@ -9230,7 +9230,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "lib_i18n_locales_fr_fr",
-      "community": 79,
+      "community": 9,
       "norm_label": "fr"
     },
     {
@@ -9240,7 +9240,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_i18n_locales_it",
-      "community": 79,
+      "community": 9,
       "norm_label": "it.ts"
     },
     {
@@ -9250,7 +9250,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "lib_i18n_locales_it_it",
-      "community": 79,
+      "community": 9,
       "norm_label": "it"
     },
     {
@@ -9260,7 +9260,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_i18n_locales_ja",
-      "community": 79,
+      "community": 9,
       "norm_label": "ja.ts"
     },
     {
@@ -9270,7 +9270,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "lib_i18n_locales_ja_ja",
-      "community": 79,
+      "community": 9,
       "norm_label": "ja"
     },
     {
@@ -9280,7 +9280,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_i18n_locales_pt",
-      "community": 79,
+      "community": 9,
       "norm_label": "pt.ts"
     },
     {
@@ -9290,7 +9290,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "lib_i18n_locales_pt_pt",
-      "community": 79,
+      "community": 9,
       "norm_label": "pt"
     },
     {
@@ -9300,7 +9300,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_i18n_locales_zh",
-      "community": 79,
+      "community": 9,
       "norm_label": "zh.ts"
     },
     {
@@ -9310,7 +9310,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "lib_i18n_locales_zh_zh",
-      "community": 79,
+      "community": 9,
       "norm_label": "zh"
     },
     {
@@ -9320,7 +9320,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_media_url",
-      "community": 65,
+      "community": 61,
       "norm_label": "media-url.ts"
     },
     {
@@ -9330,7 +9330,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "lib_media_url_youtube_hosts",
-      "community": 65,
+      "community": 61,
       "norm_label": "youtube_hosts"
     },
     {
@@ -9340,7 +9340,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "lib_media_url_soundcloud_hosts",
-      "community": 65,
+      "community": 61,
       "norm_label": "soundcloud_hosts"
     },
     {
@@ -9350,7 +9350,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "lib_media_url_vimeo_hosts",
-      "community": 65,
+      "community": 61,
       "norm_label": "vimeo_hosts"
     },
     {
@@ -9360,7 +9360,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "lib_media_url_mixcloud_hosts",
-      "community": 65,
+      "community": 61,
       "norm_label": "mixcloud_hosts"
     },
     {
@@ -9370,7 +9370,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "lib_media_url_audiomack_hosts",
-      "community": 65,
+      "community": 61,
       "norm_label": "audiomack_hosts"
     },
     {
@@ -9380,7 +9380,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "lib_media_url_tiktok_hosts",
-      "community": 65,
+      "community": 61,
       "norm_label": "tiktok_hosts"
     },
     {
@@ -9390,7 +9390,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "lib_media_url_instagram_hosts",
-      "community": 65,
+      "community": 61,
       "norm_label": "instagram_hosts"
     },
     {
@@ -9400,7 +9400,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "lib_media_url_twitter_hosts",
-      "community": 65,
+      "community": 61,
       "norm_label": "twitter_hosts"
     },
     {
@@ -9410,7 +9410,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "lib_media_url_canonicalyoutubeurl",
-      "community": 60,
+      "community": 61,
       "norm_label": "canonicalyoutubeurl()"
     },
     {
@@ -9420,7 +9420,7 @@
       "source_location": "L47",
       "_origin": "ast",
       "id": "lib_media_url_validateplaylisturl",
-      "community": 76,
+      "community": 15,
       "norm_label": "validateplaylisturl()"
     },
     {
@@ -9430,7 +9430,7 @@
       "source_location": "L70",
       "_origin": "ast",
       "id": "lib_media_url_validatespotifyurl",
-      "community": 15,
+      "community": 61,
       "norm_label": "validatespotifyurl()"
     },
     {
@@ -9440,7 +9440,7 @@
       "source_location": "L100",
       "_origin": "ast",
       "id": "lib_media_url_validatemediaurl",
-      "community": 60,
+      "community": 61,
       "norm_label": "validatemediaurl()"
     },
     {
@@ -9730,7 +9730,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_server_jobs",
-      "community": 79,
+      "community": 32,
       "norm_label": "jobs.ts"
     },
     {
@@ -9740,7 +9740,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "lib_server_jobs_ytjob",
-      "community": 79,
+      "community": 32,
       "norm_label": "ytjob"
     },
     {
@@ -9750,7 +9750,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "lib_server_jobs_yt_base_dir",
-      "community": 79,
+      "community": 32,
       "norm_label": "yt_base_dir"
     },
     {
@@ -9760,7 +9760,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "lib_server_jobs_globalstore",
-      "community": 79,
+      "community": 32,
       "norm_label": "globalstore"
     },
     {
@@ -9770,7 +9770,7 @@
       "source_location": "L42",
       "_origin": "ast",
       "id": "lib_server_jobs_sweepjobs",
-      "community": 79,
+      "community": 32,
       "norm_label": "sweepjobs()"
     },
     {
@@ -9780,7 +9780,7 @@
       "source_location": "L58",
       "_origin": "ast",
       "id": "lib_server_jobs_runningjobcount",
-      "community": 79,
+      "community": 32,
       "norm_label": "runningjobcount()"
     },
     {
@@ -9820,7 +9820,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "lib_server_link_analysis_cachedanalysis",
-      "community": 76,
+      "community": 60,
       "norm_label": "cachedanalysis"
     },
     {
@@ -9840,7 +9840,7 @@
       "source_location": "L46",
       "_origin": "ast",
       "id": "lib_server_link_analysis_sourceidforurl",
-      "community": 60,
+      "community": 61,
       "norm_label": "sourceidforurl()"
     },
     {
@@ -10080,7 +10080,7 @@
       "source_location": "L433",
       "_origin": "ast",
       "id": "lib_server_link_analysis_resolvetitle",
-      "community": 60,
+      "community": 61,
       "norm_label": "resolvetitle()"
     },
     {
@@ -10250,7 +10250,7 @@
       "source_location": "L49",
       "_origin": "ast",
       "id": "lib_server_rate_limit_allowjobstart",
-      "community": 79,
+      "community": 32,
       "norm_label": "allowjobstart()"
     },
     {
@@ -10260,7 +10260,7 @@
       "source_location": "L53",
       "_origin": "ast",
       "id": "lib_server_rate_limit_allowenumerate",
-      "community": 76,
+      "community": 15,
       "norm_label": "allowenumerate()"
     },
     {
@@ -10370,7 +10370,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_server_song_search",
-      "community": 72,
+      "community": 10,
       "norm_label": "song-search.ts"
     },
     {
@@ -10380,7 +10380,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "lib_server_song_search_songsearchrow",
-      "community": 72,
+      "community": 10,
       "norm_label": "songsearchrow"
     },
     {
@@ -10390,7 +10390,7 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "lib_server_song_search_quotepostgrestvalue",
-      "community": 72,
+      "community": 10,
       "norm_label": "quotepostgrestvalue()"
     },
     {
@@ -10400,7 +10400,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "lib_server_song_search_row",
-      "community": 72,
+      "community": 10,
       "norm_label": "row"
     },
     {
@@ -10410,7 +10410,7 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "lib_server_song_search_searchsongs",
-      "community": 72,
+      "community": 10,
       "norm_label": "searchsongs()"
     },
     {
@@ -10520,7 +10520,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_server_youtube_playlist",
-      "community": 79,
+      "community": 9,
       "norm_label": "youtube-playlist.ts"
     },
     {
@@ -10530,7 +10530,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "lib_server_youtube_playlist_youtubetracklistitem",
-      "community": 79,
+      "community": 9,
       "norm_label": "youtubetracklistitem"
     },
     {
@@ -10540,7 +10540,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "lib_server_youtube_playlist_youtubetracklistresult",
-      "community": 79,
+      "community": 9,
       "norm_label": "youtubetracklistresult"
     },
     {
@@ -10550,7 +10550,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "lib_server_youtube_playlist_fetchyoutubetracklist",
-      "community": 76,
+      "community": 15,
       "norm_label": "fetchyoutubetracklist()"
     },
     {
@@ -10560,7 +10560,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_server_ytdlp",
-      "community": 79,
+      "community": 32,
       "norm_label": "ytdlp.ts"
     },
     {
@@ -10570,7 +10570,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "lib_server_ytdlp_setuperror",
-      "community": 79,
+      "community": 32,
       "norm_label": "setuperror"
     },
     {
@@ -10580,7 +10580,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "lib_server_ytdlp_setuperror_constructor",
-      "community": 79,
+      "community": 32,
       "norm_label": ".constructor()"
     },
     {
@@ -10590,7 +10590,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "lib_server_ytdlp_stripinternalpaths",
-      "community": 79,
+      "community": 32,
       "norm_label": "stripinternalpaths()"
     },
     {
@@ -10600,7 +10600,7 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "lib_server_ytdlp_isexecutable",
-      "community": 79,
+      "community": 32,
       "norm_label": "isexecutable()"
     },
     {
@@ -10610,7 +10610,7 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "lib_server_ytdlp_resolveytdlp",
-      "community": 79,
+      "community": 32,
       "norm_label": "resolveytdlp()"
     },
     {
@@ -10620,7 +10620,7 @@
       "source_location": "L51",
       "_origin": "ast",
       "id": "lib_server_ytdlp_resolveffmpeg",
-      "community": 79,
+      "community": 32,
       "norm_label": "resolveffmpeg()"
     },
     {
@@ -10630,7 +10630,7 @@
       "source_location": "L56",
       "_origin": "ast",
       "id": "lib_server_ytdlp_classifyerror",
-      "community": 79,
+      "community": 32,
       "norm_label": "classifyerror()"
     },
     {
@@ -10640,7 +10640,7 @@
       "source_location": "L69",
       "_origin": "ast",
       "id": "lib_server_ytdlp_startyoutubejob",
-      "community": 79,
+      "community": 32,
       "norm_label": "startyoutubejob()"
     },
     {
@@ -10660,7 +10660,7 @@
       "source_location": "L201",
       "_origin": "ast",
       "id": "lib_server_ytdlp_playlistitem",
-      "community": 79,
+      "community": 32,
       "norm_label": "playlistitem"
     },
     {
@@ -10670,7 +10670,7 @@
       "source_location": "L210",
       "_origin": "ast",
       "id": "lib_server_ytdlp_enumerateplaylist",
-      "community": 79,
+      "community": 32,
       "norm_label": "enumerateplaylist()"
     },
     {
@@ -10710,7 +10710,7 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "lib_studio_beat_grid_beatgrid",
-      "community": 37,
+      "community": 2,
       "norm_label": "beatgrid"
     },
     {
@@ -10830,7 +10830,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_studio_display_signal",
-      "community": 37,
+      "community": 47,
       "norm_label": "display-signal.ts"
     },
     {
@@ -10840,7 +10840,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "lib_studio_display_signal_displaysignal",
-      "community": 37,
+      "community": 47,
       "norm_label": "displaysignal"
     },
     {
@@ -10850,7 +10850,7 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "lib_studio_display_signal_cache",
-      "community": 37,
+      "community": 47,
       "norm_label": "cache"
     },
     {
@@ -10860,7 +10860,7 @@
       "source_location": "L30",
       "_origin": "ast",
       "id": "lib_studio_display_signal_pending",
-      "community": 37,
+      "community": 47,
       "norm_label": "pending"
     },
     {
@@ -10880,7 +10880,7 @@
       "source_location": "L41",
       "_origin": "ast",
       "id": "lib_studio_display_signal_render",
-      "community": 37,
+      "community": 47,
       "norm_label": "render()"
     },
     {
@@ -10910,7 +10910,7 @@
       "source_location": "L103",
       "_origin": "ast",
       "id": "lib_studio_display_signal_forgetdisplaysignals",
-      "community": 37,
+      "community": 47,
       "norm_label": "forgetdisplaysignals()"
     },
     {
@@ -10920,7 +10920,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_studio_engine",
-      "community": 37,
+      "community": 0,
       "norm_label": "engine.ts"
     },
     {
@@ -10930,7 +10930,7 @@
       "source_location": "L35",
       "_origin": "ast",
       "id": "lib_studio_engine_activegraph",
-      "community": 37,
+      "community": 0,
       "norm_label": "activegraph"
     },
     {
@@ -10950,7 +10950,7 @@
       "source_location": "L72",
       "_origin": "ast",
       "id": "lib_studio_engine_studioengine_constructor",
-      "community": 74,
+      "community": 63,
       "norm_label": ".constructor()"
     },
     {
@@ -11120,7 +11120,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_studio_lock_pitch",
-      "community": 37,
+      "community": 65,
       "norm_label": "lock-pitch.ts"
     },
     {
@@ -11130,7 +11130,7 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "lib_studio_lock_pitch_stretchedidfor",
-      "community": 37,
+      "community": 65,
       "norm_label": "stretchedidfor()"
     },
     {
@@ -11140,7 +11140,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "lib_studio_lock_pitch_quantisespeed",
-      "community": 37,
+      "community": 65,
       "norm_label": "quantisespeed()"
     },
     {
@@ -11150,7 +11150,7 @@
       "source_location": "L43",
       "_origin": "ast",
       "id": "lib_studio_lock_pitch_cache",
-      "community": 37,
+      "community": 65,
       "norm_label": "cache"
     },
     {
@@ -11160,7 +11160,7 @@
       "source_location": "L44",
       "_origin": "ast",
       "id": "lib_studio_lock_pitch_pending",
-      "community": 37,
+      "community": 65,
       "norm_label": "pending"
     },
     {
@@ -11170,7 +11170,7 @@
       "source_location": "L46",
       "_origin": "ast",
       "id": "lib_studio_lock_pitch_bytesof",
-      "community": 37,
+      "community": 65,
       "norm_label": "bytesof()"
     },
     {
@@ -11180,7 +11180,7 @@
       "source_location": "L51",
       "_origin": "ast",
       "id": "lib_studio_lock_pitch_touch",
-      "community": 37,
+      "community": 65,
       "norm_label": "touch()"
     },
     {
@@ -11190,7 +11190,7 @@
       "source_location": "L66",
       "_origin": "ast",
       "id": "lib_studio_lock_pitch_getstretchedbuffer",
-      "community": 37,
+      "community": 65,
       "norm_label": "getstretchedbuffer()"
     },
     {
@@ -11200,7 +11200,7 @@
       "source_location": "L94",
       "_origin": "ast",
       "id": "lib_studio_lock_pitch_peekstretchedbuffer",
-      "community": 37,
+      "community": 65,
       "norm_label": "peekstretchedbuffer()"
     },
     {
@@ -11210,7 +11210,7 @@
       "source_location": "L99",
       "_origin": "ast",
       "id": "lib_studio_lock_pitch_stretchcachebytes",
-      "community": 37,
+      "community": 65,
       "norm_label": "stretchcachebytes()"
     },
     {
@@ -11220,7 +11220,7 @@
       "source_location": "L108",
       "_origin": "ast",
       "id": "lib_studio_lock_pitch_forgetstretched",
-      "community": 37,
+      "community": 65,
       "norm_label": "forgetstretched()"
     },
     {
@@ -11230,7 +11230,7 @@
       "source_location": "L120",
       "_origin": "ast",
       "id": "lib_studio_lock_pitch_scaleclipsforlock",
-      "community": 37,
+      "community": 65,
       "norm_label": "scaleclipsforlock()"
     },
     {
@@ -11260,7 +11260,7 @@
       "source_location": "L66",
       "_origin": "ast",
       "id": "lib_studio_render_timeline_studioexportoptions",
-      "community": 74,
+      "community": 63,
       "norm_label": "studioexportoptions"
     },
     {
@@ -11290,7 +11290,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "lib_studio_session_storedarrangement",
-      "community": 37,
+      "community": 64,
       "norm_label": "storedarrangement"
     },
     {
@@ -11400,7 +11400,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_studio_timeline_math",
-      "community": 37,
+      "community": 2,
       "norm_label": "timeline-math.ts"
     },
     {
@@ -11410,7 +11410,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "lib_studio_timeline_math_timetox",
-      "community": 37,
+      "community": 2,
       "norm_label": "timetox()"
     },
     {
@@ -11420,7 +11420,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "lib_studio_timeline_math_xtotime",
-      "community": 37,
+      "community": 2,
       "norm_label": "xtotime()"
     },
     {
@@ -11430,7 +11430,7 @@
       "source_location": "L36",
       "_origin": "ast",
       "id": "lib_studio_timeline_math_clampzoom",
-      "community": 37,
+      "community": 2,
       "norm_label": "clampzoom()"
     },
     {
@@ -11440,7 +11440,7 @@
       "source_location": "L45",
       "_origin": "ast",
       "id": "lib_studio_timeline_math_zoomatcursor",
-      "community": 37,
+      "community": 2,
       "norm_label": "zoomatcursor()"
     },
     {
@@ -11450,7 +11450,7 @@
       "source_location": "L57",
       "_origin": "ast",
       "id": "lib_studio_timeline_math_zoomtofit",
-      "community": 37,
+      "community": 2,
       "norm_label": "zoomtofit()"
     },
     {
@@ -11460,7 +11460,7 @@
       "source_location": "L68",
       "_origin": "ast",
       "id": "lib_studio_timeline_math_snaptime",
-      "community": 37,
+      "community": 2,
       "norm_label": "snaptime()"
     },
     {
@@ -11470,7 +11470,7 @@
       "source_location": "L89",
       "_origin": "ast",
       "id": "lib_studio_timeline_math_snapclipstart",
-      "community": 37,
+      "community": 2,
       "norm_label": "snapclipstart()"
     },
     {
@@ -11480,7 +11480,7 @@
       "source_location": "L114",
       "_origin": "ast",
       "id": "lib_studio_timeline_math_rulerstepseconds",
-      "community": 37,
+      "community": 2,
       "norm_label": "rulerstepseconds()"
     },
     {
@@ -11490,7 +11490,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_studio_timeline",
-      "community": 37,
+      "community": 2,
       "norm_label": "timeline.ts"
     },
     {
@@ -11500,7 +11500,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "lib_studio_timeline_studioclip",
-      "community": 37,
+      "community": 64,
       "norm_label": "studioclip"
     },
     {
@@ -11510,7 +11510,7 @@
       "source_location": "L45",
       "_origin": "ast",
       "id": "lib_studio_timeline_clipduration",
-      "community": 37,
+      "community": 2,
       "norm_label": "clipduration()"
     },
     {
@@ -11520,7 +11520,7 @@
       "source_location": "L49",
       "_origin": "ast",
       "id": "lib_studio_timeline_cliptimelineend",
-      "community": 37,
+      "community": 2,
       "norm_label": "cliptimelineend()"
     },
     {
@@ -11530,7 +11530,7 @@
       "source_location": "L54",
       "_origin": "ast",
       "id": "lib_studio_timeline_timelineduration",
-      "community": 37,
+      "community": 2,
       "norm_label": "timelineduration()"
     },
     {
@@ -11540,7 +11540,7 @@
       "source_location": "L65",
       "_origin": "ast",
       "id": "lib_studio_timeline_assigndisplayrows",
-      "community": 37,
+      "community": 2,
       "norm_label": "assigndisplayrows()"
     },
     {
@@ -11550,7 +11550,7 @@
       "source_location": "L83",
       "_origin": "ast",
       "id": "lib_studio_timeline_fadepoint",
-      "community": 37,
+      "community": 2,
       "norm_label": "fadepoint"
     },
     {
@@ -11560,7 +11560,7 @@
       "source_location": "L90",
       "_origin": "ast",
       "id": "lib_studio_timeline_scheduledclip",
-      "community": 37,
+      "community": 2,
       "norm_label": "scheduledclip"
     },
     {
@@ -11570,7 +11570,7 @@
       "source_location": "L115",
       "_origin": "ast",
       "id": "lib_studio_timeline_computeclipschedule",
-      "community": 37,
+      "community": 2,
       "norm_label": "computeclipschedule()"
     },
     {
@@ -11580,7 +11580,7 @@
       "source_location": "L181",
       "_origin": "ast",
       "id": "lib_studio_timeline_looppassend",
-      "community": 37,
+      "community": 2,
       "norm_label": "looppassend()"
     },
     {
@@ -11590,7 +11590,7 @@
       "source_location": "L199",
       "_origin": "ast",
       "id": "lib_studio_timeline_sliceclipstowindow",
-      "community": 37,
+      "community": 2,
       "norm_label": "sliceclipstowindow()"
     },
     {
@@ -11600,7 +11600,7 @@
       "source_location": "L229",
       "_origin": "ast",
       "id": "lib_studio_timeline_audibleduration",
-      "community": 37,
+      "community": 2,
       "norm_label": "audibleduration()"
     },
     {
@@ -11610,7 +11610,7 @@
       "source_location": "L247",
       "_origin": "ast",
       "id": "lib_studio_timeline_adjacentclipid",
-      "community": 37,
+      "community": 2,
       "norm_label": "adjacentclipid()"
     },
     {
@@ -11620,7 +11620,7 @@
       "source_location": "L263",
       "_origin": "ast",
       "id": "lib_studio_timeline_issoloing",
-      "community": 37,
+      "community": 2,
       "norm_label": "issoloing()"
     },
     {
@@ -11630,7 +11630,7 @@
       "source_location": "L272",
       "_origin": "ast",
       "id": "lib_studio_timeline_snapcandidates",
-      "community": 37,
+      "community": 2,
       "norm_label": "snapcandidates()"
     },
     {
@@ -11640,7 +11640,7 @@
       "source_location": "L288",
       "_origin": "ast",
       "id": "lib_studio_timeline_moveclip",
-      "community": 37,
+      "community": 2,
       "norm_label": "moveclip()"
     },
     {
@@ -11650,7 +11650,7 @@
       "source_location": "L294",
       "_origin": "ast",
       "id": "lib_studio_timeline_trimclipstart",
-      "community": 37,
+      "community": 2,
       "norm_label": "trimclipstart()"
     },
     {
@@ -11660,7 +11660,7 @@
       "source_location": "L305",
       "_origin": "ast",
       "id": "lib_studio_timeline_trimclipend",
-      "community": 37,
+      "community": 2,
       "norm_label": "trimclipend()"
     },
     {
@@ -11670,7 +11670,7 @@
       "source_location": "L314",
       "_origin": "ast",
       "id": "lib_studio_timeline_splitclip",
-      "community": 37,
+      "community": 2,
       "norm_label": "splitclip()"
     },
     {
@@ -11680,7 +11680,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_studio_waveform_pyramid",
-      "community": 37,
+      "community": 47,
       "norm_label": "waveform-pyramid.ts"
     },
     {
@@ -11690,7 +11690,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "lib_studio_waveform_pyramid_peakpyramid",
-      "community": 37,
+      "community": 47,
       "norm_label": "peakpyramid"
     },
     {
@@ -11700,7 +11700,7 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "lib_studio_waveform_pyramid_buildpeakpyramid",
-      "community": 37,
+      "community": 47,
       "norm_label": "buildpeakpyramid()"
     },
     {
@@ -11710,7 +11710,7 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "lib_studio_waveform_pyramid_minmax",
-      "community": 37,
+      "community": 47,
       "norm_label": "minmax"
     },
     {
@@ -11720,7 +11720,7 @@
       "source_location": "L60",
       "_origin": "ast",
       "id": "lib_studio_waveform_pyramid_windowminmax",
-      "community": 37,
+      "community": 47,
       "norm_label": "windowminmax()"
     },
     {
@@ -11730,7 +11730,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_supabase_client",
-      "community": 47,
+      "community": 5,
       "norm_label": "client.ts"
     },
     {
@@ -11740,7 +11740,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "lib_supabase_client_issupabaseconfigured",
-      "community": 47,
+      "community": 5,
       "norm_label": "issupabaseconfigured"
     },
     {
@@ -11750,7 +11750,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "lib_supabase_client_getsupabase",
-      "community": 47,
+      "community": 5,
       "norm_label": "getsupabase()"
     },
     {
@@ -12960,7 +12960,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "public_vendor_ffmpeg_ffmpeg_core_zeromemory",
-      "community": 27,
+      "community": 3,
       "norm_label": "zeromemory()"
     },
     {
@@ -12970,7 +12970,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "public_vendor_ffmpeg_ffmpeg_core_alignmemory",
-      "community": 27,
+      "community": 3,
       "norm_label": "alignmemory()"
     },
     {
@@ -12980,7 +12980,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "public_vendor_ffmpeg_ffmpeg_core_mmapalloc",
-      "community": 27,
+      "community": 3,
       "norm_label": "mmapalloc()"
     },
     {
@@ -13050,7 +13050,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "public_vendor_ffmpeg_ffmpeg_core_base",
-      "community": 6,
+      "community": 3,
       "norm_label": "base()"
     },
     {
@@ -13720,7 +13720,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "public_vendor_ffmpeg_ffmpeg_core_getexecutablename",
-      "community": 3,
+      "community": 74,
       "norm_label": "getexecutablename()"
     },
     {
@@ -13730,7 +13730,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "public_vendor_ffmpeg_ffmpeg_core_getenvstrings",
-      "community": 3,
+      "community": 74,
       "norm_label": "getenvstrings()"
     },
     {
@@ -13740,7 +13740,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "public_vendor_ffmpeg_ffmpeg_core_stringtoascii",
-      "community": 3,
+      "community": 74,
       "norm_label": "stringtoascii()"
     },
     {
@@ -13750,7 +13750,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "public_vendor_ffmpeg_ffmpeg_core_environ_get",
-      "community": 3,
+      "community": 74,
       "norm_label": "_environ_get()"
     },
     {
@@ -13760,7 +13760,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "public_vendor_ffmpeg_ffmpeg_core_environ_sizes_get",
-      "community": 3,
+      "community": 74,
       "norm_label": "_environ_sizes_get()"
     },
     {
@@ -15828,7 +15828,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_lufs_test",
-      "community": 2,
+      "community": 12,
       "norm_label": "lufs.test.ts"
     },
     {
@@ -15838,7 +15838,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "tests_lufs_test_sine",
-      "community": 2,
+      "community": 12,
       "norm_label": "sine()"
     },
     {
@@ -15848,37 +15848,37 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_studio_timeline_test",
-      "community": 37,
+      "community": 2,
       "norm_label": "studio-timeline.test.ts"
     },
     {
       "label": "makeId()",
       "file_type": "code",
       "source_file": "tests/studio-timeline.test.ts",
-      "source_location": "L42",
+      "source_location": "L43",
       "_origin": "ast",
       "id": "tests_studio_timeline_test_makeid",
-      "community": 37,
+      "community": 2,
       "norm_label": "makeid()"
     },
     {
       "label": "clip()",
       "file_type": "code",
       "source_file": "tests/studio-timeline.test.ts",
-      "source_location": "L44",
+      "source_location": "L45",
       "_origin": "ast",
       "id": "tests_studio_timeline_test_clip",
-      "community": 37,
+      "community": 2,
       "norm_label": "clip()"
     },
     {
       "label": "grid120",
       "file_type": "code",
       "source_file": "tests/studio-timeline.test.ts",
-      "source_location": "L393",
+      "source_location": "L394",
       "_origin": "ast",
       "id": "tests_studio_timeline_test_grid120",
-      "community": 37,
+      "community": 2,
       "norm_label": "grid120"
     },
     {
@@ -16128,7 +16128,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "types_analysis_historyentry",
-      "community": 80,
+      "community": 20,
       "norm_label": "historyentry"
     },
     {
@@ -16138,7 +16138,7 @@
       "source_location": "L36",
       "_origin": "ast",
       "id": "types_analysis_workerrequest",
-      "community": 9,
+      "community": 13,
       "norm_label": "workerrequest"
     },
     {
@@ -16158,7 +16158,7 @@
       "source_location": "L66",
       "_origin": "ast",
       "id": "types_analysis_ytjobstatus",
-      "community": 79,
+      "community": 32,
       "norm_label": "ytjobstatus"
     },
     {
@@ -16168,7 +16168,7 @@
       "source_location": "L68",
       "_origin": "ast",
       "id": "types_analysis_ytformat",
-      "community": 79,
+      "community": 32,
       "norm_label": "ytformat"
     },
     {
@@ -16218,7 +16218,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "workers_analysis_worker",
-      "community": 9,
+      "community": 13,
       "norm_label": "analysis.worker.ts"
     },
     {
@@ -16228,7 +16228,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "workers_analysis_worker_flat_to_sharp",
-      "community": 9,
+      "community": 13,
       "norm_label": "flat_to_sharp"
     },
     {
@@ -16238,7 +16238,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "workers_analysis_worker_essentialike",
-      "community": 9,
+      "community": 13,
       "norm_label": "essentialike"
     },
     {
@@ -16248,7 +16248,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "workers_analysis_worker_essentialike_arraytovector",
-      "community": 9,
+      "community": 13,
       "norm_label": ".arraytovector()"
     },
     {
@@ -16258,7 +16258,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "workers_analysis_worker_essentialike_percivalbpmestimator",
-      "community": 9,
+      "community": 13,
       "norm_label": ".percivalbpmestimator()"
     },
     {
@@ -16268,7 +16268,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "workers_analysis_worker_essentialike_keyextractor",
-      "community": 9,
+      "community": 13,
       "norm_label": ".keyextractor()"
     },
     {
@@ -16278,7 +16278,7 @@
       "source_location": "L40",
       "_origin": "ast",
       "id": "workers_analysis_worker_essentialike_danceability",
-      "community": 9,
+      "community": 13,
       "norm_label": ".danceability()"
     },
     {
@@ -16288,7 +16288,7 @@
       "source_location": "L82",
       "_origin": "ast",
       "id": "workers_analysis_worker_foldbpm",
-      "community": 9,
+      "community": 13,
       "norm_label": "foldbpm()"
     },
     {
@@ -16298,7 +16298,7 @@
       "source_location": "L105",
       "_origin": "ast",
       "id": "workers_analysis_worker_loadessentia",
-      "community": 9,
+      "community": 13,
       "norm_label": "loadessentia()"
     },
     {
@@ -16308,7 +16308,7 @@
       "source_location": "L132",
       "_origin": "ast",
       "id": "workers_analysis_worker_rmsof",
-      "community": 9,
+      "community": 13,
       "norm_label": "rmsof()"
     },
     {
@@ -16318,7 +16318,7 @@
       "source_location": "L139",
       "_origin": "ast",
       "id": "workers_analysis_worker_centeredwindow",
-      "community": 9,
+      "community": 13,
       "norm_label": "centeredwindow()"
     },
     {
@@ -16328,7 +16328,7 @@
       "source_location": "L146",
       "_origin": "ast",
       "id": "workers_analysis_worker_basicanalysis",
-      "community": 9,
+      "community": 13,
       "norm_label": "basicanalysis()"
     },
     {
@@ -16338,7 +16338,7 @@
       "source_location": "L165",
       "_origin": "ast",
       "id": "workers_analysis_worker_percivalbpm",
-      "community": 9,
+      "community": 13,
       "norm_label": "percivalbpm()"
     },
     {
@@ -16348,7 +16348,7 @@
       "source_location": "L172",
       "_origin": "ast",
       "id": "workers_analysis_worker_essentiaanalysis",
-      "community": 9,
+      "community": 13,
       "norm_label": "essentiaanalysis()"
     },
     {
@@ -16358,7 +16358,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "workers_loudness_worker",
-      "community": 2,
+      "community": 12,
       "norm_label": "loudness.worker.ts"
     },
     {
@@ -16368,7 +16368,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "workers_loudness_worker_loudnessworkerrequest",
-      "community": 2,
+      "community": 12,
       "norm_label": "loudnessworkerrequest"
     },
     {
@@ -16378,7 +16378,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "workers_loudness_worker_loudnessworkerresponse",
-      "community": 2,
+      "community": 12,
       "norm_label": "loudnessworkerresponse"
     },
     {
@@ -44838,7 +44838,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "tests/studio-timeline.test.ts",
-      "source_location": "L29",
+      "source_location": "L30",
       "weight": 1.0,
       "source": "tests_studio_timeline_test",
       "target": "lib_audio_remix",
@@ -45386,7 +45386,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "tests/studio-timeline.test.ts",
-      "source_location": "L29",
+      "source_location": "L30",
       "weight": 1.0,
       "source": "tests_studio_timeline_test",
       "target": "lib_audio_remix_automatedoutputduration",
@@ -47455,7 +47455,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/i18n/locales/en.ts",
-      "source_location": "L995",
+      "source_location": "L1002",
       "weight": 1.0,
       "source": "lib_i18n_locales_en",
       "target": "lib_i18n_locales_en_dictkey",
@@ -50209,7 +50209,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "tests/studio-timeline.test.ts",
-      "source_location": "L30",
+      "source_location": "L31",
       "weight": 1.0,
       "source": "tests_studio_timeline_test",
       "target": "lib_studio_beat_grid",
@@ -50220,7 +50220,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "tests/studio-timeline.test.ts",
-      "source_location": "L30",
+      "source_location": "L31",
       "weight": 1.0,
       "source": "tests_studio_timeline_test",
       "target": "lib_studio_beat_grid_beatgrid",
@@ -50264,7 +50264,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "tests/studio-timeline.test.ts",
-      "source_location": "L30",
+      "source_location": "L31",
       "weight": 1.0,
       "source": "tests_studio_timeline_test",
       "target": "lib_studio_beat_grid_nearestgridtime",
@@ -50275,7 +50275,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "tests/studio-timeline.test.ts",
-      "source_location": "L30",
+      "source_location": "L31",
       "weight": 1.0,
       "source": "tests_studio_timeline_test",
       "target": "lib_studio_beat_grid_beattimesinrange",
@@ -50286,7 +50286,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "tests/studio-timeline.test.ts",
-      "source_location": "L30",
+      "source_location": "L31",
       "weight": 1.0,
       "source": "tests_studio_timeline_test",
       "target": "lib_studio_beat_grid_tempomatchratio",
@@ -50297,7 +50297,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "tests/studio-timeline.test.ts",
-      "source_location": "L30",
+      "source_location": "L31",
       "weight": 1.0,
       "source": "tests_studio_timeline_test",
       "target": "lib_studio_beat_grid_needstempomatch",
@@ -50308,7 +50308,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "tests/studio-timeline.test.ts",
-      "source_location": "L30",
+      "source_location": "L31",
       "weight": 1.0,
       "source": "tests_studio_timeline_test",
       "target": "lib_studio_beat_grid_estimatebeatphase",
@@ -51062,7 +51062,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "tests/studio-timeline.test.ts",
-      "source_location": "L39",
+      "source_location": "L40",
       "weight": 1.0,
       "source": "tests_studio_timeline_test",
       "target": "lib_studio_lock_pitch",
@@ -51106,7 +51106,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "tests/studio-timeline.test.ts",
-      "source_location": "L39",
+      "source_location": "L40",
       "weight": 1.0,
       "source": "tests_studio_timeline_test",
       "target": "lib_studio_lock_pitch_stretchedidfor",
@@ -51150,7 +51150,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "tests/studio-timeline.test.ts",
-      "source_location": "L39",
+      "source_location": "L40",
       "weight": 1.0,
       "source": "tests_studio_timeline_test",
       "target": "lib_studio_lock_pitch_scaleclipsforlock",
@@ -51557,7 +51557,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "tests/studio-timeline.test.ts",
-      "source_location": "L20",
+      "source_location": "L21",
       "weight": 1.0,
       "source": "tests_studio_timeline_test",
       "target": "lib_studio_timeline_math",
@@ -51590,7 +51590,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "tests/studio-timeline.test.ts",
-      "source_location": "L20",
+      "source_location": "L21",
       "weight": 1.0,
       "source": "tests_studio_timeline_test",
       "target": "lib_studio_timeline_math_zoomatcursor",
@@ -51601,7 +51601,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "tests/studio-timeline.test.ts",
-      "source_location": "L20",
+      "source_location": "L21",
       "weight": 1.0,
       "source": "tests_studio_timeline_test",
       "target": "lib_studio_timeline_math_zoomtofit",
@@ -51623,7 +51623,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "tests/studio-timeline.test.ts",
-      "source_location": "L20",
+      "source_location": "L21",
       "weight": 1.0,
       "source": "tests_studio_timeline_test",
       "target": "lib_studio_timeline_math_snaptime",
@@ -51634,7 +51634,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "tests/studio-timeline.test.ts",
-      "source_location": "L20",
+      "source_location": "L21",
       "weight": 1.0,
       "source": "tests_studio_timeline_test",
       "target": "lib_studio_timeline_math_snapclipstart",
@@ -51645,7 +51645,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "tests/studio-timeline.test.ts",
-      "source_location": "L20",
+      "source_location": "L21",
       "weight": 1.0,
       "source": "tests_studio_timeline_test",
       "target": "lib_studio_timeline_math_rulerstepseconds",
@@ -52103,6 +52103,17 @@
       "source_location": "L3",
       "weight": 1.0,
       "source": "tests_studio_timeline_test",
+      "target": "lib_studio_timeline_adjacentclipid",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/studio-timeline.test.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "tests_studio_timeline_test",
       "target": "lib_studio_timeline_issoloing",
       "confidence_score": 1.0
     },
@@ -52217,7 +52228,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "tests/studio-timeline.test.ts",
-      "source_location": "L38",
+      "source_location": "L39",
       "weight": 1.0,
       "source": "tests_studio_timeline_test",
       "target": "lib_studio_waveform_pyramid",
@@ -52228,7 +52239,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "tests/studio-timeline.test.ts",
-      "source_location": "L38",
+      "source_location": "L39",
       "weight": 1.0,
       "source": "tests_studio_timeline_test",
       "target": "lib_studio_waveform_pyramid_buildpeakpyramid",
@@ -58546,7 +58557,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/studio-timeline.test.ts",
-      "source_location": "L44",
+      "source_location": "L45",
       "weight": 1.0,
       "source": "tests_studio_timeline_test",
       "target": "tests_studio_timeline_test_clip",
@@ -58556,7 +58567,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/studio-timeline.test.ts",
-      "source_location": "L393",
+      "source_location": "L394",
       "weight": 1.0,
       "source": "tests_studio_timeline_test",
       "target": "tests_studio_timeline_test_grid120",
@@ -58566,7 +58577,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/studio-timeline.test.ts",
-      "source_location": "L42",
+      "source_location": "L43",
       "weight": 1.0,
       "source": "tests_studio_timeline_test",
       "target": "tests_studio_timeline_test_makeid",
@@ -58577,7 +58588,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "tests/studio-timeline.test.ts",
-      "source_location": "L46",
+      "source_location": "L47",
       "weight": 1.0,
       "source": "tests_studio_timeline_test_clip",
       "target": "tests_studio_timeline_test_makeid",
@@ -59307,5 +59318,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "f20c66761a0ea5f0837c8accbaf3ec0cb584e352"
+  "built_at_commit": "ee7f76c46b70feee9a6056352b3cd0e5c96e8cbe"
 }

@@ -590,43 +590,43 @@
     "semantic_hash": ""
   },
   "lib/i18n/locales/de.ts": {
-    "mtime": 1785095801.2445138,
-    "ast_hash": "e9cf21fdb5dc98deeb27f8e3fb58c296",
+    "mtime": 1785098700.702578,
+    "ast_hash": "cd95514fd232e7d9a51f104f3e1d7358",
     "semantic_hash": ""
   },
   "lib/i18n/locales/en.ts": {
-    "mtime": 1785095801.2418475,
-    "ast_hash": "ba1396e812a48fc03ffbbe4dffa2e24a",
+    "mtime": 1785098700.698143,
+    "ast_hash": "a29fdd7d9e063ad8acb469287b88f660",
     "semantic_hash": ""
   },
   "lib/i18n/locales/es.ts": {
-    "mtime": 1785095801.243611,
-    "ast_hash": "541d1c177d1f6eebeefa4b9a5d59e431",
+    "mtime": 1785098700.70095,
+    "ast_hash": "8e75bcb4a02b77d4536a675b445f1af6",
     "semantic_hash": ""
   },
   "lib/i18n/locales/fr.ts": {
-    "mtime": 1785095801.2427924,
-    "ast_hash": "384ea99a17f843e2a5568c966046ac2e",
+    "mtime": 1785098700.6996548,
+    "ast_hash": "13ed418de20bfc5a0f3a099222d44b10",
     "semantic_hash": ""
   },
   "lib/i18n/locales/it.ts": {
-    "mtime": 1785095801.2460756,
-    "ast_hash": "741997994225982915c76fa62a293848",
+    "mtime": 1785098700.7054083,
+    "ast_hash": "c2d8c5015d288d92ba80f0440ebad3ce",
     "semantic_hash": ""
   },
   "lib/i18n/locales/ja.ts": {
-    "mtime": 1785095801.2466092,
-    "ast_hash": "4ab22381143e6983ecaf9dffdf9b999a",
+    "mtime": 1785098700.7064812,
+    "ast_hash": "50d7b0faeb90b7f6c34baff9bccb3c70",
     "semantic_hash": ""
   },
   "lib/i18n/locales/pt.ts": {
-    "mtime": 1785095801.245354,
-    "ast_hash": "014b8b50350f8fbd6353c2ff1f0bbf09",
+    "mtime": 1785098700.703711,
+    "ast_hash": "22f4667b2e1ad12c777bc7916b964be3",
     "semantic_hash": ""
   },
   "lib/i18n/locales/zh.ts": {
-    "mtime": 1785095801.2470703,
-    "ast_hash": "2c3aca054fb59335514ee181068ffb0a",
+    "mtime": 1785098700.7075632,
+    "ast_hash": "6411f9373dd15b3968e807fb49a96784",
     "semantic_hash": ""
   },
   "lib/media-url.ts": {
@@ -1555,8 +1555,8 @@
     "semantic_hash": ""
   },
   "tests/studio-timeline.test.ts": {
-    "mtime": 1785096727.106732,
-    "ast_hash": "b43d5167da6dfbff9463735ac7684b50",
+    "mtime": 1785098176.3448668,
+    "ast_hash": "3413c5a32ade5ce8800b7d4d395a9635",
     "semantic_hash": ""
   },
   "lib/studio/render-timeline.ts": {

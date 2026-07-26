@@ -590,43 +590,43 @@
     "semantic_hash": ""
   },
   "lib/i18n/locales/de.ts": {
-    "mtime": 1785098176.3860643,
-    "ast_hash": "6a492f995dec3232f594aadf009e0f0a",
+    "mtime": 1785098700.702578,
+    "ast_hash": "cd95514fd232e7d9a51f104f3e1d7358",
     "semantic_hash": ""
   },
   "lib/i18n/locales/en.ts": {
-    "mtime": 1785098176.382798,
-    "ast_hash": "c13188444aebd2dbb9b4c952fd08256f",
+    "mtime": 1785098700.698143,
+    "ast_hash": "a29fdd7d9e063ad8acb469287b88f660",
     "semantic_hash": ""
   },
   "lib/i18n/locales/es.ts": {
-    "mtime": 1785098176.3849003,
-    "ast_hash": "be7250442b83a1774b211bc9da40a152",
+    "mtime": 1785098700.70095,
+    "ast_hash": "8e75bcb4a02b77d4536a675b445f1af6",
     "semantic_hash": ""
   },
   "lib/i18n/locales/fr.ts": {
-    "mtime": 1785098176.383799,
-    "ast_hash": "82f01a8a671baab5d40eccaab3911426",
+    "mtime": 1785098700.6996548,
+    "ast_hash": "13ed418de20bfc5a0f3a099222d44b10",
     "semantic_hash": ""
   },
   "lib/i18n/locales/it.ts": {
-    "mtime": 1785098176.3879964,
-    "ast_hash": "8d14b4317937b593220927fa5929e18f",
+    "mtime": 1785098700.7054083,
+    "ast_hash": "c2d8c5015d288d92ba80f0440ebad3ce",
     "semantic_hash": ""
   },
   "lib/i18n/locales/ja.ts": {
-    "mtime": 1785098176.389284,
-    "ast_hash": "58f75417878ab600f19545d3db58d857",
+    "mtime": 1785098700.7064812,
+    "ast_hash": "50d7b0faeb90b7f6c34baff9bccb3c70",
     "semantic_hash": ""
   },
   "lib/i18n/locales/pt.ts": {
-    "mtime": 1785098176.3871858,
-    "ast_hash": "38f4380359069f45db6af2cb6cd0733d",
+    "mtime": 1785098700.703711,
+    "ast_hash": "22f4667b2e1ad12c777bc7916b964be3",
     "semantic_hash": ""
   },
   "lib/i18n/locales/zh.ts": {
-    "mtime": 1785098176.3902807,
-    "ast_hash": "04eb1a690302bd3829b0080701e05795",
+    "mtime": 1785098700.7075632,
+    "ast_hash": "6411f9373dd15b3968e807fb49a96784",
     "semantic_hash": ""
   },
   "lib/media-url.ts": {
@@ -1580,8 +1580,8 @@
     "semantic_hash": ""
   },
   "components/studio/StudioPanel.tsx": {
-    "mtime": 1785097141.0981605,
-    "ast_hash": "55f79b43dfbf0e8ee903c7508784ce16",
+    "mtime": 1785098720.3590398,
+    "ast_hash": "cbbc3b818a8738701164ef6da71580aa",
     "semantic_hash": ""
   },
   "lib/files/tool-handoff.ts": {
@@ -1590,8 +1590,8 @@
     "semantic_hash": ""
   },
   "app/daw/page.tsx": {
-    "mtime": 1785033721.5075479,
-    "ast_hash": "baa07128cb7969a1c0e78c3069101c5b",
+    "mtime": 1785098720.3868124,
+    "ast_hash": "acfac64bfdf56a2a06ecb3bbc18fb04d",
     "semantic_hash": ""
   },
   "components/studio/StudioClient.tsx": {

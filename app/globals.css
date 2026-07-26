@@ -4915,3 +4915,31 @@ tbody tr:last-child td {
   .studio-hint { width: 100%; }
   .studio-clip-name { font-size: 10px; }
 }
+
+/* Empty-state lines: what the tool does, before there is anything to see. */
+.studio-intro {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 62ch;
+}
+.studio-intro li {
+  font-size: 13px;
+  color: var(--muted);
+  padding-left: 16px;
+  position: relative;
+}
+.studio-intro li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 8px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--ink);
+  opacity: 0.35;
+}
