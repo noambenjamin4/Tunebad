@@ -1,0 +1,190 @@
+// Beat grid for the DAW: the difference between "song B starts near the
+// switch" and "song B starts ON the one".
+//
+// Two separate problems, and only the first is a solved one:
+//   TEMPO  — reuse the site's analysis worker (essentia's Percival estimator,
+//            the same engine behind /key-bpm-finder), off the main thread.
+//   PHASE  — the estimator returns a tempo, not a downbeat. A grid at the
+//            right BPM but the wrong phase is WORSE than no grid: every snap
+//            lands confidently between beats. So phase is estimated here, by
+//            scoring candidate offsets against an onset envelope and keeping
+//            the one the transients actually agree with.
+//
+// Both are estimates. The UI shows the number, offers x2 / ÷2 (the site's
+// tempo estimator is documented to halve fast tracks — see
+// scripts/octave-map.mjs) and lets it be typed in, because a producer knows
+// their own track's tempo better than any estimator does.
+
+import type { WorkerRequest, WorkerResponse } from "@/types/analysis";
+import { monoSamples, resampleMono } from "@/lib/audio/decode";
+import type { DisplaySignal } from "./display-signal";
+
+export interface BeatGrid {
+  bpm: number;
+  /** Timeline seconds of SOME beat; the grid repeats every 60/bpm from here. */
+  anchorSec: number;
+  beatsPerBar: number;
+}
+
+export const DEFAULT_BEATS_PER_BAR = 4;
+export const MIN_BPM = 40;
+export const MAX_BPM = 220;
+
+/* ------------------------------ pure math ------------------------------ */
+
+export function beatPeriod(bpm: number): number {
+  return 60 / Math.max(1, bpm);
+}
+
+/** The grid time nearest `t` — O(1), no list to scan. */
+export function nearestGridTime(t: number, grid: BeatGrid): number {
+  const period = beatPeriod(grid.bpm);
+  return grid.anchorSec + Math.round((t - grid.anchorSec) / period) * period;
+}
+
+/**
+ * Beat times within [from, to), each flagged as a downbeat. Returns []
+ * when the beats would be closer together than `minSpacingSec` — drawing a
+ * line every two pixels is a grey smear, not a grid.
+ */
+export function beatTimesInRange(
+  grid: BeatGrid,
+  from: number,
+  to: number,
+  minSpacingSec = 0,
+): { t: number; downbeat: boolean }[] {
+  const period = beatPeriod(grid.bpm);
+  if (period <= 0 || to <= from) return [];
+  const out: { t: number; downbeat: boolean }[] = [];
+  const bars = Math.max(1, grid.beatsPerBar);
+  // Bar lines survive when beat lines are too dense to read.
+  const step = period >= minSpacingSec ? period : period * bars;
+  if (step < minSpacingSec) return [];
+  const firstIndex = Math.ceil((from - grid.anchorSec) / step);
+  // Exclusive end, as documented: floor() would emit a line exactly ON `to`
+  // and double up with the next range's first line when ranges are tiled.
+  const lastIndex = Math.ceil((to - grid.anchorSec) / step) - 1;
+  // A pathological zoom-out could ask for millions of lines; the caller's
+  // minSpacing normally prevents it, this is the hard stop.
+  if (lastIndex - firstIndex > 5000) return [];
+  for (let i = firstIndex; i <= lastIndex; i++) {
+    const t = grid.anchorSec + i * step;
+    const beatIndex = Math.round((t - grid.anchorSec) / period);
+    out.push({ t, downbeat: ((beatIndex % bars) + bars) % bars === 0 });
+  }
+  return out;
+}
+
+/* --------------------------- phase estimation --------------------------- */
+
+const ONSET_HOP = 256;
+
+/**
+ * Where the beats sit, in SOURCE seconds. Builds an onset envelope (rising
+ * energy between frames — the percussive edges), then tries every phase
+ * across one beat period and keeps the one where the most onset energy lands
+ * on a beat. Uses the already-decimated display signal, so it costs one pass
+ * over ~11 kHz mono rather than the full-rate audio.
+ */
+export function estimateBeatPhase(signal: DisplaySignal, bpm: number): number {
+  const { data, sampleRate } = signal;
+  const frames = Math.floor(data.length / ONSET_HOP);
+  if (frames < 8) return 0;
+
+  const onset = new Float32Array(frames);
+  let prev = 0;
+  for (let f = 0; f < frames; f++) {
+    let sum = 0;
+    const start = f * ONSET_HOP;
+    for (let i = start; i < start + ONSET_HOP; i++) sum += data[i] * data[i];
+    const energy = Math.sqrt(sum / ONSET_HOP);
+    onset[f] = Math.max(0, energy - prev); // half-wave rectified: rises only
+    prev = energy;
+  }
+
+  const framesPerSecond = sampleRate / ONSET_HOP;
+  const periodFrames = beatPeriod(bpm) * framesPerSecond;
+  if (!Number.isFinite(periodFrames) || periodFrames < 1) return 0;
+
+  // 64 candidate phases across one beat is ~8 ms at 120 BPM — finer than
+  // the onset envelope's own resolution, so more would buy nothing.
+  const CANDIDATES = 64;
+  let bestScore = -1;
+  let bestPhaseFrames = 0;
+  for (let c = 0; c < CANDIDATES; c++) {
+    const phase = (c / CANDIDATES) * periodFrames;
+    let score = 0;
+    for (let beat = 0; ; beat++) {
+      const f = Math.round(phase + beat * periodFrames);
+      if (f >= frames) break;
+      score += onset[f];
+    }
+    if (score > bestScore) {
+      bestScore = score;
+      bestPhaseFrames = phase;
+    }
+  }
+  return bestPhaseFrames / framesPerSecond;
+}
+
+/* ---------------------------- tempo detection ---------------------------- */
+
+let worker: Worker | null = null;
+let nextId = 1;
+const waiting = new Map<number, (r: WorkerResponse) => void>();
+
+function ensureWorker(): Worker {
+  if (worker) return worker;
+  worker = new Worker(new URL("../../workers/analysis.worker.ts", import.meta.url));
+  worker.onmessage = (event: MessageEvent<WorkerResponse>) => {
+    const resolve = waiting.get(event.data.id);
+    if (resolve) {
+      waiting.delete(event.data.id);
+      resolve(event.data);
+    }
+  };
+  return worker;
+}
+
+export interface DetectedTempo {
+  bpm: number;
+  /** The other octave, when the estimator flagged one — feeds the x2 / ÷2 UI. */
+  bpmAlternate: number | null;
+}
+
+/**
+ * Tempo for one buffer, via the shared analysis worker. The 16 kHz `samples`
+ * field drives key detection, which we do not use here but the worker
+ * requires; tempo reads `bpmSamples` at the native rate, which is what its
+ * frame sizes are specified for.
+ */
+export async function detectTempo(buffer: AudioBuffer): Promise<DetectedTempo | null> {
+  try {
+    const native = monoSamples(buffer);
+    const sixteen = await resampleMono(native, buffer.sampleRate, 16000);
+    const id = nextId++;
+    const request: WorkerRequest = {
+      id,
+      samples: sixteen,
+      sampleRate: 16000,
+      bpmSamples: native,
+      bpmSampleRate: buffer.sampleRate,
+    };
+    const response = await new Promise<WorkerResponse>((resolve, reject) => {
+      const timer = window.setTimeout(() => {
+        waiting.delete(id);
+        reject(new Error("tempo detection timed out"));
+      }, 30000);
+      waiting.set(id, (r) => {
+        window.clearTimeout(timer);
+        resolve(r);
+      });
+      // Structured clone, never transfer: the caller still owns these arrays.
+      ensureWorker().postMessage(request);
+    });
+    if (!response.bpm || response.bpm < MIN_BPM || response.bpm > MAX_BPM) return null;
+    return { bpm: Math.round(response.bpm), bpmAlternate: response.bpmAlternate ?? null };
+  } catch {
+    return null; // no grid is a fine outcome; a wrong grid is not
+  }
+}

@@ -43,6 +43,7 @@ import {
   zoomToFit,
 } from "@/lib/studio/timeline-math";
 import type { DisplaySignal } from "@/lib/studio/display-signal";
+import { type BeatGrid, beatTimesInRange, nearestGridTime } from "@/lib/studio/beat-grid";
 import { ClipCanvas } from "./ClipCanvas";
 
 const CLIP_PAD = 6;
@@ -74,6 +75,7 @@ export function Timeline({
   onChangeZoom,
   loop,
   onSetLoop,
+  grid,
   follow,
   headSignal = 0,
   disabled,
@@ -97,6 +99,8 @@ export function Timeline({
   onChangeZoom: (pxPerSecond: number) => void;
   loop: { start: number; end: number } | null;
   onSetLoop: (region: { start: number; end: number } | null) => void;
+  /** Beat grid to draw and snap to, or null when off / no tempo. */
+  grid: BeatGrid | null;
   /** Keep the playhead on screen while playing. */
   follow: boolean;
   headSignal?: number;
@@ -376,14 +380,16 @@ export function Timeline({
       // Alt = place freely. Otherwise the clip's START and its END both look
       // for a neighbour to line up with, so a beat switch lands exactly on
       // the outgoing song's edge instead of a pixel away from it.
+      const candidates = snapCandidates(clipsRef.current, drag.clipId, getPositionRef.current());
+      if (grid) {
+        // The nearest beat to each edge, so a clip can land on the one
+        // whether the user is aiming with its head or its tail.
+        candidates.push(nearestGridTime(raw, grid));
+        candidates.push(nearestGridTime(raw + clipDuration(clip), grid) - clipDuration(clip));
+      }
       const start = event.altKey
         ? raw
-        : snapClipStart(
-            raw,
-            clipDuration(clip),
-            snapCandidates(clipsRef.current, drag.clipId, getPositionRef.current()),
-            pxPerSecond,
-          );
+        : snapClipStart(raw, clipDuration(clip), candidates, pxPerSecond);
       drag.latestStart = start;
       // Show WHERE it landed: mark whichever edge actually snapped, so the
       // alignment is visible rather than merely felt.
@@ -471,6 +477,15 @@ export function Timeline({
     }
   };
 
+  /* -------------------------------- grid -------------------------------- */
+
+  // Only the visible band, and never denser than 7px apart — beat lines
+  // closer than that stop being a grid and become grey fill.
+  const gridLines = useMemo(() => {
+    if (!grid) return [];
+    return beatTimesInRange(grid, Math.max(0, band.from), band.to, 7 / pxPerSecond);
+  }, [grid, band.from, band.to, pxPerSecond]);
+
   /* ------------------------------- ruler ------------------------------- */
 
   const step = rulerStepSeconds(pxPerSecond);
@@ -499,6 +514,16 @@ export function Timeline({
           onPointerCancel={handleTrackPointerUp}
           onKeyDown={handleKeyDown}
         >
+          <div className="studio-grid" aria-hidden="true">
+            {gridLines.map((line) => (
+              <span
+                key={line.t}
+                className={`studio-grid-line${line.downbeat ? " downbeat" : ""}`}
+                style={{ left: `${line.t * pxPerSecond}px` }}
+              />
+            ))}
+          </div>
+
           <div className="studio-loop-lane" aria-hidden="true">
             {loop && (
               <div

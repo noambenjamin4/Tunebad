@@ -48,6 +48,14 @@ import {
 } from "@/lib/studio/display-signal";
 import { StudioEngine } from "@/lib/studio/engine";
 import {
+  type BeatGrid,
+  DEFAULT_BEATS_PER_BAR,
+  MAX_BPM,
+  MIN_BPM,
+  detectTempo,
+  estimateBeatPhase,
+} from "@/lib/studio/beat-grid";
+import {
   forgetStretched,
   getStretchedBuffer,
   quantiseSpeed,
@@ -180,6 +188,13 @@ export function StudioPanel() {
   const [loop, setLoopState] = useState<{ start: number; end: number } | null>(null);
   const [follow, setFollow] = useState(true);
   const [exportLoopOnly, setExportLoopOnly] = useState(false);
+  // Beat grid: derived from the FIRST clip's tempo, anchored to where that
+  // clip's beats actually fall. Null until a tempo is known.
+  const [grid, setGrid] = useState<BeatGrid | null>(null);
+  const [gridOn, setGridOn] = useState(true);
+  const [detectingTempo, setDetectingTempo] = useState(false);
+  const [tempoFailed, setTempoFailed] = useState(false);
+  const gridSourceRef = useRef<string | null>(null);
 
   const clipsRef = useRef(clips);
   clipsRef.current = clips;
@@ -424,6 +439,61 @@ export function StudioPanel() {
     const files = takeStudioFiles();
     if (files && files.length > 0) void addFiles(files);
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  /* ------------------------------- beat grid ------------------------------- */
+
+  // Tempo comes from the first clip on the timeline — in a beat switch that
+  // is the track everything else has to line up with. Detection runs once
+  // per source clip; the phase pass needs its display signal, so this waits
+  // for both rather than guessing a downbeat at zero.
+  useEffect(() => {
+    const first = [...clips].sort((a, b) => a.timelineStart - b.timelineStart)[0];
+    if (!first) {
+      gridSourceRef.current = null;
+      setGrid(null);
+      setTempoFailed(false);
+      return;
+    }
+    if (gridSourceRef.current === first.bufferId) return;
+    const buffer = bufferMap.get(first.bufferId);
+    const signal = signals.get(first.bufferId);
+    if (!buffer || !signal) return;
+
+    gridSourceRef.current = first.bufferId;
+    setDetectingTempo(true);
+    setTempoFailed(false);
+    let cancelled = false;
+    void detectTempo(buffer).then((tempo) => {
+      if (cancelled) return;
+      setDetectingTempo(false);
+      if (!tempo) {
+        setTempoFailed(true);
+        setGrid(null);
+        return;
+      }
+      // Phase is measured in SOURCE seconds; map it onto the timeline through
+      // the clip's own trim and position.
+      const phase = estimateBeatPhase(signal, tempo.bpm);
+      setGrid({
+        bpm: tempo.bpm,
+        anchorSec: first.timelineStart + (phase - first.clipStart),
+        beatsPerBar: DEFAULT_BEATS_PER_BAR,
+      });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [clips, signals]);
+
+  const setGridBpm = useCallback((bpm: number) => {
+    if (!Number.isFinite(bpm) || bpm < MIN_BPM || bpm > MAX_BPM) return;
+    setGrid((prev) =>
+      prev
+        ? { ...prev, bpm: Math.round(bpm) }
+        : { bpm: Math.round(bpm), anchorSec: 0, beatsPerBar: DEFAULT_BEATS_PER_BAR },
+    );
+    setTempoFailed(false);
   }, []);
 
   /* ------------------------------ transport ------------------------------ */
@@ -828,6 +898,7 @@ export function StudioPanel() {
             onChangeZoom={handleChangeZoom}
             loop={loop}
             onSetLoop={applyLoop}
+            grid={gridOn ? grid : null}
             follow={follow}
             headSignal={headSignal}
             disabled={working}
@@ -857,6 +928,16 @@ export function StudioPanel() {
               title={t("studio.loopHint")}
             >
               {t("studio.loop")}
+            </button>
+            <button
+              className={`text-button${gridOn && grid ? " active" : ""}`}
+              type="button"
+              onClick={() => setGridOn((g) => !g)}
+              disabled={working || (!grid && !tempoFailed)}
+              aria-pressed={gridOn && Boolean(grid)}
+              title={t("studio.gridHint")}
+            >
+              {t("studio.grid")}
             </button>
             <button
               className={`text-button${follow ? " active" : ""}`}
@@ -955,6 +1036,52 @@ export function StudioPanel() {
               <button className="text-button" type="button" onClick={handleDeleteSelected}>
                 {t("studio.remove")}
               </button>
+            </div>
+          )}
+
+          {(detectingTempo || grid || tempoFailed) && (
+            <div className="studio-tempo">
+              {detectingTempo && <span className="studio-hint">{t("studio.gridDetecting")}</span>}
+              {!detectingTempo && (
+                <>
+                  <label className="studio-field">
+                    {t("studio.bpm")}
+                    <input
+                      className="num"
+                      type="number"
+                      min={MIN_BPM}
+                      max={MAX_BPM}
+                      step={1}
+                      value={grid ? grid.bpm : ""}
+                      placeholder="—"
+                      disabled={working}
+                      onChange={(e) => setGridBpm(Number(e.target.value))}
+                    />
+                  </label>
+                  {/* The tempo estimator is known to report the wrong octave
+                      on fast tracks; halving/doubling is one click, not a
+                      re-analysis. */}
+                  <button
+                    className="text-button"
+                    type="button"
+                    disabled={working || !grid}
+                    onClick={() => grid && setGridBpm(grid.bpm / 2)}
+                  >
+                    {t("studio.gridHalf")}
+                  </button>
+                  <button
+                    className="text-button"
+                    type="button"
+                    disabled={working || !grid}
+                    onClick={() => grid && setGridBpm(grid.bpm * 2)}
+                  >
+                    {t("studio.gridDouble")}
+                  </button>
+                  {tempoFailed && !grid && (
+                    <span className="studio-hint">{t("studio.gridNone")}</span>
+                  )}
+                </>
+              )}
             </div>
           )}
 

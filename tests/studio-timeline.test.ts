@@ -26,6 +26,13 @@ import {
   zoomToFit,
 } from "../lib/studio/timeline-math";
 import { automatedOutputDuration } from "../lib/audio/remix";
+import {
+  type BeatGrid,
+  beatTimesInRange,
+  estimateBeatPhase,
+  nearestGridTime,
+} from "../lib/studio/beat-grid";
+import { buildPeakPyramid } from "../lib/studio/waveform-pyramid";
 import { scaleClipsForLock, stretchedIdFor } from "../lib/studio/lock-pitch";
 
 let nextId = 100;
@@ -376,4 +383,60 @@ test("export the loop: a sliver thinner than the minimum clip is dropped", () =>
   assert.deepEqual(sliceClipsToWindow([sliver], 10, 20).map((c) => c.id), ["sliver"]);
   // Only 0.05s pokes into the window — below MIN_CLIP_SECONDS, so nothing.
   assert.deepEqual(sliceClipsToWindow([sliver], 14.9, 20), []);
+});
+
+/* ------------------------------ beat grid ------------------------------ */
+
+const grid120: BeatGrid = { bpm: 120, anchorSec: 0, beatsPerBar: 4 };
+
+test("beat grid: snaps to the nearest beat, both directions", () => {
+  // 120 BPM = a beat every 0.5s.
+  assert.equal(nearestGridTime(0.24, grid120), 0);
+  assert.equal(nearestGridTime(0.26, grid120), 0.5);
+  assert.equal(nearestGridTime(3.9, grid120), 4);
+  // Anchored grids stay aligned to their anchor, not to zero.
+  const offset: BeatGrid = { bpm: 120, anchorSec: 0.2, beatsPerBar: 4 };
+  assert.equal(+nearestGridTime(1.1, offset).toFixed(6), 1.2);
+});
+
+test("beat grid: downbeats land every beatsPerBar", () => {
+  const beats = beatTimesInRange(grid120, 0, 4);
+  assert.deepEqual(beats.map((b) => b.t), [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5]);
+  // 4/4 at 120 BPM: a downbeat every 2s.
+  assert.deepEqual(beats.filter((b) => b.downbeat).map((b) => b.t), [0, 2]);
+});
+
+test("beat grid: too dense to read falls back to bar lines, then to nothing", () => {
+  // Beats 0.5s apart, but we need 1s of space: bars (2s) are drawn instead.
+  const bars = beatTimesInRange(grid120, 0, 8, 1);
+  assert.deepEqual(bars.map((b) => b.t), [0, 2, 4, 6]);
+  assert.ok(bars.every((b) => b.downbeat));
+  // Even bars are too dense here — draw nothing rather than a grey smear.
+  assert.deepEqual(beatTimesInRange(grid120, 0, 8, 5), []);
+});
+
+test("beat grid: phase finds where the beats actually are", () => {
+  // A click track at 120 BPM whose first beat is deliberately at 0.25s.
+  const rate = 11025;
+  const seconds = 8;
+  const data = new Float32Array(rate * seconds);
+  const period = 0.5;
+  for (let beat = 0; ; beat++) {
+    const at = 0.25 + beat * period;
+    if (at >= seconds) break;
+    const start = Math.round(at * rate);
+    for (let i = 0; i < 400; i++) data[start + i] = 1 - i / 400; // a percussive hit
+  }
+  const signal = { data, pyramid: buildPeakPyramid(data), sampleRate: rate };
+  const phase = estimateBeatPhase(signal, 120);
+  // Within one onset frame (256 samples ~ 23ms) of the truth.
+  assert.ok(Math.abs(phase - 0.25) < 0.03, `phase ${phase} should be ~0.25`);
+});
+
+test("beat grid: phase on silence is harmless, not NaN", () => {
+  const data = new Float32Array(11025 * 2);
+  const signal = { data, pyramid: buildPeakPyramid(data), sampleRate: 11025 };
+  const phase = estimateBeatPhase(signal, 120);
+  assert.ok(Number.isFinite(phase));
+  assert.ok(phase >= 0);
 });

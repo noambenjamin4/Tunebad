@@ -590,43 +590,43 @@
     "semantic_hash": ""
   },
   "lib/i18n/locales/de.ts": {
-    "mtime": 1785046108.3432522,
-    "ast_hash": "843963e05bff9a954be4ac9d05f771b1",
+    "mtime": 1785088844.515917,
+    "ast_hash": "4874740ada3385d51762a8bfed1f2a73",
     "semantic_hash": ""
   },
   "lib/i18n/locales/en.ts": {
-    "mtime": 1785046108.3405457,
-    "ast_hash": "be046f943b2f285f97956e91ed616799",
+    "mtime": 1785088844.5133708,
+    "ast_hash": "770f571c96b31edf5461fde7b1cc9757",
     "semantic_hash": ""
   },
   "lib/i18n/locales/es.ts": {
-    "mtime": 1785046108.342385,
-    "ast_hash": "d2fe4abbb674dff1ee0de6da5b757ea9",
+    "mtime": 1785088844.5152402,
+    "ast_hash": "ebf7bbad218185ce93d1c4f4da6acbb3",
     "semantic_hash": ""
   },
   "lib/i18n/locales/fr.ts": {
-    "mtime": 1785046108.341483,
-    "ast_hash": "7831e5ebdab2bc672a5201f94109af7e",
+    "mtime": 1785088844.5143714,
+    "ast_hash": "7b3ce17b8172d6fd3182a45dd7633b9b",
     "semantic_hash": ""
   },
   "lib/i18n/locales/it.ts": {
-    "mtime": 1785046108.3445365,
-    "ast_hash": "b73f6f94389fda656909c69b9b2f4831",
+    "mtime": 1785088844.517127,
+    "ast_hash": "04dcd556b3740b883e457ab6e6d044c7",
     "semantic_hash": ""
   },
   "lib/i18n/locales/ja.ts": {
-    "mtime": 1785046108.345097,
-    "ast_hash": "b9b9c17521cacdb8064dfefd6b5e1380",
+    "mtime": 1785088844.5176997,
+    "ast_hash": "9293a452e3c5612584cc943b596008a6",
     "semantic_hash": ""
   },
   "lib/i18n/locales/pt.ts": {
-    "mtime": 1785046108.3439221,
-    "ast_hash": "a809a71308480dea1583ae1db07d4db4",
+    "mtime": 1785088844.5165396,
+    "ast_hash": "c0ea1255a1fd7f4d3a62a491cb2d56d8",
     "semantic_hash": ""
   },
   "lib/i18n/locales/zh.ts": {
-    "mtime": 1785046108.3456302,
-    "ast_hash": "0f7d7ebbb9d072703eea68f740fc59e2",
+    "mtime": 1785088844.518431,
+    "ast_hash": "b670eeba4a07c95dc034a92c05aaffa6",
     "semantic_hash": ""
   },
   "lib/media-url.ts": {
@@ -1555,8 +1555,8 @@
     "semantic_hash": ""
   },
   "tests/studio-timeline.test.ts": {
-    "mtime": 1785046088.4551625,
-    "ast_hash": "aaff1f09810b12bb4eebec1e0407620f",
+    "mtime": 1785088793.7009473,
+    "ast_hash": "b1d70688d7e41c0efa182668ed349f01",
     "semantic_hash": ""
   },
   "lib/studio/render-timeline.ts": {
@@ -1565,13 +1565,13 @@
     "semantic_hash": ""
   },
   "components/studio/ClipCanvas.tsx": {
-    "mtime": 1785086466.5619576,
-    "ast_hash": "ad4d9c1b6ceaba69d525a0c4cfeef3ce",
+    "mtime": 1785087625.112531,
+    "ast_hash": "d036a6d4686ec8d0deee02f465acea4c",
     "semantic_hash": ""
   },
   "components/studio/Timeline.tsx": {
-    "mtime": 1785085835.0407336,
-    "ast_hash": "dcdfe0214b3f40a3af81e6822f459272",
+    "mtime": 1785088886.5274491,
+    "ast_hash": "131a9731c8d57d6466e249cce3f516eb",
     "semantic_hash": ""
   },
   "lib/studio/engine.ts": {
@@ -1580,8 +1580,8 @@
     "semantic_hash": ""
   },
   "components/studio/StudioPanel.tsx": {
-    "mtime": 1785046108.376994,
-    "ast_hash": "4a66b96757bc123d62118b18eabda769",
+    "mtime": 1785088863.3425572,
+    "ast_hash": "3dabb95a3841d1d10856dda0aa75cd35",
     "semantic_hash": ""
   },
   "lib/files/tool-handoff.ts": {
@@ -1617,6 +1617,11 @@
   "lib/studio/lock-pitch.ts": {
     "mtime": 1785046041.7156708,
     "ast_hash": "7181eb7d298721c3c2672dd496f5a022",
+    "semantic_hash": ""
+  },
+  "lib/studio/beat-grid.ts": {
+    "mtime": 1785088825.0403156,
+    "ast_hash": "aa4530742c7ef88bf3ece67b82eabc22",
     "semantic_hash": ""
   }
 }

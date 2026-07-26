@@ -4861,3 +4861,18 @@ tbody tr:last-child td {
   cursor: pointer;
 }
 .studio-lock input { accent-color: var(--ink); width: 15px; height: 15px; cursor: pointer; }
+
+/* ---- DAW: beat grid ---- */
+.studio-grid { position: absolute; inset: 0; pointer-events: none; }
+.studio-grid-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--ink);
+  opacity: 0.08;
+}
+/* Bar lines read stronger so 4/4 structure is visible at a glance. */
+.studio-grid-line.downbeat { opacity: 0.2; }
+.studio-tempo { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.studio-tempo input { width: 72px; }
