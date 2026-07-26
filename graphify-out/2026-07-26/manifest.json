@@ -1540,8 +1540,8 @@
     "semantic_hash": ""
   },
   "lib/studio/timeline.ts": {
-    "mtime": 1785096727.0782115,
-    "ast_hash": "bca949843e16e36a26bb0d2b86a24451",
+    "mtime": 1785098151.208888,
+    "ast_hash": "bbb89c39dad83148a448532218b9fc42",
     "semantic_hash": ""
   },
   "lib/studio/timeline-math.ts": {
@@ -1570,8 +1570,8 @@
     "semantic_hash": ""
   },
   "components/studio/Timeline.tsx": {
-    "mtime": 1785088886.5274491,
-    "ast_hash": "131a9731c8d57d6466e249cce3f516eb",
+    "mtime": 1785098151.245046,
+    "ast_hash": "6d089b529a976e78182969e88027ca5c",
     "semantic_hash": ""
   },
   "lib/studio/engine.ts": {

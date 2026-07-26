@@ -963,7 +963,7 @@ const en = {
   "studio.pause": "Pause",
   "studio.record": "Record moves",
   "studio.recordStop": "Stop recording",
-  "studio.keysHint": "Space play · S split · D duplicate · L loop · ⌫ delete · arrows nudge · ⌘Z undo · pinch to zoom",
+  "studio.keysHint": "Space play · ↑↓ pick a clip · ←→ nudge · S split · D duplicate · L loop · ⌫ delete · Home/End · ⌘Z undo · pinch to zoom",
   "studio.clipGain": "Clip volume",
   "studio.fadeIn": "Fade in (s)",
   "studio.fadeOut": "Fade out (s)",

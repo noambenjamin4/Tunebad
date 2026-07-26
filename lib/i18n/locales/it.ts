@@ -914,7 +914,7 @@ const it: Record<keyof typeof en, string> = {
   "studio.pause": "Pausa",
   "studio.record": "Registra mosse",
   "studio.recordStop": "Ferma registrazione",
-  "studio.keysHint": "Spazio riproduci · S dividi · D duplica · L loop · ⌫ elimina · frecce sposta · ⌘Z annulla · pizzica per zoom",
+  "studio.keysHint": "Spazio riproduci · ↑↓ scegli clip · ←→ sposta · S dividi · D duplica · L loop · ⌫ elimina · Home/Fine · ⌘Z annulla · pizzica per zoom",
   "studio.clipGain": "Volume clip",
   "studio.fadeIn": "Dissolvenza in entrata (s)",
   "studio.fadeOut": "Dissolvenza in uscita (s)",

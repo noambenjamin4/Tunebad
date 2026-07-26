@@ -911,7 +911,7 @@ const zh: Record<keyof typeof en, string> = {
   "studio.pause": "暂停",
   "studio.record": "录制操作",
   "studio.recordStop": "停止录制",
-  "studio.keysHint": "空格 播放 · S 分割 · D 复制 · L 循环 · ⌫ 删除 · 方向键 微调 · ⌘Z 撤销 · 捏合缩放",
+  "studio.keysHint": "空格 播放 · ↑↓ 选择片段 · ←→ 微调 · S 分割 · D 复制 · L 循环 · ⌫ 删除 · Home/End · ⌘Z 撤销 · 捏合缩放",
   "studio.clipGain": "片段音量",
   "studio.fadeIn": "淡入（秒）",
   "studio.fadeOut": "淡出（秒）",

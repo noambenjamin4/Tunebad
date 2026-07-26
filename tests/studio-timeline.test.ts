@@ -11,6 +11,7 @@ import {
   trimClipStart,
   trimClipEnd,
   splitClip,
+  adjacentClipId,
   audibleDuration,
   isSoloing,
   loopPassEnd,
@@ -485,4 +486,31 @@ test("bounce length follows what is audible, not what exists", () => {
   assert.equal(audibleDuration([{ ...a, muted: true }, b]), 20);
   // Everything silent is a zero-length bounce, not a crash.
   assert.equal(audibleDuration([{ ...a, muted: true }, { ...b, muted: true }]), 0);
+});
+
+test("keyboard selection walks clips in TIME order, not insertion order", () => {
+  // Added late but positioned first — insertion order would get this wrong.
+  const late = clip({ id: "late", timelineStart: 0 });
+  const mid = clip({ id: "mid", timelineStart: 20 });
+  const early = clip({ id: "early", timelineStart: 10 });
+  const clips = [mid, early, late];   // deliberately unsorted
+
+  assert.equal(adjacentClipId(clips, "late", 1), "early");
+  assert.equal(adjacentClipId(clips, "early", 1), "mid");
+  assert.equal(adjacentClipId(clips, "mid", -1), "early");
+});
+
+test("keyboard selection wraps, and reaches the timeline from nothing", () => {
+  const a = clip({ id: "a", timelineStart: 0 });
+  const b = clip({ id: "b", timelineStart: 10 });
+  // Wrap at both ends.
+  assert.equal(adjacentClipId([a, b], "b", 1), "a");
+  assert.equal(adjacentClipId([a, b], "a", -1), "b");
+  // Nothing selected: forward takes the first, back takes the last, so one
+  // keypress always gets you onto the timeline.
+  assert.equal(adjacentClipId([a, b], null, 1), "a");
+  assert.equal(adjacentClipId([a, b], null, -1), "b");
+  // A selection that no longer exists behaves like no selection.
+  assert.equal(adjacentClipId([a, b], "deleted", 1), "a");
+  assert.equal(adjacentClipId([], null, 1), null);
 });

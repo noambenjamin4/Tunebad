@@ -21,6 +21,7 @@ import { useI18n } from "@/lib/i18n";
 import { formatTime, formatTimeTenths } from "@/lib/format";
 import {
   type StudioClip,
+  adjacentClipId,
   assignDisplayRows,
   clipDuration,
   snapCandidates,
@@ -529,6 +530,31 @@ export function Timeline({
     if (event.key === "+" || event.key === "=" || event.key === "-") {
       event.preventDefault();
       applyZoom(event.key === "-" ? 1 / ZOOM_STEP : ZOOM_STEP);
+      return;
+    }
+    // Vertical arrows pick a clip — without this every other shortcut is
+    // unreachable from the keyboard, because they all act on the SELECTION
+    // and nothing but a pointer could create one.
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      event.preventDefault();
+      const next = adjacentClipId(clipsRef.current, selectedId, event.key === "ArrowDown" ? 1 : -1);
+      if (next) {
+        onSelect(next);
+        const el = clipElOf(next);
+        el?.scrollIntoView({ inline: "nearest", block: "nearest" });
+      }
+      return;
+    }
+    if (event.key === "Home" || event.key === "End") {
+      event.preventDefault();
+      const to = event.key === "Home" ? 0 : timelineDuration(clipsRef.current);
+      applyHead(to);
+      onSeek(to);
+      return;
+    }
+    if (event.key === "Escape") {
+      event.preventDefault();
+      onSelect(null);
       return;
     }
     if (event.key === "ArrowLeft" || event.key === "ArrowRight") {

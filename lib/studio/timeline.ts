@@ -237,6 +237,28 @@ export function audibleDuration(clips: StudioClip[]): number {
   return end;
 }
 
+/**
+ * The clip before/after `currentId` in TIME order (not insertion order —
+ * the list is whatever order clips were added, which is meaningless once
+ * they have been dragged around). Wraps at both ends, and with nothing
+ * selected picks the first clip going forward / the last going back, so a
+ * single keypress can reach the timeline from a standing start.
+ */
+export function adjacentClipId(
+  clips: StudioClip[],
+  currentId: string | null,
+  direction: 1 | -1,
+): string | null {
+  if (clips.length === 0) return null;
+  const ordered = [...clips].sort(
+    (a, b) => a.timelineStart - b.timelineStart || a.id.localeCompare(b.id),
+  );
+  const index = ordered.findIndex((c) => c.id === currentId);
+  if (index === -1) return (direction === 1 ? ordered[0] : ordered[ordered.length - 1]).id;
+  const next = (index + direction + ordered.length) % ordered.length;
+  return ordered[next].id;
+}
+
 /** True when at least one clip is soloed (and not also muted). */
 export function isSoloing(clips: StudioClip[]): boolean {
   return clips.some((c) => c.soloed && !c.muted);

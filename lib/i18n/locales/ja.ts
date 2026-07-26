@@ -912,7 +912,7 @@ const ja: Record<keyof typeof en, string> = {
   "studio.pause": "一時停止",
   "studio.record": "操作を記録",
   "studio.recordStop": "記録を停止",
-  "studio.keysHint": "スペース 再生 · S 分割 · D 複製 · L ループ · ⌫ 削除 · 矢印 微調整 · ⌘Z 元に戻す · ピンチで拡大",
+  "studio.keysHint": "スペース 再生 · ↑↓ クリップ選択 · ←→ 微調整 · S 分割 · D 複製 · L ループ · ⌫ 削除 · Home/End · ⌘Z 元に戻す · ピンチで拡大",
   "studio.clipGain": "クリップ音量",
   "studio.fadeIn": "フェードイン（秒）",
   "studio.fadeOut": "フェードアウト（秒）",

@@ -914,7 +914,7 @@ const de: Record<keyof typeof en, string> = {
   "studio.pause": "Pause",
   "studio.record": "Moves aufnehmen",
   "studio.recordStop": "Aufnahme stoppen",
-  "studio.keysHint": "Leertaste Wiedergabe · S teilen · D duplizieren · L Loop · ⌫ löschen · Pfeile verschieben · ⌘Z rückgängig · Pinch zum Zoomen",
+  "studio.keysHint": "Leertaste Wiedergabe · ↑↓ Clip wählen · ←→ verschieben · S teilen · D duplizieren · L Loop · ⌫ löschen · Pos1/Ende · ⌘Z rückgängig · Pinch zum Zoomen",
   "studio.clipGain": "Clip-Lautstärke",
   "studio.fadeIn": "Einblenden (s)",
   "studio.fadeOut": "Ausblenden (s)",
