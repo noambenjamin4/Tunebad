@@ -1540,8 +1540,8 @@
     "semantic_hash": ""
   },
   "lib/studio/timeline.ts": {
-    "mtime": 1785095773.3757946,
-    "ast_hash": "54ba99cf4b4db5b611498adae7f6a086",
+    "mtime": 1785096727.0782115,
+    "ast_hash": "bca949843e16e36a26bb0d2b86a24451",
     "semantic_hash": ""
   },
   "lib/studio/timeline-math.ts": {
@@ -1555,13 +1555,13 @@
     "semantic_hash": ""
   },
   "tests/studio-timeline.test.ts": {
-    "mtime": 1785095336.4755456,
-    "ast_hash": "bc6a32689d2b545d87cbca58bd35f855",
+    "mtime": 1785096727.106732,
+    "ast_hash": "b43d5167da6dfbff9463735ac7684b50",
     "semantic_hash": ""
   },
   "lib/studio/render-timeline.ts": {
-    "mtime": 1785033384.0986485,
-    "ast_hash": "9e335fe031e2fc224898fd0eeafe4af6",
+    "mtime": 1785096727.0788925,
+    "ast_hash": "d53a1e1c89364186ee0508d275f6a0f6",
     "semantic_hash": ""
   },
   "components/studio/ClipCanvas.tsx": {

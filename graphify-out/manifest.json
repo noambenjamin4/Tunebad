@@ -1580,8 +1580,8 @@
     "semantic_hash": ""
   },
   "components/studio/StudioPanel.tsx": {
-    "mtime": 1785095850.3143225,
-    "ast_hash": "f695945038b384e1d9a4e40de6b83929",
+    "mtime": 1785097141.0981605,
+    "ast_hash": "55f79b43dfbf0e8ee903c7508784ce16",
     "semantic_hash": ""
   },
   "lib/files/tool-handoff.ts": {
@@ -1620,8 +1620,8 @@
     "semantic_hash": ""
   },
   "lib/studio/beat-grid.ts": {
-    "mtime": 1785095336.445787,
-    "ast_hash": "0c95a8e8de39f8ff811ae6ee5dd825ae",
+    "mtime": 1785097141.0708373,
+    "ast_hash": "117dab374de93dac3155ee1277021ce1",
     "semantic_hash": ""
   },
   "lib/studio/session.ts": {

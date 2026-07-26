@@ -183,6 +183,24 @@ function ensureWorker(): Worker {
   return worker;
 }
 
+/**
+ * Compile the essentia WASM before anyone asks for a tempo.
+ *
+ * Without this the FIRST detection pays the whole download-and-compile cost
+ * while a timeout runs against it, and on a cold cache that surfaced as a
+ * bogus "No tempo detected" on audio whose tempo is perfectly clear —
+ * observed once, and initially misdiagnosed as a minimum-length problem
+ * (8-second drums detect fine). useAnalyzer already warms the same worker
+ * on the analyzer page; the DAW simply never did.
+ */
+export function warmTempoWorker(): void {
+  try {
+    ensureWorker().postMessage({ warmup: true });
+  } catch {
+    // No worker support: detection will fall back or fail honestly.
+  }
+}
+
 export interface DetectedTempo {
   bpm: number;
   /** The other octave, when the estimator flagged one — feeds the x2 / ÷2 UI. */
@@ -208,10 +226,13 @@ export async function detectTempo(buffer: AudioBuffer): Promise<DetectedTempo | 
       bpmSampleRate: buffer.sampleRate,
     };
     const response = await new Promise<WorkerResponse>((resolve, reject) => {
+      // Generous: this is background work behind a "Finding the tempo…"
+      // label, and a cold WASM compile on a slow connection genuinely can
+      // take a while. Cutting it short just throws away a real answer.
       const timer = window.setTimeout(() => {
         waiting.delete(id);
         reject(new Error("tempo detection timed out"));
-      }, 30000);
+      }, 60000);
       waiting.set(id, (r) => {
         window.clearTimeout(timer);
         resolve(r);

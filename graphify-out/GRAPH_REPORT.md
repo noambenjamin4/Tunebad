@@ -1,16 +1,16 @@
 # Graph Report - Tunebad  (2026-07-26)
 
 ## Corpus Check
-- 268 files · ~294,125 words
+- 268 files · ~294,307 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1651 nodes · 4002 edges · 88 communities (77 shown, 11 thin omitted)
+- 1652 nodes · 4006 edges · 92 communities (73 shown, 19 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 18 edges (avg confidence: 0.72)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `ec0fc7c2`
+- Built from commit: `34179585`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -101,10 +101,14 @@
 - page.tsx
 - StudioClient.tsx
 - page.tsx
+- page.tsx
+- page.tsx
+- page.tsx
+- page.tsx
 
 ## God Nodes (most connected - your core abstractions)
 1. `useI18n()` - 123 edges
-2. `StudioPanel()` - 47 edges
+2. `StudioPanel()` - 48 edges
 3. `downloadBlob()` - 31 edges
 4. `RelatedTools()` - 28 edges
 5. `ToolPageShell()` - 28 edges
@@ -115,16 +119,16 @@
 10. `AudioMasteringTool()` - 21 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `Home()` --calls--> `countSongs()`  [EXTRACTED]
-  app/page.tsx → lib/server/link-analysis.ts
-- `generateStaticParams()` --calls--> `keyToSlug()`  [EXTRACTED]
-  app/songs/key/[slug]/page.tsx → lib/audio/harmonic.ts
+- `generateMetadata()` --calls--> `keyHubMeta()`  [EXTRACTED]
+  app/songs/key/[slug]/page.tsx → components/songs/KeyHubPage.tsx
 - `LinkAnalyze()` --indirect_call--> `song()`  [INFERRED]
   components/analysis/LinkAnalyze.tsx → tests/artists.test.ts
 - `RemixStudio()` --indirect_call--> `base()`  [INFERRED]
   components/remix/RemixStudio.tsx → public/vendor/ffmpeg/ffmpeg-core.js
 - `StudioPanel()` --indirect_call--> `hit()`  [INFERRED]
   components/studio/StudioPanel.tsx → scripts/octave-map.mjs
+- `GET()` --calls--> `resolveTitle()`  [EXTRACTED]
+  app/api/lookup/route.ts → lib/server/link-analysis.ts
 
 ## Import Cycles
 - 3-file cycle: `components/TunebadApp.tsx -> components/layout/TopBar.tsx -> components/layout/NavTabs.tsx -> components/TunebadApp.tsx`
@@ -132,15 +136,15 @@
 - 3-file cycle: `components/TunebadApp.tsx -> components/bpm/BpmToolsView.tsx -> components/bpm/MetronomeCard.tsx -> components/TunebadApp.tsx`
 - 3-file cycle: `components/TunebadApp.tsx -> components/bpm/BpmToolsView.tsx -> components/bpm/TapTempoCard.tsx -> components/TunebadApp.tsx`
 
-## Communities (88 total, 11 thin omitted)
+## Communities (92 total, 19 thin omitted)
 
 ### Community 0 - "analysis.ts"
 Cohesion: 0.09
-Nodes (37): formatSemitones(), matchesPreset(), PRESETS, RemixStudio(), applyEffectParams(), automatedOutputDuration(), baseEffectiveSpeed(), buildEffectChain() (+29 more)
+Nodes (31): EightDParams, RenderedAudio, applyEffectParams(), automatedOutputDuration(), baseEffectiveSpeed(), buildEffectChain(), buildParallelConvolvers(), buildRemixChain() (+23 more)
 
 ### Community 1 - "RemixStudio.tsx"
-Cohesion: 0.22
-Nodes (15): PlaylistLookupTrack, artistMetaTitle(), ArtistPage(), generateMetadata(), generateStaticParams(), generateStaticParams(), SongsPage(), ArtistGroup (+7 more)
+Cohesion: 0.24
+Nodes (13): PlaylistLookupTrack, artistMetaTitle(), ArtistPage(), generateMetadata(), generateStaticParams(), SongsPage(), ArtistGroup, artistSlug() (+5 more)
 
 ### Community 2 - "route.ts"
 Cohesion: 0.21
@@ -155,52 +159,52 @@ Cohesion: 0.07
 Nodes (43): AUDIOMACK_HOSTS, canonicalYouTubeUrl(), INSTAGRAM_HOSTS, MIXCLOUD_HOSTS, SOUNDCLOUD_HOSTS, TIKTOK_HOSTS, TWITTER_HOSTS, validateMediaUrl() (+35 more)
 
 ### Community 5 - "TunebadApp"
-Cohesion: 0.07
-Nodes (18): metadata, metadata, metadata, metadata, metadata, metadata, metadata, metadata (+10 more)
+Cohesion: 0.06
+Nodes (25): metadata, metadata, metadata, metadata, metadata, metadata, metadata, metadata (+17 more)
 
 ### Community 6 - "layout.tsx"
-Cohesion: 0.16
-Nodes (21): bufferKey(), bufferMap, decodedBytes(), DEFAULT_PARAMS, EFFECT_OPTIONS, makeClipId(), REVERB_TYPE_OPTIONS, StudioPanel() (+13 more)
+Cohesion: 0.17
+Nodes (15): AutomationMove, DistributiveOmit, EFFECT_OPTIONS, formatSemitones(), matchesPreset(), Preset, PRESETS, RemixStudio() (+7 more)
 
 ### Community 7 - "rate-limit.ts"
-Cohesion: 0.19
-Nodes (12): generateMetadata(), generateMetadata(), MinimalFooter(), ALL_CODES, camelotHubMeta(), CamelotHubPage(), CODE_TO_KEY, parseCode() (+4 more)
+Cohesion: 0.15
+Nodes (15): generateMetadata(), generateMetadata(), generateMetadata(), MinimalFooter(), ALL_CODES, camelotHubMeta(), CamelotHubPage(), CODE_TO_KEY (+7 more)
 
 ### Community 8 - "dependencies"
 Cohesion: 0.05
 Nodes (40): dependencies, essentia.js, fflate, @ffmpeg/core, @ffmpeg/ffmpeg, ffmpeg-static, heic-to, next (+32 more)
 
 ### Community 9 - "lufs.ts"
-Cohesion: 0.15
-Nodes (21): POST(), globalStore, runningJobCount(), sweepJobs(), YT_BASE_DIR, YtJob, allowJobStart(), AUDIO_QUALITIES (+13 more)
+Cohesion: 0.17
+Nodes (19): GET(), globalStore, publicJob(), sweepJobs(), YT_BASE_DIR, YtJob, classifyError(), enumeratePlaylist() (+11 more)
 
 ### Community 10 - "VideoTool.tsx"
 Cohesion: 0.12
 Nodes (21): POST(), resultSchema, POST(), reportSchema, GET(), GET(), GET(), querySchema (+13 more)
 
 ### Community 11 - "link-analysis.ts"
-Cohesion: 0.12
-Nodes (24): metadata, metadata, ImageDimensionError, ImageFormatPicker(), ImageTool(), ImageToolMode, ResultRow, SizePreset (+16 more)
+Cohesion: 0.17
+Nodes (5): metadata, metadata, metadata, REGISTRY, RelatedSlug
 
 ### Community 12 - "AnalyzerPanel.tsx"
-Cohesion: 0.16
-Nodes (20): analyzeBandCurve(), applyStereoWidth(), BAND_EDGES, clampBand(), crestFactorDb(), effectiveCurve(), fft(), limitPeaks() (+12 more)
+Cohesion: 0.17
+Nodes (19): analyzeBandCurve(), applyStereoWidth(), BAND_EDGES, clampBand(), crestFactorDb(), effectiveCurve(), fft(), limitPeaks() (+11 more)
 
 ### Community 13 - "AudioMasteringTool.tsx"
-Cohesion: 0.17
-Nodes (14): majorProfile, minorProfile, estimateBpm(), estimateKey(), getEnergyEnvelope(), goertzel(), basicAnalysis(), centeredWindow() (+6 more)
+Cohesion: 0.08
+Nodes (36): CAMELOT_ORDER, ErrorKey, exportPlaylistCsv(), Phase, PlaylistAnalyzer(), AnalyzeStage, useAnalyzer(), PlaylistCachedRow (+28 more)
 
 ### Community 14 - "CutterPanel.tsx"
-Cohesion: 0.13
-Nodes (28): AUDIO_FORMATS, MediaConvertTool(), MP3_BITRATES, Status, VIDEO_FORMATS, Status, VideoTool(), AUDIO_MIME (+20 more)
+Cohesion: 0.05
+Nodes (81): DropZone(), FileDrop(), HeicTool(), ResultRow, Status, ImageDimensionError, ImageFormatPicker(), ImageTool() (+73 more)
 
 ### Community 15 - "ToolPageShell.tsx"
 Cohesion: 0.47
 Nodes (4): NightcoreTool(), NightcoreParams, RenderedAudio, renderNightcore()
 
 ### Community 16 - "backends.ts"
-Cohesion: 0.27
-Nodes (8): FAQS, metadata, CAMELOT_ORDER, ErrorKey, exportPlaylistCsv(), Phase, PlaylistAnalyzer(), useUnloadGuard()
+Cohesion: 0.24
+Nodes (4): metadata, metadata, PageDropGuard(), useWindowFileDrop()
 
 ### Community 17 - "AudioMasteringTool.tsx"
 Cohesion: 0.19
@@ -215,8 +219,8 @@ Cohesion: 0.12
 Nodes (16): foldBpm(), addTracks(), analyze(), CAMELOT, collectTracks(), COUNTRY_PLAYLISTS, __dirname, env (+8 more)
 
 ### Community 20 - "VideoTool.tsx"
-Cohesion: 0.14
-Nodes (20): AnalysisSummary(), MetricCardProps, DropZone(), FileMetaPill(), RecentRow, RecentStrip(), ResultsTable(), STAGE_ROW_LABELS (+12 more)
+Cohesion: 0.12
+Nodes (16): AnalysisSummary(), MetricCardProps, FileMetaPill(), RecentRow, RecentStrip(), ResultsTable(), STAGE_ROW_LABELS, SimilarSong (+8 more)
 
 ### Community 21 - "fs"
 Cohesion: 0.11
@@ -231,8 +235,8 @@ Cohesion: 0.13
 Nodes (9): CamelotWheelSvg(), metadata, polar(), WHEEL, metadata, metadata, metadata, metadata (+1 more)
 
 ### Community 25 - "useAnalyzer.ts"
-Cohesion: 0.05
-Nodes (34): metadata, metadata, metadata, metadata, metadata, metadata, metadata, metadata (+26 more)
+Cohesion: 0.14
+Nodes (7): metadata, metadata, metadata, metadata, metadata, FaqEntry, ToolFaq()
 
 ### Community 26 - "getWasmTableEntry"
 Cohesion: 0.12
@@ -251,12 +255,12 @@ Cohesion: 0.18
 Nodes (12): _getnameinfo(), inetNtop4(), inetNtop6(), intArrayFromString(), LazyUint8Array(), lengthBytesUTF8(), readSockaddr(), stringToNewUTF8() (+4 more)
 
 ### Community 31 - "ReverbEq.tsx"
-Cohesion: 0.13
-Nodes (23): ConverterView(), LocalFileConverter(), Status, FormatPicker(), FORMATS, OutputFormat, QUALITIES, Quality (+15 more)
+Cohesion: 0.10
+Nodes (37): BpmToolsView(), ConverterView(), LocalFileConverter(), Status, PlaylistBatch(), FormatPicker(), FORMATS, OutputFormat (+29 more)
 
 ### Community 32 - "AnalysisResult"
-Cohesion: 0.23
-Nodes (12): EXPORT_TARGETS, formatDb(), LoudnessPanel(), LoudnessWorkerResult, resampleTo48k(), toneFor(), clampBpm(), useMetronome() (+4 more)
+Cohesion: 0.20
+Nodes (14): EXPORT_TARGETS, formatDb(), LoudnessPanel(), LoudnessWorkerResult, resampleTo48k(), toneFor(), useNowPlaying(), PLATFORM_TARGETS (+6 more)
 
 ### Community 33 - "_strftime"
 Cohesion: 0.15
@@ -271,24 +275,24 @@ Cohesion: 0.20
 Nodes (11): abort(), _dlopen(), ___dlsym(), getBinary(), getBinaryPromise(), getValue(), initRandomFill(), instantiateArrayBuffer() (+3 more)
 
 ### Community 37 - "audio-joiner.ts"
-Cohesion: 0.13
-Nodes (33): DragState, Timeline(), BeatGrid, beatPeriod(), beatTimesInRange(), DetectedTempo, estimateBeatPhase(), nearestGridTime() (+25 more)
+Cohesion: 0.06
+Nodes (87): ClipCanvas(), bufferKey(), bufferMap, decodedBytes(), DEFAULT_PARAMS, EFFECT_OPTIONS, makeClipId(), REVERB_TYPE_OPTIONS (+79 more)
 
 ### Community 38 - "manifest.json"
 Cohesion: 0.20
 Nodes (9): background_color, description, display, icons, name, scope, short_name, start_url (+1 more)
 
 ### Community 39 - "page.tsx"
-Cohesion: 0.10
-Nodes (20): PitchConverter(), REFERENCES, AutomationMove, DistributiveOmit, EFFECT_OPTIONS, Preset, REVERB_TYPE_OPTIONS, Status (+12 more)
+Cohesion: 0.15
+Nodes (13): PitchConverter(), REFERENCES, BASE_SVG_PROPS, DownloadIcon(), EchoIcon(), GaugeIcon(), HistoryIcon(), IconProps (+5 more)
 
 ### Community 40 - "setup-ytdlp.mjs"
 Cohesion: 0.22
 Nodes (7): actual, binDir, check, expected, line, projectRoot, target
 
 ### Community 41 - "lufs.ts"
-Cohesion: 0.09
-Nodes (22): metadata, metadata, FILE_TOOLS, ToolsHub(), HISTORY_TAB, TABS, KNOWN_HREFS, LINKS (+14 more)
+Cohesion: 0.14
+Nodes (16): metadata, KNOWN_HREFS, LINKS, ToolPageNav(), CopyrightBody(), SECTIONS, LanguageMenu(), detectLocale() (+8 more)
 
 ### Community 42 - "callRuntimeCallbacks"
 Cohesion: 0.25
@@ -311,64 +315,64 @@ Cohesion: 0.16
 Nodes (24): CamelotWheel(), CODE_TO_KEY, point(), segmentPath(), SEGMENTS, shortKey(), ALL_CODES, CamelotWheelPage() (+16 more)
 
 ### Community 47 - "mp3-encoder.ts"
-Cohesion: 0.27
-Nodes (11): ensureAnonSession(), entryFromRemoteRow(), entryFromResult(), readLocal(), RemoteRow, useHistory(), writeLocal(), exportResultsCsv() (+3 more)
+Cohesion: 0.33
+Nodes (10): ensureAnonSession(), entryFromRemoteRow(), entryFromResult(), readLocal(), RemoteRow, useHistory(), writeLocal(), formatTime() (+2 more)
 
 ### Community 48 - "next.config.mjs"
 Cohesion: 0.50
 Nodes (3): csp, nextConfig, withBundleAnalyzer
 
 ### Community 53 - "lufs.ts"
-Cohesion: 0.12
-Nodes (27): AudioEffectResult, AudioEffectTool(), Status, AudioFormatPicker(), AudioOutputFormat, MP3_BITRATES, AudioJoinerTool(), nextId() (+19 more)
+Cohesion: 0.13
+Nodes (19): AudioEffectResult, Status, AudioFormatPicker(), AudioOutputFormat, MP3_BITRATES, AudioJoinerTool(), nextId(), QueuedFile (+11 more)
 
 ### Community 56 - "DelayCalculator.tsx"
-Cohesion: 0.15
-Nodes (20): BpmToolsView(), MetronomeCard(), TapTempoCard(), DelayCalculator(), formatHz(), formatMs(), PRESET_NAME_KEYS, useTunebad() (+12 more)
+Cohesion: 0.17
+Nodes (18): MetronomeCard(), TapTempoCard(), DelayCalculator(), formatHz(), formatMs(), PRESET_NAME_KEYS, useTunebad(), useTapTempo() (+10 more)
 
 ### Community 57 - "route.ts"
-Cohesion: 0.33
-Nodes (9): countSongShards(), GET(), countSongs(), escapeXml(), SitemapEntry, sitemapIndexXml(), UrlEntry, urlsetXml() (+1 more)
+Cohesion: 0.22
+Nodes (14): countSongShards(), GET(), GET(), STATIC_ENTRIES, ToolEntry, generateStaticParams(), readAllSongs(), readSongSlugRange() (+6 more)
 
 ### Community 58 - "page.tsx"
-Cohesion: 0.15
-Nodes (16): AbMode, AudioMasteringTool(), barsFromChannels(), differenceCurve(), GENRE_LABELS, GENRE_ORDER, GENRE_PRESETS, GenreKey (+8 more)
+Cohesion: 0.14
+Nodes (17): AbMode, AudioMasteringTool(), barsFromChannels(), GENRE_LABELS, GENRE_ORDER, GENRE_PRESETS, GenreKey, GenrePreset (+9 more)
 
 ### Community 59 - "audio-joiner.ts"
-Cohesion: 0.17
-Nodes (12): ActivityBpmPage(), generateMetadata(), metadata, SongBrowser(), SongRow, SortKey, SearchRow, SongSearch() (+4 more)
+Cohesion: 0.16
+Nodes (13): ActivityBpmPage(), generateMetadata(), metadata, SongBrowser(), SongRow, SortKey, SearchRow, SongSearch() (+5 more)
 
 ### Community 60 - "formatBytes"
-Cohesion: 0.20
-Nodes (17): PdfSplitTool(), Status, PdfTool(), PdfToolMode, Status, downloadBlob(), formatBytes(), extractPages() (+9 more)
+Cohesion: 0.33
+Nodes (9): GET(), idSchema, querySchema, searchSchema, resolveTrack(), cleanSongTitle(), findDeezerPreview(), findPreview() (+1 more)
 
 ### Community 61 - "delay.ts"
 Cohesion: 0.14
 Nodes (21): CachedRow, isSupportedTrackUrl(), LinkAnalyze(), LinkPreviewMeta, looksLikeUrl(), permalinkFor(), Phase, AUDIOMACK_HOSTS (+13 more)
 
 ### Community 62 - "page.tsx"
-Cohesion: 0.12
-Nodes (14): Home(), FAQ_JSON_LD, FAQ_KEYS, LandingSeo(), TOUR_KEYS, VALUE_KEYS, de, en (+6 more)
+Cohesion: 0.08
+Nodes (23): Home(), FAQS, metadata, PlaylistAnalyzerPage(), FAQS, metadata, ROWS, VsPage() (+15 more)
 
 ### Community 63 - "CamelotHubPage.tsx"
-Cohesion: 0.20
-Nodes (14): RemixTake, StudioTake, BassBoostParams, limitPeak(), renderBassBoost(), RenderedAudio, AutomationEvent, RemixParams (+6 more)
+Cohesion: 0.19
+Nodes (16): BassBoostParams, limitPeak(), renderBassBoost(), RenderedAudio, convertFileToMp3(), convertFileToWav(), decodeAndTrim(), encodeMp3FromChannels() (+8 more)
 
 ### Community 64 - "downloadBlob"
-Cohesion: 0.15
-Nodes (6): RemixChain, RemixGraph, StudioEngine, StoredArrangement, loopPassEnd(), StudioClip
+Cohesion: 0.18
+Nodes (3): RemixChain, RemixGraph, StudioEngine
 
 ### Community 65 - "route.ts"
-Cohesion: 0.23
-Nodes (12): metadata, HeicTool(), ResultRow, Status, convertHeic(), HeicDecodeError, HeicOutputFormat, heicOutputName() (+4 more)
+Cohesion: 0.20
+Nodes (4): metadata, metadata, metadata, ToolPageShell()
 
 ### Community 66 - "CutterPanel.tsx"
-Cohesion: 0.30
-Nodes (11): applyFades(), CutterPanel(), Status, clamp(), TrimWaveform(), ZOOM_LEVELS, ZoomLevel, TransportClock() (+3 more)
+Cohesion: 0.23
+Nodes (15): applyFades(), CutterPanel(), Status, clamp(), TrimWaveform(), ZOOM_LEVELS, ZoomLevel, TransportClock() (+7 more)
 
 ### Community 68 - "page.tsx"
-Cohesion: 0.17
-Nodes (20): AnalyzerState, AnalyzeStage, useAnalyzer(), PlaylistCachedRow, PlaylistRow, PlaylistTrackInput, rowsFromTracks(), RowStatus (+12 more)
+Cohesion: 0.20
+Nodes (4): metadata, metadata, metadata, RelatedTools()
 
 ### Community 70 - "useFileDrop"
 Cohesion: 0.08
@@ -379,24 +383,20 @@ Cohesion: 0.38
 Nodes (5): CURVE, DRIVES, magnitudeAt(), measure(), shape()
 
 ### Community 72 - "LandingSeo.tsx"
-Cohesion: 0.20
-Nodes (13): SimpleFilterInstance, timeStretch(), bytesOf(), cache, forgetStretched(), getStretchedBuffer(), peekStretchedBuffer(), pending (+5 more)
+Cohesion: 0.40
+Nodes (3): metadata, FILE_TOOLS, ToolsHub()
 
 ### Community 74 - "LandingSeo.tsx"
-Cohesion: 0.18
-Nodes (15): ClipCanvas(), EffectId, EFFECTS, cache, DisplaySignal, forgetDisplaySignals(), getDisplaySignal(), keyOf() (+7 more)
+Cohesion: 0.47
+Nodes (5): RemixTake, StudioTake, AutomationEvent, RemixParams, StudioExportOptions
 
 ### Community 75 - "page.tsx"
-Cohesion: 0.16
-Nodes (19): GET(), querySchema, Image(), loadFont(), size, displayTitle(), generateMetadata(), metaTitle() (+11 more)
+Cohesion: 0.17
+Nodes (18): GET(), querySchema, Image(), loadFont(), size, displayTitle(), generateMetadata(), metaTitle() (+10 more)
 
 ### Community 76 - "analysis.ts"
-Cohesion: 0.12
-Nodes (27): GET(), idSchema, querySchema, searchSchema, GET(), querySchema, resolveTrack(), runPool() (+19 more)
-
-### Community 77 - "OpenInDawButton.tsx"
-Cohesion: 0.21
-Nodes (10): PlaylistBatch(), BatchOptions, PlaylistItem, PlaylistRowPhase, PlaylistRowState, rowLabel(), usePlaylistBatch(), YouTubeJobState (+2 more)
+Cohesion: 0.13
+Nodes (21): GET(), querySchema, runPool(), sleep(), SourceTrack, POST(), spotifyRequestSchema, playlistRequestSchema (+13 more)
 
 ### Community 78 - "youtube-playlist.ts"
 Cohesion: 0.22
@@ -404,11 +404,11 @@ Nodes (13): decode(), detect(), FFMPEG, findPreview(), FLAT_TO_SHARP, getEssenti
 
 ### Community 79 - "usePlaylistBatch.ts"
 Cohesion: 0.13
-Nodes (19): CONTENT_TYPE_BY_FORMAT, contentDisposition(), GET(), GET(), IMPORTANT: this module reads server-only secrets and must never be, Backend, backendForJob(), BackendPick (+11 more)
+Nodes (21): CONTENT_TYPE_BY_FORMAT, contentDisposition(), GET(), POST(), Backend, backendForJob(), BackendPick, BackendTag (+13 more)
 
 ### Community 80 - "getEnvStrings"
-Cohesion: 0.16
-Nodes (9): AnalyzerPanel(), HistoryPanel(), NavTabs(), GlobalDropCatcher(), TunebadContextValue, VIEWS_ACCEPTING_HANDOFF, VIEWS_WITH_OWN_INTAKE, AnalysisResult (+1 more)
+Cohesion: 0.19
+Nodes (8): AnalyzerPanel(), HistoryPanel(), GlobalDropCatcher(), TunebadContextValue, VIEWS_ACCEPTING_HANDOFF, VIEWS_WITH_OWN_INTAKE, AnalyzerState, AnalysisResult
 
 ### Community 81 - "octave-map.mjs"
 Cohesion: 0.33
@@ -416,19 +416,7 @@ Nodes (8): beatTrackerBpm(), getEssentia(), hit(), main(), makeTrack(), PATTERNS
 
 ### Community 82 - "page.tsx"
 Cohesion: 0.14
-Nodes (23): GET(), BpmHubPage(), generateMetadata(), generateStaticParams(), parseBpm(), tempoContext(), countSongsByBpmRange(), countSongsByCamelotCode() (+15 more)
-
-### Community 83 - "FileDrop.tsx"
-Cohesion: 0.31
-Nodes (8): TopBar(), useNowPlaying(), activeSources, isAnyAudioPlaying(), NowPlayingDetail, registerPlaybackStopper(), setNowPlaying(), stoppers
-
-### Community 84 - "EightDTool.tsx"
-Cohesion: 0.47
-Nodes (4): EightDTool(), EightDParams, RenderedAudio, renderEightD()
-
-### Community 85 - "page.tsx"
-Cohesion: 0.32
-Nodes (4): generateMetadata(), generateStaticParams(), generateMetadata(), keyHubMeta()
+Nodes (21): BpmHubPage(), generateMetadata(), generateStaticParams(), parseBpm(), tempoContext(), countSongsByArtistName(), countSongsByBpmRange(), countSongsByKey() (+13 more)
 
 ### Community 86 - "StudioClient.tsx"
 Cohesion: 0.40
@@ -437,22 +425,22 @@ Nodes (3): metadata, StudioClient(), StudioPanel
 ## Knowledge Gaps
 - **424 isolated node(s):** `metadata`, `resultSchema`, `reportSchema`, `querySchema`, `idSchema` (+419 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **11 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **19 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `RemixStudio()` connect `analysis.ts` to `AnalysisResult`, `page.tsx`, `TunebadApp`, `page.tsx`, `LandingSeo.tsx`, `mp3-encoder.ts`, `getEnvStrings`, `backends.ts`, `FileDrop.tsx`, `VideoTool.tsx`, `lufs.ts`, `VideoTool.tsx`, `DelayCalculator.tsx`, `page.tsx`, `formatBytes`, `ReverbEq.tsx`?**
+- **Why does `RemixStudio()` connect `layout.tsx` to `AnalysisResult`, `analysis.ts`, `CutterPanel.tsx`, `audio-joiner.ts`, `TunebadApp`, `AudioMasteringTool.tsx`, `CutterPanel.tsx`, `mp3-encoder.ts`, `getEnvStrings`, `VideoTool.tsx`, `DelayCalculator.tsx`, `page.tsx`, `ReverbEq.tsx`, `CamelotHubPage.tsx`?**
   _High betweenness centrality (0.274) - this node is a cross-community bridge._
-- **Why does `base()` connect `analysis.ts` to `ffmpeg-core.js`?**
+- **Why does `base()` connect `layout.tsx` to `ffmpeg-core.js`?**
   _High betweenness centrality (0.266) - this node is a cross-community bridge._
-- **Why does `useI18n()` connect `VideoTool.tsx` to `analysis.ts`, `TunebadApp`, `layout.tsx`, `link-analysis.ts`, `CutterPanel.tsx`, `ToolPageShell.tsx`, `backends.ts`, `VideoTool.tsx`, `useAnalyzer.ts`, `CutterPanel.tsx`, `ReverbEq.tsx`, `AnalysisResult`, `audio-joiner.ts`, `page.tsx`, `lufs.ts`, `lufs.ts`, `DelayCalculator.tsx`, `page.tsx`, `formatBytes`, `delay.ts`, `page.tsx`, `route.ts`, `CutterPanel.tsx`, `OpenInDawButton.tsx`, `getEnvStrings`, `EightDTool.tsx`?**
-  _High betweenness centrality (0.177) - this node is a cross-community bridge._
+- **Why does `useI18n()` connect `ReverbEq.tsx` to `TunebadApp`, `layout.tsx`, `link-analysis.ts`, `AudioMasteringTool.tsx`, `CutterPanel.tsx`, `ToolPageShell.tsx`, `VideoTool.tsx`, `VideoTool.tsx`, `useAnalyzer.ts`, `CutterPanel.tsx`, `AnalysisResult`, `audio-joiner.ts`, `page.tsx`, `lufs.ts`, `lufs.ts`, `DelayCalculator.tsx`, `page.tsx`, `delay.ts`, `page.tsx`, `CutterPanel.tsx`, `page.tsx`, `LandingSeo.tsx`, `getEnvStrings`?**
+  _High betweenness centrality (0.176) - this node is a cross-community bridge._
 - **Are the 3 inferred relationships involving `StudioPanel()` (e.g. with `.start()` and `hit()`) actually correct?**
   _`StudioPanel()` has 3 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `metadata`, `resultSchema`, `reportSchema` to the rest of the system?**
   _427 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `analysis.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.08658536585365853 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.09309309309309309 - nodes in this community are weakly interconnected._
 - **Should `ffmpeg-core.js` be split into smaller, more focused modules?**
   _Cohesion score 0.05442176870748299 - nodes in this community are weakly interconnected._

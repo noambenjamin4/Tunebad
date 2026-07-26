@@ -63,6 +63,7 @@ import {
   MIN_BPM,
   detectTempo,
   estimateBeatPhase,
+  warmTempoWorker,
   nearestGridTime,
   needsTempoMatch,
   tempoMatchRatio,
@@ -562,6 +563,12 @@ export function StudioPanel() {
   }, [clips, params, grid, loop, gridOn, pxPerSecond, restoring]);
 
   /* ------------------------------- beat grid ------------------------------- */
+
+  // Compile the tempo engine while the user is still choosing files, so the
+  // first detection is not a cold start racing its own timeout.
+  useEffect(() => {
+    warmTempoWorker();
+  }, []);
 
   // Tempo comes from the first clip on the timeline — in a beat switch that
   // is the track everything else has to line up with. Detection runs once
