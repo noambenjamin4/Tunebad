@@ -54,6 +54,7 @@ import {
   MIN_BPM,
   detectTempo,
   estimateBeatPhase,
+  nearestGridTime,
   needsTempoMatch,
   tempoMatchRatio,
 } from "@/lib/studio/beat-grid";
@@ -726,13 +727,35 @@ export function StudioPanel() {
       const id = stretchedIdFor(clip.bufferId, ratio);
       bufferMap.set(id, stretched);
       setClipBpms((prev) => new Map(prev).set(id, Math.round(sourceBpm * ratio)));
+
       // The stretched buffer is 1/ratio as long, so every source-time field
-      // scales with it; the clip keeps its place on the timeline.
+      // scales with it.
+      const nextClipStart = clip.clipStart / ratio;
+      const nextClipEnd = clip.clipEnd / ratio;
+
+      // TEMPO ALONE IS HALF A BEATMATCH. The clip now runs at the project's
+      // tempo, but its downbeat can still sit anywhere between two grid
+      // lines — right speed, wrong place, which is exactly the mistake a
+      // human makes by ear. So find where this clip's beats actually fall
+      // and slide it (by less than half a beat) until they land on the grid.
+      let nextStart = clip.timelineStart;
+      const signal = await getDisplaySignal(id, stretched, paramsRef.current.effect);
+      const phase = estimateBeatPhase(signal, grid.bpm);
+      const beatOnTimeline = clip.timelineStart + (phase - nextClipStart);
+      const correction = nearestGridTime(beatOnTimeline, grid) - beatOnTimeline;
+      if (Number.isFinite(correction)) nextStart = Math.max(0, clip.timelineStart + correction);
+
       pushUndo();
       setClips((prev) =>
         prev.map((c) =>
           c.id === clip.id
-            ? { ...c, bufferId: id, clipStart: c.clipStart / ratio, clipEnd: c.clipEnd / ratio }
+            ? {
+                ...c,
+                bufferId: id,
+                clipStart: nextClipStart,
+                clipEnd: nextClipEnd,
+                timelineStart: nextStart,
+              }
             : c,
         ),
       );

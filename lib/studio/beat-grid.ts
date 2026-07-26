@@ -109,7 +109,12 @@ export function needsTempoMatch(ratio: number): boolean {
 
 /* --------------------------- phase estimation --------------------------- */
 
-const ONSET_HOP = 256;
+// 64 samples at ~11 kHz is ~5.8 ms per frame. At 256 the envelope could
+// only locate a beat to ~23 ms, which measured as 16 ms of downbeat slop
+// after a match — audible looseness on a tight switch. Four times the
+// frames costs nothing here: the envelope is one pass over already
+// decimated mono either way, and the phase search is 64 candidates.
+const ONSET_HOP = 64;
 
 /**
  * Where the beats sit, in SOURCE seconds. Builds an onset envelope (rising

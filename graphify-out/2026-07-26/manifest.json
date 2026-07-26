@@ -1580,8 +1580,8 @@
     "semantic_hash": ""
   },
   "components/studio/StudioPanel.tsx": {
-    "mtime": 1785090309.9118783,
-    "ast_hash": "f383ec698af7986423be1ca4fa1bdd33",
+    "mtime": 1785095169.2741768,
+    "ast_hash": "be98f7dfeceea80bc03f8a5691b46775",
     "semantic_hash": ""
   },
   "lib/files/tool-handoff.ts": {

@@ -431,8 +431,10 @@ test("beat grid: phase finds where the beats actually are", () => {
   }
   const signal = { data, pyramid: buildPeakPyramid(data), sampleRate: rate };
   const phase = estimateBeatPhase(signal, 120);
-  // Within one onset frame (256 samples ~ 23ms) of the truth.
-  assert.ok(Math.abs(phase - 0.25) < 0.03, `phase ${phase} should be ~0.25`);
+  // Within one onset frame (64 samples ~ 5.8ms) of the truth. The looser
+  // 30ms this asserted at ONSET_HOP=256 measured as 16ms of real downbeat
+  // slop after a beatmatch, so the tolerance is the feature here.
+  assert.ok(Math.abs(phase - 0.25) < 0.008, `phase ${phase} should be ~0.25`);
 });
 
 test("beat grid: phase on silence is harmless, not NaN", () => {
