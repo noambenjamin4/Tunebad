@@ -31,6 +31,8 @@ import {
   beatTimesInRange,
   estimateBeatPhase,
   nearestGridTime,
+  needsTempoMatch,
+  tempoMatchRatio,
 } from "../lib/studio/beat-grid";
 import { buildPeakPyramid } from "../lib/studio/waveform-pyramid";
 import { scaleClipsForLock, stretchedIdFor } from "../lib/studio/lock-pitch";
@@ -439,4 +441,25 @@ test("beat grid: phase on silence is harmless, not NaN", () => {
   const phase = estimateBeatPhase(signal, 120);
   assert.ok(Number.isFinite(phase));
   assert.ok(phase >= 0);
+});
+
+test("beatmatch: a slower song is stretched up to the project tempo", () => {
+  // 120 BPM clip into a 128 BPM project: play it 128/120 = 1.0667x.
+  assert.equal(+tempoMatchRatio(120, 128).toFixed(4), 1.0667);
+  assert.equal(+tempoMatchRatio(140, 128).toFixed(4), 0.9143);
+  assert.ok(needsTempoMatch(tempoMatchRatio(140, 128)));
+});
+
+test("beatmatch: half-time is already in time and must not be doubled", () => {
+  // 70 against 140 is one beat per two — the ratio is 1, not 2.
+  assert.equal(tempoMatchRatio(70, 140), 1);
+  assert.equal(tempoMatchRatio(140, 70), 1);
+  // 65 vs 128 folds to 130 vs 128 — a small correction, not a huge one.
+  assert.ok(Math.abs(tempoMatchRatio(65, 128) - 0.9846) < 0.001);
+});
+
+test("beatmatch: an already-matched clip is left alone", () => {
+  assert.equal(needsTempoMatch(tempoMatchRatio(128, 128)), false);
+  assert.equal(needsTempoMatch(tempoMatchRatio(128.2, 128)), false);
+  assert.equal(tempoMatchRatio(0, 128), 1);
 });

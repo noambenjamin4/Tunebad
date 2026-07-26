@@ -75,6 +75,38 @@ export function beatTimesInRange(
   return out;
 }
 
+/**
+ * How much a clip must be stretched to sit at `targetBpm`, as a tempo
+ * factor for timeStretch (0.9 = play it at 90% speed).
+ *
+ * Octave-folded on purpose: a 70 BPM track against a 140 BPM project is
+ * ALREADY in time — half-time, one beat per two — and stretching it 2x
+ * would destroy it. The estimator also mislabels octaves regularly, so
+ * folding protects against its known failure mode as well. Candidates are
+ * scored in log space, where "twice as fast" and "half as fast" are the
+ * same distance from a perfect match.
+ */
+export function tempoMatchRatio(clipBpm: number, targetBpm: number): number {
+  if (!(clipBpm > 0) || !(targetBpm > 0)) return 1;
+  let best = 1;
+  let bestError = Infinity;
+  for (let octave = -2; octave <= 2; octave++) {
+    const candidate = clipBpm * Math.pow(2, octave);
+    const ratio = targetBpm / candidate;
+    const error = Math.abs(Math.log2(ratio));
+    if (error < bestError) {
+      bestError = error;
+      best = ratio;
+    }
+  }
+  return best;
+}
+
+/** Worth offering a match? Under ~0.3% the stretch is inaudible churn. */
+export function needsTempoMatch(ratio: number): boolean {
+  return Number.isFinite(ratio) && Math.abs(ratio - 1) > 0.003;
+}
+
 /* --------------------------- phase estimation --------------------------- */
 
 const ONSET_HOP = 256;

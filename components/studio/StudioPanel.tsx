@@ -54,6 +54,8 @@ import {
   MIN_BPM,
   detectTempo,
   estimateBeatPhase,
+  needsTempoMatch,
+  tempoMatchRatio,
 } from "@/lib/studio/beat-grid";
 import {
   forgetStretched,
@@ -195,6 +197,10 @@ export function StudioPanel() {
   const [detectingTempo, setDetectingTempo] = useState(false);
   const [tempoFailed, setTempoFailed] = useState(false);
   const gridSourceRef = useRef<string | null>(null);
+  // Detected tempo per BUFFER (not per clip): splits and duplicates of the
+  // same song share one answer and one analysis.
+  const [clipBpms, setClipBpms] = useState<Map<string, number>>(new Map());
+  const bpmRequestedRef = useRef<Set<string>>(new Set());
 
   const clipsRef = useRef(clips);
   clipsRef.current = clips;
@@ -486,6 +492,23 @@ export function StudioPanel() {
     };
   }, [clips, signals]);
 
+  // Every clip gets a tempo, so the inspector can say "this one is 140
+  // against a 128 project" and offer to fix it. One analysis per buffer,
+  // never repeated, and a failure just means no number.
+  useEffect(() => {
+    for (const id of new Set(clips.map((c) => c.bufferId))) {
+      if (bpmRequestedRef.current.has(id)) continue;
+      const buffer = bufferMap.get(id);
+      if (!buffer) continue;
+      bpmRequestedRef.current.add(id);
+      void detectTempo(buffer).then((tempo) => {
+        if (!tempo) return;
+        setClipBpms((prev) => new Map(prev).set(id, tempo.bpm));
+      });
+    }
+  }, [clips]);
+
+
   const setGridBpm = useCallback((bpm: number) => {
     if (!Number.isFinite(bpm) || bpm < MIN_BPM || bpm > MAX_BPM) return;
     setGrid((prev) =>
@@ -679,6 +702,51 @@ export function StudioPanel() {
     setClips((prev) => prev.flatMap((c) => (c.id === clip.id ? halves : [c])));
     setSelectedId(halves[1].id);
   }, [selectedId, engine, pushUndo, t]);
+
+  /**
+   * Beatmatch: stretch the selected clip so its tempo equals the project's,
+   * pitch untouched. The stretched audio is registered as a NEW buffer and
+   * the clip is repointed at it, so from here on it is simply a normal clip
+   * that happens to already be in time — playback, export, lock pitch and
+   * the waveform all work unchanged, with no special case anywhere.
+   */
+  const handleMatchTempo = useCallback(async () => {
+    const clip = clipsRef.current.find((c) => c.id === selectedId);
+    if (!clip || !grid) return;
+    const sourceBpm = clipBpms.get(clip.bufferId);
+    const source = bufferMap.get(clip.bufferId);
+    if (!sourceBpm || !source) return;
+    const ratio = tempoMatchRatio(sourceBpm, grid.bpm);
+    if (!needsTempoMatch(ratio)) return;
+
+    setWorking(true);
+    setStage("rendering");
+    try {
+      const stretched = await getStretchedBuffer(clip.bufferId, source, ratio);
+      const id = stretchedIdFor(clip.bufferId, ratio);
+      bufferMap.set(id, stretched);
+      setClipBpms((prev) => new Map(prev).set(id, Math.round(sourceBpm * ratio)));
+      // The stretched buffer is 1/ratio as long, so every source-time field
+      // scales with it; the clip keeps its place on the timeline.
+      pushUndo();
+      setClips((prev) =>
+        prev.map((c) =>
+          c.id === clip.id
+            ? { ...c, bufferId: id, clipStart: c.clipStart / ratio, clipEnd: c.clipEnd / ratio }
+            : c,
+        ),
+      );
+      setStatus(t("studio.matched", { bpm: grid.bpm }));
+      setStatusIsError(false);
+      requestReschedule("now");
+    } catch {
+      setStatus(t("studio.matchFailed"));
+      setStatusIsError(true);
+    } finally {
+      setStage(null);
+      setWorking(false);
+    }
+  }, [selectedId, grid, clipBpms, pushUndo, requestReschedule, t]);
 
   const handleToggleSolo = useCallback(() => {
     if (!selectedId) return;
@@ -1019,6 +1087,26 @@ export function StudioPanel() {
               >
                 {selectedClip.muted ? t("studio.unmute") : t("studio.mute")}
               </button>
+              {clipBpms.has(selectedClip.bufferId) && (
+                <span className="studio-hint num">
+                  {t("studio.clipBpm", { bpm: clipBpms.get(selectedClip.bufferId) as number })}
+                </span>
+              )}
+              {grid &&
+                clipBpms.has(selectedClip.bufferId) &&
+                needsTempoMatch(
+                  tempoMatchRatio(clipBpms.get(selectedClip.bufferId) as number, grid.bpm),
+                ) && (
+                  <button
+                    className="text-button"
+                    type="button"
+                    disabled={working}
+                    onClick={() => void handleMatchTempo()}
+                    title={t("studio.matchHint")}
+                  >
+                    {t("studio.match")}
+                  </button>
+                )}
               <button
                 className={`text-button${selectedClip.soloed ? " active" : ""}`}
                 type="button"
