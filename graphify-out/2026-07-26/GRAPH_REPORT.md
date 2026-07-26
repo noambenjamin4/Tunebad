@@ -1,11 +1,11 @@
 # Graph Report - Tunebad  (2026-07-26)
 
 ## Corpus Check
-- 268 files · ~293,822 words
+- 268 files · ~293,862 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1650 nodes · 3996 edges · 87 communities (75 shown, 12 thin omitted)
+- 1650 nodes · 3997 edges · 87 communities (75 shown, 12 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 17 edges (avg confidence: 0.71)
 - Token cost: 0 input · 0 output
 
@@ -103,7 +103,7 @@
 
 ## God Nodes (most connected - your core abstractions)
 1. `useI18n()` - 123 edges
-2. `StudioPanel()` - 46 edges
+2. `StudioPanel()` - 47 edges
 3. `downloadBlob()` - 31 edges
 4. `RelatedTools()` - 28 edges
 5. `ToolPageShell()` - 28 edges
@@ -135,7 +135,7 @@
 
 ### Community 0 - "analysis.ts"
 Cohesion: 0.08
-Nodes (42): AutomationMove, DistributiveOmit, EFFECT_OPTIONS, formatSemitones(), matchesPreset(), Preset, PRESETS, RemixStudio() (+34 more)
+Nodes (44): AutomationMove, DistributiveOmit, EFFECT_OPTIONS, formatSemitones(), matchesPreset(), Preset, PRESETS, RemixStudio() (+36 more)
 
 ### Community 1 - "RemixStudio.tsx"
 Cohesion: 0.14
@@ -158,7 +158,7 @@ Cohesion: 0.07
 Nodes (12): metadata, metadata, metadata, metadata, metadata, metadata, metadata, metadata (+4 more)
 
 ### Community 6 - "layout.tsx"
-Cohesion: 0.09
+Cohesion: 0.10
 Nodes (39): bufferKey(), bufferMap, decodedBytes(), DEFAULT_PARAMS, EFFECT_OPTIONS, makeClipId(), REVERB_TYPE_OPTIONS, StudioPanel() (+31 more)
 
 ### Community 7 - "rate-limit.ts"
@@ -382,8 +382,8 @@ Cohesion: 0.15
 Nodes (16): metadata, metadata, metadata, Status, VideoTool(), compressedName(), CompressProgress, compressToTargetSize() (+8 more)
 
 ### Community 74 - "LandingSeo.tsx"
-Cohesion: 0.23
-Nodes (11): ClipCanvas(), EFFECTS, cache, DisplaySignal, forgetDisplaySignals(), pending, render(), buildPeakPyramid() (+3 more)
+Cohesion: 0.26
+Nodes (10): ClipCanvas(), cache, DisplaySignal, forgetDisplaySignals(), pending, render(), buildPeakPyramid(), MinMax (+2 more)
 
 ### Community 75 - "page.tsx"
 Cohesion: 0.19
@@ -418,8 +418,8 @@ Cohesion: 0.48
 Nodes (5): useNowPlaying(), activeSources, registerPlaybackStopper(), setNowPlaying(), stoppers
 
 ### Community 84 - "EightDTool.tsx"
-Cohesion: 0.43
-Nodes (5): EightDTool(), EightDParams, RenderedAudio, renderEightD(), generateImpulseResponse()
+Cohesion: 0.47
+Nodes (4): EightDTool(), EightDParams, RenderedAudio, renderEightD()
 
 ### Community 86 - "StudioClient.tsx"
 Cohesion: 0.40
@@ -444,6 +444,6 @@ _Questions this graph is uniquely positioned to answer:_
 - **What connects `metadata`, `resultSchema`, `reportSchema` to the rest of the system?**
   _427 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `analysis.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.0797979797979798 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.07678075855689177 - nodes in this community are weakly interconnected._
 - **Should `RemixStudio.tsx` be split into smaller, more focused modules?**
   _Cohesion score 0.14153846153846153 - nodes in this community are weakly interconnected._

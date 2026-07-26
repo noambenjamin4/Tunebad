@@ -11,6 +11,7 @@ import {
   trimClipStart,
   trimClipEnd,
   splitClip,
+  audibleDuration,
   isSoloing,
   loopPassEnd,
   sliceClipsToWindow,
@@ -464,4 +465,24 @@ test("beatmatch: an already-matched clip is left alone", () => {
   assert.equal(needsTempoMatch(tempoMatchRatio(128, 128)), false);
   assert.equal(needsTempoMatch(tempoMatchRatio(128.2, 128)), false);
   assert.equal(tempoMatchRatio(0, 128), 1);
+});
+
+test("bounce length follows what is audible, not what exists", () => {
+  const a = clip({ id: "a", timelineStart: 0, clipStart: 0, clipEnd: 10 });
+  const b = clip({ id: "b", timelineStart: 10, clipStart: 0, clipEnd: 10 });
+  assert.equal(timelineDuration([a, b]), 20);
+  assert.equal(audibleDuration([a, b]), 20);
+
+  // Solo the first clip: the bounce should stop at 10s, not carry 10s of
+  // silence where the other clip used to be.
+  const soloA = { ...a, soloed: true };
+  assert.equal(audibleDuration([soloA, b]), 10);
+  assert.equal(timelineDuration([soloA, b]), 20, "the timeline itself is unchanged");
+
+  // Muting the LAST clip shortens the bounce the same way.
+  assert.equal(audibleDuration([a, { ...b, muted: true }]), 10);
+  // Muting a middle clip must NOT shorten anything.
+  assert.equal(audibleDuration([{ ...a, muted: true }, b]), 20);
+  // Everything silent is a zero-length bounce, not a crash.
+  assert.equal(audibleDuration([{ ...a, muted: true }, { ...b, muted: true }]), 0);
 });

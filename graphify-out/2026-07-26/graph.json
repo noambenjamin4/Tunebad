@@ -7640,7 +7640,7 @@
       "source_location": "L114",
       "_origin": "ast",
       "id": "lib_audio_remix_effects",
-      "community": 74,
+      "community": 0,
       "norm_label": "effects"
     },
     {
@@ -7670,7 +7670,7 @@
       "source_location": "L160",
       "_origin": "ast",
       "id": "lib_audio_remix_generateimpulseresponse",
-      "community": 84,
+      "community": 0,
       "norm_label": "generateimpulseresponse()"
     },
     {
@@ -39510,7 +39510,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L396",
+      "source_location": "L403",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "components_studio_studiopanel_makeclipid",
@@ -39599,7 +39599,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L1344",
+      "source_location": "L1363",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_audio_remix_coupledsemitones"
@@ -39610,7 +39610,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L768",
+      "source_location": "L775",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_audio_remix_remixparams"
@@ -39621,7 +39621,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L1047",
+      "source_location": "L1054",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_files_download_downloadblob"
@@ -39632,7 +39632,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L465",
+      "source_location": "L472",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_files_tool_handoff_takestudiofiles"
@@ -39643,7 +39643,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L1417",
+      "source_location": "L1436",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_format_formattimetenths"
@@ -39676,7 +39676,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L580",
+      "source_location": "L587",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_studio_beat_grid_detecttempo"
@@ -39687,7 +39687,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L590",
+      "source_location": "L597",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_studio_beat_grid_estimatebeatphase"
@@ -39698,7 +39698,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L851",
+      "source_location": "L858",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_studio_beat_grid_nearestgridtime"
@@ -39709,7 +39709,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L827",
+      "source_location": "L834",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_studio_beat_grid_needstempomatch"
@@ -39720,7 +39720,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L826",
+      "source_location": "L833",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_studio_beat_grid_tempomatchratio"
@@ -39731,7 +39731,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L791",
+      "source_location": "L798",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_studio_display_signal_forgetdisplaysignals"
@@ -39742,7 +39742,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L451",
+      "source_location": "L458",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_studio_display_signal_getdisplaysignal"
@@ -39753,7 +39753,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L442",
+      "source_location": "L449",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_studio_display_signal_peekdisplaysignal"
@@ -39764,7 +39764,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L517",
+      "source_location": "L524",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_studio_engine_studioengine_setparams"
@@ -39775,7 +39775,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L399",
+      "source_location": "L406",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_studio_engine_studioengine_start"
@@ -39786,7 +39786,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L792",
+      "source_location": "L799",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_studio_lock_pitch_forgetstretched"
@@ -39797,7 +39797,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L500",
+      "source_location": "L507",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_studio_lock_pitch_getstretchedbuffer"
@@ -39808,7 +39808,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L641",
+      "source_location": "L648",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_studio_lock_pitch_quantisespeed"
@@ -39819,7 +39819,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L655",
+      "source_location": "L662",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_studio_lock_pitch_scaleclipsforlock"
@@ -39830,7 +39830,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L653",
+      "source_location": "L660",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_studio_lock_pitch_stretchedidfor"
@@ -39841,7 +39841,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L1040",
+      "source_location": "L1047",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_studio_render_timeline_exportstudiomix"
@@ -39852,7 +39852,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L539",
+      "source_location": "L546",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_studio_session_clearsession"
@@ -39863,7 +39863,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L472",
+      "source_location": "L479",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_studio_session_loadarrangement"
@@ -39874,7 +39874,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L482",
+      "source_location": "L392",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_studio_session_loadsessionfiles"
@@ -39885,7 +39885,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L552",
+      "source_location": "L559",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_studio_session_savearrangement"
@@ -39896,7 +39896,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L391",
+      "source_location": "L397",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_studio_session_savesessionfile"
@@ -39907,7 +39907,18 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L939",
+      "source_location": "L393",
+      "weight": 1.0,
+      "source": "components_studio_studiopanel_studiopanel",
+      "target": "lib_studio_session_sessionbytes"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "components/studio/StudioPanel.tsx",
+      "source_location": "L946",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_studio_timeline_issoloing"
@@ -39918,7 +39929,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L521",
+      "source_location": "L528",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_studio_timeline_math_clampzoom"
@@ -39929,7 +39940,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L1086",
+      "source_location": "L1093",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_studio_timeline_moveclip"
@@ -39940,7 +39951,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L1038",
+      "source_location": "L1045",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_studio_timeline_sliceclipstowindow"
@@ -39951,7 +39962,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L806",
+      "source_location": "L813",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_studio_timeline_splitclip"
@@ -39973,7 +39984,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L1091",
+      "source_location": "L1098",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_studio_timeline_trimclipend"
@@ -39984,7 +39995,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L1088",
+      "source_location": "L1095",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_studio_timeline_trimclipstart"
@@ -39995,7 +40006,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L443",
+      "source_location": "L450",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "scripts_octave_map_hit"
@@ -40006,7 +40017,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L411",
+      "source_location": "L418",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "tests_studio_timeline_test_clip"

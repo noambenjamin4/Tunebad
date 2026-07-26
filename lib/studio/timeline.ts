@@ -220,6 +220,23 @@ export function sliceClipsToWindow(
   return out;
 }
 
+/**
+ * Length of what is actually AUDIBLE: the end of the last clip that mute
+ * and solo leave playing. Bouncing to timelineDuration() instead means
+ * soloing an early clip hands back a file padded with the silence where
+ * the muted clips used to be — a 10s solo arriving as a 20s file.
+ */
+export function audibleDuration(clips: StudioClip[]): number {
+  const soloing = isSoloing(clips);
+  let end = 0;
+  for (const clip of clips) {
+    if (clip.muted) continue;
+    if (soloing && !clip.soloed) continue;
+    end = Math.max(end, clipTimelineEnd(clip));
+  }
+  return end;
+}
+
 /** True when at least one clip is soloed (and not also muted). */
 export function isSoloing(clips: StudioClip[]): boolean {
   return clips.some((c) => c.soloed && !c.muted);

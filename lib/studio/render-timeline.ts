@@ -7,7 +7,7 @@
 import {
   type StudioClip,
   computeClipSchedule,
-  timelineDuration,
+  audibleDuration,
 } from "./timeline";
 import {
   type AutomationEvent,
@@ -37,7 +37,9 @@ export async function renderTimeline(
   });
   const sampleRate = Math.max(...used.map((b) => b.sampleRate));
   const numberOfChannels = Math.min(2, Math.max(...used.map((b) => b.numberOfChannels)));
-  const length = Math.max(1, Math.ceil(timelineDuration(clips) * sampleRate));
+  // Audible, not total: a soloed 10s clip must not bounce as a 20s file
+  // with the muted material's silence still stapled on the end.
+  const length = Math.max(1, Math.ceil(audibleDuration(clips) * sampleRate));
   const offline = new OfflineAudioContext(numberOfChannels, length, sampleRate);
 
   for (const scheduled of computeClipSchedule(clips, 0, 1)) {
