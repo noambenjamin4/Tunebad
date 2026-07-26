@@ -865,6 +865,15 @@ const de: Record<keyof typeof en, string> = {
 
   // TuneBad DAW (/daw)
   "studio.openIn": "In TuneBad DAW öffnen",
+  "studio.zoomIn": "Vergrößern",
+  "studio.zoomOut": "Verkleinern",
+  "studio.fit": "Einpassen",
+  "studio.zoomHint": "Pinch oder Strg+Scrollen zoomt dort, wo der Cursor steht",
+  "studio.undo": "Rückgängig",
+  "studio.mute": "Stumm",
+  "studio.unmute": "Ton an",
+  "studio.slotsFull": "Alle {count} Plätze belegt — entferne einen Song für einen neuen.",
+  "studio.clipsFull": "Zeitleiste ist bei {count} Clips voll.",
   "studio.timelineLabel": "Zeitleiste",
   "studio.zoom": "Zoom",
   "studio.dropTitle": "Songs hier ablegen, um einen Mix zu bauen (max. 6)",

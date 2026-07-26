@@ -11,8 +11,17 @@ import {
   trimClipStart,
   trimClipEnd,
   splitClip,
+  snapCandidates,
 } from "../lib/studio/timeline";
-import { rulerStepSeconds } from "../lib/studio/timeline-math";
+import {
+  MAX_PX_PER_SECOND,
+  MIN_PX_PER_SECOND,
+  rulerStepSeconds,
+  snapClipStart,
+  snapTime,
+  zoomAtCursor,
+  zoomToFit,
+} from "../lib/studio/timeline-math";
 import { automatedOutputDuration } from "../lib/audio/remix";
 
 let nextId = 100;
@@ -29,6 +38,7 @@ function clip(overrides: Partial<StudioClip>): StudioClip {
     gain: 1,
     fadeInSec: 0,
     fadeOutSec: 0,
+    muted: false,
     colorIndex: 0,
     ...overrides,
   };
@@ -185,4 +195,68 @@ test("rulerStepSeconds keeps ticks at least 60px apart", () => {
   assert.equal(rulerStepSeconds(100), 1);
   assert.equal(rulerStepSeconds(25), 5);
   assert.equal(rulerStepSeconds(6), 10);
+});
+
+test("zoomAtCursor keeps the time under the cursor pinned", () => {
+  // 25 px/s, scrolled 500px, cursor 300px in => t = (500+300)/25 = 32s.
+  const before = (500 + 300) / 25;
+  const after = zoomAtCursor(25, 2, 500, 300);
+  assert.equal(after.pxPerSecond, 50);
+  assert.equal((after.scrollLeft + 300) / after.pxPerSecond, before);
+  // Zooming out pins the same instant.
+  const out = zoomAtCursor(25, 0.5, 500, 300);
+  assert.equal(out.pxPerSecond, 12.5);
+  assert.equal((out.scrollLeft + 300) / out.pxPerSecond, before);
+});
+
+test("zoomAtCursor clamps and never scrolls negative", () => {
+  assert.equal(zoomAtCursor(MAX_PX_PER_SECOND, 4, 0, 0).pxPerSecond, MAX_PX_PER_SECOND);
+  assert.equal(zoomAtCursor(MIN_PX_PER_SECOND, 0.1, 0, 0).pxPerSecond, MIN_PX_PER_SECOND);
+  assert.equal(zoomAtCursor(25, 0.5, 0, 100).scrollLeft, 0);
+});
+
+test("snapTime pulls onto a candidate only within the pixel tolerance", () => {
+  // At 25 px/s the 8px tolerance is 0.32s.
+  assert.equal(snapTime(10.2, [10, 30], 25), 10); // 0.2s away -> snaps
+  assert.equal(snapTime(10.5, [10, 30], 25), 10.5); // 0.5s away -> free
+  // Tolerance shrinks as you zoom in: same 0.2s gap is now out of reach.
+  assert.equal(snapTime(10.2, [10, 30], 100), 10.2);
+  // Nearest candidate wins.
+  assert.equal(snapTime(10.1, [10, 10.15], 25), 10.15);
+});
+
+test("snapCandidates excludes the dragged clip's own edges", () => {
+  const a = clip({ id: "a", timelineStart: 0, clipEnd: 10 });
+  const b = clip({ id: "b", timelineStart: 20, clipStart: 0, clipEnd: 5 });
+  const candidates = snapCandidates([a, b], "a", 7.5);
+  assert.deepEqual(candidates.sort((x, y) => x - y), [0, 7.5, 20, 25]);
+});
+
+test("muted clips are skipped by the scheduler (live and export alike)", () => {
+  const a = clip({ id: "a", timelineStart: 0, clipEnd: 10, muted: true });
+  const b = clip({ id: "b", timelineStart: 0, clipEnd: 10 });
+  const sched = computeClipSchedule([a, b], 0, 1);
+  assert.equal(sched.length, 1);
+  assert.equal(sched[0].clipId, "b");
+});
+
+test("zoomToFit puts the whole timeline on screen", () => {
+  const zoom = zoomToFit(120, 1200); // 120s in 1200px
+  assert.ok(zoom * 120 <= 1200);
+  assert.ok(zoom > 9); // and uses most of the width
+});
+
+test("snapClipStart: the edge that finds a candidate wins", () => {
+  // Neighbour occupies [0,8]; tolerance at 25 px/s is 0.32s.
+  const candidates = [0, 8];
+  // Start is 0.2s shy of 8 -> snaps flush, even though the END matches nothing.
+  assert.equal(snapClipStart(7.8, 6, candidates, 25), 8);
+  // Out of reach -> untouched.
+  assert.equal(snapClipStart(7.4, 6, candidates, 25), 7.4);
+  // Now the END is what lines up: clip of length 6 ending near 8 starts at 2.
+  assert.equal(snapClipStart(2.15, 6, candidates, 25), 2);
+  // Both edges in range: the smaller correction wins (start is 0.1 off, end 0.3).
+  assert.equal(snapClipStart(0.1, 7.7, [0, 8], 25), 0);
+  // Never negative.
+  assert.equal(snapClipStart(0.05, 6, [0], 25), 0);
 });

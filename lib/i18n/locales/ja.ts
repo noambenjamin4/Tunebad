@@ -863,6 +863,15 @@ const ja: Record<keyof typeof en, string> = {
 
   // TuneBad DAW (/daw)
   "studio.openIn": "TuneBad DAW で開く",
+  "studio.zoomIn": "拡大",
+  "studio.zoomOut": "縮小",
+  "studio.fit": "全体表示",
+  "studio.zoomHint": "ピンチまたは Ctrl+スクロールでカーソル位置を拡大",
+  "studio.undo": "元に戻す",
+  "studio.mute": "ミュート",
+  "studio.unmute": "ミュート解除",
+  "studio.slotsFull": "{count} 枠すべて使用中です。追加するには 1 曲削除してください。",
+  "studio.clipsFull": "タイムラインは {count} クリップで上限です。",
   "studio.timelineLabel": "タイムライン",
   "studio.zoom": "ズーム",
   "studio.dropTitle": "ここに曲をドロップしてミックスを作成（最大6曲）",

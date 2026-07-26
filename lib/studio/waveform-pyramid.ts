@@ -10,13 +10,11 @@ export const PYRAMID_BLOCK = 256;
 export interface PeakPyramid {
   mins: Float32Array;
   maxs: Float32Array;
-  /** Source length in samples (channel 0). */
+  /** Source length in samples. */
   length: number;
-  sampleRate: number;
 }
 
-export function buildPeakPyramid(buffer: AudioBuffer): PeakPyramid {
-  const data = buffer.getChannelData(0);
+export function buildPeakPyramid(data: Float32Array): PeakPyramid {
   const blocks = Math.max(1, Math.ceil(data.length / PYRAMID_BLOCK));
   const mins = new Float32Array(blocks);
   const maxs = new Float32Array(blocks);
@@ -33,7 +31,7 @@ export function buildPeakPyramid(buffer: AudioBuffer): PeakPyramid {
     mins[b] = mn;
     maxs[b] = mx;
   }
-  return { mins, maxs, length: data.length, sampleRate: buffer.sampleRate };
+  return { mins, maxs, length: data.length };
 }
 
 export interface MinMax {

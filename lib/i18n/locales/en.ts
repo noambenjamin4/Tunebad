@@ -914,6 +914,15 @@ const en = {
 
   // TuneBad DAW (/daw)
   "studio.openIn": "Open in TuneBad DAW",
+  "studio.zoomIn": "Zoom in",
+  "studio.zoomOut": "Zoom out",
+  "studio.fit": "Fit",
+  "studio.zoomHint": "Pinch or ctrl+scroll to zoom where the cursor is",
+  "studio.undo": "Undo",
+  "studio.mute": "Mute",
+  "studio.unmute": "Unmute",
+  "studio.slotsFull": "That's all {count} song slots — remove one to add another.",
+  "studio.clipsFull": "Timeline is full at {count} clips.",
   "studio.timelineLabel": "Timeline",
   "studio.zoom": "Zoom",
   "studio.dropTitle": "Drop songs here to build a mix (up to 6)",

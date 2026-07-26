@@ -1,36 +1,40 @@
 "use client";
 
 // One clip's waveform on the DAW timeline. The canvas IS the cache: it
-// re-renders only when the trim window, width, theme, fades, or DPR change —
-// dragging a clip around the timeline just moves the element. Bars are exact
-// min/max columns from the buffer's peak pyramid (retina-crisp, a
-// single-sample spike survives every zoom), scaled by the clip's fade
-// envelope so the taper is visible on the wave itself, matching the cutter.
+// re-renders only when the trim window, width, gain, theme, fades, effect
+// signal, or DPR change — dragging a clip around the timeline just moves the
+// element. Bars are exact min/max columns from the display signal's peak
+// pyramid, scaled by BOTH the clip's fade envelope and its volume, so the
+// wave always looks like what it sounds like: quieter clip, smaller wave;
+// phone/underwater on the master, thinner filtered wave (the signal itself
+// is re-rendered through those filters — see lib/studio/display-signal.ts).
 
 import { useEffect, useRef } from "react";
-import type { PeakPyramid } from "@/lib/studio/waveform-pyramid";
+import type { DisplaySignal } from "@/lib/studio/display-signal";
 import { windowMinMax } from "@/lib/studio/waveform-pyramid";
 
 const COLUMN_PX = 3;
 const BAR_PX = 2;
 
 export function ClipCanvas({
-  buffer,
-  pyramid,
+  signal,
   clipStart,
   clipEnd,
   fadeInSec,
   fadeOutSec,
+  gain,
+  muted,
   widthPx,
   heightPx,
   themeSignal = 0,
 }: {
-  buffer: AudioBuffer;
-  pyramid: PeakPyramid;
+  signal: DisplaySignal;
   clipStart: number;
   clipEnd: number;
   fadeInSec: number;
   fadeOutSec: number;
+  gain: number;
+  muted: boolean;
   widthPx: number;
   heightPx: number;
   /** Bump to force a repaint after a theme flip. */
@@ -52,10 +56,9 @@ export function ClipCanvas({
     const styles = getComputedStyle(canvas);
     const ink = styles.getPropertyValue("--ink").trim() || "#111111";
     ctx.fillStyle = ink;
-    ctx.globalAlpha = 0.85;
+    ctx.globalAlpha = muted ? 0.28 : 0.85;
 
-    const data = buffer.getChannelData(0);
-    const rate = buffer.sampleRate;
+    const { data, pyramid, sampleRate } = signal;
     const duration = clipEnd - clipStart;
     if (duration <= 0) return;
     const secondsPerPx = duration / widthPx;
@@ -67,24 +70,25 @@ export function ClipCanvas({
     for (let x = 0; x < widthPx; x += COLUMN_PX) {
       const t0 = clipStart + x * secondsPerPx;
       const t1 = clipStart + Math.min(widthPx, x + COLUMN_PX) * secondsPerPx;
-      const { min, max } = windowMinMax(data, pyramid, t0 * rate, t1 * rate);
+      const { min, max } = windowMinMax(data, pyramid, t0 * sampleRate, t1 * sampleRate);
 
-      // Fade envelope at the column's center, clip-local time.
+      // Fade envelope at the column's center, clip-local time, times volume.
       const local = (t0 + t1) / 2 - clipStart;
-      let gain = 1;
-      if (fadeIn > 0 && local < fadeIn) gain = Math.min(gain, local / fadeIn);
-      if (fadeOut > 0 && local > duration - fadeOut) {
-        gain = Math.min(gain, (duration - local) / fadeOut);
-      }
-      gain = Math.max(0, Math.min(1, gain));
+      let level = gain;
+      if (fadeIn > 0 && local < fadeIn) level *= local / fadeIn;
+      if (fadeOut > 0 && local > duration - fadeOut) level *= (duration - local) / fadeOut;
+      level = Math.max(0, level);
 
       // Canvas y grows downward: max (positive) is the TOP of the column.
-      const yTop = mid - Math.max(0, max) * half * gain;
-      const yBottom = mid - Math.min(0, min) * half * gain;
+      // Clamp to the box so a boosted clip can't paint outside its lane.
+      const up = Math.min(1, Math.max(0, max) * level);
+      const down = Math.min(1, Math.abs(Math.min(0, min)) * level);
+      const yTop = mid - up * half;
+      const yBottom = mid + down * half;
       // One vertical min/max bar per column; floor 1px so silence stays visible.
       ctx.fillRect(x, yTop, BAR_PX, Math.max(1, yBottom - yTop));
     }
-  }, [buffer, pyramid, clipStart, clipEnd, fadeInSec, fadeOutSec, widthPx, heightPx, themeSignal]);
+  }, [signal, clipStart, clipEnd, fadeInSec, fadeOutSec, gain, muted, widthPx, heightPx, themeSignal]);
 
   return (
     <canvas

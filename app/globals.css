@@ -4724,7 +4724,35 @@ tbody tr:last-child td {
   pointer-events: none;
 }
 
-.studio-zoom { display: flex; align-items: center; gap: 10px; }
+.studio-zoom { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.studio-zoom-value { font-size: 11px; color: var(--muted); margin-left: auto; }
+
+/* Muted clip: dimmed frame (the canvas dims its own bars to match). */
+.studio-clip.muted { opacity: 0.55; border-style: dashed; }
+
+/* Start time that follows a clip while you drag it. */
+.studio-clip-time {
+  position: absolute;
+  top: 3px;
+  right: 6px;
+  font-size: 11px;
+  color: var(--ink);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 0 5px;
+  pointer-events: none;
+}
+
+/* Waveform not drawn yet (first paint, or re-filtering after an effect
+   change): a flat baseline rather than an empty box. */
+.studio-clip-pending {
+  display: block;
+  height: 58px;
+  background: linear-gradient(to bottom, transparent 49%, var(--line) 49%, var(--line) 51%, transparent 51%);
+}
+
+.text-button.active { color: var(--ink); font-weight: 600; }
 
 .studio-transport { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .studio-clock { color: var(--muted); font-size: 13px; }

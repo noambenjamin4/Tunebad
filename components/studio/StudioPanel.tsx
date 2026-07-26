@@ -30,15 +30,20 @@ import {
   MAX_CLIPS,
   MAX_DECODED_BYTES,
   MAX_TIMELINE_SECONDS,
-  clipDuration,
+  MAX_TOTAL_CLIPS,
   moveClip,
   splitClip,
   timelineDuration,
   trimClipEnd,
   trimClipStart,
 } from "@/lib/studio/timeline";
-import { DEFAULT_PX_PER_SECOND } from "@/lib/studio/timeline-math";
-import { type PeakPyramid, buildPeakPyramid } from "@/lib/studio/waveform-pyramid";
+import { DEFAULT_PX_PER_SECOND, clampZoom } from "@/lib/studio/timeline-math";
+import {
+  type DisplaySignal,
+  forgetDisplaySignals,
+  getDisplaySignal,
+  peekDisplaySignal,
+} from "@/lib/studio/display-signal";
 import { StudioEngine } from "@/lib/studio/engine";
 import { exportStudioMix } from "@/lib/studio/render-timeline";
 import { takeStudioFiles } from "@/lib/files/tool-handoff";
@@ -86,11 +91,11 @@ const makeClipId = () => `clip-${nextClipId++}`;
 let nextTakeId = 1;
 const makeTakeId = () => `take-${nextTakeId++}`;
 
-// Decoded buffers + pyramids live OUTSIDE React state: they're large, never
-// re-render on their own, and the single-entry site decode-cache would
-// thrash with N clips.
+// Decoded buffers live OUTSIDE React state: they're large, never re-render
+// on their own, and the single-entry site decode-cache would thrash with N
+// clips. Their DRAWN counterparts (decimated, optionally effect-filtered)
+// live in lib/studio/display-signal.ts.
 const bufferMap = new Map<string, AudioBuffer>();
-const pyramidMap = new Map<string, PeakPyramid>();
 
 function bufferKey(file: File): string {
   return `${file.name}:${file.size}:${file.lastModified}`;
@@ -100,6 +105,39 @@ function decodedBytes(): number {
   let total = 0;
   for (const b of bufferMap.values()) total += b.length * b.numberOfChannels * 4;
   return total;
+}
+
+/**
+ * Position / total readout. Owns its own rAF and writes textContent
+ * directly: a transport clock in React state would re-render the whole
+ * panel (and every clip canvas) 60 times a second.
+ */
+function TransportClock({
+  getPosition,
+  playing,
+  total,
+}: {
+  getPosition: () => number;
+  playing: boolean;
+  total: number;
+}) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const getRef = useRef(getPosition);
+  getRef.current = getPosition;
+
+  useEffect(() => {
+    let raf = 0;
+    const paint = () => {
+      if (ref.current) {
+        ref.current.textContent = `${formatTimeTenths(getRef.current())} / ${formatTimeTenths(total)}`;
+      }
+      if (playing) raf = requestAnimationFrame(paint);
+    };
+    paint();
+    return () => cancelAnimationFrame(raf);
+  }, [playing, total]);
+
+  return <span ref={ref} className="studio-clock num" aria-live="off" />;
 }
 
 export function StudioPanel() {
@@ -119,9 +157,16 @@ export function StudioPanel() {
   const [recording, setRecording] = useState(false);
   const [takes, setTakes] = useState<StudioTake[]>([]);
   const [selectedTakeId, setSelectedTakeId] = useState<string | null>(null);
+  // Waveforms actually drawn: keyed by bufferId, re-resolved whenever the
+  // master character effect changes so the wave matches the filter.
+  const [signals, setSignals] = useState<Map<string, DisplaySignal>>(new Map());
+  // Clip-state history for Cmd/Ctrl+Z. Buffers live outside state, so a
+  // snapshot is just an array of small plain objects.
+  const [undoDepth, setUndoDepth] = useState(0);
 
   const clipsRef = useRef(clips);
   clipsRef.current = clips;
+  const undoStackRef = useRef<StudioClip[][]>([]);
   const paramsRef = useRef(params);
   paramsRef.current = params;
 
@@ -154,12 +199,43 @@ export function StudioPanel() {
     (window as unknown as Record<string, unknown>).__tbDaw = {
       getPosition: () => engine.getPosition(),
       isPlaying: () => engine.playing,
+      clips: () => clipsRef.current,
+      pxPerSecond: () => pxPerSecond,
+      undoDepth: () => undoStackRef.current.length,
     };
-  }, [engine]);
+  }, [engine, pxPerSecond]);
 
   const bankRecordTime = useCallback(() => {
     recordBaseRef.current += engine.getOutputTime();
   }, [engine]);
+
+  /* ------------------------------ undo ------------------------------ */
+
+  const pushUndo = useCallback(() => {
+    undoStackRef.current = [...undoStackRef.current.slice(-29), clipsRef.current];
+    setUndoDepth(undoStackRef.current.length);
+  }, []);
+
+  const undo = useCallback(() => {
+    const previous = undoStackRef.current.pop();
+    setUndoDepth(undoStackRef.current.length);
+    if (!previous) return;
+    setClips(previous);
+    setSelectedId((current) => (previous.some((c) => c.id === current) ? current : null));
+  }, []);
+
+  // Cmd/Ctrl+Z anywhere on the page except while typing in a field.
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (!(event.metaKey || event.ctrlKey) || event.key.toLowerCase() !== "z") return;
+      const target = event.target as HTMLElement | null;
+      if (target && /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName)) return;
+      event.preventDefault();
+      undo();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [undo]);
 
   const stopPreview = useCallback(() => {
     if (recordingRef.current) bankRecordTime();
@@ -216,9 +292,17 @@ export function StudioPanel() {
       setStatusIsError(false);
       let added = 0;
       let cursor = timelineDuration(clipsRef.current);
+      let full = false;
+      // Snapshot the count ONCE: clipsRef re-points on every render, and this
+      // loop awaits a decode per file, so re-reading it mid-loop would count
+      // each new clip twice (once in the ref, once in `added`) and stop
+      // roughly half-way to the real limit.
+      const startingCount = clipsRef.current.length;
       for (const file of files) {
-        if (clipsRef.current.length + (added ? 1 : 0) >= MAX_CLIPS && added > 0) break;
-        if (clipsRef.current.length >= MAX_CLIPS) break;
+        if (startingCount + added >= MAX_CLIPS) {
+          full = true;
+          break;
+        }
         const key = bufferKey(file);
         try {
           if (!bufferMap.has(key)) {
@@ -230,7 +314,6 @@ export function StudioPanel() {
               break;
             }
             bufferMap.set(key, buffer);
-            pyramidMap.set(key, buildPeakPyramid(buffer));
           }
           const buffer = bufferMap.get(key)!;
           const start = Math.min(cursor, MAX_TIMELINE_SECONDS - buffer.duration);
@@ -244,9 +327,11 @@ export function StudioPanel() {
             gain: 1,
             fadeInSec: 0,
             fadeOutSec: 0,
-            colorIndex: (clipsRef.current.length + added) % 3,
+            muted: false,
+            colorIndex: (startingCount + added) % 3,
           };
           cursor = clip.timelineStart + buffer.duration;
+          pushUndo();
           setClips((prev) => [...prev, clip]);
           setSelectedId(clip.id);
           added += 1;
@@ -255,10 +340,47 @@ export function StudioPanel() {
           setStatusIsError(true);
         }
       }
+      if (full) {
+        setStatus(t("studio.slotsFull", { count: MAX_CLIPS }));
+        setStatusIsError(true);
+      }
       setDecoding(false);
     },
-    [t],
+    [t, pushUndo],
   );
+
+  /* --------------------------- drawn waveforms --------------------------- */
+
+  // The wave must show what you HEAR: a phone/underwater/lo-fi master
+  // re-renders every clip's display signal through those same filters, so
+  // the shape thins out exactly where the audio does. Cached per
+  // (buffer, effect), so flipping back is instant.
+  useEffect(() => {
+    const effect = params.effect;
+    let cancelled = false;
+    const ids = [...new Set(clips.map((c) => c.bufferId))];
+
+    const immediate = new Map<string, DisplaySignal>();
+    const missing: string[] = [];
+    for (const id of ids) {
+      const hit = peekDisplaySignal(id, effect);
+      if (hit) immediate.set(id, hit);
+      else missing.push(id);
+    }
+    setSignals(immediate);
+
+    for (const id of missing) {
+      const buffer = bufferMap.get(id);
+      if (!buffer) continue;
+      void getDisplaySignal(id, buffer, effect).then((signal) => {
+        if (cancelled) return;
+        setSignals((prev) => new Map(prev).set(id, signal));
+      });
+    }
+    return () => {
+      cancelled = true;
+    };
+  }, [clips, params.effect]);
 
   // Files handed off from the joiner / cutter / slowed-reverb pages.
   useEffect(() => {
@@ -306,7 +428,8 @@ export function StudioPanel() {
   /* ------------------------------ clip edits ------------------------------ */
 
   const editClip = useCallback(
-    (id: string, edit: (clip: StudioClip) => StudioClip | null) => {
+    (id: string, edit: (clip: StudioClip) => StudioClip | null, undoable = true) => {
+      if (undoable) pushUndo();
       setClips((prev) => {
         const next: StudioClip[] = [];
         for (const clip of prev) {
@@ -324,7 +447,7 @@ export function StudioPanel() {
         queueMicrotask(() => restartAt(engine.getPosition()));
       }
     },
-    [engine, restartAt],
+    [engine, restartAt, pushUndo],
   );
 
   const bufferDurationOf = (clip: StudioClip): number =>
@@ -332,19 +455,42 @@ export function StudioPanel() {
 
   const handleDeleteSelected = useCallback(() => {
     if (!selectedId) return;
+    const gone = clipsRef.current.find((c) => c.id === selectedId);
     editClip(selectedId, () => null);
     setSelectedId(null);
+    // Last clip using that buffer? Its drawn copies are dead weight.
+    if (gone && !clipsRef.current.some((c) => c.id !== selectedId && c.bufferId === gone.bufferId)) {
+      forgetDisplaySignals(gone.bufferId);
+      bufferMap.delete(gone.bufferId);
+    }
   }, [selectedId, editClip]);
 
   const handleSplitSelected = useCallback(() => {
     if (!selectedId) return;
     const clip = clipsRef.current.find((c) => c.id === selectedId);
     if (!clip) return;
+    if (clipsRef.current.length >= MAX_TOTAL_CLIPS) {
+      setStatus(t("studio.clipsFull", { count: MAX_TOTAL_CLIPS }));
+      setStatusIsError(true);
+      return;
+    }
     const halves = splitClip(clip, engine.getPosition(), makeClipId);
     if (!halves) return;
+    pushUndo();
     setClips((prev) => prev.flatMap((c) => (c.id === clip.id ? halves : [c])));
     setSelectedId(halves[1].id);
-  }, [selectedId, engine]);
+  }, [selectedId, engine, pushUndo, t]);
+
+  const handleToggleMute = useCallback(() => {
+    if (!selectedId) return;
+    editClip(selectedId, (c) => ({ ...c, muted: !c.muted }));
+  }, [selectedId, editClip]);
+
+  // Timeline owns the scroller and re-anchors itself; this only holds the
+  // zoom level so it survives re-renders.
+  const handleChangeZoom = useCallback((next: number) => {
+    setPxPerSecond(clampZoom(next));
+  }, []);
 
   const selectedClip = useMemo(
     () => clips.find((c) => c.id === selectedId) ?? null,
@@ -448,8 +594,7 @@ export function StudioPanel() {
         <>
           <Timeline
             clips={clips}
-            buffers={bufferMap}
-            pyramids={pyramidMap}
+            signals={signals}
             selectedId={selectedId}
             playing={playing}
             pxPerSecond={pxPerSecond}
@@ -462,7 +607,7 @@ export function StudioPanel() {
             onTogglePlay={togglePlay}
             onDeleteSelected={handleDeleteSelected}
             onSplitSelected={handleSplitSelected}
-            onChangeZoom={setPxPerSecond}
+            onChangeZoom={handleChangeZoom}
             headSignal={headSignal}
             disabled={working}
           />
@@ -480,9 +625,15 @@ export function StudioPanel() {
             >
               {recording ? t("studio.recordStop") : t("studio.record")}
             </button>
-            <span className="studio-clock num" aria-live="off">
-              {formatTimeTenths(duration)}
-            </span>
+            <TransportClock getPosition={() => engine.getPosition()} playing={playing} total={duration} />
+            <button
+              className="text-button"
+              type="button"
+              onClick={undo}
+              disabled={working || undoDepth === 0}
+            >
+              {t("studio.undo")}
+            </button>
             <span className="studio-hint">{t("studio.keysHint")}</span>
           </div>
 
@@ -497,9 +648,10 @@ export function StudioPanel() {
                   max={1.5}
                   step={0.05}
                   value={selectedClip.gain}
+                  onPointerDown={pushUndo}
                   onChange={(e) => {
                     const gain = Number(e.target.value);
-                    editClip(selectedClip.id, (c) => ({ ...c, gain }));
+                    editClip(selectedClip.id, (c) => ({ ...c, gain }), false);
                     engine.setClipGain(selectedClip.id, gain);
                   }}
                 />
@@ -532,6 +684,14 @@ export function StudioPanel() {
                   }
                 />
               </label>
+              <button
+                className={`text-button${selectedClip.muted ? " active" : ""}`}
+                type="button"
+                aria-pressed={selectedClip.muted}
+                onClick={handleToggleMute}
+              >
+                {selectedClip.muted ? t("studio.unmute") : t("studio.mute")}
+              </button>
               <button className="text-button" type="button" onClick={handleSplitSelected}>
                 {t("studio.split")}
               </button>

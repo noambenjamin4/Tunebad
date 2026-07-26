@@ -862,6 +862,15 @@ const zh: Record<keyof typeof en, string> = {
 
   // TuneBad DAW (/daw)
   "studio.openIn": "在 TuneBad DAW 中打开",
+  "studio.zoomIn": "放大",
+  "studio.zoomOut": "缩小",
+  "studio.fit": "适应窗口",
+  "studio.zoomHint": "双指捏合或 Ctrl+滚轮，以光标位置为中心缩放",
+  "studio.undo": "撤销",
+  "studio.mute": "静音",
+  "studio.unmute": "取消静音",
+  "studio.slotsFull": "{count} 个位置已满——先移除一首再添加。",
+  "studio.clipsFull": "时间轴已达 {count} 个片段上限。",
   "studio.timelineLabel": "时间轴",
   "studio.zoom": "缩放",
   "studio.dropTitle": "将歌曲拖到这里开始混音（最多 6 首）",

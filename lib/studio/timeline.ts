@@ -18,12 +18,17 @@ export interface StudioClip {
   gain: number;
   fadeInSec: number;
   fadeOutSec: number;
+  /** Silenced without losing its gain setting; skipped by the scheduler. */
+  muted: boolean;
   /** 0..5, assigned round-robin at add time; drives the clip tint. */
   colorIndex: number;
 }
 
 export const MIN_CLIP_SECONDS = 0.1;
-export const MAX_CLIPS = 6;
+/** Songs you can ADD. Splitting is bounded separately by MAX_TOTAL_CLIPS. */
+export const MAX_CLIPS = 12;
+/** Hard ceiling including split halves — keeps scheduling and paint bounded. */
+export const MAX_TOTAL_CLIPS = 32;
 export const MAX_TIMELINE_SECONDS = 30 * 60;
 /** ~500 MB of decoded Float32 audio across all clips. */
 export const MAX_DECODED_BYTES = 500 * 1024 * 1024;
@@ -105,6 +110,7 @@ export function computeClipSchedule(
 ): ScheduledClip[] {
   const out: ScheduledClip[] = [];
   for (const clip of clips) {
+    if (clip.muted) continue;
     const duration = clipDuration(clip);
     const end = clip.timelineStart + duration;
     if (end <= position + 1e-9) continue; // entirely behind the playhead
@@ -152,6 +158,24 @@ export function computeClipSchedule(
     });
   }
   return out.sort((a, b) => a.when - b.when);
+}
+
+/**
+ * Times a dragged clip should stick to: every OTHER clip's start and end,
+ * the playhead, and 0. Excluding the dragged clip's own edges matters —
+ * otherwise it snaps to where it already is and never moves.
+ */
+export function snapCandidates(
+  clips: StudioClip[],
+  draggedId: string | null,
+  playhead: number,
+): number[] {
+  const out = [0, playhead];
+  for (const clip of clips) {
+    if (clip.id === draggedId) continue;
+    out.push(clip.timelineStart, clipTimelineEnd(clip));
+  }
+  return out;
 }
 
 /* ------------------------------ clip edits ------------------------------ */
