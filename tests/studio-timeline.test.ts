@@ -41,6 +41,7 @@ import {
 } from "../lib/studio/beat-grid";
 import { buildPeakPyramid } from "../lib/studio/waveform-pyramid";
 import { scaleClipsForLock, stretchedIdFor } from "../lib/studio/lock-pitch";
+import { makeClipId, reserveClipIds, resetClipIds } from "../lib/studio/clip-ids";
 
 let nextId = 100;
 const makeId = () => `t${nextId++}`;
@@ -644,4 +645,39 @@ test("an equal-power fade is scheduled as a curve, a linear one as a line", () =
   // Halfway through an equal-power fade-in is sin(45 deg), not 0.5.
   const mid = curved[0].fadePoints.find((p) => Math.abs(p.at - 2) < 1e-9);
   assert.ok(mid && Math.abs(mid.gain - Math.SQRT1_2) < 1e-9);
+});
+
+/* ------------------------------ clip ids ------------------------------ */
+
+test("restored ids are reserved, so a later clip cannot collide with them", () => {
+  resetClipIds();
+  // A fresh session hands out clip-1, clip-2.
+  assert.equal(makeClipId(), "clip-1");
+  assert.equal(makeClipId(), "clip-2");
+
+  // Reload: the counter is back at 1 and a saved arrangement comes back
+  // holding those same ids. Without reserving, the next clip added would be
+  // handed "clip-1" again — and every id-keyed edit would hit BOTH clips.
+  resetClipIds();
+  reserveClipIds([{ id: "clip-1" }, { id: "clip-2" }]);
+  assert.equal(makeClipId(), "clip-3");
+
+  // Reserving is a high-water mark, not a sequence: gaps and out-of-order
+  // input still push the counter past everything seen.
+  reserveClipIds([{ id: "clip-9" }, { id: "clip-4" }]);
+  assert.equal(makeClipId(), "clip-10");
+
+  // Ids that aren't ours can't collide with a generated one, so they're
+  // ignored rather than parsed into a nonsense counter.
+  reserveClipIds([{ id: "imported-track" }, { id: "clip-x" }]);
+  assert.equal(makeClipId(), "clip-11");
+});
+
+test("a duplicated clip gets an id of its own", () => {
+  resetClipIds();
+  const original = clip({ id: makeClipId(), timelineStart: 0 });
+  const copy = { ...original, id: makeClipId() };
+  assert.notEqual(original.id, copy.id);
+  // The edit path matches on id, so a collision here would move both.
+  assert.equal([original, copy].filter((c) => c.id === original.id).length, 1);
 });

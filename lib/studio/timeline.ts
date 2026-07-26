@@ -348,12 +348,20 @@ export function isSoloing(clips: StudioClip[]): boolean {
  * the playhead, and 0. Excluding the dragged clip's own edges matters —
  * otherwise it snaps to where it already is and never moves.
  */
+/**
+ * Landmarks a dragged time can latch onto: the timeline origin, every other
+ * clip's edges, and optionally the playhead.
+ *
+ * `playhead` is nullable because SCRUBBING the playhead must not offer the
+ * playhead itself — its distance would be zero, it would win every
+ * comparison, and snapping would silently stop working for that gesture.
+ */
 export function snapCandidates(
   clips: StudioClip[],
   draggedId: string | null,
-  playhead: number,
+  playhead: number | null,
 ): number[] {
-  const out = [0, playhead];
+  const out = playhead === null ? [0] : [0, playhead];
   for (const clip of clips) {
     if (clip.id === draggedId) continue;
     out.push(clip.timelineStart, clipTimelineEnd(clip));

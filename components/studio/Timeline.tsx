@@ -40,6 +40,7 @@ import {
   clampZoom,
   rulerStepSeconds,
   snapClipStart,
+  snapTime,
   zoomAtCursor,
   zoomToFit,
 } from "@/lib/studio/timeline-math";
@@ -413,6 +414,27 @@ export function Timeline({
     }
   };
 
+  /**
+   * Snap a bare timeline TIME (a trim edge, the playhead) to the same
+   * landmarks a dragged clip uses. Moving a clip needs snapClipStart instead,
+   * because there two edges compete; here there is only one.
+   *
+   * Holding Alt turns it off, matching the drag.
+   */
+  const snapEdge = (
+    raw: number,
+    options: { excludeClipId?: string | null; withPlayhead?: boolean; free?: boolean },
+  ): number => {
+    if (options.free) return raw;
+    const candidates = snapCandidates(
+      clipsRef.current,
+      options.excludeClipId ?? null,
+      options.withPlayhead === false ? null : getPositionRef.current(),
+    );
+    if (grid) candidates.push(nearestGridTime(raw, grid));
+    return snapTime(raw, candidates, pxPerSecond);
+  };
+
   const handleTrackPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
     const drag = dragRef.current;
     if (!drag) return;
@@ -427,7 +449,10 @@ export function Timeline({
         if (Math.abs(event.clientX - drag.startX) > 8) drag.moved = true;
         return;
       }
-      const seconds = secondsFromClientX(event.clientX);
+      const seconds = snapEdge(secondsFromClientX(event.clientX), {
+        withPlayhead: false,
+        free: event.altKey,
+      });
       applyHead(seconds);
       onSeek(seconds);
       return;
@@ -470,12 +495,21 @@ export function Timeline({
       if (el) el.style.left = `${start * pxPerSecond}px`;
       setDragLabel(formatTimeTenths(start));
     } else if (drag.kind === "trim-start") {
-      const pointerSec = secondsFromClientX(event.clientX);
+      // Trims snap too. Cutting a song at the drop is a beat-accurate edit
+      // exactly like placing one is, and a tool that lets you position a
+      // clip on the grid but not CUT on it is only half a grid.
+      const pointerSec = snapEdge(secondsFromClientX(event.clientX), {
+        excludeClipId: clip.id,
+        free: event.altKey,
+      });
       // Timeline delta maps 1:1 onto buffer trim (content stays put).
       const newClipStart = clip.clipStart + (pointerSec - clip.timelineStart);
       onTrimStart(clip.id, Math.min(newClipStart, clip.clipEnd - MIN_CLIP_SECONDS));
     } else {
-      const pointerSec = secondsFromClientX(event.clientX);
+      const pointerSec = snapEdge(secondsFromClientX(event.clientX), {
+        excludeClipId: clip.id,
+        free: event.altKey,
+      });
       const newClipEnd = clip.clipStart + Math.max(MIN_CLIP_SECONDS, pointerSec - clip.timelineStart);
       onTrimEnd(clip.id, newClipEnd);
     }
@@ -492,7 +526,7 @@ export function Timeline({
     }
     if (drag?.kind === "move") onMoveClip(drag.clipId, drag.latestStart);
     if (drag?.kind === "seek" && drag.touch && !drag.moved) {
-      const seconds = secondsFromClientX(event.clientX);
+      const seconds = snapEdge(secondsFromClientX(event.clientX), { withPlayhead: false });
       applyHead(seconds);
       onSeek(seconds);
     }

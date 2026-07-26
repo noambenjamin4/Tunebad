@@ -57,6 +57,8 @@ interface ActiveGraph {
 
 export class StudioEngine {
   private ctx: AudioContext | null = null;
+  private analyser: AnalyserNode | null = null;
+  private meterBuffer: Float32Array<ArrayBuffer> | null = null;
   private mixBus: GainNode | null = null;
   private chain: RemixChain | null = null;
   private chainReverbType: string | null = null;
@@ -127,13 +129,50 @@ export class StudioEngine {
     return this.ctx;
   }
 
-  /** Master chain, rebuilt only when the reverb TYPE changes (new IR). */
+  /**
+   * Master chain, rebuilt only when the reverb TYPE changes (new IR).
+   *
+   * The chain lands on an analyser rather than straight on the speakers, so
+   * the meter reads the FINAL signal — after reverb and character, which are
+   * exactly the stages that add the level a mix clips on.
+   */
   private ensureChain(ctx: AudioContext, mixBus: GainNode): RemixChain {
     if (this.chain && this.chainReverbType === this.params.reverbType) return this.chain;
     if (this.chain) mixBus.disconnect();
-    this.chain = buildRemixChain(ctx, mixBus, ctx.destination, this.params);
+    this.chain = buildRemixChain(ctx, mixBus, this.ensureAnalyser(ctx), this.params);
     this.chainReverbType = this.params.reverbType;
     return this.chain;
+  }
+
+  private ensureAnalyser(ctx: AudioContext): AnalyserNode {
+    if (!this.analyser) {
+      this.analyser = ctx.createAnalyser();
+      // Small window: this measures PEAK, and the point of a peak meter is to
+      // catch a single sample over the line. A long FFT-sized buffer would
+      // only cost copying.
+      this.analyser.fftSize = 1024;
+      this.meterBuffer = new Float32Array(this.analyser.fftSize);
+      this.analyser.connect(ctx.destination);
+    }
+    return this.analyser;
+  }
+
+  /**
+   * Highest absolute sample in the last ~23 ms of output, where 1 is full
+   * scale. Returns 0 when nothing is playing.
+   *
+   * Deliberately a pull, not a subscription: the meter paints on its own rAF
+   * and reading on demand keeps this out of React's update path entirely.
+   */
+  getPeakLevel(): number {
+    if (!this.analyser || !this.meterBuffer || !this.graph) return 0;
+    this.analyser.getFloatTimeDomainData(this.meterBuffer);
+    let peak = 0;
+    for (let i = 0; i < this.meterBuffer.length; i++) {
+      const v = Math.abs(this.meterBuffer[i]);
+      if (v > peak) peak = v;
+    }
+    return peak;
   }
 
   /**

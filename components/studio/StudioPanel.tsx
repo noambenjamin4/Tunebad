@@ -46,6 +46,7 @@ import {
 } from "@/lib/studio/timeline";
 import { DEFAULT_PX_PER_SECOND, clampZoom } from "@/lib/studio/timeline-math";
 import { bufferKey, bufferMap, decodedBytes, releaseBuffer } from "@/lib/studio/buffer-store";
+import { makeClipId, reserveClipIds } from "@/lib/studio/clip-ids";
 import { getDisplaySignal } from "@/lib/studio/display-signal";
 import { StudioEngine } from "@/lib/studio/engine";
 import {
@@ -71,6 +72,7 @@ import {
 } from "@/lib/studio/lock-pitch";
 import { exportStudioMix } from "@/lib/studio/render-timeline";
 import { ClipInspector } from "./ClipInspector";
+import { LevelMeter } from "./LevelMeter";
 import { MasterControls } from "./MasterControls";
 import { Timeline } from "./Timeline";
 import { useBeatGrid } from "./useBeatGrid";
@@ -90,9 +92,6 @@ const DEFAULT_PARAMS: RemixParams = {
   reverbEq: NEUTRAL_REVERB_EQ,
   effect: "none",
 };
-
-let nextClipId = 1;
-const makeClipId = () => `clip-${nextClipId++}`;
 
 // How long a continuous gesture (slider drag, trim, fade field) must be
 // quiet before the graph is rescheduled. Long enough to swallow a drag,
@@ -148,7 +147,7 @@ export function StudioPanel() {
   const [headSignal, setHeadSignal] = useState(0);
   // Clip-state history for Cmd/Ctrl+Z. Buffers live outside state, so a
   // snapshot is just an array of small plain objects.
-  const [undoDepth, setUndoDepth] = useState(0);
+  const [history, setHistory] = useState({ undo: 0, redo: 0 });
   const [loop, setLoopState] = useState<{ start: number; end: number } | null>(null);
   const [follow, setFollow] = useState(true);
   const [exportLoopOnly, setExportLoopOnly] = useState(false);
@@ -156,6 +155,7 @@ export function StudioPanel() {
   const clipsRef = useRef(clips);
   clipsRef.current = clips;
   const undoStackRef = useRef<StudioClip[][]>([]);
+  const redoStackRef = useRef<StudioClip[][]>([]);
   const paramsRef = useRef(params);
   paramsRef.current = params;
 
@@ -202,36 +202,59 @@ export function StudioPanel() {
       clips: () => clipsRef.current,
       pxPerSecond: () => pxPerSecond,
       undoDepth: () => undoStackRef.current.length,
+      redoDepth: () => redoStackRef.current.length,
     };
   }, [engine, pxPerSecond]);
 
   /* ------------------------------ undo ------------------------------ */
 
+  const syncHistory = () => {
+    setHistory({ undo: undoStackRef.current.length, redo: redoStackRef.current.length });
+  };
+
   const pushUndo = useCallback(() => {
     undoStackRef.current = [...undoStackRef.current.slice(-29), clipsRef.current];
-    setUndoDepth(undoStackRef.current.length);
+    // A new edit forks the timeline: whatever was undone is no longer
+    // reachable, and keeping it would let Redo paste in a state that never
+    // followed from what is on screen now.
+    redoStackRef.current = [];
+    syncHistory();
+  }, []);
+
+  /** Move one state between the two stacks. Undo and redo are mirror images. */
+  const step = useCallback((from: StudioClip[][], to: StudioClip[][]) => {
+    const previous = from.pop();
+    if (!previous) return;
+    to.push(clipsRef.current);
+    setClips(previous);
+    setSelectedId((current) => (previous.some((c) => c.id === current) ? current : null));
+    syncHistory();
   }, []);
 
   const undo = useCallback(() => {
-    const previous = undoStackRef.current.pop();
-    setUndoDepth(undoStackRef.current.length);
-    if (!previous) return;
-    setClips(previous);
-    setSelectedId((current) => (previous.some((c) => c.id === current) ? current : null));
-  }, []);
+    step(undoStackRef.current, redoStackRef.current);
+  }, [step]);
 
-  // Cmd/Ctrl+Z anywhere on the page except while typing in a field.
+  const redo = useCallback(() => {
+    step(redoStackRef.current, undoStackRef.current);
+  }, [step]);
+
+  // Cmd/Ctrl+Z anywhere on the page except while typing in a field; add
+  // Shift for redo (and Ctrl+Y, which is what Windows habits reach for).
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (!(event.metaKey || event.ctrlKey) || event.key.toLowerCase() !== "z") return;
+      if (!(event.metaKey || event.ctrlKey)) return;
+      const key = event.key.toLowerCase();
+      if (key !== "z" && key !== "y") return;
       const target = event.target as HTMLElement | null;
       if (target && /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName)) return;
       event.preventDefault();
-      undo();
+      if (key === "y" || event.shiftKey) redo();
+      else undo();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [undo]);
+  }, [undo, redo]);
 
   const stopPreview = useCallback(() => {
     if (isRecording()) bankTime();
@@ -692,6 +715,9 @@ export function StudioPanel() {
     pxPerSecond,
     onHandoffFiles: (files) => void addFiles(files),
     onRestored: (saved) => {
+      // Before anything else: ids minted from here on must not collide with
+      // the ones coming back from disk.
+      reserveClipIds(saved.clips);
       setClips(saved.clips);
       if (saved.params) setParams(saved.params);
       if (saved.grid) beatGrid.setGrid(saved.grid);
@@ -883,6 +909,7 @@ export function StudioPanel() {
               {recording ? t("studio.recordStop") : t("studio.record")}
             </button>
             <TransportClock getPosition={() => engine.getPosition()} playing={playing} total={duration} />
+            <LevelMeter getLevel={() => engine.getPeakLevel()} playing={playing} />
             <button
               className={`text-button${loop ? " active" : ""}`}
               type="button"
@@ -929,9 +956,17 @@ export function StudioPanel() {
               className="text-button"
               type="button"
               onClick={undo}
-              disabled={working || undoDepth === 0}
+              disabled={working || history.undo === 0}
             >
               {t("studio.undo")}
+            </button>
+            <button
+              className="text-button"
+              type="button"
+              onClick={redo}
+              disabled={working || history.redo === 0}
+            >
+              {t("studio.redo")}
             </button>
             <span className="studio-hint">{t("studio.keysHint")}</span>
           </div>
