@@ -53,7 +53,11 @@ export class StudioEngine {
   // still-sounding old sources instantly, which is the very click the ramp
   // exists to prevent.
   private silentAt = 0;
-  private position = 0; // timeline seconds while stopped
+  private position = 0; // INTERNAL seconds while stopped
+  // internal seconds x playbackScale = timeline seconds. 1 normally; equal
+  // to the master speed when lock pitch pre-stretches the clips (they are
+  // then scheduled at speed 1, so the internal clock runs 1/speed as fast).
+  private playbackScale = 1;
   // Loop region in timeline seconds, or null. When set, the transport wraps
   // to `start` on reaching `end` instead of stopping — the tool for working
   // a beat switch until the transition is right.
@@ -77,10 +81,14 @@ export class StudioEngine {
   /** Timeline position in seconds, on demand (no per-frame state). */
   getPosition(): number {
     const g = this.graph;
-    if (!g || !this.ctx) return this.position;
+    if (!g || !this.ctx) return this.position * this.playbackScale;
     // startedAt sits slightly in the future at start — clamp so the readout
     // never dips below the start position while the first samples queue.
-    return Math.max(g.startPos, g.startPos + (this.ctx.currentTime - g.startedAt) * g.speed);
+    const internal = Math.max(
+      g.startPos,
+      g.startPos + (this.ctx.currentTime - g.startedAt) * g.speed,
+    );
+    return internal * this.playbackScale;
   }
 
   /** Wall-clock output seconds since start — the take recorder's clock. */
@@ -115,6 +123,19 @@ export class StudioEngine {
     return this.chain;
   }
 
+  /**
+   * Declare the clock relationship for the clips that will be passed to
+   * start(). Changing it re-expresses the stored position so a lock-pitch
+   * toggle doesn't teleport the playhead.
+   */
+  setPlaybackScale(scale: number): void {
+    const next = Math.max(0.01, scale);
+    if (next === this.playbackScale) return;
+    const timelineNow = this.position * this.playbackScale;
+    this.playbackScale = next;
+    this.position = timelineNow / next;
+  }
+
   /** Set or clear the loop region (timeline seconds). */
   setLoop(region: { start: number; end: number } | null): void {
     this.loop =
@@ -123,7 +144,16 @@ export class StudioEngine {
         : null;
   }
 
-  start(clips: StudioClip[], buffers: Map<string, AudioBuffer>, position = this.position): void {
+  /**
+   * `clips`/`buffers` must already match the current playbackScale (locked
+   * playback passes pre-stretched clips); `position` is TIMELINE seconds.
+   */
+  start(
+    clips: StudioClip[],
+    buffers: Map<string, AudioBuffer>,
+    timelinePosition = this.position * this.playbackScale,
+  ): void {
+    const position = Math.max(0, timelinePosition) / this.playbackScale;
     this.stopSources();
     this.lastClips = clips;
     this.lastBuffers = buffers;
@@ -185,7 +215,10 @@ export class StudioEngine {
   /** One timer for "the timeline ran out" — per-source onended can't tell
    *  "this clip finished" from "the transport finished". */
   private armEndTimer(duration: number, position: number, speed: number): number {
-    const { at, wrap } = loopPassEnd(duration, position, this.loop);
+    const scaledLoop = this.loop
+      ? { start: this.loop.start / this.playbackScale, end: this.loop.end / this.playbackScale }
+      : null;
+    const { at, wrap } = loopPassEnd(duration, position, scaledLoop);
     // The wrap has to fire ON the boundary, not 80 ms past it; only the
     // real end gets slack so the last sample is never clipped.
     const remainingWall = ((at - position) / speed) * 1000 + (wrap ? 0 : 80);
@@ -205,7 +238,7 @@ export class StudioEngine {
   /** Stop playback, remembering where we were. */
   stop(): void {
     if (!this.graph) return;
-    this.position = Math.max(0, this.getPosition());
+    this.position = Math.max(0, this.getPosition()) / this.playbackScale;
     this.stopSources();
   }
 
@@ -238,8 +271,9 @@ export class StudioEngine {
     }
   }
 
+  /** Timeline seconds in, internal seconds stored. */
   seek(seconds: number): void {
-    this.position = Math.max(0, seconds);
+    this.position = Math.max(0, seconds) / this.playbackScale;
   }
 
   /**

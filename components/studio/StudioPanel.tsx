@@ -46,6 +46,13 @@ import {
   peekDisplaySignal,
 } from "@/lib/studio/display-signal";
 import { StudioEngine } from "@/lib/studio/engine";
+import {
+  forgetStretched,
+  getStretchedBuffer,
+  quantiseSpeed,
+  scaleClipsForLock,
+  stretchedIdFor,
+} from "@/lib/studio/lock-pitch";
 import { exportStudioMix } from "@/lib/studio/render-timeline";
 import { takeStudioFiles } from "@/lib/files/tool-handoff";
 import { Timeline } from "./Timeline";
@@ -400,14 +407,74 @@ export function StudioPanel() {
 
   /* ------------------------------ transport ------------------------------ */
 
+  /**
+   * The clips and buffers that actually play, plus the clock scale they run
+   * on. Unlocked this is the timeline as-is at the master speed. Locked, it
+   * is the pre-stretched twin scheduled at speed 1 — see lib/studio/
+   * lock-pitch.ts. Both live playback and the bounce call this, so they
+   * still cannot disagree.
+   */
+  const buildPlaybackSet = useCallback(
+    async (): Promise<{ clips: StudioClip[]; buffers: Map<string, AudioBuffer>; scale: number }> => {
+      const p = paramsRef.current;
+      const speed = quantiseSpeed(p.speed);
+      const clips = clipsRef.current;
+      if (!p.lockPitch || speed === 1 || clips.length === 0) {
+        return { clips, buffers: bufferMap, scale: 1 };
+      }
+      // Stretching is real CPU on the main thread, so it is cached per
+      // (buffer, speed) and only ever runs for buffers actually in use.
+      const stretched = new Map<string, AudioBuffer>();
+      const ids = [...new Set(clips.map((c) => c.bufferId))];
+      for (const id of ids) {
+        const source = bufferMap.get(id);
+        if (!source) continue;
+        stretched.set(stretchedIdFor(id, speed), await getStretchedBuffer(id, source, speed));
+      }
+      return { clips: scaleClipsForLock(clips, speed), buffers: stretched, scale: speed };
+    },
+    [],
+  );
+
+  // Guards the async gap: a stretch that finishes after the user has already
+  // changed their mind must not start playback with stale material.
+  const playTokenRef = useRef(0);
+
+  const startPlayback = useCallback(
+    async (timelinePosition: number) => {
+      const token = ++playTokenRef.current;
+      const p = paramsRef.current;
+      const needsStretch = p.lockPitch && quantiseSpeed(p.speed) !== 1;
+      if (needsStretch) {
+        setStage("rendering");
+        setWorking(true);
+      }
+      try {
+        const set = await buildPlaybackSet();
+        if (token !== playTokenRef.current) return;
+        engine.setPlaybackScale(set.scale);
+        engine.start(set.clips, set.buffers, timelinePosition);
+        setPlaying(engine.playing);
+      } catch {
+        setStatus(t("studio.lockPitchFailed"));
+        setStatusIsError(true);
+      } finally {
+        if (needsStretch) {
+          setStage(null);
+          setWorking(false);
+        }
+      }
+    },
+    [engine, buildPlaybackSet, t],
+  );
+
   const restartAt = useCallback(
     (position: number) => {
       engine.stop();
       engine.seek(position);
-      engine.start(clipsRef.current, bufferMap, position);
-      setPlaying(engine.playing);
+      void startPlayback(position);
     },
-    [engine],
+    [engine, startPlayback],
   );
 
   const togglePlay = useCallback(() => {
@@ -415,10 +482,9 @@ export function StudioPanel() {
       stopPreview();
     } else {
       if (clipsRef.current.length === 0) return;
-      engine.start(clipsRef.current, bufferMap, engine.getPosition());
-      setPlaying(engine.playing);
+      void startPlayback(engine.getPosition());
     }
-  }, [engine, stopPreview]);
+  }, [engine, stopPreview, startPlayback]);
 
   const handleSeek = useCallback(
     (seconds: number) => {
@@ -502,6 +568,7 @@ export function StudioPanel() {
     // Last clip using that buffer? Its drawn copies are dead weight.
     if (gone && !clipsRef.current.some((c) => c.id !== selectedId && c.bufferId === gone.bufferId)) {
       forgetDisplaySignals(gone.bufferId);
+      forgetStretched(gone.bufferId);
       bufferMap.delete(gone.bufferId);
     }
   }, [selectedId, editClip]);
@@ -600,6 +667,27 @@ export function StudioPanel() {
     [engine, requestReschedule],
   );
 
+  /**
+   * Lock pitch is a whole different playback material (pre-stretched clips),
+   * so toggling it re-prepares and restarts at the same musical position.
+   * It is mutually exclusive with take recording: renderRemixAutomated
+   * cannot pitch-lock a recorded speed sweep, and an export that silently
+   * disagreed with what you performed would be worse than not offering it.
+   */
+  const setLockPitch = (lockPitch: boolean) => {
+    const next = { ...paramsRef.current, lockPitch };
+    setParams(next);
+    engine.setParams(next);
+    const at = engine.getPosition();
+    if (engine.playing) {
+      engine.stop();
+      void startPlayback(at);
+    } else {
+      engine.setPlaybackScale(lockPitch ? quantiseSpeed(next.speed) : 1);
+      engine.seek(at);
+    }
+  };
+
   const setSpeed = (speed: number) =>
     applyParams(
       { ...paramsRef.current, speed },
@@ -630,7 +718,7 @@ export function StudioPanel() {
     recordingRef.current = true;
     setRecording(true);
     if (!engine.playing) {
-      engine.start(clipsRef.current, bufferMap, engine.getPosition());
+      void startPlayback(engine.getPosition());
       setPlaying(engine.playing);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -646,9 +734,14 @@ export function StudioPanel() {
     setStatusIsError(false);
     try {
       const take = takes.find((tk) => tk.id === selectedTakeId) ?? null;
-      const blob = await exportStudioMix(clipsRef.current, bufferMap, {
+      // Same material as the preview: locked exports bounce the stretched
+      // clips at speed 1, so the file matches what was heard.
+      const set = await buildPlaybackSet();
+      const exportParams =
+        set.scale === 1 ? paramsRef.current : { ...paramsRef.current, speed: 1, lockPitch: false };
+      const blob = await exportStudioMix(set.clips, set.buffers, {
         format,
-        params: paramsRef.current,
+        params: exportParams,
         take,
         onStage: setStage,
       });
@@ -662,7 +755,7 @@ export function StudioPanel() {
       setStage(null);
       setWorking(false);
     }
-  }, [working, format, takes, selectedTakeId, stopPreview, t]);
+  }, [working, format, takes, selectedTakeId, stopPreview, buildPlaybackSet, t]);
 
   /* ------------------------------ render ------------------------------ */
 
@@ -721,7 +814,8 @@ export function StudioPanel() {
               className={`secondary-button studio-record${recording ? " recording" : ""}`}
               type="button"
               onClick={toggleRecording}
-              disabled={working}
+              disabled={working || params.lockPitch}
+              title={params.lockPitch ? t("studio.lockVsRecord") : undefined}
               aria-pressed={recording}
             >
               {recording ? t("studio.recordStop") : t("studio.record")}
@@ -840,6 +934,16 @@ export function StudioPanel() {
           {soloing && <p className="studio-notice">{t("studio.soloNotice")}</p>}
 
           <div className="studio-master">
+            <label className="studio-field studio-lock" title={t("studio.lockPitchHint")}>
+              <input
+                type="checkbox"
+                checked={params.lockPitch}
+                disabled={working || recording}
+                onChange={(e) => setLockPitch(e.target.checked)}
+              />
+              {t("studio.lockPitch")}
+            </label>
+            {params.lockPitch && <p className="studio-notice">{t("studio.lockVsRecord")}</p>}
             <label className="studio-field studio-field-wide">
               {t("studio.speed")}
               <input

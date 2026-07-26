@@ -4845,3 +4845,12 @@ tbody tr:last-child td {
   color: var(--muted);
   margin: 0;
 }
+
+/* Lock-pitch toggle sits with the master controls. */
+.studio-lock {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+.studio-lock input { accent-color: var(--ink); width: 15px; height: 15px; cursor: pointer; }

@@ -25,6 +25,7 @@ import {
   zoomToFit,
 } from "../lib/studio/timeline-math";
 import { automatedOutputDuration } from "../lib/audio/remix";
+import { scaleClipsForLock, stretchedIdFor } from "../lib/studio/lock-pitch";
 
 let nextId = 100;
 const makeId = () => `t${nextId++}`;
@@ -304,4 +305,43 @@ test("loop: no region means the pass ends at the timeline end", () => {
 
 test("loop: a region past the timeline end clamps to real material", () => {
   assert.deepEqual(loopPassEnd(30, 5, { start: 2, end: 90 }), { at: 30, wrap: true });
+});
+
+test("lock pitch: scaling by 1/speed reproduces the unlocked wall-clock timing", () => {
+  // Two clips, B starting over A's tail — the beat-switch shape.
+  const a = clip({ id: "a", timelineStart: 0, clipStart: 0, clipEnd: 12, fadeOutSec: 2 });
+  const b = clip({ id: "b", timelineStart: 8, clipStart: 0, clipEnd: 10 });
+  const speed = 0.8;
+
+  const unlocked = computeClipSchedule([a, b], 0, speed);
+  // Locked: pre-stretched clips, every time field / speed, scheduled at 1.
+  const locked = computeClipSchedule(scaleClipsForLock([a, b], speed), 0, 1);
+
+  assert.equal(locked.length, unlocked.length);
+  for (let i = 0; i < locked.length; i++) {
+    // Same wall-clock entry AND same audible length: only the pitch differs.
+    assert.ok(Math.abs(locked[i].when - unlocked[i].when) < 1e-9, `when[${i}]`);
+    assert.ok(
+      Math.abs(locked[i].sourceDuration - unlocked[i].sourceDuration / speed) < 1e-9,
+      `duration[${i}]`,
+    );
+    const uf = unlocked[i].fadePoints;
+    const lf = locked[i].fadePoints;
+    assert.equal(lf.length, uf.length, `fade count[${i}]`);
+    for (let k = 0; k < lf.length; k++) {
+      assert.ok(Math.abs(lf[k].at - uf[k].at) < 1e-9, `fade at[${i}][${k}]`);
+    }
+  }
+});
+
+test("lock pitch: clips point at the stretched buffer for that exact speed", () => {
+  const a = clip({ id: "a", bufferId: "song" });
+  const scaled = scaleClipsForLock([a], 0.8);
+  assert.equal(scaled[0].bufferId, stretchedIdFor("song", 0.8));
+  assert.notEqual(scaled[0].bufferId, stretchedIdFor("song", 0.9));
+});
+
+test("lock pitch: speed 1 is a no-op — nothing to stretch", () => {
+  const clips = [clip({ id: "a" }), clip({ id: "b", timelineStart: 5 })];
+  assert.equal(scaleClipsForLock(clips, 1), clips);
 });
