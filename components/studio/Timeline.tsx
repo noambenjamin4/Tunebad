@@ -53,7 +53,10 @@ type DragState =
   | { kind: "move"; clipId: string; grabOffsetSec: number; latestStart: number }
   | { kind: "trim-start" | "trim-end"; clipId: string }
   | { kind: "loop"; anchorSec: number }
-  | { kind: "seek" };
+  // `touch` seeks on RELEASE, and only if the finger stayed put: on a
+  // touchscreen a drag across empty track means "pan the timeline", and
+  // seeking on touchdown would yank the playhead every time you scrolled.
+  | { kind: "seek"; touch: boolean; startX: number; moved: boolean };
 
 export function Timeline({
   clips,
@@ -265,6 +268,47 @@ export function Timeline({
     return () => scroller.removeEventListener("wheel", onWheel);
   }, [applyZoom]);
 
+  // Pinch. A touchscreen pinch fires touch events, never wheel, so the
+  // ctrl+wheel path above (trackpads) does nothing here and zoom would be
+  // button-only on a phone. Tracked on the scroller with passive:false so
+  // the gesture zooms the timeline instead of the whole page.
+  useEffect(() => {
+    const scroller = scrollRef.current;
+    if (!scroller) return;
+    let startDistance = 0;
+    let startZoom = 0;
+    const spread = (t: TouchList) =>
+      Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+
+    const onStart = (event: TouchEvent) => {
+      if (event.touches.length !== 2) return;
+      startDistance = spread(event.touches);
+      startZoom = zoomRef.current;
+    };
+    const onMove = (event: TouchEvent) => {
+      if (event.touches.length !== 2 || startDistance <= 0) return;
+      event.preventDefault();
+      const rect = scroller.getBoundingClientRect();
+      const midX = (event.touches[0].clientX + event.touches[1].clientX) / 2 - rect.left;
+      // Relative to the zoom the pinch STARTED at, so the gesture is
+      // absolute rather than accumulating drift over many move events.
+      applyZoom((spread(event.touches) / startDistance) * (startZoom / zoomRef.current), midX);
+    };
+    const onEnd = () => {
+      startDistance = 0;
+    };
+    scroller.addEventListener("touchstart", onStart, { passive: true });
+    scroller.addEventListener("touchmove", onMove, { passive: false });
+    scroller.addEventListener("touchend", onEnd, { passive: true });
+    scroller.addEventListener("touchcancel", onEnd, { passive: true });
+    return () => {
+      scroller.removeEventListener("touchstart", onStart);
+      scroller.removeEventListener("touchmove", onMove);
+      scroller.removeEventListener("touchend", onEnd);
+      scroller.removeEventListener("touchcancel", onEnd);
+    };
+  }, [applyZoom]);
+
   const lastZoomRef = useRef(pxPerSecond);
   useLayoutEffect(() => {
     const scroller = scrollRef.current;
@@ -332,9 +376,15 @@ export function Timeline({
       const rect = clipEl.getBoundingClientRect();
       const fromLeft = event.clientX - rect.left;
       const fromRight = rect.right - event.clientX;
-      if (fromLeft <= TRIM_GRIP_PX) {
+      // A fingertip is ~10mm; a 12px grip is unhittable. Widen for touch,
+      // but never past a third of the clip or short clips become un-movable.
+      const grip =
+        event.pointerType === "touch"
+          ? Math.min(TRIM_GRIP_PX * 2, rect.width / 3)
+          : TRIM_GRIP_PX;
+      if (fromLeft <= grip) {
         dragRef.current = { kind: "trim-start", clipId };
-      } else if (fromRight <= TRIM_GRIP_PX) {
+      } else if (fromRight <= grip) {
         dragRef.current = { kind: "trim-end", clipId };
       } else {
         dragRef.current = {
@@ -347,10 +397,13 @@ export function Timeline({
       }
     } else {
       onSelect(null);
-      dragRef.current = { kind: "seek" };
-      const seconds = secondsFromClientX(event.clientX);
-      applyHead(seconds);
-      onSeek(seconds);
+      const isTouch = event.pointerType === "touch";
+      dragRef.current = { kind: "seek", touch: isTouch, startX: event.clientX, moved: false };
+      if (!isTouch) {
+        const seconds = secondsFromClientX(event.clientX);
+        applyHead(seconds);
+        onSeek(seconds);
+      }
     }
     try {
       event.currentTarget.setPointerCapture(event.pointerId);
@@ -368,6 +421,11 @@ export function Timeline({
       return;
     }
     if (drag.kind === "seek") {
+      if (drag.touch) {
+        // Past a few px this is a pan, not a tap — let the scroller have it.
+        if (Math.abs(event.clientX - drag.startX) > 8) drag.moved = true;
+        return;
+      }
       const seconds = secondsFromClientX(event.clientX);
       applyHead(seconds);
       onSeek(seconds);
@@ -432,6 +490,11 @@ export function Timeline({
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
     if (drag?.kind === "move") onMoveClip(drag.clipId, drag.latestStart);
+    if (drag?.kind === "seek" && drag.touch && !drag.moved) {
+      const seconds = secondsFromClientX(event.clientX);
+      applyHead(seconds);
+      onSeek(seconds);
+    }
   };
 
   /* ------------------------------ keyboard ------------------------------ */

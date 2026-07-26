@@ -1570,8 +1570,8 @@
     "semantic_hash": ""
   },
   "components/studio/Timeline.tsx": {
-    "mtime": 1785088886.5274491,
-    "ast_hash": "131a9731c8d57d6466e249cce3f516eb",
+    "mtime": 1785097565.2089818,
+    "ast_hash": "2d8b4cf8e140f8ad5a2879b5c827fabd",
     "semantic_hash": ""
   },
   "lib/studio/engine.ts": {

@@ -4876,3 +4876,42 @@ tbody tr:last-child td {
 .studio-grid-line.downbeat { opacity: 0.2; }
 .studio-tempo { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .studio-tempo input { width: 72px; }
+
+/* ---- DAW: touch ----
+   Without touch-action the browser claims every drag for panning and the
+   clip never moves. The split is the whole interaction model on a phone:
+   one finger on a CLIP edits it, one finger on empty track pans the
+   timeline, two fingers pinch to zoom. */
+.studio-scroll {
+  /* Horizontal panning stays native (momentum, rubber-banding); vertical
+     is left to the page so the timeline never traps the scroll. */
+  touch-action: pan-x pan-y;
+}
+.studio-clip,
+.studio-loop-lane {
+  /* These are dragged, so the browser must not steal the gesture. */
+  touch-action: none;
+}
+.studio-clip-grip { width: 12px; }
+
+@media (pointer: coarse) {
+  /* Fingers: wider grips (matched to the JS hit test) and taller rows. */
+  .studio-clip-grip { width: 24px; }
+  .studio-loop-lane { height: 20px; }
+}
+
+/* Narrow screens: the control rows are built for a desktop width and would
+   otherwise overflow horizontally, which on a phone is unusable. */
+@media (max-width: 640px) {
+  .studio-transport,
+  .studio-master,
+  .studio-inspector,
+  .studio-tempo,
+  .studio-zoom {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .studio-field-wide { width: 100%; }
+  .studio-hint { width: 100%; }
+  .studio-clip-name { font-size: 10px; }
+}

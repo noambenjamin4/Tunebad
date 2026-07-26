@@ -5667,7 +5667,7 @@
       "label": "Timeline()",
       "file_type": "code",
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L58",
+      "source_location": "L61",
       "_origin": "ast",
       "id": "components_studio_timeline_timeline",
       "community": 37,
@@ -40078,7 +40078,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L58",
+      "source_location": "L61",
       "weight": 1.0,
       "source": "components_studio_timeline",
       "target": "components_studio_timeline_timeline",
@@ -40343,7 +40343,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L542",
+      "source_location": "L605",
       "weight": 1.0,
       "source": "components_studio_timeline_timeline",
       "target": "lib_format_formattime"
@@ -40354,7 +40354,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L346",
+      "source_location": "L396",
       "weight": 1.0,
       "source": "components_studio_timeline_timeline",
       "target": "lib_format_formattimetenths"
@@ -40365,7 +40365,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L509",
+      "source_location": "L572",
       "weight": 1.0,
       "source": "components_studio_timeline_timeline",
       "target": "lib_i18n_index_i18ncontextvalue_t"
@@ -40376,7 +40376,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L109",
+      "source_location": "L112",
       "weight": 1.0,
       "source": "components_studio_timeline_timeline",
       "target": "lib_i18n_index_usei18n"
@@ -40387,7 +40387,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L486",
+      "source_location": "L549",
       "weight": 1.0,
       "source": "components_studio_timeline_timeline",
       "target": "lib_studio_beat_grid_beattimesinrange"
@@ -40398,7 +40398,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L387",
+      "source_location": "L445",
       "weight": 1.0,
       "source": "components_studio_timeline_timeline",
       "target": "lib_studio_beat_grid_nearestgridtime"
@@ -40409,7 +40409,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L129",
+      "source_location": "L132",
       "weight": 1.0,
       "source": "components_studio_timeline_timeline",
       "target": "lib_studio_timeline_assigndisplayrows"
@@ -40420,7 +40420,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L283",
+      "source_location": "L327",
       "weight": 1.0,
       "source": "components_studio_timeline_timeline",
       "target": "lib_studio_timeline_clipduration"
@@ -40431,7 +40431,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L641",
+      "source_location": "L704",
       "weight": 1.0,
       "source": "components_studio_timeline_timeline",
       "target": "lib_studio_timeline_math_clampzoom"
@@ -40442,7 +40442,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L491",
+      "source_location": "L554",
       "weight": 1.0,
       "source": "components_studio_timeline_timeline",
       "target": "lib_studio_timeline_math_rulerstepseconds"
@@ -40453,7 +40453,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L392",
+      "source_location": "L450",
       "weight": 1.0,
       "source": "components_studio_timeline_timeline",
       "target": "lib_studio_timeline_math_snapclipstart"
@@ -40464,7 +40464,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L237",
+      "source_location": "L240",
       "weight": 1.0,
       "source": "components_studio_timeline_timeline",
       "target": "lib_studio_timeline_math_zoomatcursor"
@@ -40475,7 +40475,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L293",
+      "source_location": "L337",
       "weight": 1.0,
       "source": "components_studio_timeline_timeline",
       "target": "lib_studio_timeline_math_zoomtofit"
@@ -40486,7 +40486,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L383",
+      "source_location": "L441",
       "weight": 1.0,
       "source": "components_studio_timeline_timeline",
       "target": "lib_studio_timeline_snapcandidates"
@@ -40497,7 +40497,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L131",
+      "source_location": "L134",
       "weight": 1.0,
       "source": "components_studio_timeline_timeline",
       "target": "lib_studio_timeline_timelineduration"
@@ -40508,7 +40508,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L388",
+      "source_location": "L446",
       "weight": 1.0,
       "source": "components_studio_timeline_timeline",
       "target": "tests_studio_timeline_test_clip"
@@ -59265,5 +59265,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "34179585f952ea2f4416794191b41853815c4d53"
+  "built_at_commit": "1030855165606b1ea01a77ec4f31c1ed7f9e9f1f"
 }
