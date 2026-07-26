@@ -97,6 +97,11 @@ const makeTakeId = () => `take-${nextTakeId++}`;
 // live in lib/studio/display-signal.ts.
 const bufferMap = new Map<string, AudioBuffer>();
 
+// How long a continuous gesture (slider drag, trim, fade field) must be
+// quiet before the graph is rescheduled. Long enough to swallow a drag,
+// short enough that a release feels immediate.
+const RESCHEDULE_SETTLE_MS = 160;
+
 function bufferKey(file: File): string {
   return `${file.name}:${file.size}:${file.lastModified}`;
 }
@@ -427,8 +432,43 @@ export function StudioPanel() {
 
   /* ------------------------------ clip edits ------------------------------ */
 
+  /**
+   * Rescheduling is what makes the graph match the timeline again — and it
+   * is the one expensive thing here, so WHEN it happens matters:
+   *   "now"   discrete action (mute, split, a drag that already ended)
+   *   "defer" continuous gesture (trim handle, fade field, speed knob) —
+   *           coalesced to one reschedule after the gesture settles, so a
+   *           slider dragged at pointer-move rate rebuilds once, not 60x
+   *   "never" already applied live to the running graph (clip gain)
+   */
+  const rescheduleTimerRef = useRef(0);
+  const requestReschedule = useCallback(
+    (mode: "now" | "defer" | "never") => {
+      if (mode === "never" || !engine.playing) return;
+      window.clearTimeout(rescheduleTimerRef.current);
+      if (mode === "now") {
+        if (recordingRef.current) bankRecordTime();
+        queueMicrotask(() => restartAt(engine.getPosition()));
+        return;
+      }
+      rescheduleTimerRef.current = window.setTimeout(() => {
+        if (!engine.playing) return;
+        if (recordingRef.current) bankRecordTime();
+        restartAt(engine.getPosition());
+      }, RESCHEDULE_SETTLE_MS);
+    },
+    [engine, restartAt, bankRecordTime],
+  );
+
+  useEffect(() => () => window.clearTimeout(rescheduleTimerRef.current), []);
+
   const editClip = useCallback(
-    (id: string, edit: (clip: StudioClip) => StudioClip | null, undoable = true) => {
+    (
+      id: string,
+      edit: (clip: StudioClip) => StudioClip | null,
+      options: { undoable?: boolean; reschedule?: "now" | "defer" | "never" } = {},
+    ) => {
+      const { undoable = true, reschedule = "now" } = options;
       if (undoable) pushUndo();
       setClips((prev) => {
         const next: StudioClip[] = [];
@@ -442,12 +482,9 @@ export function StudioPanel() {
         }
         return next;
       });
-      // Mid-play edits reschedule so what you hear matches what you see.
-      if (engine.playing && !recordingRef.current) {
-        queueMicrotask(() => restartAt(engine.getPosition()));
-      }
+      requestReschedule(reschedule);
     },
-    [engine, restartAt, pushUndo],
+    [pushUndo, requestReschedule],
   );
 
   const bufferDurationOf = (clip: StudioClip): number =>
@@ -500,20 +537,25 @@ export function StudioPanel() {
   /* ------------------------------ master params ------------------------------ */
 
   const applyParams = useCallback(
-    (next: RemixParams, moves: AutomationEvent[]) => {
+    (next: RemixParams, moves: AutomationEvent[], settle: "now" | "defer" = "now") => {
       setParams(next);
       for (const move of moves) recordMove(move);
-      const needsRestart = engine.setParams(next);
-      if (needsRestart && engine.playing) {
-        if (recordingRef.current) bankRecordTime();
-        restartAt(engine.getPosition());
-      }
+      // setParams applies everything it can in place and reports whether a
+      // reschedule is still owed. Speed is the interesting case: it is
+      // ALREADY audible (playbackRate on the live sources), and the
+      // reschedule only fixes the start times of clips that haven't begun —
+      // so it can wait for the knob to settle instead of fighting the drag.
+      if (engine.setParams(next)) requestReschedule(settle);
     },
-    [engine, restartAt, bankRecordTime],
+    [engine, requestReschedule],
   );
 
   const setSpeed = (speed: number) =>
-    applyParams({ ...paramsRef.current, speed }, [{ t: outputNow(), kind: "speed", value: speed }]);
+    applyParams(
+      { ...paramsRef.current, speed },
+      [{ t: outputNow(), kind: "speed", value: speed }],
+      "defer",
+    );
   const setReverb = (reverb: number) =>
     applyParams({ ...paramsRef.current, reverb }, [{ t: outputNow(), kind: "reverb", value: reverb }]);
   const setBass = (bassBoostDb: number) =>
@@ -601,8 +643,12 @@ export function StudioPanel() {
             getPosition={() => engine.getPosition()}
             onSelect={setSelectedId}
             onMoveClip={(id, start) => editClip(id, (c) => moveClip(c, start))}
-            onTrimStart={(id, v) => editClip(id, (c) => trimClipStart(c, v, bufferDurationOf(c)))}
-            onTrimEnd={(id, v) => editClip(id, (c) => trimClipEnd(c, v, bufferDurationOf(c)))}
+            onTrimStart={(id, v) =>
+              editClip(id, (c) => trimClipStart(c, v, bufferDurationOf(c)), { reschedule: "defer" })
+            }
+            onTrimEnd={(id, v) =>
+              editClip(id, (c) => trimClipEnd(c, v, bufferDurationOf(c)), { reschedule: "defer" })
+            }
             onSeek={handleSeek}
             onTogglePlay={togglePlay}
             onDeleteSelected={handleDeleteSelected}
@@ -651,7 +697,7 @@ export function StudioPanel() {
                   onPointerDown={pushUndo}
                   onChange={(e) => {
                     const gain = Number(e.target.value);
-                    editClip(selectedClip.id, (c) => ({ ...c, gain }), false);
+                    editClip(selectedClip.id, (c) => ({ ...c, gain }), { undoable: false, reschedule: "never" });
                     engine.setClipGain(selectedClip.id, gain);
                   }}
                 />
@@ -666,7 +712,9 @@ export function StudioPanel() {
                   step={0.5}
                   value={selectedClip.fadeInSec}
                   onChange={(e) =>
-                    editClip(selectedClip.id, (c) => ({ ...c, fadeInSec: Math.max(0, Number(e.target.value) || 0) }))
+                    editClip(selectedClip.id, (c) => ({ ...c, fadeInSec: Math.max(0, Number(e.target.value) || 0) }), {
+                      reschedule: "defer",
+                    })
                   }
                 />
               </label>
@@ -680,7 +728,9 @@ export function StudioPanel() {
                   step={0.5}
                   value={selectedClip.fadeOutSec}
                   onChange={(e) =>
-                    editClip(selectedClip.id, (c) => ({ ...c, fadeOutSec: Math.max(0, Number(e.target.value) || 0) }))
+                    editClip(selectedClip.id, (c) => ({ ...c, fadeOutSec: Math.max(0, Number(e.target.value) || 0) }), {
+                      reschedule: "defer",
+                    })
                   }
                 />
               </label>

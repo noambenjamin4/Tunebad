@@ -52,6 +52,9 @@ const PRESETS: Preset[] = [
 ];
 
 const DEBOUNCE_MS = 400;
+// Master fade around every rebuild: long enough to kill the click, short
+// enough to read as instant.
+const FADE_SECONDS = 0.012;
 
 // Reverb-character pill labels come from i18n; the type values feed
 // REVERB_TYPES in lib/audio/remix.ts.
@@ -155,6 +158,11 @@ export function RemixStudio() {
 
   const previewUrlRef = useRef<string | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
+  // Persistent output node: rebuilt graphs connect here, so it can be
+  // ramped across a rebuild instead of the audio being cut.
+  const masterGainRef = useRef<GainNode | null>(null);
+  // ctx time the last fade-out completes; a restart resumes after it.
+  const masterSilentAtRef = useRef(0);
   const graphRef = useRef<RemixGraph | null>(null);
   const stretchedBufferRef = useRef<AudioBuffer | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -237,21 +245,51 @@ export function RemixStudio() {
     );
   }, []);
 
+  // Silence WITHOUT closing the context. A rebuild (seek, reverb type, a
+  // lock-pitch re-stretch) used to create a fresh AudioContext every time —
+  // milliseconds of hardware setup per knob turn — and stop the source
+  // mid-waveform, which is exactly what a click is. Now the master gain
+  // ramps down over FADE_SECONDS and the source stops after the ramp, on a
+  // context that lives as long as the tool.
   const stopPreview = useCallback(() => {
+    const ctx = audioCtxRef.current;
+    const master = masterGainRef.current;
     if (graphRef.current) {
-      try {
-        graphRef.current.source.stop();
-      } catch {
-        // already stopped
-      }
+      const { source } = graphRef.current;
       graphRef.current = null;
-    }
-    if (audioCtxRef.current) {
-      void audioCtxRef.current.close();
-      audioCtxRef.current = null;
+      if (ctx && master) {
+        const now = ctx.currentTime;
+        const stopAt = now + FADE_SECONDS;
+        masterSilentAtRef.current = stopAt;
+        master.gain.cancelScheduledValues(now);
+        master.gain.setValueAtTime(Math.max(0.0001, master.gain.value), now);
+        master.gain.linearRampToValueAtTime(0, stopAt);
+        try {
+          source.stop(stopAt);
+        } catch {
+          // already stopped
+        }
+      } else {
+        try {
+          source.stop();
+        } catch {
+          // already stopped
+        }
+      }
     }
     setPlaying(false);
   }, []);
+
+  // Unmount is the only time the context is actually torn down.
+  useEffect(
+    () => () => {
+      const ctx = audioCtxRef.current;
+      audioCtxRef.current = null;
+      masterGainRef.current = null;
+      if (ctx) window.setTimeout(() => void ctx.close().catch(() => {}), 60);
+    },
+    [],
+  );
 
   const resetAll = useCallback(() => {
     // Recorded takes are unrecoverable work — unlike a loaded file, which is
@@ -529,8 +567,24 @@ export function RemixStudio() {
       const effectiveParams = override?.params ?? params;
       const effectiveLock = effectiveParams.lockPitch;
       const playBuffer = effectiveLock ? stretchedBufferRef.current ?? buffer : buffer;
-      const ctx = new AudioContextClass();
-      const graph = buildRemixGraph(ctx, playBuffer, effectiveParams, offset);
+      let ctx = audioCtxRef.current;
+      if (!ctx) {
+        ctx = new AudioContextClass();
+        audioCtxRef.current = ctx;
+        const master = ctx.createGain();
+        master.gain.value = 0;
+        master.connect(ctx.destination);
+        masterGainRef.current = master;
+      }
+      if (ctx.state === "suspended") void ctx.resume().catch(() => {});
+      const master = masterGainRef.current!;
+      const graph = buildRemixGraph(ctx, playBuffer, effectiveParams, offset, master);
+      // Fade in, but only once a pending fade-OUT has landed: cancelling it
+      // and forcing the gain to 0 would cut the still-sounding old source,
+      // which is the click the ramp exists to prevent.
+      const resumeAt = Math.max(ctx.currentTime, masterSilentAtRef.current);
+      master.gain.setValueAtTime(0, resumeAt);
+      master.gain.linearRampToValueAtTime(1, resumeAt + FADE_SECONDS);
       graph.source.onended = () => {
         if (graphRef.current === graph) {
           graphRef.current = null;

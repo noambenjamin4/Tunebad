@@ -147,9 +147,26 @@ export interface RemixParams {
   effect: EffectId;
 }
 
+// Impulse responses are pure noise + an exponential decay: identical every
+// time for the same (context, seconds, decay), and a 2.8 s stereo hall is
+// ~250k Math.random+exp calls. Rebuilding one per graph is invisible when a
+// graph is built on a click, and ruinous when a knob rebuilds the graph at
+// pointer-move rate — so they are cached per context. WeakMap: an offline
+// render's context is garbage after it resolves and takes its IRs with it.
+const irCache = new WeakMap<BaseAudioContext, Map<string, AudioBuffer>>();
+
 // A short, exponentially-decaying noise burst used as the reverb's impulse
 // response. Cheap to generate and avoids shipping a sample asset.
 export function generateImpulseResponse(ctx: BaseAudioContext, seconds = 2.8, decay = 3.5): AudioBuffer {
+  let perContext = irCache.get(ctx);
+  if (!perContext) {
+    perContext = new Map();
+    irCache.set(ctx, perContext);
+  }
+  const key = `${seconds}:${decay}:${ctx.sampleRate}`;
+  const cached = perContext.get(key);
+  if (cached) return cached;
+
   const length = Math.max(1, Math.round(seconds * ctx.sampleRate));
   const impulse = ctx.createBuffer(2, length, ctx.sampleRate);
   for (let channel = 0; channel < impulse.numberOfChannels; channel += 1) {
@@ -158,6 +175,7 @@ export function generateImpulseResponse(ctx: BaseAudioContext, seconds = 2.8, de
       data[i] = (Math.random() * 2 - 1) * Math.exp((-decay * i) / length);
     }
   }
+  perContext.set(key, impulse);
   return impulse;
 }
 
@@ -367,12 +385,21 @@ export function buildRemixChain(
 // an AudioBufferSourceNode: it can't be seeked in place once started, so
 // seeking means stopping and rebuilding this graph with a new offset. The
 // caller can still live-update source.playbackRate afterward.
-export function buildRemixGraph(ctx: BaseAudioContext, buffer: AudioBuffer, params: RemixParams, offset = 0): RemixGraph {
+export function buildRemixGraph(
+  ctx: BaseAudioContext,
+  buffer: AudioBuffer,
+  params: RemixParams,
+  offset = 0,
+  // Where the chain lands. Defaults to the speakers; pass a master GainNode
+  // to keep one node alive across rebuilds and ramp it, which is how a
+  // rebuild (seek, reverb-type change) avoids clicking.
+  destination: AudioNode = ctx.destination,
+): RemixGraph {
   const source = ctx.createBufferSource();
   source.buffer = buffer;
   source.playbackRate.value = params.lockPitch ? 1 : params.speed;
 
-  const chain = buildRemixChain(ctx, source, ctx.destination, params);
+  const chain = buildRemixChain(ctx, source, destination, params);
 
   const clampedOffset = Math.min(Math.max(0, offset), Math.max(0, buffer.duration - 0.001));
   source.start(0, clampedOffset);

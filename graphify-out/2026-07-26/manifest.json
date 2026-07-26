@@ -420,8 +420,8 @@
     "semantic_hash": ""
   },
   "components/remix/RemixStudio.tsx": {
-    "mtime": 1785042975.3328187,
-    "ast_hash": "f2beda8a51d8501714db3dba38a77218",
+    "mtime": 1785042500.8345797,
+    "ast_hash": "51c109dddf9629800c750f26cb3a8496",
     "semantic_hash": ""
   },
   "components/remix/ReverbEq.tsx": {
@@ -1575,8 +1575,8 @@
     "semantic_hash": ""
   },
   "lib/studio/engine.ts": {
-    "mtime": 1785042975.2853267,
-    "ast_hash": "4cd7aef7de9ab7d104c1fa04e26a9ab7",
+    "mtime": 1785042956.924598,
+    "ast_hash": "e0a87d4260d6a664dc96b76eb5016ead",
     "semantic_hash": ""
   },
   "components/studio/StudioPanel.tsx": {
