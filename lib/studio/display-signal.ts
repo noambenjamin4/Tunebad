@@ -18,7 +18,7 @@ import { type EffectId, EFFECTS } from "@/lib/audio/remix";
 import { type PeakPyramid, buildPeakPyramid } from "./waveform-pyramid";
 
 /** Plenty for drawing, and above 2x the highest effect cutoff (3.8 kHz). */
-export const DISPLAY_RATE = 11025;
+const DISPLAY_RATE = 11025;
 
 export interface DisplaySignal {
   data: Float32Array;

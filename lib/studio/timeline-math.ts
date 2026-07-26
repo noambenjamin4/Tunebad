@@ -1,8 +1,12 @@
-// px <-> seconds for the DAW timeline. pxPerSecond is the primary unit (the
-// cutter's percent-of-duration model doesn't survive a multi-clip timeline
-// whose length changes as clips move). One transform, every consumer — bars,
-// clip positioning, pointer hit-testing, and the playhead all go through
-// these two functions so rounding is identical everywhere.
+// Layout constants and the non-obvious geometry for the DAW timeline.
+//
+// pxPerSecond is the primary unit — the cutter's percent-of-duration model
+// doesn't survive a multi-clip timeline whose length changes as clips move.
+// The conversion itself is `seconds * pxPerSecond`, written inline at each
+// call site ON PURPOSE: there is no window offset to get wrong here (the
+// DOM owns the scroll), so wrapping a multiply in a function bought
+// indirection and prevented nothing. What DOES live here is the geometry
+// that is easy to get wrong — cursor-anchored zoom, snapping, tick spacing.
 
 /** Continuous, not a preset ladder: pinch/ctrl-wheel zooms smoothly. */
 export const MIN_PX_PER_SECOND = 2;
@@ -23,15 +27,7 @@ export const NUDGE_SECONDS_LARGE = 1;
 /** Pointer distance (px) within which a clip edge counts as a trim grip. */
 export const TRIM_GRIP_PX = 12;
 /** Drag lands on a neighbouring edge / the playhead inside this many px. */
-export const SNAP_PX = 8;
-
-export function timeToX(t: number, pxPerSecond: number): number {
-  return t * pxPerSecond;
-}
-
-export function xToTime(x: number, pxPerSecond: number): number {
-  return x / pxPerSecond;
-}
+const SNAP_PX = 8;
 
 export function clampZoom(pxPerSecond: number): number {
   return Math.min(MAX_PX_PER_SECOND, Math.max(MIN_PX_PER_SECOND, pxPerSecond));

@@ -131,7 +131,7 @@ export function loadArrangement(): StoredArrangement | null {
   }
 }
 
-export function clearArrangement(): void {
+function clearArrangement(): void {
   try {
     localStorage.removeItem(ARRANGEMENT_KEY);
   } catch {

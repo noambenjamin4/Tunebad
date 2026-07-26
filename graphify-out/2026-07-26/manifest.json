@@ -1580,8 +1580,8 @@
     "semantic_hash": ""
   },
   "components/studio/StudioPanel.tsx": {
-    "mtime": 1785097141.0981605,
-    "ast_hash": "55f79b43dfbf0e8ee903c7508784ce16",
+    "mtime": 1785098720.3590398,
+    "ast_hash": "cbbc3b818a8738701164ef6da71580aa",
     "semantic_hash": ""
   },
   "lib/files/tool-handoff.ts": {
@@ -1590,8 +1590,8 @@
     "semantic_hash": ""
   },
   "app/daw/page.tsx": {
-    "mtime": 1785033721.5075479,
-    "ast_hash": "baa07128cb7969a1c0e78c3069101c5b",
+    "mtime": 1785098720.3868124,
+    "ast_hash": "acfac64bfdf56a2a06ecb3bbc18fb04d",
     "semantic_hash": ""
   },
   "components/studio/StudioClient.tsx": {

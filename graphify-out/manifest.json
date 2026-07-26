@@ -1540,18 +1540,18 @@
     "semantic_hash": ""
   },
   "lib/studio/timeline.ts": {
-    "mtime": 1785098151.208888,
-    "ast_hash": "bbb89c39dad83148a448532218b9fc42",
+    "mtime": 1785099814.6568055,
+    "ast_hash": "5ac26121e9120eb047e68c504a6e587b",
     "semantic_hash": ""
   },
   "lib/studio/timeline-math.ts": {
-    "mtime": 1785044033.3832476,
-    "ast_hash": "f527063a18fbe0fdfc537f02f9c80fbf",
+    "mtime": 1785099814.652645,
+    "ast_hash": "f695ac4f6ff83192ba697b4c99690a9e",
     "semantic_hash": ""
   },
   "lib/studio/waveform-pyramid.ts": {
-    "mtime": 1785087599.0183952,
-    "ast_hash": "9205d0f806e8b649f77e906fb0fc5e5f",
+    "mtime": 1785099814.657737,
+    "ast_hash": "372d167d43cf51ec2aa9d6fc220f3ad9",
     "semantic_hash": ""
   },
   "tests/studio-timeline.test.ts": {
@@ -1610,23 +1610,23 @@
     "semantic_hash": ""
   },
   "lib/studio/display-signal.ts": {
-    "mtime": 1785036115.2351668,
-    "ast_hash": "eb968c98f0c2098114e9068a689d75a1",
+    "mtime": 1785099814.6560752,
+    "ast_hash": "34f272e2088213d239f14df644824f79",
     "semantic_hash": ""
   },
   "lib/studio/lock-pitch.ts": {
-    "mtime": 1785046041.7156708,
-    "ast_hash": "7181eb7d298721c3c2672dd496f5a022",
+    "mtime": 1785099814.6537015,
+    "ast_hash": "9e854cce5c77d67eb5ca8978bc48dad0",
     "semantic_hash": ""
   },
   "lib/studio/beat-grid.ts": {
-    "mtime": 1785097141.0708373,
-    "ast_hash": "117dab374de93dac3155ee1277021ce1",
+    "mtime": 1785099814.655031,
+    "ast_hash": "479482fcaf94ea2fbb307d9152827d38",
     "semantic_hash": ""
   },
   "lib/studio/session.ts": {
-    "mtime": 1785095760.3574517,
-    "ast_hash": "0b252514727181e6700f085e0ef2fdd3",
+    "mtime": 1785099814.6541846,
+    "ast_hash": "a7d95494764e0bdf6aba43c32be40224",
     "semantic_hash": ""
   }
 }

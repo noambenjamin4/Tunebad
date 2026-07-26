@@ -46,7 +46,7 @@ export function clipDuration(clip: StudioClip): number {
   return clip.clipEnd - clip.clipStart;
 }
 
-export function clipTimelineEnd(clip: StudioClip): number {
+function clipTimelineEnd(clip: StudioClip): number {
   return clip.timelineStart + clipDuration(clip);
 }
 

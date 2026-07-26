@@ -91,19 +91,6 @@ export function getStretchedBuffer(
   return job;
 }
 
-export function peekStretchedBuffer(bufferId: string, speed: number): AudioBuffer | null {
-  return cache.get(stretchedIdFor(bufferId, speed)) ?? null;
-}
-
-/** Cached bytes — exposed so a test can prove the LRU budget holds. */
-export function stretchCacheBytes(): number {
-  let total = 0;
-  for (const b of cache.values()) total += bytesOf(b);
-  return total;
-}
-
-export const STRETCH_BYTE_BUDGET = MAX_STRETCH_BYTES;
-
 /** Drop every stretched variant of one buffer (its last clip was removed). */
 export function forgetStretched(bufferId: string): void {
   for (const key of [...cache.keys()]) {

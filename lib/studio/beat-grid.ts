@@ -32,7 +32,7 @@ export const MAX_BPM = 220;
 
 /* ------------------------------ pure math ------------------------------ */
 
-export function beatPeriod(bpm: number): number {
+function beatPeriod(bpm: number): number {
   return 60 / Math.max(1, bpm);
 }
 

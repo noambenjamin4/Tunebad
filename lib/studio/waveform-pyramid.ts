@@ -5,7 +5,7 @@
 // O(range), with raw samples at the ragged edges so a single-sample spike is
 // never lost at any zoom level.
 
-export const PYRAMID_BLOCK = 256;
+const PYRAMID_BLOCK = 256;
 
 export interface PeakPyramid {
   mins: Float32Array;

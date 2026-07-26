@@ -39640,7 +39640,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L1370",
+      "source_location": "L1381",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_audio_remix_coupledsemitones"
@@ -39684,7 +39684,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L1443",
+      "source_location": "L1454",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_format_formattimetenths"
@@ -39992,7 +39992,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L1100",
+      "source_location": "L1111",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_studio_timeline_moveclip"
@@ -40036,7 +40036,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L1105",
+      "source_location": "L1116",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_studio_timeline_trimclipend"
@@ -40047,7 +40047,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L1102",
+      "source_location": "L1113",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_studio_timeline_trimclipstart"
