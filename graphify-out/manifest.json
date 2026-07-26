@@ -1550,8 +1550,8 @@
     "semantic_hash": ""
   },
   "lib/studio/waveform-pyramid.ts": {
-    "mtime": 1785036132.3260653,
-    "ast_hash": "7b4d9b5d4ce6de1a9fbce1665bd4deba",
+    "mtime": 1785087599.0183952,
+    "ast_hash": "9205d0f806e8b649f77e906fb0fc5e5f",
     "semantic_hash": ""
   },
   "tests/studio-timeline.test.ts": {
@@ -1565,8 +1565,8 @@
     "semantic_hash": ""
   },
   "components/studio/ClipCanvas.tsx": {
-    "mtime": 1785086466.5619576,
-    "ast_hash": "ad4d9c1b6ceaba69d525a0c4cfeef3ce",
+    "mtime": 1785087625.112531,
+    "ast_hash": "d036a6d4686ec8d0deee02f465acea4c",
     "semantic_hash": ""
   },
   "components/studio/Timeline.tsx": {

@@ -19,8 +19,10 @@ import { useLayoutEffect, useRef } from "react";
 import type { DisplaySignal } from "@/lib/studio/display-signal";
 import { windowMinMax } from "@/lib/studio/waveform-pyramid";
 
-const COLUMN_PX = 3;
-const BAR_PX = 2;
+// One column per pixel, drawn edge to edge. The old 2px-bar-every-3px grid
+// left a third of the clip blank, which reads as a sparse picket fence
+// rather than audio — the single biggest reason the waveform looked wrong.
+const COLUMN_PX = 1;
 
 export function ClipCanvas({
   signal,
@@ -77,7 +79,7 @@ export function ClipCanvas({
     const styles = getComputedStyle(canvas);
     const ink = styles.getPropertyValue("--ink").trim() || "#111111";
     ctx.fillStyle = ink;
-    ctx.globalAlpha = muted ? 0.28 : 0.85;
+    const dim = muted ? 0.33 : 1;
 
     const { data, pyramid, sampleRate } = signal;
     const clipLength = clipEnd - clipStart;
@@ -88,10 +90,18 @@ export function ClipCanvas({
     const fadeIn = Math.min(fadeInSec, clipLength / 2);
     const fadeOut = Math.min(fadeOutSec, clipLength / 2);
 
-    for (let x = 0; x < widthPx; x += COLUMN_PX) {
+    // Two passes so the whole outline sits under the whole body — drawing
+    // them per column would let each body edge overlap the next outline.
+    const cols = Math.ceil(widthPx / COLUMN_PX);
+    const peakTop = new Float32Array(cols);
+    const peakBottom = new Float32Array(cols);
+    const rmsHalf = new Float32Array(cols);
+
+    for (let c = 0; c < cols; c++) {
+      const x = c * COLUMN_PX;
       const t0 = fromSec + x * secondsPerPx;
       const t1 = fromSec + Math.min(widthPx, x + COLUMN_PX) * secondsPerPx;
-      const { min, max } = windowMinMax(data, pyramid, t0 * sampleRate, t1 * sampleRate);
+      const { min, max, rms } = windowMinMax(data, pyramid, t0 * sampleRate, t1 * sampleRate);
 
       // Fade envelope at the column's centre, measured from the clip's own
       // start (not the slice's), times volume.
@@ -105,11 +115,24 @@ export function ClipCanvas({
       // Clamp to the box so a boosted clip can't paint outside its lane.
       const up = Math.min(1, Math.max(0, max) * level);
       const down = Math.min(1, Math.abs(Math.min(0, min)) * level);
-      const yTop = mid - up * half;
-      const yBottom = mid + down * half;
-      // One vertical min/max bar per column; floor 1px so silence stays visible.
-      ctx.fillRect(x, yTop, BAR_PX, Math.max(1, yBottom - yTop));
+      peakTop[c] = mid - up * half;
+      peakBottom[c] = mid + down * half;
+      rmsHalf[c] = Math.min(1, rms * level) * half;
     }
+
+    // Peak outline: the transients, faint.
+    ctx.globalAlpha = 0.38 * dim;
+    for (let c = 0; c < cols; c++) {
+      ctx.fillRect(c * COLUMN_PX, peakTop[c], COLUMN_PX, Math.max(1, peakBottom[c] - peakTop[c]));
+    }
+    // RMS body: how loud it actually is, solid. A quiet intro now looks
+    // quiet next to a drop instead of equally tall.
+    ctx.globalAlpha = 0.92 * dim;
+    for (let c = 0; c < cols; c++) {
+      const h = Math.max(1, rmsHalf[c] * 2);
+      ctx.fillRect(c * COLUMN_PX, mid - h / 2, COLUMN_PX, h);
+    }
+    ctx.globalAlpha = 1;
   }, [
     signal,
     clipStart,
