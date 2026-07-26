@@ -33,6 +33,7 @@ import {
 } from "@/lib/audio/remix";
 import { ReverbEq } from "@/components/remix/ReverbEq";
 import { useNowPlaying } from "@/hooks/useNowPlaying";
+import { OpenInDawButton } from "@/components/studio/OpenInDawButton";
 
 const NOW_PLAYING_SOURCE = "remix-preview";
 
@@ -1021,6 +1022,7 @@ export function RemixStudio() {
           )}
 
           <div className="remix-export-row">
+            <OpenInDawButton files={[file]} />
             <FormatPicker value={format} onChange={setFormat} />
             <button
               className="convert-button"

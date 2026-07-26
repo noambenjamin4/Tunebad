@@ -9,6 +9,7 @@ import { decodeAudioFile } from "@/lib/audio/decode";
 import { renderJoin } from "@/lib/audio/audio-joiner";
 import { formatBytes } from "@/lib/files/image";
 import { FileDrop } from "./FileDrop";
+import { OpenInDawButton } from "@/components/studio/OpenInDawButton";
 import { AudioFormatPicker, type AudioOutputFormat } from "./AudioFormatPicker";
 
 type Status = { title: string; message: string; tone: "neutral" | "success" | "warning" };
@@ -189,6 +190,7 @@ export function AudioJoinerTool() {
 
         <AudioFormatPicker format={format} setFormat={setFormat} mp3Kbps={mp3Kbps} setMp3Kbps={setMp3Kbps} disabled={busy} />
 
+        <OpenInDawButton files={queue.map((q) => q.file)} />
         <button type="button" className="primary-button" disabled={busy || queue.length < 2} onClick={join}>
           {busy ? t("files.processing") : t("joinertool.join", { count: queue.length })}
         </button>

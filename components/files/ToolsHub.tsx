@@ -17,6 +17,7 @@ const FILE_TOOLS: { href: string; nameKey: DictKey; descKey: DictKey }[] = [
   { href: "/bass-booster", nameKey: "tools.cardBassBooster", descKey: "tools.descBassBooster" },
   { href: "/audio-converter", nameKey: "tools.cardAudioConvert", descKey: "tools.descAudioConvert" },
   { href: "/audio-joiner", nameKey: "tools.cardAudioJoiner", descKey: "tools.descAudioJoiner" },
+  { href: "/daw", nameKey: "tools.cardDaw", descKey: "tools.descDaw" },
   { href: "/flac-to-mp3", nameKey: "tools.cardFlacMp3", descKey: "tools.descFlacMp3" },
   { href: "/wav-to-mp3", nameKey: "tools.cardWavMp3", descKey: "tools.descWavMp3" },
   // Video

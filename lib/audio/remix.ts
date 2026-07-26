@@ -296,8 +296,10 @@ export function coupledSemitones(speed: number): number {
   return 12 * Math.log2(speed);
 }
 
-export interface RemixGraph {
-  source: AudioBufferSourceNode;
+// The effects half of the remix graph — everything downstream of the source.
+// Shared by the single-source remix graph below and the DAW's master bus,
+// where `input` is a mix of many clip sources rather than one BufferSource.
+export interface RemixChain {
   dryGain: GainNode;
   wetGain: GainNode;
   bassFilter: BiquadFilterNode;
@@ -305,20 +307,22 @@ export interface RemixGraph {
   effect: EffectNodes;
 }
 
-// Builds: source -> [dry gain, convolver (-> drive) -> reverb EQ -> wet gain]
-// -> bass shelf -> [clean gain | effect chain -> fx gain] -> destination, and
-// starts the source immediately (at `offset`
-// seconds into the buffer). `offset` lets playback begin partway through the
-// buffer, which is how scrubbing works for an AudioBufferSourceNode: it can't
-// be seeked in place once started, so seeking means stopping and rebuilding
-// this graph with a new offset. The caller can still live-update dryGain/
-// wetGain/bassFilter/reverbEq/source.playbackRate afterward; changing the
-// reverb TYPE requires a rebuild (the convolver's impulse response swaps).
-export function buildRemixGraph(ctx: BaseAudioContext, buffer: AudioBuffer, params: RemixParams, offset = 0): RemixGraph {
-  const source = ctx.createBufferSource();
-  source.buffer = buffer;
-  source.playbackRate.value = params.lockPitch ? 1 : params.speed;
+export interface RemixGraph extends RemixChain {
+  source: AudioBufferSourceNode;
+}
 
+// Builds: input -> [dry gain, convolver (-> drive) -> reverb EQ -> wet gain]
+// -> bass shelf -> [clean gain | effect chain -> fx gain] -> destination.
+// NOTE: params.speed/lockPitch are ignored here — playback rate belongs to
+// the source(s) feeding `input`, not to the chain. The caller can live-update
+// dryGain/wetGain/bassFilter/reverbEq afterward; changing the reverb TYPE
+// requires a rebuild (the convolver's impulse response swaps).
+export function buildRemixChain(
+  ctx: BaseAudioContext,
+  input: AudioNode,
+  destination: AudioNode,
+  params: RemixParams,
+): RemixChain {
   const dryGain = ctx.createGain();
   const wetGain = ctx.createGain();
   const { wet, dry } = remixGain(params.reverb);
@@ -336,8 +340,8 @@ export function buildRemixGraph(ctx: BaseAudioContext, buffer: AudioBuffer, para
 
   const reverbEq = buildReverbEqChain(ctx, params.reverbEq);
 
-  source.connect(dryGain);
-  source.connect(convolver);
+  input.connect(dryGain);
+  input.connect(convolver);
 
   // Wet path: convolver (-> soft clipper for the saturated character) -> EQ -> wet gain.
   let wetTail: AudioNode = convolver;
@@ -353,12 +357,27 @@ export function buildRemixGraph(ctx: BaseAudioContext, buffer: AudioBuffer, para
 
   dryGain.connect(bassFilter);
   wetGain.connect(bassFilter);
-  const effect = buildEffectChain(ctx, bassFilter, ctx.destination, params.effect);
+  const effect = buildEffectChain(ctx, bassFilter, destination, params.effect);
+
+  return { dryGain, wetGain, bassFilter, reverbEq, effect };
+}
+
+// Single-source wrapper: chain fed by one BufferSource, started immediately
+// (at `offset` seconds into the buffer). `offset` is how scrubbing works for
+// an AudioBufferSourceNode: it can't be seeked in place once started, so
+// seeking means stopping and rebuilding this graph with a new offset. The
+// caller can still live-update source.playbackRate afterward.
+export function buildRemixGraph(ctx: BaseAudioContext, buffer: AudioBuffer, params: RemixParams, offset = 0): RemixGraph {
+  const source = ctx.createBufferSource();
+  source.buffer = buffer;
+  source.playbackRate.value = params.lockPitch ? 1 : params.speed;
+
+  const chain = buildRemixChain(ctx, source, ctx.destination, params);
 
   const clampedOffset = Math.min(Math.max(0, offset), Math.max(0, buffer.duration - 0.001));
   source.start(0, clampedOffset);
 
-  return { source, dryGain, wetGain, bassFilter, reverbEq, effect };
+  return { source, ...chain };
 }
 
 // Renders the remix graph offline to raw channel data, ready for encoding.

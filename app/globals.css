@@ -4643,3 +4643,142 @@ tbody tr:last-child td {
   color: var(--fill-ink);
   border-color: var(--fill);
 }
+
+/* ---------------------------------------------------------------------
+   TuneBad DAW (/daw) — timeline, clips, transport, inspector
+   --------------------------------------------------------------------- */
+.studio-panel { display: flex; flex-direction: column; gap: 18px; }
+
+.studio-timeline { display: flex; flex-direction: column; gap: 10px; }
+.studio-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-inner);
+  background: var(--surface);
+}
+.studio-track {
+  position: relative;
+  touch-action: none;
+  cursor: crosshair;
+  outline: none;
+  min-width: 100%;
+}
+.studio-track:focus-visible { box-shadow: inset 0 0 0 2px var(--ink); }
+
+.studio-ruler {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 24px;
+  border-bottom: 1px solid var(--line);
+  font-size: 10px;
+  color: var(--muted);
+  user-select: none;
+}
+.studio-tick { position: absolute; top: 4px; transform: translateX(4px); }
+.studio-tick::before {
+  content: "";
+  position: absolute;
+  left: -4px; top: -4px; bottom: -14px;
+  border-left: 1px solid var(--line);
+}
+
+.studio-clip {
+  position: absolute;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--hover);
+  cursor: grab;
+  user-select: none;
+}
+.studio-clip:active { cursor: grabbing; }
+.studio-clip.selected { border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink); }
+.studio-clip-shade-1 { background: color-mix(in oklab, var(--ink) 6%, transparent); }
+.studio-clip-shade-2 { background: color-mix(in oklab, var(--ink) 11%, transparent); }
+.studio-clip-name {
+  display: block;
+  padding: 3px 8px 0;
+  font-size: 11px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+}
+.studio-clip-canvas { display: block; pointer-events: none; }
+.studio-clip-grip {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 12px;
+  cursor: ew-resize;
+}
+.studio-clip-grip-l { left: 0; border-left: 3px solid var(--ink); opacity: 0.25; }
+.studio-clip-grip-r { right: 0; border-right: 3px solid var(--ink); opacity: 0.25; }
+.studio-clip.selected .studio-clip-grip { opacity: 0.7; }
+
+.studio-head {
+  position: absolute;
+  top: 0; bottom: 0;
+  left: var(--studio-head-px, 0px);
+  border-left: 2px solid var(--ink);
+  pointer-events: none;
+}
+
+.studio-zoom { display: flex; align-items: center; gap: 10px; }
+
+.studio-transport { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.studio-clock { color: var(--muted); font-size: 13px; }
+.studio-hint { color: var(--muted); font-size: 11px; }
+.studio-record.recording { border-color: var(--ink); }
+.studio-record.recording::before {
+  content: "";
+  display: inline-block;
+  width: 8px; height: 8px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background: var(--ink);
+  animation: studio-rec-pulse 1.2s ease-in-out infinite;
+}
+@keyframes studio-rec-pulse { 50% { opacity: 0.25; } }
+@media (prefers-reduced-motion: reduce) {
+  .studio-record.recording::before { animation: none; }
+}
+
+.studio-inspector,
+.studio-master,
+.studio-export,
+.studio-takes {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-inner);
+}
+.studio-inspector-name {
+  font-size: 13px;
+  font-weight: 600;
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.studio-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.studio-field input[type="range"] { width: 120px; accent-color: var(--fill); }
+.studio-field-wide input[type="range"] { width: 160px; }
+.studio-field input[type="number"] { width: 64px; }
+.studio-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+.studio-status { font-size: 13px; color: var(--muted); }
+.studio-status.error { color: var(--ink); font-weight: 600; }
+.studio-open-in { white-space: nowrap; }
+
+@media (max-width: 640px) {
+  .studio-field input[type="range"] { width: 90px; }
+}

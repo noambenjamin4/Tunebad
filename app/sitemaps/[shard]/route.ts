@@ -70,6 +70,7 @@ const STATIC_ENTRIES: ToolEntry[] = [
   { path: "/bass-booster", changefreq: "weekly", priority: 0.9 },
   { path: "/8d-audio", changefreq: "weekly", priority: 0.9 },
   { path: "/audio-joiner", changefreq: "weekly", priority: 0.9 },
+  { path: "/daw", changefreq: "weekly", priority: 0.9 },
   { path: "/songs", changefreq: "daily", priority: 0.7 },
   { path: "/copyright", changefreq: "yearly", priority: 0.3 },
 ];

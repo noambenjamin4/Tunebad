@@ -1,0 +1,663 @@
+"use client";
+
+// TuneBad DAW: multi-song timeline (joiner) + trims/splits (cutter) + live
+// master-bus slowed/reverb/effects with take recording (remix studio), one
+// tool. Clips schedule through lib/studio/timeline.ts, play through
+// StudioEngine, and export through exportStudioMix — live and export share
+// computeClipSchedule, so the bounce matches the preview by construction.
+
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useI18n } from "@/lib/i18n";
+import { decodeAudioFile } from "@/lib/audio/decode";
+import { downloadBlob } from "@/lib/files/download";
+import { FileDrop } from "@/components/files/FileDrop";
+import { useNowPlaying } from "@/hooks/useNowPlaying";
+import { useUnloadGuard } from "@/hooks/useUnloadGuard";
+import { formatTimeTenths } from "@/lib/format";
+import type { AudioStage } from "@/lib/audio/stages";
+import { STAGE_LABELS } from "@/lib/audio/stages";
+import {
+  type AutomationEvent,
+  type EffectId,
+  type RemixParams,
+  type ReverbType,
+  NEUTRAL_REVERB_EQ,
+  automatedOutputDuration,
+  coupledSemitones,
+} from "@/lib/audio/remix";
+import {
+  type StudioClip,
+  MAX_CLIPS,
+  MAX_DECODED_BYTES,
+  MAX_TIMELINE_SECONDS,
+  clipDuration,
+  moveClip,
+  splitClip,
+  timelineDuration,
+  trimClipEnd,
+  trimClipStart,
+} from "@/lib/studio/timeline";
+import { DEFAULT_PX_PER_SECOND } from "@/lib/studio/timeline-math";
+import { type PeakPyramid, buildPeakPyramid } from "@/lib/studio/waveform-pyramid";
+import { StudioEngine } from "@/lib/studio/engine";
+import { exportStudioMix } from "@/lib/studio/render-timeline";
+import { takeStudioFiles } from "@/lib/files/tool-handoff";
+import { Timeline } from "./Timeline";
+
+const NOW_PLAYING_SOURCE = "studio-preview";
+
+const DEFAULT_PARAMS: RemixParams = {
+  speed: 1,
+  reverb: 0,
+  bassBoostDb: 0,
+  lockPitch: false,
+  pitchSemitones: 0,
+  reverbType: "hall",
+  reverbEq: NEUTRAL_REVERB_EQ,
+  effect: "none",
+};
+
+const REVERB_TYPE_OPTIONS: { type: ReverbType; labelKey: "remix.typeRoom" | "remix.typePlate" | "remix.typeHall" | "remix.typeCathedral" | "remix.typeSaturated" }[] = [
+  { type: "room", labelKey: "remix.typeRoom" },
+  { type: "plate", labelKey: "remix.typePlate" },
+  { type: "hall", labelKey: "remix.typeHall" },
+  { type: "cathedral", labelKey: "remix.typeCathedral" },
+  { type: "saturated", labelKey: "remix.typeSaturated" },
+];
+
+const EFFECT_OPTIONS: { id: EffectId; labelKey: "remix.effectNone" | "remix.effectUnderwater" | "remix.effectPhone" | "remix.effectLofi" }[] = [
+  { id: "none", labelKey: "remix.effectNone" },
+  { id: "underwater", labelKey: "remix.effectUnderwater" },
+  { id: "phone", labelKey: "remix.effectPhone" },
+  { id: "lofi", labelKey: "remix.effectLofi" },
+];
+
+interface StudioTake {
+  id: string;
+  label: string;
+  base: RemixParams;
+  events: AutomationEvent[];
+  startOffset: number;
+  outDuration: number;
+}
+
+let nextClipId = 1;
+const makeClipId = () => `clip-${nextClipId++}`;
+let nextTakeId = 1;
+const makeTakeId = () => `take-${nextTakeId++}`;
+
+// Decoded buffers + pyramids live OUTSIDE React state: they're large, never
+// re-render on their own, and the single-entry site decode-cache would
+// thrash with N clips.
+const bufferMap = new Map<string, AudioBuffer>();
+const pyramidMap = new Map<string, PeakPyramid>();
+
+function bufferKey(file: File): string {
+  return `${file.name}:${file.size}:${file.lastModified}`;
+}
+
+function decodedBytes(): number {
+  let total = 0;
+  for (const b of bufferMap.values()) total += b.length * b.numberOfChannels * 4;
+  return total;
+}
+
+export function StudioPanel() {
+  const { t } = useI18n();
+  const [clips, setClips] = useState<StudioClip[]>([]);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [playing, setPlaying] = useState(false);
+  const [params, setParams] = useState<RemixParams>(DEFAULT_PARAMS);
+  const [pxPerSecond, setPxPerSecond] = useState<number>(DEFAULT_PX_PER_SECOND);
+  const [status, setStatus] = useState<string>("");
+  const [statusIsError, setStatusIsError] = useState(false);
+  const [stage, setStage] = useState<AudioStage | null>(null);
+  const [working, setWorking] = useState(false);
+  const [decoding, setDecoding] = useState(false);
+  const [format, setFormat] = useState<"wav" | "mp3">("mp3");
+  const [headSignal, setHeadSignal] = useState(0);
+  const [recording, setRecording] = useState(false);
+  const [takes, setTakes] = useState<StudioTake[]>([]);
+  const [selectedTakeId, setSelectedTakeId] = useState<string | null>(null);
+
+  const clipsRef = useRef(clips);
+  clipsRef.current = clips;
+  const paramsRef = useRef(params);
+  paramsRef.current = params;
+
+  // Take recording refs (RemixStudio's model: events timestamped in OUTPUT
+  // seconds; `recordBase` banks output time already elapsed across engine
+  // rebuilds, since each start gets a fresh AudioContext clock).
+  const recordingRef = useRef(false);
+  const recordBaseRef = useRef(0);
+  const eventsRef = useRef<AutomationEvent[]>([]);
+  const takeBaseRef = useRef<RemixParams>(DEFAULT_PARAMS);
+  const takeStartRef = useRef(0);
+
+  const engineRef = useRef<StudioEngine | null>(null);
+  if (engineRef.current === null) {
+    engineRef.current = new StudioEngine(DEFAULT_PARAMS, () => {
+      setPlaying(false);
+      if (recordingRef.current) finishTake();
+      setHeadSignal((n) => n + 1);
+    });
+  }
+  const engine = engineRef.current;
+
+  useEffect(() => () => engine.dispose(), [engine]);
+
+  // Dev-only verification hook (same pattern as the extension's
+  // __tbSamplerState): lets the scripted harness read the transport clock,
+  // which it can't otherwise observe when the pane isn't painting rAF frames.
+  useEffect(() => {
+    if (process.env.NODE_ENV === "production") return;
+    (window as unknown as Record<string, unknown>).__tbDaw = {
+      getPosition: () => engine.getPosition(),
+      isPlaying: () => engine.playing,
+    };
+  }, [engine]);
+
+  const bankRecordTime = useCallback(() => {
+    recordBaseRef.current += engine.getOutputTime();
+  }, [engine]);
+
+  const stopPreview = useCallback(() => {
+    if (recordingRef.current) bankRecordTime();
+    engine.stop();
+    setPlaying(false);
+  }, [engine, bankRecordTime]);
+
+  useNowPlaying(NOW_PLAYING_SOURCE, playing, stopPreview);
+  useUnloadGuard(clips.length > 0 || working);
+
+  /* ------------------------------ recording clock ------------------------------ */
+
+  function outputNow(): number {
+    return recordBaseRef.current + engine.getOutputTime();
+  }
+
+  function recordMove(event: AutomationEvent) {
+    if (!recordingRef.current) return;
+    eventsRef.current.push(event);
+  }
+
+  function finishTake() {
+    recordingRef.current = false;
+    setRecording(false);
+    const events = eventsRef.current;
+    eventsRef.current = [];
+    if (events.length === 0) return;
+    const mixSeconds = timelineDuration(clipsRef.current);
+    const base = takeBaseRef.current;
+    const outDuration = automatedOutputDuration(
+      Math.max(0, mixSeconds - takeStartRef.current),
+      Math.max(0.01, base.lockPitch ? 1 : base.speed),
+      events,
+    );
+    const take: StudioTake = {
+      id: makeTakeId(),
+      label: `${t("studio.takeLabel")} ${takes.length + 1}`,
+      base,
+      events,
+      startOffset: takeStartRef.current,
+      outDuration,
+    };
+    setTakes((prev) => [...prev, take]);
+    setSelectedTakeId(take.id);
+  }
+
+  /* ------------------------------ files in ------------------------------ */
+
+  const addFiles = useCallback(
+    async (files: File[]) => {
+      if (files.length === 0) return;
+      setDecoding(true);
+      setStatus("");
+      setStatusIsError(false);
+      let added = 0;
+      let cursor = timelineDuration(clipsRef.current);
+      for (const file of files) {
+        if (clipsRef.current.length + (added ? 1 : 0) >= MAX_CLIPS && added > 0) break;
+        if (clipsRef.current.length >= MAX_CLIPS) break;
+        const key = bufferKey(file);
+        try {
+          if (!bufferMap.has(key)) {
+            const { buffer } = await decodeAudioFile(file);
+            const bytes = buffer.length * buffer.numberOfChannels * 4;
+            if (decodedBytes() + bytes > MAX_DECODED_BYTES) {
+              setStatus(t("studio.memoryFull"));
+              setStatusIsError(true);
+              break;
+            }
+            bufferMap.set(key, buffer);
+            pyramidMap.set(key, buildPeakPyramid(buffer));
+          }
+          const buffer = bufferMap.get(key)!;
+          const start = Math.min(cursor, MAX_TIMELINE_SECONDS - buffer.duration);
+          const clip: StudioClip = {
+            id: makeClipId(),
+            name: file.name.replace(/\.[^.]+$/, ""),
+            bufferId: key,
+            timelineStart: Math.max(0, start),
+            clipStart: 0,
+            clipEnd: buffer.duration,
+            gain: 1,
+            fadeInSec: 0,
+            fadeOutSec: 0,
+            colorIndex: (clipsRef.current.length + added) % 3,
+          };
+          cursor = clip.timelineStart + buffer.duration;
+          setClips((prev) => [...prev, clip]);
+          setSelectedId(clip.id);
+          added += 1;
+        } catch {
+          setStatus(t("studio.decodeFailed", { name: file.name }));
+          setStatusIsError(true);
+        }
+      }
+      setDecoding(false);
+    },
+    [t],
+  );
+
+  // Files handed off from the joiner / cutter / slowed-reverb pages.
+  useEffect(() => {
+    const files = takeStudioFiles();
+    if (files && files.length > 0) void addFiles(files);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  /* ------------------------------ transport ------------------------------ */
+
+  const restartAt = useCallback(
+    (position: number) => {
+      engine.stop();
+      engine.seek(position);
+      engine.start(clipsRef.current, bufferMap, position);
+      setPlaying(engine.playing);
+    },
+    [engine],
+  );
+
+  const togglePlay = useCallback(() => {
+    if (engine.playing) {
+      stopPreview();
+    } else {
+      if (clipsRef.current.length === 0) return;
+      engine.start(clipsRef.current, bufferMap, engine.getPosition());
+      setPlaying(engine.playing);
+    }
+  }, [engine, stopPreview]);
+
+  const handleSeek = useCallback(
+    (seconds: number) => {
+      if (recordingRef.current) return; // seeks would corrupt the take's clock
+      const max = Math.max(0, timelineDuration(clipsRef.current) - 0.05);
+      const clamped = Math.min(seconds, max);
+      if (engine.playing) restartAt(clamped);
+      else {
+        engine.seek(clamped);
+        setHeadSignal((n) => n + 1);
+      }
+    },
+    [engine, restartAt],
+  );
+
+  /* ------------------------------ clip edits ------------------------------ */
+
+  const editClip = useCallback(
+    (id: string, edit: (clip: StudioClip) => StudioClip | null) => {
+      setClips((prev) => {
+        const next: StudioClip[] = [];
+        for (const clip of prev) {
+          if (clip.id !== id) {
+            next.push(clip);
+            continue;
+          }
+          const edited = edit(clip);
+          if (edited) next.push(edited);
+        }
+        return next;
+      });
+      // Mid-play edits reschedule so what you hear matches what you see.
+      if (engine.playing && !recordingRef.current) {
+        queueMicrotask(() => restartAt(engine.getPosition()));
+      }
+    },
+    [engine, restartAt],
+  );
+
+  const bufferDurationOf = (clip: StudioClip): number =>
+    bufferMap.get(clip.bufferId)?.duration ?? clip.clipEnd;
+
+  const handleDeleteSelected = useCallback(() => {
+    if (!selectedId) return;
+    editClip(selectedId, () => null);
+    setSelectedId(null);
+  }, [selectedId, editClip]);
+
+  const handleSplitSelected = useCallback(() => {
+    if (!selectedId) return;
+    const clip = clipsRef.current.find((c) => c.id === selectedId);
+    if (!clip) return;
+    const halves = splitClip(clip, engine.getPosition(), makeClipId);
+    if (!halves) return;
+    setClips((prev) => prev.flatMap((c) => (c.id === clip.id ? halves : [c])));
+    setSelectedId(halves[1].id);
+  }, [selectedId, engine]);
+
+  const selectedClip = useMemo(
+    () => clips.find((c) => c.id === selectedId) ?? null,
+    [clips, selectedId],
+  );
+
+  /* ------------------------------ master params ------------------------------ */
+
+  const applyParams = useCallback(
+    (next: RemixParams, moves: AutomationEvent[]) => {
+      setParams(next);
+      for (const move of moves) recordMove(move);
+      const needsRestart = engine.setParams(next);
+      if (needsRestart && engine.playing) {
+        if (recordingRef.current) bankRecordTime();
+        restartAt(engine.getPosition());
+      }
+    },
+    [engine, restartAt, bankRecordTime],
+  );
+
+  const setSpeed = (speed: number) =>
+    applyParams({ ...paramsRef.current, speed }, [{ t: outputNow(), kind: "speed", value: speed }]);
+  const setReverb = (reverb: number) =>
+    applyParams({ ...paramsRef.current, reverb }, [{ t: outputNow(), kind: "reverb", value: reverb }]);
+  const setBass = (bassBoostDb: number) =>
+    applyParams({ ...paramsRef.current, bassBoostDb }, [{ t: outputNow(), kind: "bassBoostDb", value: bassBoostDb }]);
+  const setReverbType = (reverbType: ReverbType) =>
+    applyParams({ ...paramsRef.current, reverbType }, [{ t: outputNow(), kind: "reverbType", value: reverbType }]);
+  const setEffect = (effect: EffectId) =>
+    applyParams({ ...paramsRef.current, effect }, [{ t: outputNow(), kind: "effect", value: effect }]);
+
+  /* ------------------------------ record ------------------------------ */
+
+  const toggleRecording = useCallback(() => {
+    if (recordingRef.current) {
+      finishTake();
+      return;
+    }
+    if (clipsRef.current.length === 0) return;
+    takeBaseRef.current = paramsRef.current;
+    takeStartRef.current = engine.getPosition();
+    recordBaseRef.current = 0;
+    eventsRef.current = [];
+    recordingRef.current = true;
+    setRecording(true);
+    if (!engine.playing) {
+      engine.start(clipsRef.current, bufferMap, engine.getPosition());
+      setPlaying(engine.playing);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [engine]);
+
+  /* ------------------------------ export ------------------------------ */
+
+  const handleExport = useCallback(async () => {
+    if (working || clipsRef.current.length === 0) return;
+    stopPreview();
+    setWorking(true);
+    setStatus("");
+    setStatusIsError(false);
+    try {
+      const take = takes.find((tk) => tk.id === selectedTakeId) ?? null;
+      const blob = await exportStudioMix(clipsRef.current, bufferMap, {
+        format,
+        params: paramsRef.current,
+        take,
+        onStage: setStage,
+      });
+      const base = clipsRef.current[0]?.name || "tunebad-mix";
+      downloadBlob(blob, `${base}-daw.${format}`);
+      setStatus(t("studio.exportDone"));
+    } catch {
+      setStatus(t("studio.exportFailed"));
+      setStatusIsError(true);
+    } finally {
+      setStage(null);
+      setWorking(false);
+    }
+  }, [working, format, takes, selectedTakeId, stopPreview, t]);
+
+  /* ------------------------------ render ------------------------------ */
+
+  const duration = timelineDuration(clips);
+
+  return (
+    <div className="studio-panel">
+      <FileDrop
+        accept="audio/*,.mp3,.wav,.m4a,.ogg,.flac,.aac,.opus"
+        multiple
+        disabled={decoding || working || clips.length >= MAX_CLIPS}
+        onFiles={(files) => void addFiles(files)}
+        hint={
+          clips.length === 0
+            ? t("studio.dropTitle")
+            : t("studio.dropMore", { count: MAX_CLIPS - clips.length })
+        }
+      />
+
+      {clips.length > 0 && (
+        <>
+          <Timeline
+            clips={clips}
+            buffers={bufferMap}
+            pyramids={pyramidMap}
+            selectedId={selectedId}
+            playing={playing}
+            pxPerSecond={pxPerSecond}
+            getPosition={() => engine.getPosition()}
+            onSelect={setSelectedId}
+            onMoveClip={(id, start) => editClip(id, (c) => moveClip(c, start))}
+            onTrimStart={(id, v) => editClip(id, (c) => trimClipStart(c, v, bufferDurationOf(c)))}
+            onTrimEnd={(id, v) => editClip(id, (c) => trimClipEnd(c, v, bufferDurationOf(c)))}
+            onSeek={handleSeek}
+            onTogglePlay={togglePlay}
+            onDeleteSelected={handleDeleteSelected}
+            onSplitSelected={handleSplitSelected}
+            onChangeZoom={setPxPerSecond}
+            headSignal={headSignal}
+            disabled={working}
+          />
+
+          <div className="studio-transport">
+            <button className="primary-button" type="button" onClick={togglePlay} disabled={working}>
+              {playing ? t("studio.pause") : t("studio.play")}
+            </button>
+            <button
+              className={`secondary-button studio-record${recording ? " recording" : ""}`}
+              type="button"
+              onClick={toggleRecording}
+              disabled={working}
+              aria-pressed={recording}
+            >
+              {recording ? t("studio.recordStop") : t("studio.record")}
+            </button>
+            <span className="studio-clock num" aria-live="off">
+              {formatTimeTenths(duration)}
+            </span>
+            <span className="studio-hint">{t("studio.keysHint")}</span>
+          </div>
+
+          {selectedClip && (
+            <div className="studio-inspector">
+              <span className="studio-inspector-name">{selectedClip.name}</span>
+              <label className="studio-field">
+                {t("studio.clipGain")}
+                <input
+                  type="range"
+                  min={0}
+                  max={1.5}
+                  step={0.05}
+                  value={selectedClip.gain}
+                  onChange={(e) => {
+                    const gain = Number(e.target.value);
+                    editClip(selectedClip.id, (c) => ({ ...c, gain }));
+                    engine.setClipGain(selectedClip.id, gain);
+                  }}
+                />
+              </label>
+              <label className="studio-field">
+                {t("studio.fadeIn")}
+                <input
+                  type="number"
+                  className="num"
+                  min={0}
+                  max={30}
+                  step={0.5}
+                  value={selectedClip.fadeInSec}
+                  onChange={(e) =>
+                    editClip(selectedClip.id, (c) => ({ ...c, fadeInSec: Math.max(0, Number(e.target.value) || 0) }))
+                  }
+                />
+              </label>
+              <label className="studio-field">
+                {t("studio.fadeOut")}
+                <input
+                  type="number"
+                  className="num"
+                  min={0}
+                  max={30}
+                  step={0.5}
+                  value={selectedClip.fadeOutSec}
+                  onChange={(e) =>
+                    editClip(selectedClip.id, (c) => ({ ...c, fadeOutSec: Math.max(0, Number(e.target.value) || 0) }))
+                  }
+                />
+              </label>
+              <button className="text-button" type="button" onClick={handleSplitSelected}>
+                {t("studio.split")}
+              </button>
+              <button className="text-button" type="button" onClick={handleDeleteSelected}>
+                {t("studio.remove")}
+              </button>
+            </div>
+          )}
+
+          <div className="studio-master">
+            <label className="studio-field studio-field-wide">
+              {t("studio.speed")}
+              <input
+                type="range"
+                min={0.5}
+                max={1.5}
+                step={0.01}
+                value={params.speed}
+                onChange={(e) => setSpeed(Number(e.target.value))}
+              />
+              <span className="num">
+                {params.speed.toFixed(2)}x · {coupledSemitones(params.speed) >= 0 ? "+" : ""}
+                {coupledSemitones(params.speed).toFixed(1)} st
+              </span>
+            </label>
+            <label className="studio-field studio-field-wide">
+              {t("studio.reverb")}
+              <input
+                type="range"
+                min={0}
+                max={100}
+                step={1}
+                value={params.reverb}
+                onChange={(e) => setReverb(Number(e.target.value))}
+              />
+              <span className="num">{params.reverb}</span>
+            </label>
+            <label className="studio-field studio-field-wide">
+              {t("studio.bass")}
+              <input
+                type="range"
+                min={-6}
+                max={9}
+                step={0.5}
+                value={params.bassBoostDb}
+                onChange={(e) => setBass(Number(e.target.value))}
+              />
+              <span className="num">{params.bassBoostDb} dB</span>
+            </label>
+
+            <div className="studio-pills" role="group" aria-label={t("studio.reverbType")}>
+              {REVERB_TYPE_OPTIONS.map((option) => (
+                <button
+                  key={option.type}
+                  className={`cutter-format-pill${params.reverbType === option.type ? " active" : ""}`}
+                  type="button"
+                  aria-pressed={params.reverbType === option.type}
+                  onClick={() => setReverbType(option.type)}
+                >
+                  {t(option.labelKey)}
+                </button>
+              ))}
+            </div>
+            <div className="studio-pills" role="group" aria-label={t("studio.effect")}>
+              {EFFECT_OPTIONS.map((option) => (
+                <button
+                  key={option.id}
+                  className={`cutter-format-pill${params.effect === option.id ? " active" : ""}`}
+                  type="button"
+                  aria-pressed={params.effect === option.id}
+                  onClick={() => setEffect(option.id)}
+                >
+                  {t(option.labelKey)}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {takes.length > 0 && (
+            <div className="studio-takes" role="radiogroup" aria-label={t("studio.takes")}>
+              <button
+                className={`cutter-format-pill${selectedTakeId === null ? " active" : ""}`}
+                type="button"
+                onClick={() => setSelectedTakeId(null)}
+              >
+                {t("studio.takeNone")}
+              </button>
+              {takes.map((take) => (
+                <button
+                  key={take.id}
+                  className={`cutter-format-pill${selectedTakeId === take.id ? " active" : ""}`}
+                  type="button"
+                  onClick={() => setSelectedTakeId(take.id)}
+                >
+                  {take.label} · {formatTimeTenths(take.outDuration)}
+                </button>
+              ))}
+            </div>
+          )}
+
+          <div className="studio-export">
+            <div className="cutter-format-pills" role="group" aria-label={t("studio.format")}>
+              {(["mp3", "wav"] as const).map((f) => (
+                <button
+                  key={f}
+                  className={`cutter-format-pill${format === f ? " active" : ""}`}
+                  type="button"
+                  aria-pressed={format === f}
+                  onClick={() => setFormat(f)}
+                >
+                  {f.toUpperCase()}
+                </button>
+              ))}
+            </div>
+            <button className="primary-button" type="button" onClick={() => void handleExport()} disabled={working || clips.length === 0}>
+              {working && stage ? t(STAGE_LABELS[stage]) : t("studio.export")}
+            </button>
+          </div>
+        </>
+      )}
+
+      {(status || decoding) && (
+        <p className={`studio-status${statusIsError ? " error" : ""}`} role="status">
+          {decoding ? t("studio.decoding") : status}
+        </p>
+      )}
+    </div>
+  );
+}

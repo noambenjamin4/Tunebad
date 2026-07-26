@@ -11,6 +11,7 @@ import { TrimWaveform, type ZoomLevel } from "./TrimWaveform";
 import type { OutputFormat } from "@/components/converter/QualityPicker";
 import { useTunebad } from "../TunebadApp";
 import { useI18n } from "@/lib/i18n";
+import { OpenInDawButton } from "@/components/studio/OpenInDawButton";
 import { WaveformIcon } from "@/components/ui/icons";
 import { useNowPlaying } from "@/hooks/useNowPlaying";
 import { formatTimeTenths } from "@/lib/format";
@@ -523,6 +524,7 @@ export function CutterPanel() {
                   ))}
                 </div>
               </div>
+              <OpenInDawButton files={[file]} />
               <button className="convert-button" type="button" onClick={() => void onExport()} disabled={working}>
                 {working ? t("cutter.exporting") : t("cutter.export")}
               </button>

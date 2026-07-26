@@ -33,6 +33,7 @@ export type RelatedSlug =
   | "bass-booster"
   | "8d-audio"
   | "audio-joiner"
+  | "daw"
   | "audio-mastering";
 
 const REGISTRY: Record<RelatedSlug, { nameKey: DictKey; descKey: DictKey }> = {
@@ -59,6 +60,7 @@ const REGISTRY: Record<RelatedSlug, { nameKey: DictKey; descKey: DictKey }> = {
   "bass-booster": { nameKey: "tools.cardBassBooster", descKey: "tools.descBassBooster" },
   "8d-audio": { nameKey: "tools.card8dAudio", descKey: "tools.desc8dAudio" },
   "audio-joiner": { nameKey: "tools.cardAudioJoiner", descKey: "tools.descAudioJoiner" },
+  daw: { nameKey: "tools.cardDaw", descKey: "tools.descDaw" },
   "audio-mastering": { nameKey: "tools.cardMastering", descKey: "tools.descMastering" },
 };
 
