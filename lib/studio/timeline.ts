@@ -20,6 +20,8 @@ export interface StudioClip {
   fadeOutSec: number;
   /** Silenced without losing its gain setting; skipped by the scheduler. */
   muted: boolean;
+  /** When ANY clip is soloed, only soloed clips play — live AND on export. */
+  soloed: boolean;
   /** 0..5, assigned round-robin at add time; drives the clip tint. */
   colorIndex: number;
 }
@@ -109,8 +111,12 @@ export function computeClipSchedule(
   speed: number,
 ): ScheduledClip[] {
   const out: ScheduledClip[] = [];
+  // Solo is resolved HERE, not by the caller, so the live engine and the
+  // offline renderer can never disagree about what is audible.
+  const soloing = clips.some((c) => c.soloed && !c.muted);
   for (const clip of clips) {
     if (clip.muted) continue;
+    if (soloing && !clip.soloed) continue;
     const duration = clipDuration(clip);
     const end = clip.timelineStart + duration;
     if (end <= position + 1e-9) continue; // entirely behind the playhead
@@ -158,6 +164,27 @@ export function computeClipSchedule(
     });
   }
   return out.sort((a, b) => a.when - b.when);
+}
+
+/**
+ * Where the current playback pass ends, and whether reaching it should wrap
+ * to the loop start instead of stopping. Pure so the boundary decision is
+ * testable — the engine only owns the timer that acts on it.
+ */
+export function loopPassEnd(
+  duration: number,
+  position: number,
+  loop: { start: number; end: number } | null,
+): { at: number; wrap: boolean } {
+  // A loop the playhead has already passed is inert: playing from beyond it
+  // must run to the end, not jump backwards into a region you left.
+  if (loop && position < loop.end - 0.01) return { at: Math.min(loop.end, duration), wrap: true };
+  return { at: duration, wrap: false };
+}
+
+/** True when at least one clip is soloed (and not also muted). */
+export function isSoloing(clips: StudioClip[]): boolean {
+  return clips.some((c) => c.soloed && !c.muted);
 }
 
 /**

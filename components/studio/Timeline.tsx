@@ -28,6 +28,7 @@ import {
   MIN_CLIP_SECONDS,
 } from "@/lib/studio/timeline";
 import {
+  LOOP_LANE_HEIGHT,
   ROW_HEIGHT,
   RULER_HEIGHT,
   TAIL_HEADROOM_SECONDS,
@@ -50,6 +51,7 @@ const WAVE_HEIGHT = ROW_HEIGHT - 26;
 type DragState =
   | { kind: "move"; clipId: string; grabOffsetSec: number; latestStart: number }
   | { kind: "trim-start" | "trim-end"; clipId: string }
+  | { kind: "loop"; anchorSec: number }
   | { kind: "seek" };
 
 export function Timeline({
@@ -67,7 +69,12 @@ export function Timeline({
   onTogglePlay,
   onDeleteSelected,
   onSplitSelected,
+  onDuplicateSelected,
+  onToggleLoop,
   onChangeZoom,
+  loop,
+  onSetLoop,
+  follow,
   headSignal = 0,
   disabled,
 }: {
@@ -85,7 +92,13 @@ export function Timeline({
   onTogglePlay: () => void;
   onDeleteSelected: () => void;
   onSplitSelected: () => void;
+  onDuplicateSelected: () => void;
+  onToggleLoop: () => void;
   onChangeZoom: (pxPerSecond: number) => void;
+  loop: { start: number; end: number } | null;
+  onSetLoop: (region: { start: number; end: number } | null) => void;
+  /** Keep the playhead on screen while playing. */
+  follow: boolean;
   headSignal?: number;
   disabled?: boolean;
 }) {
@@ -111,12 +124,54 @@ export function Timeline({
 
   /* ------------------------------ playhead ------------------------------ */
 
+  // Set by our own scrollLeft writes so the scroll listener can tell them
+  // apart from the user grabbing the bar (which suspends follow).
+  const selfScrollRef = useRef(false);
+  const followRef = useRef(follow);
+  followRef.current = follow;
+  const followSuspendedRef = useRef(false);
+
   const applyHead = useCallback(
     (seconds: number) => {
-      trackRef.current?.style.setProperty("--studio-head-px", `${seconds * pxPerSecond}px`);
+      const track = trackRef.current;
+      const scroller = scrollRef.current;
+      if (!track) return;
+      const px = seconds * pxPerSecond;
+      track.style.setProperty("--studio-head-px", `${px}px`);
+      // Follow: at any real zoom the playhead leaves the viewport in seconds,
+      // and a timeline you have to chase by hand is unusable. Scroll only
+      // when it approaches the edges, so the view isn't constantly twitching.
+      if (!scroller || !followRef.current || followSuspendedRef.current) return;
+      const w = scroller.clientWidth;
+      const left = scroller.scrollLeft;
+      if (px < left + w * 0.08 || px > left + w * 0.78) {
+        selfScrollRef.current = true;
+        scroller.scrollLeft = Math.max(0, px - w * 0.35);
+      }
     },
     [pxPerSecond],
   );
+
+  // Manual scrolling suspends follow until the next play/seek — otherwise
+  // the view fights the user for control of the scrollbar.
+  useEffect(() => {
+    const scroller = scrollRef.current;
+    if (!scroller) return;
+    const onScroll = () => {
+      if (selfScrollRef.current) {
+        selfScrollRef.current = false;
+        return;
+      }
+      followSuspendedRef.current = true;
+    };
+    scroller.addEventListener("scroll", onScroll, { passive: true });
+    return () => scroller.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // A fresh play or seek re-arms following.
+  useEffect(() => {
+    followSuspendedRef.current = false;
+  }, [playing, headSignal]);
 
   useEffect(() => {
     const tick = () => {
@@ -220,6 +275,19 @@ export function Timeline({
     const clipEl = target.closest<HTMLElement>("[data-clip-id]");
     if (!trackRef.current) return;
 
+    if (target.closest(".studio-loop-lane")) {
+      // Drag the lane to set a loop; a plain click clears it.
+      const anchorSec = secondsFromClientX(event.clientX);
+      dragRef.current = { kind: "loop", anchorSec };
+      onSetLoop(null);
+      try {
+        event.currentTarget.setPointerCapture(event.pointerId);
+      } catch {
+        // synthetic pointers may refuse capture; the drag still tracks
+      }
+      return;
+    }
+
     if (clipEl) {
       const clipId = clipEl.dataset.clipId as string;
       const clip = clips.find((c) => c.id === clipId);
@@ -258,6 +326,11 @@ export function Timeline({
   const handleTrackPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
     const drag = dragRef.current;
     if (!drag) return;
+    if (drag.kind === "loop") {
+      const here = secondsFromClientX(event.clientX);
+      onSetLoop({ start: Math.min(drag.anchorSec, here), end: Math.max(drag.anchorSec, here) });
+      return;
+    }
     if (drag.kind === "seek") {
       const seconds = secondsFromClientX(event.clientX);
       applyHead(seconds);
@@ -280,6 +353,20 @@ export function Timeline({
             pxPerSecond,
           );
       drag.latestStart = start;
+      // Show WHERE it landed: mark whichever edge actually snapped, so the
+      // alignment is visible rather than merely felt.
+      const snapEl = trackRef.current?.querySelector<HTMLElement>(".studio-snapline");
+      if (snapEl) {
+        const snapped = Math.abs(start - raw) > 1e-9;
+        snapEl.style.display = snapped ? "block" : "none";
+        if (snapped) {
+          const length = clipDuration(clip);
+          const candidates = snapCandidates(clipsRef.current, drag.clipId, getPositionRef.current());
+          const startHit = candidates.some((c) => Math.abs(c - start) < 1e-6);
+          const at = startHit ? start : start + length;
+          snapEl.style.left = `${at * pxPerSecond}px`;
+        }
+      }
       // Live preview via style only — state commits on release, so React
       // isn't asked to re-render the timeline at pointer-move rate.
       const el = clipElOf(drag.clipId);
@@ -301,6 +388,8 @@ export function Timeline({
     const drag = dragRef.current;
     dragRef.current = null;
     setDragLabel(null);
+    const snapEl = trackRef.current?.querySelector<HTMLElement>(".studio-snapline");
+    if (snapEl) snapEl.style.display = "none";
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
@@ -324,6 +413,16 @@ export function Timeline({
     if (event.key === "s" || event.key === "S") {
       event.preventDefault();
       onSplitSelected();
+      return;
+    }
+    if (event.key === "d" || event.key === "D") {
+      event.preventDefault();
+      onDuplicateSelected();
+      return;
+    }
+    if (event.key === "l" || event.key === "L") {
+      event.preventDefault();
+      onToggleLoop();
       return;
     }
     if (event.key === "+" || event.key === "=" || event.key === "-") {
@@ -355,7 +454,10 @@ export function Timeline({
         <div
           ref={trackRef}
           className="studio-track"
-          style={{ width: `${innerWidth}px`, height: `${RULER_HEIGHT + rowCount * ROW_HEIGHT}px` }}
+          style={{
+            width: `${innerWidth}px`,
+            height: `${LOOP_LANE_HEIGHT + RULER_HEIGHT + rowCount * ROW_HEIGHT}px`,
+          }}
           role="application"
           aria-label={t("studio.timelineLabel")}
           tabIndex={0}
@@ -365,6 +467,18 @@ export function Timeline({
           onPointerCancel={handleTrackPointerUp}
           onKeyDown={handleKeyDown}
         >
+          <div className="studio-loop-lane" aria-hidden="true">
+            {loop && (
+              <div
+                className="studio-loop-region"
+                style={{
+                  left: `${loop.start * pxPerSecond}px`,
+                  width: `${Math.max(2, (loop.end - loop.start) * pxPerSecond)}px`,
+                }}
+              />
+            )}
+          </div>
+
           <div className="studio-ruler" aria-hidden="true">
             {ticks.map((s) => (
               <span key={s} className="studio-tick" style={{ left: `${s * pxPerSecond}px` }}>
@@ -391,7 +505,7 @@ export function Timeline({
                   .join(" ")}
                 style={{
                   left: `${clip.timelineStart * pxPerSecond}px`,
-                  top: `${RULER_HEIGHT + row * ROW_HEIGHT + CLIP_PAD / 2}px`,
+                  top: `${LOOP_LANE_HEIGHT + RULER_HEIGHT + row * ROW_HEIGHT + CLIP_PAD / 2}px`,
                   width: `${widthPx}px`,
                   height: `${ROW_HEIGHT - CLIP_PAD}px`,
                 }}
@@ -421,6 +535,7 @@ export function Timeline({
             );
           })}
 
+          <div className="studio-snapline" aria-hidden="true" style={{ display: "none" }} />
           <div className="studio-head" aria-hidden="true" />
         </div>
       </div>

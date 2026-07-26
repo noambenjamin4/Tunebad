@@ -11,6 +11,8 @@ import {
   trimClipStart,
   trimClipEnd,
   splitClip,
+  isSoloing,
+  loopPassEnd,
   snapCandidates,
 } from "../lib/studio/timeline";
 import {
@@ -38,6 +40,7 @@ function clip(overrides: Partial<StudioClip>): StudioClip {
     gain: 1,
     fadeInSec: 0,
     fadeOutSec: 0,
+    soloed: false,
     muted: false,
     colorIndex: 0,
     ...overrides,
@@ -259,4 +262,46 @@ test("snapClipStart: the edge that finds a candidate wins", () => {
   assert.equal(snapClipStart(0.1, 7.7, [0, 8], 25), 0);
   // Never negative.
   assert.equal(snapClipStart(0.05, 6, [0], 25), 0);
+});
+
+test("solo: one soloed clip silences the others, live and on export alike", () => {
+  const a = clip({ id: "a", timelineStart: 0, soloed: true });
+  const b = clip({ id: "b", timelineStart: 10 });
+  const c = clip({ id: "c", timelineStart: 20 });
+  const scheduled = computeClipSchedule([a, b, c], 0, 1);
+  assert.deepEqual(scheduled.map((s) => s.clipId), ["a"]);
+  assert.equal(isSoloing([a, b, c]), true);
+  // The SAME call drives the offline render, so a bounce cannot disagree.
+  assert.equal(computeClipSchedule([a, b, c], 0, 1).length, 1);
+});
+
+test("solo: a muted clip cannot solo — that would silence everything", () => {
+  const a = clip({ id: "a", soloed: true, muted: true });
+  const b = clip({ id: "b", timelineStart: 10 });
+  assert.equal(isSoloing([a, b]), false);
+  assert.deepEqual(computeClipSchedule([a, b], 0, 1).map((s) => s.clipId), ["b"]);
+});
+
+test("solo + mute: mute still wins over solo on the same clip", () => {
+  const a = clip({ id: "a", soloed: true });
+  const b = clip({ id: "b", timelineStart: 10, soloed: true, muted: true });
+  assert.deepEqual(computeClipSchedule([a, b], 0, 1).map((s) => s.clipId), ["a"]);
+});
+
+test("loop: a pass inside the region ends at the loop end and wraps", () => {
+  const r = loopPassEnd(300, 8, { start: 6, end: 10 });
+  assert.deepEqual(r, { at: 10, wrap: true });
+});
+
+test("loop: playing from past the region runs to the end, never backwards", () => {
+  // Jumping back into a region the playhead already left would be a trap.
+  assert.deepEqual(loopPassEnd(300, 40, { start: 6, end: 10 }), { at: 300, wrap: false });
+});
+
+test("loop: no region means the pass ends at the timeline end", () => {
+  assert.deepEqual(loopPassEnd(300, 8, null), { at: 300, wrap: false });
+});
+
+test("loop: a region past the timeline end clamps to real material", () => {
+  assert.deepEqual(loopPassEnd(30, 5, { start: 2, end: 90 }), { at: 30, wrap: true });
 });

@@ -4810,3 +4810,38 @@ tbody tr:last-child td {
 @media (max-width: 640px) {
   .studio-field input[type="range"] { width: 90px; }
 }
+
+/* ---- DAW: loop lane, loop region, snap indicator ---- */
+.studio-loop-lane {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  height: 14px;
+  cursor: ew-resize;
+  border-bottom: 1px solid var(--line);
+}
+.studio-loop-region {
+  position: absolute;
+  top: 2px;
+  height: 10px;
+  border-radius: 3px;
+  background: var(--ink);
+  opacity: 0.55;
+  pointer-events: none;
+}
+/* Vertical guide showing the edge a dragged clip has snapped to. */
+.studio-snapline {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--ink);
+  opacity: 0.5;
+  pointer-events: none;
+}
+.studio-notice {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 0;
+}

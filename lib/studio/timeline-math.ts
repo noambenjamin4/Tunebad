@@ -12,6 +12,8 @@ export const DEFAULT_PX_PER_SECOND = 25;
 export const ZOOM_STEP = 1.25;
 
 export const ROW_HEIGHT = 84;
+/** Strip above the ruler where a loop region is dragged. */
+export const LOOP_LANE_HEIGHT = 14;
 export const RULER_HEIGHT = 24;
 /** Extra scrollable room past the last clip, in seconds. */
 export const TAIL_HEADROOM_SECONDS = 10;

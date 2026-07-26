@@ -27,7 +27,7 @@ import {
   applyEffectParams,
   applyReverbEqParams,
 } from "@/lib/audio/remix";
-import { type StudioClip, computeClipSchedule, timelineDuration } from "./timeline";
+import { type StudioClip, computeClipSchedule, loopPassEnd, timelineDuration } from "./timeline";
 
 /** Long enough to kill the click, short enough to read as instant. */
 const FADE_SECONDS = 0.012;
@@ -54,6 +54,14 @@ export class StudioEngine {
   // exists to prevent.
   private silentAt = 0;
   private position = 0; // timeline seconds while stopped
+  // Loop region in timeline seconds, or null. When set, the transport wraps
+  // to `start` on reaching `end` instead of stopping — the tool for working
+  // a beat switch until the transition is right.
+  private loop: { start: number; end: number } | null = null;
+  // Last scheduling inputs, kept so a loop wrap can re-arm itself without
+  // the caller having to drive every pass.
+  private lastClips: StudioClip[] = [];
+  private lastBuffers: Map<string, AudioBuffer> = new Map();
   private params: RemixParams;
   private onEnded: (() => void) | null = null;
 
@@ -107,8 +115,18 @@ export class StudioEngine {
     return this.chain;
   }
 
+  /** Set or clear the loop region (timeline seconds). */
+  setLoop(region: { start: number; end: number } | null): void {
+    this.loop =
+      region && region.end - region.start > 0.05
+        ? { start: Math.max(0, region.start), end: region.end }
+        : null;
+  }
+
   start(clips: StudioClip[], buffers: Map<string, AudioBuffer>, position = this.position): void {
     this.stopSources();
+    this.lastClips = clips;
+    this.lastBuffers = buffers;
     const duration = timelineDuration(clips);
     if (clips.length === 0 || position >= duration - 0.01) return;
 
@@ -167,8 +185,17 @@ export class StudioEngine {
   /** One timer for "the timeline ran out" — per-source onended can't tell
    *  "this clip finished" from "the transport finished". */
   private armEndTimer(duration: number, position: number, speed: number): number {
-    const remainingWall = ((duration - position) / speed) * 1000 + 80;
+    const { at, wrap } = loopPassEnd(duration, position, this.loop);
+    // The wrap has to fire ON the boundary, not 80 ms past it; only the
+    // real end gets slack so the last sample is never clipped.
+    const remainingWall = ((at - position) / speed) * 1000 + (wrap ? 0 : 80);
     return window.setTimeout(() => {
+      if (wrap && this.loop) {
+        // Restart the pass. The 12 ms ramps mean the seam is a brief dip
+        // rather than a click; a hard splice would pop on most material.
+        this.start(this.lastClips, this.lastBuffers, this.loop.start);
+        return;
+      }
       this.position = 0;
       this.stopSources();
       this.onEnded?.();

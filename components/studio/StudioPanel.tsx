@@ -31,6 +31,7 @@ import {
   MAX_DECODED_BYTES,
   MAX_TIMELINE_SECONDS,
   MAX_TOTAL_CLIPS,
+  isSoloing,
   moveClip,
   splitClip,
   timelineDuration,
@@ -168,6 +169,8 @@ export function StudioPanel() {
   // Clip-state history for Cmd/Ctrl+Z. Buffers live outside state, so a
   // snapshot is just an array of small plain objects.
   const [undoDepth, setUndoDepth] = useState(0);
+  const [loop, setLoopState] = useState<{ start: number; end: number } | null>(null);
+  const [follow, setFollow] = useState(true);
 
   const clipsRef = useRef(clips);
   clipsRef.current = clips;
@@ -333,6 +336,7 @@ export function StudioPanel() {
             fadeInSec: 0,
             fadeOutSec: 0,
             muted: false,
+            soloed: false,
             colorIndex: (startingCount + added) % 3,
           };
           cursor = clip.timelineStart + buffer.duration;
@@ -518,6 +522,50 @@ export function StudioPanel() {
     setSelectedId(halves[1].id);
   }, [selectedId, engine, pushUndo, t]);
 
+  const handleToggleSolo = useCallback(() => {
+    if (!selectedId) return;
+    editClip(selectedId, (c) => ({ ...c, soloed: !c.soloed }));
+  }, [selectedId, editClip]);
+
+  /** Copy the selected clip and drop it straight after itself. */
+  const handleDuplicate = useCallback(() => {
+    const clip = clipsRef.current.find((c) => c.id === selectedId);
+    if (!clip) return;
+    if (clipsRef.current.length >= MAX_TOTAL_CLIPS) {
+      setStatus(t("studio.clipsFull", { count: MAX_TOTAL_CLIPS }));
+      setStatusIsError(true);
+      return;
+    }
+    const copy: StudioClip = {
+      ...clip,
+      id: makeClipId(),
+      timelineStart: clip.timelineStart + (clip.clipEnd - clip.clipStart),
+    };
+    pushUndo();
+    setClips((prev) => [...prev, copy]);
+    setSelectedId(copy.id);
+    requestReschedule("now");
+  }, [selectedId, pushUndo, requestReschedule, t]);
+
+  const applyLoop = useCallback(
+    (region: { start: number; end: number } | null) => {
+      setLoopState(region);
+      engine.setLoop(region);
+    },
+    [engine],
+  );
+
+  const handleLoopSelection = useCallback(() => {
+    if (loop) {
+      applyLoop(null);
+      return;
+    }
+    const clip = clipsRef.current.find((c) => c.id === selectedId);
+    if (clip) {
+      applyLoop({ start: clip.timelineStart, end: clip.timelineStart + (clip.clipEnd - clip.clipStart) });
+    }
+  }, [loop, selectedId, applyLoop]);
+
   const handleToggleMute = useCallback(() => {
     if (!selectedId) return;
     editClip(selectedId, (c) => ({ ...c, muted: !c.muted }));
@@ -528,6 +576,8 @@ export function StudioPanel() {
   const handleChangeZoom = useCallback((next: number) => {
     setPxPerSecond(clampZoom(next));
   }, []);
+
+  const soloing = useMemo(() => isSoloing(clips), [clips]);
 
   const selectedClip = useMemo(
     () => clips.find((c) => c.id === selectedId) ?? null,
@@ -653,7 +703,12 @@ export function StudioPanel() {
             onTogglePlay={togglePlay}
             onDeleteSelected={handleDeleteSelected}
             onSplitSelected={handleSplitSelected}
+            onDuplicateSelected={handleDuplicate}
+            onToggleLoop={handleLoopSelection}
             onChangeZoom={handleChangeZoom}
+            loop={loop}
+            onSetLoop={applyLoop}
+            follow={follow}
             headSignal={headSignal}
             disabled={working}
           />
@@ -672,6 +727,26 @@ export function StudioPanel() {
               {recording ? t("studio.recordStop") : t("studio.record")}
             </button>
             <TransportClock getPosition={() => engine.getPosition()} playing={playing} total={duration} />
+            <button
+              className={`text-button${loop ? " active" : ""}`}
+              type="button"
+              onClick={handleLoopSelection}
+              disabled={working || (!loop && !selectedClip)}
+              aria-pressed={Boolean(loop)}
+              title={t("studio.loopHint")}
+            >
+              {t("studio.loop")}
+            </button>
+            <button
+              className={`text-button${follow ? " active" : ""}`}
+              type="button"
+              onClick={() => setFollow((f) => !f)}
+              disabled={working}
+              aria-pressed={follow}
+              title={t("studio.followHint")}
+            >
+              {t("studio.follow")}
+            </button>
             <button
               className="text-button"
               type="button"
@@ -742,14 +817,27 @@ export function StudioPanel() {
               >
                 {selectedClip.muted ? t("studio.unmute") : t("studio.mute")}
               </button>
+              <button
+                className={`text-button${selectedClip.soloed ? " active" : ""}`}
+                type="button"
+                aria-pressed={selectedClip.soloed}
+                onClick={handleToggleSolo}
+              >
+                {t("studio.solo")}
+              </button>
               <button className="text-button" type="button" onClick={handleSplitSelected}>
                 {t("studio.split")}
+              </button>
+              <button className="text-button" type="button" onClick={handleDuplicate}>
+                {t("studio.duplicate")}
               </button>
               <button className="text-button" type="button" onClick={handleDeleteSelected}>
                 {t("studio.remove")}
               </button>
             </div>
           )}
+
+          {soloing && <p className="studio-notice">{t("studio.soloNotice")}</p>}
 
           <div className="studio-master">
             <label className="studio-field studio-field-wide">

@@ -10,7 +10,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_8d_audio_page",
-      "community": 25,
+      "community": 87,
       "norm_label": "page.tsx"
     },
     {
@@ -20,7 +20,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "app_8d_audio_page_metadata",
-      "community": 25,
+      "community": 87,
       "norm_label": "metadata"
     },
     {
@@ -30,7 +30,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "app_8d_audio_page_page",
-      "community": 25,
+      "community": 87,
       "norm_label": "page()"
     },
     {
@@ -40,7 +40,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_cache_analysis_route",
-      "community": 13,
+      "community": 10,
       "norm_label": "route.ts"
     },
     {
@@ -50,7 +50,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "app_api_cache_analysis_route_resultschema",
-      "community": 13,
+      "community": 10,
       "norm_label": "resultschema"
     },
     {
@@ -60,7 +60,7 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "app_api_cache_analysis_route_post",
-      "community": 13,
+      "community": 10,
       "norm_label": "post()"
     },
     {
@@ -250,7 +250,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_recent_route",
-      "community": 13,
+      "community": 10,
       "norm_label": "route.ts"
     },
     {
@@ -260,7 +260,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "app_api_recent_route_get",
-      "community": 13,
+      "community": 10,
       "norm_label": "get()"
     },
     {
@@ -300,7 +300,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_songs_route",
-      "community": 66,
+      "community": 13,
       "norm_label": "route.ts"
     },
     {
@@ -310,7 +310,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "app_api_songs_route_queryschema",
-      "community": 66,
+      "community": 13,
       "norm_label": "queryschema"
     },
     {
@@ -320,7 +320,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "app_api_songs_route_get",
-      "community": 66,
+      "community": 13,
       "norm_label": "get()"
     },
     {
@@ -330,7 +330,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_spotify_route",
-      "community": 86,
+      "community": 77,
       "norm_label": "route.ts"
     },
     {
@@ -340,7 +340,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "app_api_spotify_route_spotifyrequestschema",
-      "community": 86,
+      "community": 77,
       "norm_label": "spotifyrequestschema"
     },
     {
@@ -350,7 +350,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "app_api_spotify_route_post",
-      "community": 86,
+      "community": 77,
       "norm_label": "post()"
     },
     {
@@ -420,7 +420,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_youtube_playlist_route",
-      "community": 77,
+      "community": 86,
       "norm_label": "route.ts"
     },
     {
@@ -430,7 +430,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "app_api_youtube_playlist_route_playlistrequestschema",
-      "community": 77,
+      "community": 86,
       "norm_label": "playlistrequestschema"
     },
     {
@@ -440,7 +440,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "app_api_youtube_playlist_route_post",
-      "community": 77,
+      "community": 86,
       "norm_label": "post()"
     },
     {
@@ -540,7 +540,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_audio_converter_page",
-      "community": 87,
+      "community": 72,
       "norm_label": "page.tsx"
     },
     {
@@ -550,7 +550,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "app_audio_converter_page_metadata",
-      "community": 87,
+      "community": 72,
       "norm_label": "metadata"
     },
     {
@@ -560,7 +560,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "app_audio_converter_page_page",
-      "community": 87,
+      "community": 72,
       "norm_label": "page()"
     },
     {
@@ -570,7 +570,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_audio_joiner_page",
-      "community": 25,
+      "community": 87,
       "norm_label": "page.tsx"
     },
     {
@@ -580,7 +580,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "app_audio_joiner_page_metadata",
-      "community": 25,
+      "community": 87,
       "norm_label": "metadata"
     },
     {
@@ -590,7 +590,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "app_audio_joiner_page_page",
-      "community": 25,
+      "community": 87,
       "norm_label": "page()"
     },
     {
@@ -600,7 +600,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_audio_mastering_page",
-      "community": 25,
+      "community": 87,
       "norm_label": "page.tsx"
     },
     {
@@ -610,7 +610,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "app_audio_mastering_page_metadata",
-      "community": 25,
+      "community": 87,
       "norm_label": "metadata"
     },
     {
@@ -620,7 +620,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "app_audio_mastering_page_page",
-      "community": 25,
+      "community": 87,
       "norm_label": "page()"
     },
     {
@@ -630,7 +630,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_bass_booster_page",
-      "community": 25,
+      "community": 87,
       "norm_label": "page.tsx"
     },
     {
@@ -640,7 +640,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "app_bass_booster_page_metadata",
-      "community": 25,
+      "community": 87,
       "norm_label": "metadata"
     },
     {
@@ -650,7 +650,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "app_bass_booster_page_page",
-      "community": 25,
+      "community": 87,
       "norm_label": "page()"
     },
     {
@@ -760,7 +760,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_camelot_wheel_page",
-      "community": 46,
+      "community": 47,
       "norm_label": "page.tsx"
     },
     {
@@ -770,7 +770,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "app_camelot_wheel_page_metadata",
-      "community": 46,
+      "community": 47,
       "norm_label": "metadata"
     },
     {
@@ -780,7 +780,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "app_camelot_wheel_page_code_to_key",
-      "community": 46,
+      "community": 47,
       "norm_label": "code_to_key"
     },
     {
@@ -790,7 +790,7 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "app_camelot_wheel_page_all_codes",
-      "community": 46,
+      "community": 47,
       "norm_label": "all_codes"
     },
     {
@@ -800,7 +800,7 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "app_camelot_wheel_page_faqs",
-      "community": 46,
+      "community": 47,
       "norm_label": "faqs"
     },
     {
@@ -810,7 +810,7 @@
       "source_location": "L61",
       "_origin": "ast",
       "id": "app_camelot_wheel_page_camelotwheelpage",
-      "community": 46,
+      "community": 47,
       "norm_label": "camelotwheelpage()"
     },
     {
@@ -880,7 +880,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_compress_video_for_discord_page",
-      "community": 59,
+      "community": 72,
       "norm_label": "page.tsx"
     },
     {
@@ -890,7 +890,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "app_compress_video_for_discord_page_metadata",
-      "community": 59,
+      "community": 72,
       "norm_label": "metadata"
     },
     {
@@ -900,7 +900,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "app_compress_video_for_discord_page_page",
-      "community": 59,
+      "community": 72,
       "norm_label": "page()"
     },
     {
@@ -910,7 +910,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_compress_video_for_whatsapp_page",
-      "community": 59,
+      "community": 85,
       "norm_label": "page.tsx"
     },
     {
@@ -920,7 +920,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "app_compress_video_for_whatsapp_page_metadata",
-      "community": 59,
+      "community": 85,
       "norm_label": "metadata"
     },
     {
@@ -930,7 +930,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "app_compress_video_for_whatsapp_page_page",
-      "community": 59,
+      "community": 85,
       "norm_label": "page()"
     },
     {
@@ -940,7 +940,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_compress_video_page",
-      "community": 59,
+      "community": 87,
       "norm_label": "page.tsx"
     },
     {
@@ -950,7 +950,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "app_compress_video_page_metadata",
-      "community": 59,
+      "community": 87,
       "norm_label": "metadata"
     },
     {
@@ -960,7 +960,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "app_compress_video_page_page",
-      "community": 59,
+      "community": 87,
       "norm_label": "page()"
     },
     {
@@ -1090,7 +1090,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_flac_to_mp3_page",
-      "community": 7,
+      "community": 87,
       "norm_label": "page.tsx"
     },
     {
@@ -1100,7 +1100,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "app_flac_to_mp3_page_metadata",
-      "community": 7,
+      "community": 87,
       "norm_label": "metadata"
     },
     {
@@ -1110,7 +1110,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "app_flac_to_mp3_page_page",
-      "community": 7,
+      "community": 87,
       "norm_label": "page()"
     },
     {
@@ -1610,7 +1610,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_mkv_to_mp4_page",
-      "community": 87,
+      "community": 88,
       "norm_label": "page.tsx"
     },
     {
@@ -1620,7 +1620,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "app_mkv_to_mp4_page_metadata",
-      "community": 87,
+      "community": 88,
       "norm_label": "metadata"
     },
     {
@@ -1630,7 +1630,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "app_mkv_to_mp4_page_page",
-      "community": 87,
+      "community": 88,
       "norm_label": "page()"
     },
     {
@@ -1640,7 +1640,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_mov_to_mp4_page",
-      "community": 7,
+      "community": 82,
       "norm_label": "page.tsx"
     },
     {
@@ -1650,7 +1650,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "app_mov_to_mp4_page_metadata",
-      "community": 7,
+      "community": 82,
       "norm_label": "metadata"
     },
     {
@@ -1660,7 +1660,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "app_mov_to_mp4_page_page",
-      "community": 7,
+      "community": 82,
       "norm_label": "page()"
     },
     {
@@ -1700,7 +1700,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_nightcore_maker_page",
-      "community": 87,
+      "community": 15,
       "norm_label": "page.tsx"
     },
     {
@@ -1710,7 +1710,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "app_nightcore_maker_page_metadata",
-      "community": 87,
+      "community": 15,
       "norm_label": "metadata"
     },
     {
@@ -1720,7 +1720,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "app_nightcore_maker_page_page",
-      "community": 87,
+      "community": 15,
       "norm_label": "page()"
     },
     {
@@ -1730,7 +1730,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_page",
-      "community": 57,
+      "community": 60,
       "norm_label": "page.tsx"
     },
     {
@@ -1740,7 +1740,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "app_page_home",
-      "community": 57,
+      "community": 60,
       "norm_label": "home()"
     },
     {
@@ -1780,7 +1780,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_playlist_analyzer_page",
-      "community": 41,
+      "community": 47,
       "norm_label": "page.tsx"
     },
     {
@@ -1790,7 +1790,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "app_playlist_analyzer_page_metadata",
-      "community": 41,
+      "community": 47,
       "norm_label": "metadata"
     },
     {
@@ -1800,7 +1800,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "app_playlist_analyzer_page_faqs",
-      "community": 41,
+      "community": 47,
       "norm_label": "faqs"
     },
     {
@@ -1810,7 +1810,7 @@
       "source_location": "L44",
       "_origin": "ast",
       "id": "app_playlist_analyzer_page_playlistanalyzerpage",
-      "community": 87,
+      "community": 47,
       "norm_label": "playlistanalyzerpage()"
     },
     {
@@ -1940,7 +1940,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_sitemaps_shard_route",
-      "community": 10,
+      "community": 57,
       "norm_label": "route.ts"
     },
     {
@@ -1950,7 +1950,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "app_sitemaps_shard_route_toolentry",
-      "community": 10,
+      "community": 57,
       "norm_label": "toolentry"
     },
     {
@@ -1960,7 +1960,7 @@
       "source_location": "L30",
       "_origin": "ast",
       "id": "app_sitemaps_shard_route_static_entries",
-      "community": 10,
+      "community": 57,
       "norm_label": "static_entries"
     },
     {
@@ -1970,7 +1970,7 @@
       "source_location": "L78",
       "_origin": "ast",
       "id": "app_sitemaps_shard_route_get",
-      "community": 10,
+      "community": 57,
       "norm_label": "get()"
     },
     {
@@ -2360,7 +2360,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_songs_key_slug_page_n_page",
-      "community": 28,
+      "community": 46,
       "norm_label": "page.tsx"
     },
     {
@@ -2370,7 +2370,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "app_songs_key_slug_page_n_page_generatemetadata",
-      "community": 28,
+      "community": 46,
       "norm_label": "generatemetadata()"
     },
     {
@@ -2380,7 +2380,7 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "app_songs_key_slug_page_n_page_page",
-      "community": 28,
+      "community": 46,
       "norm_label": "page()"
     },
     {
@@ -2410,7 +2410,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "app_songs_page_songspage",
-      "community": 1,
+      "community": 60,
       "norm_label": "songspage()"
     },
     {
@@ -2450,7 +2450,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_tools_page",
-      "community": 25,
+      "community": 68,
       "norm_label": "page.tsx"
     },
     {
@@ -2460,7 +2460,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "app_tools_page_metadata",
-      "community": 25,
+      "community": 68,
       "norm_label": "metadata"
     },
     {
@@ -2470,7 +2470,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "app_tools_page_page",
-      "community": 25,
+      "community": 68,
       "norm_label": "page()"
     },
     {
@@ -2480,7 +2480,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_tunebad_vs_tunebat_page",
-      "community": 87,
+      "community": 47,
       "norm_label": "page.tsx"
     },
     {
@@ -2490,7 +2490,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "app_tunebad_vs_tunebat_page_metadata",
-      "community": 87,
+      "community": 47,
       "norm_label": "metadata"
     },
     {
@@ -2500,7 +2500,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "app_tunebad_vs_tunebat_page_rows",
-      "community": 87,
+      "community": 47,
       "norm_label": "rows"
     },
     {
@@ -2510,7 +2510,7 @@
       "source_location": "L45",
       "_origin": "ast",
       "id": "app_tunebad_vs_tunebat_page_faqs",
-      "community": 87,
+      "community": 47,
       "norm_label": "faqs"
     },
     {
@@ -2520,7 +2520,7 @@
       "source_location": "L68",
       "_origin": "ast",
       "id": "app_tunebad_vs_tunebat_page_vspage",
-      "community": 87,
+      "community": 47,
       "norm_label": "vspage()"
     },
     {
@@ -2590,7 +2590,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_wav_to_mp3_page",
-      "community": 7,
+      "community": 89,
       "norm_label": "page.tsx"
     },
     {
@@ -2600,7 +2600,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "app_wav_to_mp3_page_metadata",
-      "community": 7,
+      "community": 89,
       "norm_label": "metadata"
     },
     {
@@ -2610,7 +2610,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "app_wav_to_mp3_page_page",
-      "community": 7,
+      "community": 89,
       "norm_label": "page()"
     },
     {
@@ -2620,7 +2620,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_tunebadapp",
-      "community": 76,
+      "community": 5,
       "norm_label": "tunebadapp.tsx"
     },
     {
@@ -2630,7 +2630,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "components_tunebadapp_viewname",
-      "community": 76,
+      "community": 5,
       "norm_label": "viewname"
     },
     {
@@ -2650,7 +2650,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "components_tunebadapp_view_to_path",
-      "community": 76,
+      "community": 5,
       "norm_label": "view_to_path"
     },
     {
@@ -2660,7 +2660,7 @@
       "source_location": "L46",
       "_origin": "ast",
       "id": "components_tunebadapp_view_to_title",
-      "community": 76,
+      "community": 5,
       "norm_label": "view_to_title"
     },
     {
@@ -2680,7 +2680,7 @@
       "source_location": "L63",
       "_origin": "ast",
       "id": "components_tunebadapp_tunebadcontextvalue",
-      "community": 76,
+      "community": 14,
       "norm_label": "tunebadcontextvalue"
     },
     {
@@ -2690,7 +2690,7 @@
       "source_location": "L65",
       "_origin": "ast",
       "id": "components_tunebadapp_tunebadcontextvalue_showview",
-      "community": 76,
+      "community": 14,
       "norm_label": ".showview()"
     },
     {
@@ -2700,7 +2700,7 @@
       "source_location": "L67",
       "_origin": "ast",
       "id": "components_tunebadapp_tunebadcontextvalue_setdelaybpminput",
-      "community": 76,
+      "community": 14,
       "norm_label": ".setdelaybpminput()"
     },
     {
@@ -2710,7 +2710,7 @@
       "source_location": "L68",
       "_origin": "ast",
       "id": "components_tunebadapp_tunebadcontextvalue_setmainbpm",
-      "community": 76,
+      "community": 14,
       "norm_label": ".setmainbpm()"
     },
     {
@@ -2720,7 +2720,7 @@
       "source_location": "L70",
       "_origin": "ast",
       "id": "components_tunebadapp_tunebadcontextvalue_setmetronomebpm",
-      "community": 2,
+      "community": 14,
       "norm_label": ".setmetronomebpm()"
     },
     {
@@ -2730,7 +2730,7 @@
       "source_location": "L72",
       "_origin": "ast",
       "id": "components_tunebadapp_tunebadcontextvalue_setlastanalyzedbpm",
-      "community": 76,
+      "community": 14,
       "norm_label": ".setlastanalyzedbpm()"
     },
     {
@@ -2740,7 +2740,7 @@
       "source_location": "L74",
       "_origin": "ast",
       "id": "components_tunebadapp_tunebadcontextvalue_setlastanalysis",
-      "community": 76,
+      "community": 14,
       "norm_label": ".setlastanalysis()"
     },
     {
@@ -2750,7 +2750,7 @@
       "source_location": "L76",
       "_origin": "ast",
       "id": "components_tunebadapp_tunebadcontextvalue_rememberresult",
-      "community": 76,
+      "community": 14,
       "norm_label": ".rememberresult()"
     },
     {
@@ -2760,7 +2760,7 @@
       "source_location": "L77",
       "_origin": "ast",
       "id": "components_tunebadapp_tunebadcontextvalue_clearhistory",
-      "community": 76,
+      "community": 14,
       "norm_label": ".clearhistory()"
     },
     {
@@ -2770,7 +2770,7 @@
       "source_location": "L83",
       "_origin": "ast",
       "id": "components_tunebadapp_tunebadcontextvalue_requestanalysis",
-      "community": 76,
+      "community": 14,
       "norm_label": ".requestanalysis()"
     },
     {
@@ -2780,7 +2780,7 @@
       "source_location": "L84",
       "_origin": "ast",
       "id": "components_tunebadapp_tunebadcontextvalue_sendfilestotool",
-      "community": 76,
+      "community": 14,
       "norm_label": ".sendfilestotool()"
     },
     {
@@ -2790,7 +2790,7 @@
       "source_location": "L85",
       "_origin": "ast",
       "id": "components_tunebadapp_tunebadcontextvalue_clearpendingfiles",
-      "community": 32,
+      "community": 14,
       "norm_label": ".clearpendingfiles()"
     },
     {
@@ -2800,7 +2800,7 @@
       "source_location": "L88",
       "_origin": "ast",
       "id": "components_tunebadapp_tunebadcontext",
-      "community": 76,
+      "community": 5,
       "norm_label": "tunebadcontext"
     },
     {
@@ -2830,7 +2830,7 @@
       "source_location": "L305",
       "_origin": "ast",
       "id": "components_tunebadapp_views_with_own_intake",
-      "community": 76,
+      "community": 14,
       "norm_label": "views_with_own_intake"
     },
     {
@@ -2840,7 +2840,7 @@
       "source_location": "L312",
       "_origin": "ast",
       "id": "components_tunebadapp_views_accepting_handoff",
-      "community": 76,
+      "community": 14,
       "norm_label": "views_accepting_handoff"
     },
     {
@@ -2850,7 +2850,7 @@
       "source_location": "L329",
       "_origin": "ast",
       "id": "components_tunebadapp_globaldropcatcher",
-      "community": 76,
+      "community": 14,
       "norm_label": "globaldropcatcher()"
     },
     {
@@ -2910,7 +2910,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "components_analysis_analyzerpanel_analyzerpanel",
-      "community": 76,
+      "community": 14,
       "norm_label": "analyzerpanel()"
     },
     {
@@ -2920,7 +2920,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_analysis_dropzone",
-      "community": 6,
+      "community": 20,
       "norm_label": "dropzone.tsx"
     },
     {
@@ -2930,7 +2930,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "components_analysis_dropzone_dropzone",
-      "community": 6,
+      "community": 20,
       "norm_label": "dropzone()"
     },
     {
@@ -3040,7 +3040,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_analysis_recentstrip",
-      "community": 31,
+      "community": 20,
       "norm_label": "recentstrip.tsx"
     },
     {
@@ -3050,7 +3050,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "components_analysis_recentstrip_recentrow",
-      "community": 31,
+      "community": 20,
       "norm_label": "recentrow"
     },
     {
@@ -3060,7 +3060,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "components_analysis_recentstrip_recentstrip",
-      "community": 31,
+      "community": 20,
       "norm_label": "recentstrip()"
     },
     {
@@ -3130,7 +3130,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_analysis_waveformpreview",
-      "community": 20,
+      "community": 31,
       "norm_label": "waveformpreview.tsx"
     },
     {
@@ -3140,7 +3140,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "components_analysis_waveformpreview_waveformpreview",
-      "community": 20,
+      "community": 31,
       "norm_label": "waveformpreview()"
     },
     {
@@ -3150,7 +3150,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_bpm_bpmtoolsview",
-      "community": 39,
+      "community": 56,
       "norm_label": "bpmtoolsview.tsx"
     },
     {
@@ -3160,7 +3160,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "components_bpm_bpmtoolsview_bpmtoolsview",
-      "community": 39,
+      "community": 31,
       "norm_label": "bpmtoolsview()"
     },
     {
@@ -3170,7 +3170,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_bpm_metronomecard",
-      "community": 2,
+      "community": 56,
       "norm_label": "metronomecard.tsx"
     },
     {
@@ -3180,7 +3180,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "components_bpm_metronomecard_metronomecard",
-      "community": 2,
+      "community": 56,
       "norm_label": "metronomecard()"
     },
     {
@@ -3440,7 +3440,7 @@
       "source_location": "L40",
       "_origin": "ast",
       "id": "components_converter_youtubedownloader_parsetimestamp",
-      "community": 31,
+      "community": 14,
       "norm_label": "parsetimestamp()"
     },
     {
@@ -3450,7 +3450,7 @@
       "source_location": "L52",
       "_origin": "ast",
       "id": "components_converter_youtubedownloader_youtubedownloader",
-      "community": 31,
+      "community": 14,
       "norm_label": "youtubedownloader()"
     },
     {
@@ -3460,7 +3460,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_cutter_cutterpanel",
-      "community": 14,
+      "community": 80,
       "norm_label": "cutterpanel.tsx"
     },
     {
@@ -3470,7 +3470,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "components_cutter_cutterpanel_status",
-      "community": 14,
+      "community": 80,
       "norm_label": "status"
     },
     {
@@ -3480,7 +3480,7 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "components_cutter_cutterpanel_applyfades",
-      "community": 14,
+      "community": 80,
       "norm_label": "applyfades()"
     },
     {
@@ -3490,7 +3490,7 @@
       "source_location": "L60",
       "_origin": "ast",
       "id": "components_cutter_cutterpanel_cutterpanel",
-      "community": 14,
+      "community": 80,
       "norm_label": "cutterpanel()"
     },
     {
@@ -3500,7 +3500,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_cutter_trimwaveform",
-      "community": 14,
+      "community": 80,
       "norm_label": "trimwaveform.tsx"
     },
     {
@@ -3510,7 +3510,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "components_cutter_trimwaveform_clamp",
-      "community": 14,
+      "community": 80,
       "norm_label": "clamp()"
     },
     {
@@ -3520,7 +3520,7 @@
       "source_location": "L30",
       "_origin": "ast",
       "id": "components_cutter_trimwaveform_zoom_levels",
-      "community": 14,
+      "community": 80,
       "norm_label": "zoom_levels"
     },
     {
@@ -3530,7 +3530,7 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "components_cutter_trimwaveform_zoomlevel",
-      "community": 14,
+      "community": 80,
       "norm_label": "zoomlevel"
     },
     {
@@ -3540,7 +3540,7 @@
       "source_location": "L60",
       "_origin": "ast",
       "id": "components_cutter_trimwaveform_trimwaveform",
-      "community": 14,
+      "community": 80,
       "norm_label": "trimwaveform()"
     },
     {
@@ -3630,7 +3630,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "components_files_audioeffecttool_audioeffecttool",
-      "community": 11,
+      "community": 53,
       "norm_label": "audioeffecttool()"
     },
     {
@@ -3860,7 +3860,7 @@
       "source_location": "L76",
       "_origin": "ast",
       "id": "components_files_audiomasteringtool_barsfromchannels",
-      "community": 12,
+      "community": 80,
       "norm_label": "barsfromchannels()"
     },
     {
@@ -3920,7 +3920,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_files_filedrop",
-      "community": 6,
+      "community": 32,
       "norm_label": "filedrop.tsx"
     },
     {
@@ -3930,7 +3930,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "components_files_filedrop_filedrop",
-      "community": 6,
+      "community": 32,
       "norm_label": "filedrop()"
     },
     {
@@ -4150,7 +4150,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_files_pagedropguard",
-      "community": 25,
+      "community": 72,
       "norm_label": "pagedropguard.tsx"
     },
     {
@@ -4160,7 +4160,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "components_files_pagedropguard_pagedropguard",
-      "community": 25,
+      "community": 72,
       "norm_label": "pagedropguard()"
     },
     {
@@ -4170,7 +4170,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_files_pdfsplittool",
-      "community": 11,
+      "community": 2,
       "norm_label": "pdfsplittool.tsx"
     },
     {
@@ -4180,7 +4180,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "components_files_pdfsplittool_status",
-      "community": 11,
+      "community": 2,
       "norm_label": "status"
     },
     {
@@ -4190,7 +4190,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "components_files_pdfsplittool_pdfsplittool",
-      "community": 11,
+      "community": 2,
       "norm_label": "pdfsplittool()"
     },
     {
@@ -4200,7 +4200,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_files_pdftool",
-      "community": 11,
+      "community": 2,
       "norm_label": "pdftool.tsx"
     },
     {
@@ -4210,7 +4210,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "components_files_pdftool_pdftoolmode",
-      "community": 11,
+      "community": 2,
       "norm_label": "pdftoolmode"
     },
     {
@@ -4220,7 +4220,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "components_files_pdftool_status",
-      "community": 11,
+      "community": 2,
       "norm_label": "status"
     },
     {
@@ -4230,7 +4230,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "components_files_pdftool_pdftool",
-      "community": 11,
+      "community": 2,
       "norm_label": "pdftool()"
     },
     {
@@ -4310,7 +4310,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_files_toolpageshell",
-      "community": 25,
+      "community": 72,
       "norm_label": "toolpageshell.tsx"
     },
     {
@@ -4330,7 +4330,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_files_toolshub",
-      "community": 62,
+      "community": 68,
       "norm_label": "toolshub.tsx"
     },
     {
@@ -4340,7 +4340,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "components_files_toolshub_file_tools",
-      "community": 62,
+      "community": 68,
       "norm_label": "file_tools"
     },
     {
@@ -4350,7 +4350,7 @@
       "source_location": "L44",
       "_origin": "ast",
       "id": "components_files_toolshub_toolshub",
-      "community": 31,
+      "community": 68,
       "norm_label": "toolshub()"
     },
     {
@@ -4360,7 +4360,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_files_videotool",
-      "community": 59,
+      "community": 7,
       "norm_label": "videotool.tsx"
     },
     {
@@ -4370,7 +4370,7 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "components_files_videotool_status",
-      "community": 59,
+      "community": 7,
       "norm_label": "status"
     },
     {
@@ -4380,7 +4380,7 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "components_files_videotool_videotool",
-      "community": 59,
+      "community": 7,
       "norm_label": "videotool()"
     },
     {
@@ -4480,7 +4480,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "components_history_historypanel_historypanel",
-      "community": 76,
+      "community": 14,
       "norm_label": "historypanel()"
     },
     {
@@ -4530,7 +4530,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_layout_footer",
-      "community": 62,
+      "community": 5,
       "norm_label": "footer.tsx"
     },
     {
@@ -4540,7 +4540,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "components_layout_footer_tool_links",
-      "community": 62,
+      "community": 5,
       "norm_label": "tool_links"
     },
     {
@@ -4550,7 +4550,7 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "components_layout_footer_footer",
-      "community": 76,
+      "community": 5,
       "norm_label": "footer()"
     },
     {
@@ -4560,7 +4560,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_layout_landingseo",
-      "community": 62,
+      "community": 60,
       "norm_label": "landingseo.tsx"
     },
     {
@@ -4570,7 +4570,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "components_layout_landingseo_value_keys",
-      "community": 62,
+      "community": 60,
       "norm_label": "value_keys"
     },
     {
@@ -4580,7 +4580,7 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "components_layout_landingseo_tour_keys",
-      "community": 62,
+      "community": 60,
       "norm_label": "tour_keys"
     },
     {
@@ -4590,7 +4590,7 @@
       "source_location": "L36",
       "_origin": "ast",
       "id": "components_layout_landingseo_faq_keys",
-      "community": 62,
+      "community": 60,
       "norm_label": "faq_keys"
     },
     {
@@ -4600,7 +4600,7 @@
       "source_location": "L52",
       "_origin": "ast",
       "id": "components_layout_landingseo_faq_json_ld",
-      "community": 62,
+      "community": 60,
       "norm_label": "faq_json_ld"
     },
     {
@@ -4610,7 +4610,7 @@
       "source_location": "L54",
       "_origin": "ast",
       "id": "components_layout_landingseo_landingseo",
-      "community": 31,
+      "community": 60,
       "norm_label": "landingseo()"
     },
     {
@@ -4620,7 +4620,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_layout_minimalfooter",
-      "community": 28,
+      "community": 47,
       "norm_label": "minimalfooter.tsx"
     },
     {
@@ -4630,7 +4630,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "components_layout_minimalfooter_minimalfooter",
-      "community": 28,
+      "community": 47,
       "norm_label": "minimalfooter()"
     },
     {
@@ -4640,7 +4640,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_layout_navtabs",
-      "community": 76,
+      "community": 5,
       "norm_label": "navtabs.tsx"
     },
     {
@@ -4650,7 +4650,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "components_layout_navtabs_tabs",
-      "community": 76,
+      "community": 5,
       "norm_label": "tabs"
     },
     {
@@ -4660,7 +4660,7 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "components_layout_navtabs_history_tab",
-      "community": 76,
+      "community": 5,
       "norm_label": "history_tab"
     },
     {
@@ -4670,7 +4670,7 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "components_layout_navtabs_navtabs",
-      "community": 76,
+      "community": 5,
       "norm_label": "navtabs()"
     },
     {
@@ -4720,7 +4720,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_layout_topbar",
-      "community": 2,
+      "community": 5,
       "norm_label": "topbar.tsx"
     },
     {
@@ -4730,7 +4730,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "components_layout_topbar_topbar",
-      "community": 2,
+      "community": 5,
       "norm_label": "topbar()"
     },
     {
@@ -4870,7 +4870,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_playlist_playlistanalyzer",
-      "community": 14,
+      "community": 80,
       "norm_label": "playlistanalyzer.tsx"
     },
     {
@@ -4880,7 +4880,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "components_playlist_playlistanalyzer_phase",
-      "community": 14,
+      "community": 80,
       "norm_label": "phase"
     },
     {
@@ -4890,7 +4890,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "components_playlist_playlistanalyzer_errorkey",
-      "community": 14,
+      "community": 80,
       "norm_label": "errorkey"
     },
     {
@@ -4900,7 +4900,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "components_playlist_playlistanalyzer_camelot_order",
-      "community": 14,
+      "community": 80,
       "norm_label": "camelot_order"
     },
     {
@@ -4910,7 +4910,7 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "components_playlist_playlistanalyzer_exportplaylistcsv",
-      "community": 14,
+      "community": 80,
       "norm_label": "exportplaylistcsv()"
     },
     {
@@ -4920,7 +4920,7 @@
       "source_location": "L46",
       "_origin": "ast",
       "id": "components_playlist_playlistanalyzer_playlistanalyzer",
-      "community": 14,
+      "community": 80,
       "norm_label": "playlistanalyzer()"
     },
     {
@@ -4990,7 +4990,7 @@
       "source_location": "L83",
       "_origin": "ast",
       "id": "components_remix_remixstudio_remixtake",
-      "community": 60,
+      "community": 6,
       "norm_label": "remixtake"
     },
     {
@@ -5350,7 +5350,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_songs_keyhubpage",
-      "community": 28,
+      "community": 46,
       "norm_label": "keyhubpage.tsx"
     },
     {
@@ -5360,7 +5360,7 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "components_songs_keyhubpage_keyhubhref",
-      "community": 28,
+      "community": 46,
       "norm_label": "keyhubhref()"
     },
     {
@@ -5370,7 +5370,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "components_songs_keyhubpage_keyhubmeta",
-      "community": 28,
+      "community": 46,
       "norm_label": "keyhubmeta()"
     },
     {
@@ -5530,117 +5530,117 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_studio_studiopanel",
-      "community": 60,
+      "community": 63,
       "norm_label": "studiopanel.tsx"
     },
     {
       "label": "DEFAULT_PARAMS",
       "file_type": "code",
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L54",
+      "source_location": "L55",
       "_origin": "ast",
       "id": "components_studio_studiopanel_default_params",
-      "community": 60,
+      "community": 63,
       "norm_label": "default_params"
     },
     {
       "label": "REVERB_TYPE_OPTIONS",
       "file_type": "code",
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L65",
+      "source_location": "L66",
       "_origin": "ast",
       "id": "components_studio_studiopanel_reverb_type_options",
-      "community": 60,
+      "community": 63,
       "norm_label": "reverb_type_options"
     },
     {
       "label": "EFFECT_OPTIONS",
       "file_type": "code",
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L73",
+      "source_location": "L74",
       "_origin": "ast",
       "id": "components_studio_studiopanel_effect_options",
-      "community": 60,
+      "community": 63,
       "norm_label": "effect_options"
     },
     {
       "label": "StudioTake",
       "file_type": "code",
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L80",
+      "source_location": "L81",
       "_origin": "ast",
       "id": "components_studio_studiopanel_studiotake",
-      "community": 60,
+      "community": 6,
       "norm_label": "studiotake"
     },
     {
       "label": "makeClipId()",
       "file_type": "code",
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L90",
+      "source_location": "L91",
       "_origin": "ast",
       "id": "components_studio_studiopanel_makeclipid",
-      "community": 60,
+      "community": 63,
       "norm_label": "makeclipid()"
     },
     {
       "label": "makeTakeId()",
       "file_type": "code",
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L92",
+      "source_location": "L93",
       "_origin": "ast",
       "id": "components_studio_studiopanel_maketakeid",
-      "community": 60,
+      "community": 63,
       "norm_label": "maketakeid()"
     },
     {
       "label": "bufferMap",
       "file_type": "code",
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L98",
+      "source_location": "L99",
       "_origin": "ast",
       "id": "components_studio_studiopanel_buffermap",
-      "community": 60,
+      "community": 63,
       "norm_label": "buffermap"
     },
     {
       "label": "bufferKey()",
       "file_type": "code",
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L105",
+      "source_location": "L106",
       "_origin": "ast",
       "id": "components_studio_studiopanel_bufferkey",
-      "community": 60,
+      "community": 63,
       "norm_label": "bufferkey()"
     },
     {
       "label": "decodedBytes()",
       "file_type": "code",
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L109",
+      "source_location": "L110",
       "_origin": "ast",
       "id": "components_studio_studiopanel_decodedbytes",
-      "community": 60,
+      "community": 63,
       "norm_label": "decodedbytes()"
     },
     {
       "label": "TransportClock()",
       "file_type": "code",
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L120",
+      "source_location": "L121",
       "_origin": "ast",
       "id": "components_studio_studiopanel_transportclock",
-      "community": 60,
+      "community": 80,
       "norm_label": "transportclock()"
     },
     {
       "label": "StudioPanel()",
       "file_type": "code",
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L148",
+      "source_location": "L149",
       "_origin": "ast",
       "id": "components_studio_studiopanel_studiopanel",
-      "community": 60,
+      "community": 63,
       "norm_label": "studiopanel()"
     },
     {
@@ -5657,7 +5657,7 @@
       "label": "DragState",
       "file_type": "code",
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L50",
+      "source_location": "L51",
       "_origin": "ast",
       "id": "components_studio_timeline_dragstate",
       "community": 37,
@@ -5667,7 +5667,7 @@
       "label": "Timeline()",
       "file_type": "code",
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L55",
+      "source_location": "L57",
       "_origin": "ast",
       "id": "components_studio_timeline_timeline",
       "community": 37,
@@ -5740,7 +5740,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_ui_seekablewaveform",
-      "community": 20,
+      "community": 31,
       "norm_label": "seekablewaveform.tsx"
     },
     {
@@ -5750,7 +5750,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "components_ui_seekablewaveform_clamp",
-      "community": 20,
+      "community": 31,
       "norm_label": "clamp()"
     },
     {
@@ -5760,7 +5760,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "components_ui_seekablewaveform_seekablewaveform",
-      "community": 20,
+      "community": 31,
       "norm_label": "seekablewaveform()"
     },
     {
@@ -5860,7 +5860,7 @@
       "source_location": "L93",
       "_origin": "ast",
       "id": "components_ui_icons_downloadicon",
-      "community": 39,
+      "community": 31,
       "norm_label": "downloadicon()"
     },
     {
@@ -5900,7 +5900,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "hooks_useanalyzer",
-      "community": 47,
+      "community": 80,
       "norm_label": "useanalyzer.ts"
     },
     {
@@ -5910,7 +5910,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "hooks_useanalyzer_analyzestage",
-      "community": 47,
+      "community": 80,
       "norm_label": "analyzestage"
     },
     {
@@ -5920,7 +5920,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "hooks_useanalyzer_analyzerstate",
-      "community": 47,
+      "community": 80,
       "norm_label": "analyzerstate"
     },
     {
@@ -5930,7 +5930,7 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "hooks_useanalyzer_useanalyzer",
-      "community": 47,
+      "community": 80,
       "norm_label": "useanalyzer()"
     },
     {
@@ -5940,7 +5940,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "hooks_usefiledrop",
-      "community": 6,
+      "community": 32,
       "norm_label": "usefiledrop.ts"
     },
     {
@@ -5950,7 +5950,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "hooks_usefiledrop_usefiledrop",
-      "community": 6,
+      "community": 32,
       "norm_label": "usefiledrop()"
     },
     {
@@ -5960,7 +5960,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "hooks_usehistory",
-      "community": 5,
+      "community": 59,
       "norm_label": "usehistory.ts"
     },
     {
@@ -5970,7 +5970,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "hooks_usehistory_remoterow",
-      "community": 5,
+      "community": 59,
       "norm_label": "remoterow"
     },
     {
@@ -5980,7 +5980,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "hooks_usehistory_readlocal",
-      "community": 5,
+      "community": 59,
       "norm_label": "readlocal()"
     },
     {
@@ -5990,7 +5990,7 @@
       "source_location": "L42",
       "_origin": "ast",
       "id": "hooks_usehistory_writelocal",
-      "community": 5,
+      "community": 59,
       "norm_label": "writelocal()"
     },
     {
@@ -6000,7 +6000,7 @@
       "source_location": "L50",
       "_origin": "ast",
       "id": "hooks_usehistory_entryfromresult",
-      "community": 5,
+      "community": 59,
       "norm_label": "entryfromresult()"
     },
     {
@@ -6010,7 +6010,7 @@
       "source_location": "L65",
       "_origin": "ast",
       "id": "hooks_usehistory_entryfromremoterow",
-      "community": 5,
+      "community": 59,
       "norm_label": "entryfromremoterow()"
     },
     {
@@ -6020,7 +6020,7 @@
       "source_location": "L80",
       "_origin": "ast",
       "id": "hooks_usehistory_ensureanonsession",
-      "community": 5,
+      "community": 59,
       "norm_label": "ensureanonsession()"
     },
     {
@@ -6030,7 +6030,7 @@
       "source_location": "L97",
       "_origin": "ast",
       "id": "hooks_usehistory_usehistory",
-      "community": 5,
+      "community": 59,
       "norm_label": "usehistory()"
     },
     {
@@ -6070,7 +6070,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "hooks_usenowplaying",
-      "community": 2,
+      "community": 32,
       "norm_label": "usenowplaying.ts"
     },
     {
@@ -6080,7 +6080,7 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "hooks_usenowplaying_usenowplaying",
-      "community": 2,
+      "community": 32,
       "norm_label": "usenowplaying()"
     },
     {
@@ -6090,7 +6090,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "hooks_useplaylistanalyzer",
-      "community": 47,
+      "community": 80,
       "norm_label": "useplaylistanalyzer.ts"
     },
     {
@@ -6100,7 +6100,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "hooks_useplaylistanalyzer_playlistcachedrow",
-      "community": 47,
+      "community": 80,
       "norm_label": "playlistcachedrow"
     },
     {
@@ -6110,7 +6110,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "hooks_useplaylistanalyzer_playlisttrackinput",
-      "community": 14,
+      "community": 80,
       "norm_label": "playlisttrackinput"
     },
     {
@@ -6120,7 +6120,7 @@
       "source_location": "L34",
       "_origin": "ast",
       "id": "hooks_useplaylistanalyzer_rowstatus",
-      "community": 47,
+      "community": 80,
       "norm_label": "rowstatus"
     },
     {
@@ -6130,7 +6130,7 @@
       "source_location": "L36",
       "_origin": "ast",
       "id": "hooks_useplaylistanalyzer_playlistrow",
-      "community": 47,
+      "community": 80,
       "norm_label": "playlistrow"
     },
     {
@@ -6140,7 +6140,7 @@
       "source_location": "L51",
       "_origin": "ast",
       "id": "hooks_useplaylistanalyzer_rowsfromtracks",
-      "community": 47,
+      "community": 80,
       "norm_label": "rowsfromtracks()"
     },
     {
@@ -6150,7 +6150,7 @@
       "source_location": "L105",
       "_origin": "ast",
       "id": "hooks_useplaylistanalyzer_useplaylistanalyzer",
-      "community": 47,
+      "community": 80,
       "norm_label": "useplaylistanalyzer()"
     },
     {
@@ -6250,7 +6250,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "hooks_useunloadguard",
-      "community": 14,
+      "community": 80,
       "norm_label": "useunloadguard.ts"
     },
     {
@@ -6260,7 +6260,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "hooks_useunloadguard_useunloadguard",
-      "community": 14,
+      "community": 80,
       "norm_label": "useunloadguard()"
     },
     {
@@ -6270,7 +6270,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "hooks_usewindowfiledrop",
-      "community": 25,
+      "community": 72,
       "norm_label": "usewindowfiledrop.ts"
     },
     {
@@ -6280,7 +6280,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "hooks_usewindowfiledrop_usewindowfiledrop",
-      "community": 25,
+      "community": 72,
       "norm_label": "usewindowfiledrop()"
     },
     {
@@ -6290,7 +6290,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "hooks_useyoutubejob",
-      "community": 20,
+      "community": 31,
       "norm_label": "useyoutubejob.ts"
     },
     {
@@ -6300,7 +6300,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "hooks_useyoutubejob_youtubejobstate",
-      "community": 20,
+      "community": 31,
       "norm_label": "youtubejobstate"
     },
     {
@@ -6320,7 +6320,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_audio_audio_joiner",
-      "community": 53,
+      "community": 76,
       "norm_label": "audio-joiner.ts"
     },
     {
@@ -6330,7 +6330,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "lib_audio_audio_joiner_joinoptions",
-      "community": 53,
+      "community": 76,
       "norm_label": "joinoptions"
     },
     {
@@ -6340,7 +6340,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "lib_audio_audio_joiner_renderedaudio",
-      "community": 53,
+      "community": 76,
       "norm_label": "renderedaudio"
     },
     {
@@ -6350,7 +6350,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "lib_audio_audio_joiner_resamplebuffer",
-      "community": 53,
+      "community": 76,
       "norm_label": "resamplebuffer()"
     },
     {
@@ -6360,7 +6360,7 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "lib_audio_audio_joiner_channeldatafor",
-      "community": 53,
+      "community": 76,
       "norm_label": "channeldatafor()"
     },
     {
@@ -6370,7 +6370,7 @@
       "source_location": "L39",
       "_origin": "ast",
       "id": "lib_audio_audio_joiner_renderjoin",
-      "community": 53,
+      "community": 76,
       "norm_label": "renderjoin()"
     },
     {
@@ -6470,7 +6470,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "lib_audio_constants_camelot",
-      "community": 46,
+      "community": 84,
       "norm_label": "camelot"
     },
     {
@@ -6480,7 +6480,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "lib_audio_constants_camelotlabel",
-      "community": 47,
+      "community": 80,
       "norm_label": "camelotlabel()"
     },
     {
@@ -6490,7 +6490,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_audio_decode_cache",
-      "community": 47,
+      "community": 80,
       "norm_label": "decode-cache.ts"
     },
     {
@@ -6500,7 +6500,7 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "lib_audio_decode_cache_keyfor",
-      "community": 47,
+      "community": 80,
       "norm_label": "keyfor()"
     },
     {
@@ -6510,7 +6510,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "lib_audio_decode_cache_bytesof",
-      "community": 47,
+      "community": 80,
       "norm_label": "bytesof()"
     },
     {
@@ -6520,7 +6520,7 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "lib_audio_decode_cache_cleardecodecache",
-      "community": 47,
+      "community": 80,
       "norm_label": "cleardecodecache()"
     },
     {
@@ -6530,7 +6530,7 @@
       "source_location": "L36",
       "_origin": "ast",
       "id": "lib_audio_decode_cache_decodeaudiofilecached",
-      "community": 47,
+      "community": 80,
       "norm_label": "decodeaudiofilecached()"
     },
     {
@@ -6540,7 +6540,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_audio_decode",
-      "community": 47,
+      "community": 80,
       "norm_label": "decode.ts"
     },
     {
@@ -6560,7 +6560,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "lib_audio_decode_decodeaudiofile",
-      "community": 47,
+      "community": 53,
       "norm_label": "decodeaudiofile()"
     },
     {
@@ -6570,7 +6570,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "lib_audio_decode_monosamples",
-      "community": 47,
+      "community": 80,
       "norm_label": "monosamples()"
     },
     {
@@ -6580,7 +6580,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "lib_audio_decode_resamplemono",
-      "community": 47,
+      "community": 80,
       "norm_label": "resamplemono()"
     },
     {
@@ -6590,7 +6590,7 @@
       "source_location": "L46",
       "_origin": "ast",
       "id": "lib_audio_decode_parsewavbitdepth",
-      "community": 47,
+      "community": 80,
       "norm_label": "parsewavbitdepth()"
     },
     {
@@ -6600,7 +6600,7 @@
       "source_location": "L59",
       "_origin": "ast",
       "id": "lib_audio_decode_describebitdepth",
-      "community": 47,
+      "community": 80,
       "norm_label": "describebitdepth()"
     },
     {
@@ -6750,7 +6750,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_audio_fade",
-      "community": 14,
+      "community": 80,
       "norm_label": "fade.ts"
     },
     {
@@ -6760,7 +6760,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "lib_audio_fade_faderampseconds",
-      "community": 14,
+      "community": 80,
       "norm_label": "faderampseconds()"
     },
     {
@@ -6770,7 +6770,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "lib_audio_fade_fadeenvelopegain",
-      "community": 14,
+      "community": 80,
       "norm_label": "fadeenvelopegain()"
     },
     {
@@ -7250,7 +7250,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_audio_mp3_encoder",
-      "community": 32,
+      "community": 53,
       "norm_label": "mp3-encoder.ts"
     },
     {
@@ -7260,7 +7260,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "lib_audio_mp3_encoder_mp3encoder",
-      "community": 32,
+      "community": 53,
       "norm_label": "mp3encoder"
     },
     {
@@ -7270,7 +7270,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "lib_audio_mp3_encoder_loadmp3encoder",
-      "community": 32,
+      "community": 53,
       "norm_label": "loadmp3encoder()"
     },
     {
@@ -7280,7 +7280,7 @@
       "source_location": "L35",
       "_origin": "ast",
       "id": "lib_audio_mp3_encoder_findleadingsilenceend",
-      "community": 32,
+      "community": 53,
       "norm_label": "findleadingsilenceend()"
     },
     {
@@ -7290,7 +7290,7 @@
       "source_location": "L70",
       "_origin": "ast",
       "id": "lib_audio_mp3_encoder_decodeandtrim",
-      "community": 32,
+      "community": 53,
       "norm_label": "decodeandtrim()"
     },
     {
@@ -7300,7 +7300,7 @@
       "source_location": "L83",
       "_origin": "ast",
       "id": "lib_audio_mp3_encoder_encodewavfromchannels",
-      "community": 32,
+      "community": 53,
       "norm_label": "encodewavfromchannels()"
     },
     {
@@ -7310,7 +7310,7 @@
       "source_location": "L120",
       "_origin": "ast",
       "id": "lib_audio_mp3_encoder_convertfiletowav",
-      "community": 32,
+      "community": 53,
       "norm_label": "convertfiletowav()"
     },
     {
@@ -7320,7 +7320,7 @@
       "source_location": "L126",
       "_origin": "ast",
       "id": "lib_audio_mp3_encoder_mp3_bitrates",
-      "community": 32,
+      "community": 53,
       "norm_label": "mp3_bitrates"
     },
     {
@@ -7330,7 +7330,7 @@
       "source_location": "L128",
       "_origin": "ast",
       "id": "lib_audio_mp3_encoder_encodemp3fromchannels",
-      "community": 32,
+      "community": 53,
       "norm_label": "encodemp3fromchannels()"
     },
     {
@@ -7340,7 +7340,7 @@
       "source_location": "L156",
       "_origin": "ast",
       "id": "lib_audio_mp3_encoder_convertfiletomp3",
-      "community": 32,
+      "community": 53,
       "norm_label": "convertfiletomp3()"
     },
     {
@@ -7390,7 +7390,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_audio_now_playing",
-      "community": 2,
+      "community": 32,
       "norm_label": "now-playing.ts"
     },
     {
@@ -7400,7 +7400,7 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "lib_audio_now_playing_activesources",
-      "community": 2,
+      "community": 32,
       "norm_label": "activesources"
     },
     {
@@ -7410,7 +7410,7 @@
       "source_location": "L34",
       "_origin": "ast",
       "id": "lib_audio_now_playing_stoppers",
-      "community": 2,
+      "community": 32,
       "norm_label": "stoppers"
     },
     {
@@ -7420,7 +7420,7 @@
       "source_location": "L36",
       "_origin": "ast",
       "id": "lib_audio_now_playing_nowplayingdetail",
-      "community": 2,
+      "community": 5,
       "norm_label": "nowplayingdetail"
     },
     {
@@ -7430,7 +7430,7 @@
       "source_location": "L47",
       "_origin": "ast",
       "id": "lib_audio_now_playing_registerplaybackstopper",
-      "community": 2,
+      "community": 32,
       "norm_label": "registerplaybackstopper()"
     },
     {
@@ -7440,7 +7440,7 @@
       "source_location": "L57",
       "_origin": "ast",
       "id": "lib_audio_now_playing_setnowplaying",
-      "community": 2,
+      "community": 32,
       "norm_label": "setnowplaying()"
     },
     {
@@ -7450,7 +7450,7 @@
       "source_location": "L75",
       "_origin": "ast",
       "id": "lib_audio_now_playing_isanyaudioplaying",
-      "community": 2,
+      "community": 5,
       "norm_label": "isanyaudioplaying()"
     },
     {
@@ -7460,7 +7460,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_audio_pitch",
-      "community": 39,
+      "community": 80,
       "norm_label": "pitch.ts"
     },
     {
@@ -7580,7 +7580,7 @@
       "source_location": "L57",
       "_origin": "ast",
       "id": "lib_audio_remix_reverbtype",
-      "community": 60,
+      "community": 6,
       "norm_label": "reverbtype"
     },
     {
@@ -7610,7 +7610,7 @@
       "source_location": "L78",
       "_origin": "ast",
       "id": "lib_audio_remix_neutral_reverb_eq",
-      "community": 60,
+      "community": 6,
       "norm_label": "neutral_reverb_eq"
     },
     {
@@ -7650,7 +7650,7 @@
       "source_location": "L139",
       "_origin": "ast",
       "id": "lib_audio_remix_remixparams",
-      "community": 60,
+      "community": 6,
       "norm_label": "remixparams"
     },
     {
@@ -7700,7 +7700,7 @@
       "source_location": "L202",
       "_origin": "ast",
       "id": "lib_audio_remix_applyreverbeqparams",
-      "community": 23,
+      "community": 0,
       "norm_label": "applyreverbeqparams()"
     },
     {
@@ -7760,7 +7760,7 @@
       "source_location": "L313",
       "_origin": "ast",
       "id": "lib_audio_remix_coupledsemitones",
-      "community": 6,
+      "community": 63,
       "norm_label": "coupledsemitones()"
     },
     {
@@ -7810,7 +7810,7 @@
       "source_location": "L415",
       "_origin": "ast",
       "id": "lib_audio_remix_renderremix",
-      "community": 68,
+      "community": 64,
       "norm_label": "renderremix()"
     },
     {
@@ -7820,7 +7820,7 @@
       "source_location": "L444",
       "_origin": "ast",
       "id": "lib_audio_remix_automationevent",
-      "community": 60,
+      "community": 6,
       "norm_label": "automationevent"
     },
     {
@@ -7970,7 +7970,7 @@
       "source_location": "L36",
       "_origin": "ast",
       "id": "lib_audio_stages_nextpaint",
-      "community": 68,
+      "community": 12,
       "norm_label": "nextpaint()"
     },
     {
@@ -7980,7 +7980,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_audio_waveform",
-      "community": 12,
+      "community": 80,
       "norm_label": "waveform.ts"
     },
     {
@@ -7990,7 +7990,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "lib_audio_waveform_computewaveformbars",
-      "community": 12,
+      "community": 80,
       "norm_label": "computewaveformbars()"
     },
     {
@@ -8140,7 +8140,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_files_download",
-      "community": 11,
+      "community": 2,
       "norm_label": "download.ts"
     },
     {
@@ -8150,7 +8150,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "lib_files_download_downloadblob",
-      "community": 11,
+      "community": 2,
       "norm_label": "downloadblob()"
     },
     {
@@ -8410,7 +8410,7 @@
       "source_location": "L209",
       "_origin": "ast",
       "id": "lib_files_image_formatbytes",
-      "community": 11,
+      "community": 2,
       "norm_label": "formatbytes()"
     },
     {
@@ -8420,7 +8420,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_files_pdf",
-      "community": 11,
+      "community": 2,
       "norm_label": "pdf.ts"
     },
     {
@@ -8430,7 +8430,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "lib_files_pdf_pdflibmodule",
-      "community": 11,
+      "community": 2,
       "norm_label": "pdflibmodule"
     },
     {
@@ -8440,7 +8440,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "lib_files_pdf_loadpdflib",
-      "community": 11,
+      "community": 2,
       "norm_label": "loadpdflib()"
     },
     {
@@ -8450,7 +8450,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "lib_files_pdf_pdfencryptederror",
-      "community": 11,
+      "community": 2,
       "norm_label": "pdfencryptederror"
     },
     {
@@ -8460,7 +8460,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "lib_files_pdf_pdfencryptederror_constructor",
-      "community": 11,
+      "community": 2,
       "norm_label": ".constructor()"
     },
     {
@@ -8470,7 +8470,7 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "lib_files_pdf_pdfparseerror",
-      "community": 11,
+      "community": 2,
       "norm_label": "pdfparseerror"
     },
     {
@@ -8480,7 +8480,7 @@
       "source_location": "L34",
       "_origin": "ast",
       "id": "lib_files_pdf_pdfparseerror_constructor",
-      "community": 11,
+      "community": 2,
       "norm_label": ".constructor()"
     },
     {
@@ -8490,7 +8490,7 @@
       "source_location": "L42",
       "_origin": "ast",
       "id": "lib_files_pdf_isencryptederror",
-      "community": 11,
+      "community": 2,
       "norm_label": "isencryptederror()"
     },
     {
@@ -8500,7 +8500,7 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "lib_files_pdf_mergepdfs",
-      "community": 11,
+      "community": 2,
       "norm_label": "mergepdfs()"
     },
     {
@@ -8510,7 +8510,7 @@
       "source_location": "L70",
       "_origin": "ast",
       "id": "lib_files_pdf_pdfpagecount",
-      "community": 11,
+      "community": 2,
       "norm_label": "pdfpagecount()"
     },
     {
@@ -8520,7 +8520,7 @@
       "source_location": "L86",
       "_origin": "ast",
       "id": "lib_files_pdf_extractpages",
-      "community": 11,
+      "community": 2,
       "norm_label": "extractpages()"
     },
     {
@@ -8530,7 +8530,7 @@
       "source_location": "L108",
       "_origin": "ast",
       "id": "lib_files_pdf_ispng",
-      "community": 11,
+      "community": 2,
       "norm_label": "ispng()"
     },
     {
@@ -8540,7 +8540,7 @@
       "source_location": "L116",
       "_origin": "ast",
       "id": "lib_files_pdf_imagestopdf",
-      "community": 11,
+      "community": 2,
       "norm_label": "imagestopdf()"
     },
     {
@@ -8710,7 +8710,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_files_tool_handoff",
-      "community": 60,
+      "community": 6,
       "norm_label": "tool-handoff.ts"
     },
     {
@@ -8730,7 +8730,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "lib_files_tool_handoff_takestudiofiles",
-      "community": 60,
+      "community": 63,
       "norm_label": "takestudiofiles()"
     },
     {
@@ -8740,7 +8740,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_files_video",
-      "community": 59,
+      "community": 7,
       "norm_label": "video.ts"
     },
     {
@@ -8750,7 +8750,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "lib_files_video_videotoolargeerror",
-      "community": 59,
+      "community": 7,
       "norm_label": "videotoolargeerror"
     },
     {
@@ -8760,7 +8760,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "lib_files_video_videodurationerror",
-      "community": 59,
+      "community": 7,
       "norm_label": "videodurationerror"
     },
     {
@@ -8770,7 +8770,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "lib_files_video_videomemoryerror",
-      "community": 59,
+      "community": 7,
       "norm_label": "videomemoryerror"
     },
     {
@@ -8780,7 +8780,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "lib_files_video_ffmpeglike",
-      "community": 59,
+      "community": 7,
       "norm_label": "ffmpeglike"
     },
     {
@@ -8790,7 +8790,7 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "lib_files_video_loadffmpeg",
-      "community": 59,
+      "community": 7,
       "norm_label": "loadffmpeg()"
     },
     {
@@ -8800,7 +8800,7 @@
       "source_location": "L56",
       "_origin": "ast",
       "id": "lib_files_video_resetffmpeg",
-      "community": 59,
+      "community": 7,
       "norm_label": "resetffmpeg()"
     },
     {
@@ -8810,7 +8810,7 @@
       "source_location": "L70",
       "_origin": "ast",
       "id": "lib_files_video_probeduration",
-      "community": 59,
+      "community": 7,
       "norm_label": "probeduration()"
     },
     {
@@ -8820,7 +8820,7 @@
       "source_location": "L88",
       "_origin": "ast",
       "id": "lib_files_video_compressprogress",
-      "community": 59,
+      "community": 7,
       "norm_label": "compressprogress"
     },
     {
@@ -8830,7 +8830,7 @@
       "source_location": "L95",
       "_origin": "ast",
       "id": "lib_files_video_compresstotargetsize",
-      "community": 59,
+      "community": 7,
       "norm_label": "compresstotargetsize()"
     },
     {
@@ -8840,7 +8840,7 @@
       "source_location": "L156",
       "_origin": "ast",
       "id": "lib_files_video_isios",
-      "community": 59,
+      "community": 7,
       "norm_label": "isios()"
     },
     {
@@ -8850,7 +8850,7 @@
       "source_location": "L160",
       "_origin": "ast",
       "id": "lib_files_video_compressedname",
-      "community": 59,
+      "community": 7,
       "norm_label": "compressedname()"
     },
     {
@@ -8970,7 +8970,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "lib_format_formattimetenths",
-      "community": 14,
+      "community": 80,
       "norm_label": "formattimetenths()"
     },
     {
@@ -9187,10 +9187,10 @@
       "label": "DictKey",
       "file_type": "code",
       "source_file": "lib/i18n/locales/en.ts",
-      "source_location": "L966",
+      "source_location": "L973",
       "_origin": "ast",
       "id": "lib_i18n_locales_en_dictkey",
-      "community": 62,
+      "community": 5,
       "norm_label": "dictkey"
     },
     {
@@ -9420,7 +9420,7 @@
       "source_location": "L47",
       "_origin": "ast",
       "id": "lib_media_url_validateplaylisturl",
-      "community": 77,
+      "community": 86,
       "norm_label": "validateplaylisturl()"
     },
     {
@@ -9430,7 +9430,7 @@
       "source_location": "L70",
       "_origin": "ast",
       "id": "lib_media_url_validatespotifyurl",
-      "community": 61,
+      "community": 77,
       "norm_label": "validatespotifyurl()"
     },
     {
@@ -9480,7 +9480,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_seo_jsonld",
-      "community": 87,
+      "community": 47,
       "norm_label": "jsonld.ts"
     },
     {
@@ -9490,7 +9490,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "lib_seo_jsonld_faqpagejsonld",
-      "community": 87,
+      "community": 47,
       "norm_label": "faqpagejsonld()"
     },
     {
@@ -9500,7 +9500,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "lib_seo_jsonld_breadcrumbjsonld",
-      "community": 46,
+      "community": 47,
       "norm_label": "breadcrumbjsonld()"
     },
     {
@@ -9840,7 +9840,7 @@
       "source_location": "L46",
       "_origin": "ast",
       "id": "lib_server_link_analysis_sourceidforurl",
-      "community": 61,
+      "community": 77,
       "norm_label": "sourceidforurl()"
     },
     {
@@ -9860,7 +9860,7 @@
       "source_location": "L80",
       "_origin": "ast",
       "id": "lib_server_link_analysis_readrecentanalyses",
-      "community": 13,
+      "community": 10,
       "norm_label": "readrecentanalyses()"
     },
     {
@@ -9960,7 +9960,7 @@
       "source_location": "L268",
       "_origin": "ast",
       "id": "lib_server_link_analysis_readsongslugrange",
-      "community": 10,
+      "community": 57,
       "norm_label": "readsongslugrange()"
     },
     {
@@ -10030,7 +10030,7 @@
       "source_location": "L343",
       "_origin": "ast",
       "id": "lib_server_link_analysis_countsongs",
-      "community": 57,
+      "community": 60,
       "norm_label": "countsongs()"
     },
     {
@@ -10060,7 +10060,7 @@
       "source_location": "L397",
       "_origin": "ast",
       "id": "lib_server_link_analysis_countsongsbyartistname",
-      "community": 75,
+      "community": 10,
       "norm_label": "countsongsbyartistname()"
     },
     {
@@ -10070,7 +10070,7 @@
       "source_location": "L417",
       "_origin": "ast",
       "id": "lib_server_link_analysis_writecachedanalysis",
-      "community": 13,
+      "community": 10,
       "norm_label": "writecachedanalysis()"
     },
     {
@@ -10080,7 +10080,7 @@
       "source_location": "L433",
       "_origin": "ast",
       "id": "lib_server_link_analysis_resolvetitle",
-      "community": 61,
+      "community": 77,
       "norm_label": "resolvetitle()"
     },
     {
@@ -10100,7 +10100,7 @@
       "source_location": "L470",
       "_origin": "ast",
       "id": "lib_server_link_analysis_splitcombinedtitle",
-      "community": 86,
+      "community": 77,
       "norm_label": "splitcombinedtitle()"
     },
     {
@@ -10370,7 +10370,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_server_song_search",
-      "community": 66,
+      "community": 13,
       "norm_label": "song-search.ts"
     },
     {
@@ -10380,7 +10380,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "lib_server_song_search_songsearchrow",
-      "community": 66,
+      "community": 13,
       "norm_label": "songsearchrow"
     },
     {
@@ -10390,7 +10390,7 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "lib_server_song_search_quotepostgrestvalue",
-      "community": 66,
+      "community": 13,
       "norm_label": "quotepostgrestvalue()"
     },
     {
@@ -10400,7 +10400,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "lib_server_song_search_row",
-      "community": 66,
+      "community": 13,
       "norm_label": "row"
     },
     {
@@ -10410,7 +10410,7 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "lib_server_song_search_searchsongs",
-      "community": 66,
+      "community": 13,
       "norm_label": "searchsongs()"
     },
     {
@@ -10420,7 +10420,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_server_spotify_playlist",
-      "community": 86,
+      "community": 77,
       "norm_label": "spotify-playlist.ts"
     },
     {
@@ -10430,7 +10430,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "lib_server_spotify_playlist_spotifytrackitem",
-      "community": 86,
+      "community": 77,
       "norm_label": "spotifytrackitem"
     },
     {
@@ -10440,7 +10440,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "lib_server_spotify_playlist_spotifytracklistresult",
-      "community": 86,
+      "community": 77,
       "norm_label": "spotifytracklistresult"
     },
     {
@@ -10450,7 +10450,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "lib_server_spotify_playlist_findtracklist",
-      "community": 86,
+      "community": 77,
       "norm_label": "findtracklist()"
     },
     {
@@ -10460,7 +10460,7 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "lib_server_spotify_playlist_extractitems",
-      "community": 86,
+      "community": 77,
       "norm_label": "extractitems()"
     },
     {
@@ -10470,7 +10470,7 @@
       "source_location": "L75",
       "_origin": "ast",
       "id": "lib_server_spotify_playlist_fetchspotifytracklist",
-      "community": 86,
+      "community": 77,
       "norm_label": "fetchspotifytracklist()"
     },
     {
@@ -10520,7 +10520,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_server_youtube_playlist",
-      "community": 77,
+      "community": 86,
       "norm_label": "youtube-playlist.ts"
     },
     {
@@ -10530,7 +10530,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "lib_server_youtube_playlist_youtubetracklistitem",
-      "community": 77,
+      "community": 86,
       "norm_label": "youtubetracklistitem"
     },
     {
@@ -10540,7 +10540,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "lib_server_youtube_playlist_youtubetracklistresult",
-      "community": 77,
+      "community": 86,
       "norm_label": "youtubetracklistresult"
     },
     {
@@ -10550,7 +10550,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "lib_server_youtube_playlist_fetchyoutubetracklist",
-      "community": 77,
+      "community": 86,
       "norm_label": "fetchyoutubetracklist()"
     },
     {
@@ -10817,17 +10817,17 @@
       "label": ".constructor()",
       "file_type": "code",
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L60",
+      "source_location": "L68",
       "_origin": "ast",
       "id": "lib_studio_engine_studioengine_constructor",
-      "community": 64,
+      "community": 6,
       "norm_label": ".constructor()"
     },
     {
       "label": ".playing()",
       "file_type": "code",
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L65",
+      "source_location": "L73",
       "_origin": "ast",
       "id": "lib_studio_engine_studioengine_playing",
       "community": 64,
@@ -10837,7 +10837,7 @@
       "label": ".getPosition()",
       "file_type": "code",
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L70",
+      "source_location": "L78",
       "_origin": "ast",
       "id": "lib_studio_engine_studioengine_getposition",
       "community": 64,
@@ -10847,7 +10847,7 @@
       "label": ".getOutputTime()",
       "file_type": "code",
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L79",
+      "source_location": "L87",
       "_origin": "ast",
       "id": "lib_studio_engine_studioengine_getoutputtime",
       "community": 64,
@@ -10857,7 +10857,7 @@
       "label": ".ensureContext()",
       "file_type": "code",
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L89",
+      "source_location": "L97",
       "_origin": "ast",
       "id": "lib_studio_engine_studioengine_ensurecontext",
       "community": 64,
@@ -10867,27 +10867,47 @@
       "label": ".ensureChain()",
       "file_type": "code",
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L102",
+      "source_location": "L110",
       "_origin": "ast",
       "id": "lib_studio_engine_studioengine_ensurechain",
       "community": 64,
       "norm_label": ".ensurechain()"
     },
     {
+      "label": ".setLoop()",
+      "file_type": "code",
+      "source_file": "lib/studio/engine.ts",
+      "source_location": "L119",
+      "_origin": "ast",
+      "id": "lib_studio_engine_studioengine_setloop",
+      "community": 64,
+      "norm_label": ".setloop()"
+    },
+    {
       "label": ".start()",
       "file_type": "code",
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L110",
+      "source_location": "L126",
       "_origin": "ast",
       "id": "lib_studio_engine_studioengine_start",
       "community": 64,
       "norm_label": ".start()"
     },
     {
+      "label": ".passEnd()",
+      "file_type": "code",
+      "source_file": "lib/studio/engine.ts",
+      "source_location": "L186",
+      "_origin": "ast",
+      "id": "lib_studio_engine_studioengine_passend",
+      "community": 64,
+      "norm_label": ".passend()"
+    },
+    {
       "label": ".armEndTimer()",
       "file_type": "code",
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L165",
+      "source_location": "L194",
       "_origin": "ast",
       "id": "lib_studio_engine_studioengine_armendtimer",
       "community": 64,
@@ -10897,7 +10917,7 @@
       "label": ".stop()",
       "file_type": "code",
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L175",
+      "source_location": "L213",
       "_origin": "ast",
       "id": "lib_studio_engine_studioengine_stop",
       "community": 64,
@@ -10907,7 +10927,7 @@
       "label": ".stopSources()",
       "file_type": "code",
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L186",
+      "source_location": "L224",
       "_origin": "ast",
       "id": "lib_studio_engine_studioengine_stopsources",
       "community": 64,
@@ -10917,7 +10937,7 @@
       "label": ".seek()",
       "file_type": "code",
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L209",
+      "source_location": "L248",
       "_origin": "ast",
       "id": "lib_studio_engine_studioengine_seek",
       "community": 64,
@@ -10927,7 +10947,7 @@
       "label": ".setSpeedLive()",
       "file_type": "code",
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L223",
+      "source_location": "L262",
       "_origin": "ast",
       "id": "lib_studio_engine_studioengine_setspeedlive",
       "community": 64,
@@ -10937,7 +10957,7 @@
       "label": ".setParams()",
       "file_type": "code",
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L246",
+      "source_location": "L285",
       "_origin": "ast",
       "id": "lib_studio_engine_studioengine_setparams",
       "community": 0,
@@ -10947,7 +10967,7 @@
       "label": ".setClipGain()",
       "file_type": "code",
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L270",
+      "source_location": "L309",
       "_origin": "ast",
       "id": "lib_studio_engine_studioengine_setclipgain",
       "community": 64,
@@ -10957,7 +10977,7 @@
       "label": ".dispose()",
       "file_type": "code",
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L275",
+      "source_location": "L314",
       "_origin": "ast",
       "id": "lib_studio_engine_studioengine_dispose",
       "community": 64,
@@ -10970,7 +10990,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_studio_render_timeline",
-      "community": 68,
+      "community": 64,
       "norm_label": "render-timeline.ts"
     },
     {
@@ -10980,7 +11000,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "lib_studio_render_timeline_rendertimeline",
-      "community": 68,
+      "community": 64,
       "norm_label": "rendertimeline()"
     },
     {
@@ -10990,7 +11010,7 @@
       "source_location": "L64",
       "_origin": "ast",
       "id": "lib_studio_render_timeline_studioexportoptions",
-      "community": 60,
+      "community": 6,
       "norm_label": "studioexportoptions"
     },
     {
@@ -11000,7 +11020,7 @@
       "source_location": "L79",
       "_origin": "ast",
       "id": "lib_studio_render_timeline_exportstudiomix",
-      "community": 68,
+      "community": 64,
       "norm_label": "exportstudiomix()"
     },
     {
@@ -11017,7 +11037,7 @@
       "label": "timeToX()",
       "file_type": "code",
       "source_file": "lib/studio/timeline-math.ts",
-      "source_location": "L26",
+      "source_location": "L28",
       "_origin": "ast",
       "id": "lib_studio_timeline_math_timetox",
       "community": 37,
@@ -11027,7 +11047,7 @@
       "label": "xToTime()",
       "file_type": "code",
       "source_file": "lib/studio/timeline-math.ts",
-      "source_location": "L30",
+      "source_location": "L32",
       "_origin": "ast",
       "id": "lib_studio_timeline_math_xtotime",
       "community": 37,
@@ -11037,7 +11057,7 @@
       "label": "clampZoom()",
       "file_type": "code",
       "source_file": "lib/studio/timeline-math.ts",
-      "source_location": "L34",
+      "source_location": "L36",
       "_origin": "ast",
       "id": "lib_studio_timeline_math_clampzoom",
       "community": 37,
@@ -11047,7 +11067,7 @@
       "label": "zoomAtCursor()",
       "file_type": "code",
       "source_file": "lib/studio/timeline-math.ts",
-      "source_location": "L43",
+      "source_location": "L45",
       "_origin": "ast",
       "id": "lib_studio_timeline_math_zoomatcursor",
       "community": 37,
@@ -11057,7 +11077,7 @@
       "label": "zoomToFit()",
       "file_type": "code",
       "source_file": "lib/studio/timeline-math.ts",
-      "source_location": "L55",
+      "source_location": "L57",
       "_origin": "ast",
       "id": "lib_studio_timeline_math_zoomtofit",
       "community": 37,
@@ -11067,7 +11087,7 @@
       "label": "snapTime()",
       "file_type": "code",
       "source_file": "lib/studio/timeline-math.ts",
-      "source_location": "L66",
+      "source_location": "L68",
       "_origin": "ast",
       "id": "lib_studio_timeline_math_snaptime",
       "community": 37,
@@ -11077,7 +11097,7 @@
       "label": "snapClipStart()",
       "file_type": "code",
       "source_file": "lib/studio/timeline-math.ts",
-      "source_location": "L87",
+      "source_location": "L89",
       "_origin": "ast",
       "id": "lib_studio_timeline_math_snapclipstart",
       "community": 37,
@@ -11087,7 +11107,7 @@
       "label": "rulerStepSeconds()",
       "file_type": "code",
       "source_file": "lib/studio/timeline-math.ts",
-      "source_location": "L112",
+      "source_location": "L114",
       "_origin": "ast",
       "id": "lib_studio_timeline_math_rulerstepseconds",
       "community": 37,
@@ -11117,7 +11137,7 @@
       "label": "clipDuration()",
       "file_type": "code",
       "source_file": "lib/studio/timeline.ts",
-      "source_location": "L36",
+      "source_location": "L38",
       "_origin": "ast",
       "id": "lib_studio_timeline_clipduration",
       "community": 37,
@@ -11127,7 +11147,7 @@
       "label": "clipTimelineEnd()",
       "file_type": "code",
       "source_file": "lib/studio/timeline.ts",
-      "source_location": "L40",
+      "source_location": "L42",
       "_origin": "ast",
       "id": "lib_studio_timeline_cliptimelineend",
       "community": 37,
@@ -11137,17 +11157,17 @@
       "label": "timelineDuration()",
       "file_type": "code",
       "source_file": "lib/studio/timeline.ts",
-      "source_location": "L45",
+      "source_location": "L47",
       "_origin": "ast",
       "id": "lib_studio_timeline_timelineduration",
-      "community": 37,
+      "community": 64,
       "norm_label": "timelineduration()"
     },
     {
       "label": "assignDisplayRows()",
       "file_type": "code",
       "source_file": "lib/studio/timeline.ts",
-      "source_location": "L56",
+      "source_location": "L58",
       "_origin": "ast",
       "id": "lib_studio_timeline_assigndisplayrows",
       "community": 37,
@@ -11157,7 +11177,7 @@
       "label": "FadePoint",
       "file_type": "code",
       "source_file": "lib/studio/timeline.ts",
-      "source_location": "L74",
+      "source_location": "L76",
       "_origin": "ast",
       "id": "lib_studio_timeline_fadepoint",
       "community": 37,
@@ -11167,7 +11187,7 @@
       "label": "ScheduledClip",
       "file_type": "code",
       "source_file": "lib/studio/timeline.ts",
-      "source_location": "L81",
+      "source_location": "L83",
       "_origin": "ast",
       "id": "lib_studio_timeline_scheduledclip",
       "community": 37,
@@ -11177,17 +11197,27 @@
       "label": "computeClipSchedule()",
       "file_type": "code",
       "source_file": "lib/studio/timeline.ts",
-      "source_location": "L106",
+      "source_location": "L108",
       "_origin": "ast",
       "id": "lib_studio_timeline_computeclipschedule",
-      "community": 37,
+      "community": 64,
       "norm_label": "computeclipschedule()"
+    },
+    {
+      "label": "isSoloing()",
+      "file_type": "code",
+      "source_file": "lib/studio/timeline.ts",
+      "source_location": "L170",
+      "_origin": "ast",
+      "id": "lib_studio_timeline_issoloing",
+      "community": 63,
+      "norm_label": "issoloing()"
     },
     {
       "label": "snapCandidates()",
       "file_type": "code",
       "source_file": "lib/studio/timeline.ts",
-      "source_location": "L168",
+      "source_location": "L179",
       "_origin": "ast",
       "id": "lib_studio_timeline_snapcandidates",
       "community": 37,
@@ -11197,7 +11227,7 @@
       "label": "moveClip()",
       "file_type": "code",
       "source_file": "lib/studio/timeline.ts",
-      "source_location": "L184",
+      "source_location": "L195",
       "_origin": "ast",
       "id": "lib_studio_timeline_moveclip",
       "community": 37,
@@ -11207,27 +11237,27 @@
       "label": "trimClipStart()",
       "file_type": "code",
       "source_file": "lib/studio/timeline.ts",
-      "source_location": "L190",
+      "source_location": "L201",
       "_origin": "ast",
       "id": "lib_studio_timeline_trimclipstart",
-      "community": 37,
+      "community": 63,
       "norm_label": "trimclipstart()"
     },
     {
       "label": "trimClipEnd()",
       "file_type": "code",
       "source_file": "lib/studio/timeline.ts",
-      "source_location": "L201",
+      "source_location": "L212",
       "_origin": "ast",
       "id": "lib_studio_timeline_trimclipend",
-      "community": 37,
+      "community": 63,
       "norm_label": "trimclipend()"
     },
     {
       "label": "splitClip()",
       "file_type": "code",
       "source_file": "lib/studio/timeline.ts",
-      "source_location": "L210",
+      "source_location": "L221",
       "_origin": "ast",
       "id": "lib_studio_timeline_splitclip",
       "community": 37,
@@ -11290,7 +11320,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_supabase_client",
-      "community": 5,
+      "community": 59,
       "norm_label": "client.ts"
     },
     {
@@ -11300,7 +11330,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "lib_supabase_client_issupabaseconfigured",
-      "community": 5,
+      "community": 59,
       "norm_label": "issupabaseconfigured"
     },
     {
@@ -11310,7 +11340,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "lib_supabase_client_getsupabase",
-      "community": 5,
+      "community": 59,
       "norm_label": "getsupabase()"
     },
     {
@@ -12520,7 +12550,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "public_vendor_ffmpeg_ffmpeg_core_zeromemory",
-      "community": 27,
+      "community": 3,
       "norm_label": "zeromemory()"
     },
     {
@@ -12530,7 +12560,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "public_vendor_ffmpeg_ffmpeg_core_alignmemory",
-      "community": 27,
+      "community": 3,
       "norm_label": "alignmemory()"
     },
     {
@@ -12540,7 +12570,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "public_vendor_ffmpeg_ffmpeg_core_mmapalloc",
-      "community": 27,
+      "community": 3,
       "norm_label": "mmapalloc()"
     },
     {
@@ -12610,7 +12640,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "public_vendor_ffmpeg_ffmpeg_core_base",
-      "community": 6,
+      "community": 3,
       "norm_label": "base()"
     },
     {
@@ -13280,7 +13310,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "public_vendor_ffmpeg_ffmpeg_core_getexecutablename",
-      "community": 3,
+      "community": 83,
       "norm_label": "getexecutablename()"
     },
     {
@@ -13290,7 +13320,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "public_vendor_ffmpeg_ffmpeg_core_getenvstrings",
-      "community": 3,
+      "community": 83,
       "norm_label": "getenvstrings()"
     },
     {
@@ -13300,7 +13330,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "public_vendor_ffmpeg_ffmpeg_core_stringtoascii",
-      "community": 3,
+      "community": 83,
       "norm_label": "stringtoascii()"
     },
     {
@@ -13310,7 +13340,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "public_vendor_ffmpeg_ffmpeg_core_environ_get",
-      "community": 3,
+      "community": 83,
       "norm_label": "_environ_get()"
     },
     {
@@ -13320,7 +13350,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "public_vendor_ffmpeg_ffmpeg_core_environ_sizes_get",
-      "community": 3,
+      "community": 83,
       "norm_label": "_environ_sizes_get()"
     },
     {
@@ -15368,7 +15398,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_fade_test",
-      "community": 14,
+      "community": 80,
       "norm_label": "fade.test.ts"
     },
     {
@@ -15415,7 +15445,7 @@
       "label": "makeId()",
       "file_type": "code",
       "source_file": "tests/studio-timeline.test.ts",
-      "source_location": "L28",
+      "source_location": "L29",
       "_origin": "ast",
       "id": "tests_studio_timeline_test_makeid",
       "community": 37,
@@ -15425,7 +15455,7 @@
       "label": "clip()",
       "file_type": "code",
       "source_file": "tests/studio-timeline.test.ts",
-      "source_location": "L30",
+      "source_location": "L31",
       "_origin": "ast",
       "id": "tests_studio_timeline_test_clip",
       "community": 37,
@@ -15668,7 +15698,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "types_analysis_analysisresult",
-      "community": 76,
+      "community": 20,
       "norm_label": "analysisresult"
     },
     {
@@ -15678,7 +15708,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "types_analysis_historyentry",
-      "community": 20,
+      "community": 59,
       "norm_label": "historyentry"
     },
     {
@@ -15688,7 +15718,7 @@
       "source_location": "L36",
       "_origin": "ast",
       "id": "types_analysis_workerrequest",
-      "community": 47,
+      "community": 80,
       "norm_label": "workerrequest"
     },
     {
@@ -15698,7 +15728,7 @@
       "source_location": "L52",
       "_origin": "ast",
       "id": "types_analysis_workerresponse",
-      "community": 47,
+      "community": 80,
       "norm_label": "workerresponse"
     },
     {
@@ -15728,7 +15758,7 @@
       "source_location": "L70",
       "_origin": "ast",
       "id": "types_analysis_ytjobpublic",
-      "community": 20,
+      "community": 31,
       "norm_label": "ytjobpublic"
     },
     {
@@ -25171,7 +25201,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/remix/RemixStudio.tsx",
-      "source_location": "L382",
+      "source_location": "L385",
       "weight": 1.0,
       "source": "components_remix_remixstudio_remixstudio",
       "target": "components_tunebadapp_tunebadcontextvalue_clearpendingfiles"
@@ -36535,7 +36565,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/remix/RemixStudio.tsx",
-      "source_location": "L806",
+      "source_location": "L810",
       "weight": 1.0,
       "source": "components_remix_remixstudio_remixstudio",
       "target": "components_remix_remixstudio_presets"
@@ -36567,7 +36597,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "components/remix/RemixStudio.tsx",
-      "source_location": "L806",
+      "source_location": "L810",
       "weight": 1.0,
       "source": "components_remix_remixstudio_remixstudio",
       "target": "components_remix_remixstudio_matchespreset",
@@ -36578,7 +36608,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "components/remix/RemixStudio.tsx",
-      "source_location": "L805",
+      "source_location": "L809",
       "weight": 1.0,
       "source": "components_remix_remixstudio_remixstudio",
       "target": "components_remix_remixstudio_formatsemitones",
@@ -36590,7 +36620,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/remix/RemixStudio.tsx",
-      "source_location": "L385",
+      "source_location": "L388",
       "weight": 1.0,
       "source": "components_remix_remixstudio_remixstudio",
       "target": "hooks_usefiledrop_usefiledrop"
@@ -36601,7 +36631,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/remix/RemixStudio.tsx",
-      "source_location": "L338",
+      "source_location": "L341",
       "weight": 1.0,
       "source": "components_remix_remixstudio_remixstudio",
       "target": "hooks_usenowplaying_usenowplaying"
@@ -36623,7 +36653,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/remix/RemixStudio.tsx",
-      "source_location": "L300",
+      "source_location": "L303",
       "weight": 1.0,
       "source": "components_remix_remixstudio_remixstudio",
       "target": "lib_audio_decode_cache_cleardecodecache"
@@ -36634,7 +36664,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/remix/RemixStudio.tsx",
-      "source_location": "L356",
+      "source_location": "L359",
       "weight": 1.0,
       "source": "components_remix_remixstudio_remixstudio",
       "target": "lib_audio_decode_cache_decodeaudiofilecached"
@@ -36645,7 +36675,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/remix/RemixStudio.tsx",
-      "source_location": "L558",
+      "source_location": "L561",
       "weight": 1.0,
       "source": "components_remix_remixstudio_remixstudio",
       "target": "lib_audio_decode_getaudiocontextclass"
@@ -36656,7 +36686,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/remix/RemixStudio.tsx",
-      "source_location": "L760",
+      "source_location": "L764",
       "weight": 1.0,
       "source": "components_remix_remixstudio_remixstudio",
       "target": "lib_audio_mp3_encoder_encodemp3fromchannels"
@@ -36667,7 +36697,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/remix/RemixStudio.tsx",
-      "source_location": "L757",
+      "source_location": "L761",
       "weight": 1.0,
       "source": "components_remix_remixstudio_remixstudio",
       "target": "lib_audio_mp3_encoder_encodewavfromchannels"
@@ -36678,7 +36708,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/remix/RemixStudio.tsx",
-      "source_location": "L506",
+      "source_location": "L509",
       "weight": 1.0,
       "source": "components_remix_remixstudio_remixstudio",
       "target": "lib_audio_remix_applyeffectparams"
@@ -36689,7 +36719,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/remix/RemixStudio.tsx",
-      "source_location": "L494",
+      "source_location": "L497",
       "weight": 1.0,
       "source": "components_remix_remixstudio_remixstudio",
       "target": "lib_audio_remix_applyreverbeqparams"
@@ -36700,7 +36730,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/remix/RemixStudio.tsx",
-      "source_location": "L578",
+      "source_location": "L581",
       "weight": 1.0,
       "source": "components_remix_remixstudio_remixstudio",
       "target": "lib_audio_remix_buildremixgraph"
@@ -36711,7 +36741,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/remix/RemixStudio.tsx",
-      "source_location": "L805",
+      "source_location": "L809",
       "weight": 1.0,
       "source": "components_remix_remixstudio_remixstudio",
       "target": "lib_audio_remix_coupledsemitones"
@@ -36722,7 +36752,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/remix/RemixStudio.tsx",
-      "source_location": "L776",
+      "source_location": "L780",
       "weight": 1.0,
       "source": "components_remix_remixstudio_remixstudio",
       "target": "lib_audio_remix_renderremix"
@@ -36733,7 +36763,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/remix/RemixStudio.tsx",
-      "source_location": "L748",
+      "source_location": "L752",
       "weight": 1.0,
       "source": "components_remix_remixstudio_remixstudio",
       "target": "lib_audio_remix_renderremixautomated"
@@ -36744,7 +36774,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/remix/RemixStudio.tsx",
-      "source_location": "L423",
+      "source_location": "L426",
       "weight": 1.0,
       "source": "components_remix_remixstudio_remixstudio",
       "target": "lib_audio_remix_timestretch"
@@ -36755,7 +36785,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/remix/RemixStudio.tsx",
-      "source_location": "L226",
+      "source_location": "L228",
       "weight": 1.0,
       "source": "components_remix_remixstudio_remixstudio",
       "target": "lib_audio_waveform_computewaveformbars"
@@ -36766,7 +36796,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/remix/RemixStudio.tsx",
-      "source_location": "L758",
+      "source_location": "L762",
       "weight": 1.0,
       "source": "components_remix_remixstudio_remixstudio",
       "target": "lib_files_download_downloadblob"
@@ -36777,7 +36807,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/remix/RemixStudio.tsx",
-      "source_location": "L881",
+      "source_location": "L885",
       "weight": 1.0,
       "source": "components_remix_remixstudio_remixstudio",
       "target": "lib_format_formattime"
@@ -36788,7 +36818,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/remix/RemixStudio.tsx",
-      "source_location": "L296",
+      "source_location": "L299",
       "weight": 1.0,
       "source": "components_remix_remixstudio_remixstudio",
       "target": "lib_i18n_index_i18ncontextvalue_t"
@@ -36810,7 +36840,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "components/remix/RemixStudio.tsx",
-      "source_location": "L622",
+      "source_location": "L626",
       "weight": 1.0,
       "source": "components_remix_remixstudio_remixstudio",
       "target": "public_vendor_ffmpeg_ffmpeg_core_base"
@@ -38071,7 +38101,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L45",
+      "source_location": "L46",
       "weight": 1.0,
       "source": "components_studio_timeline",
       "target": "components_studio_clipcanvas",
@@ -38093,7 +38123,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L45",
+      "source_location": "L46",
       "weight": 1.0,
       "source": "components_studio_timeline",
       "target": "components_studio_clipcanvas_clipcanvas",
@@ -38210,7 +38240,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L105",
+      "source_location": "L106",
       "weight": 1.0,
       "source": "components_studio_studiopanel",
       "target": "components_studio_studiopanel_bufferkey",
@@ -38220,7 +38250,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L98",
+      "source_location": "L99",
       "weight": 1.0,
       "source": "components_studio_studiopanel",
       "target": "components_studio_studiopanel_buffermap",
@@ -38230,7 +38260,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L109",
+      "source_location": "L110",
       "weight": 1.0,
       "source": "components_studio_studiopanel",
       "target": "components_studio_studiopanel_decodedbytes",
@@ -38240,7 +38270,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L54",
+      "source_location": "L55",
       "weight": 1.0,
       "source": "components_studio_studiopanel",
       "target": "components_studio_studiopanel_default_params",
@@ -38250,7 +38280,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L73",
+      "source_location": "L74",
       "weight": 1.0,
       "source": "components_studio_studiopanel",
       "target": "components_studio_studiopanel_effect_options",
@@ -38260,7 +38290,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L90",
+      "source_location": "L91",
       "weight": 1.0,
       "source": "components_studio_studiopanel",
       "target": "components_studio_studiopanel_makeclipid",
@@ -38270,7 +38300,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L92",
+      "source_location": "L93",
       "weight": 1.0,
       "source": "components_studio_studiopanel",
       "target": "components_studio_studiopanel_maketakeid",
@@ -38280,7 +38310,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L65",
+      "source_location": "L66",
       "weight": 1.0,
       "source": "components_studio_studiopanel",
       "target": "components_studio_studiopanel_reverb_type_options",
@@ -38290,7 +38320,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L148",
+      "source_location": "L149",
       "weight": 1.0,
       "source": "components_studio_studiopanel",
       "target": "components_studio_studiopanel_studiopanel",
@@ -38300,7 +38330,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L80",
+      "source_location": "L81",
       "weight": 1.0,
       "source": "components_studio_studiopanel",
       "target": "components_studio_studiopanel_studiotake",
@@ -38310,7 +38340,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L120",
+      "source_location": "L121",
       "weight": 1.0,
       "source": "components_studio_studiopanel",
       "target": "components_studio_studiopanel_transportclock",
@@ -38321,7 +38351,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L50",
+      "source_location": "L51",
       "weight": 1.0,
       "source": "components_studio_studiopanel",
       "target": "components_studio_timeline",
@@ -38332,7 +38362,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L50",
+      "source_location": "L51",
       "weight": 1.0,
       "source": "components_studio_studiopanel",
       "target": "components_studio_timeline_timeline",
@@ -38552,7 +38582,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L49",
+      "source_location": "L50",
       "weight": 1.0,
       "source": "components_studio_studiopanel",
       "target": "lib_files_tool_handoff",
@@ -38563,7 +38593,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L49",
+      "source_location": "L50",
       "weight": 1.0,
       "source": "components_studio_studiopanel",
       "target": "lib_files_tool_handoff_takestudiofiles",
@@ -38618,7 +38648,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L41",
+      "source_location": "L42",
       "weight": 1.0,
       "source": "components_studio_studiopanel",
       "target": "lib_studio_display_signal",
@@ -38629,7 +38659,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L41",
+      "source_location": "L42",
       "weight": 1.0,
       "source": "components_studio_studiopanel",
       "target": "lib_studio_display_signal_displaysignal",
@@ -38640,7 +38670,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L41",
+      "source_location": "L42",
       "weight": 1.0,
       "source": "components_studio_studiopanel",
       "target": "lib_studio_display_signal_forgetdisplaysignals",
@@ -38651,7 +38681,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L41",
+      "source_location": "L42",
       "weight": 1.0,
       "source": "components_studio_studiopanel",
       "target": "lib_studio_display_signal_getdisplaysignal",
@@ -38662,7 +38692,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L41",
+      "source_location": "L42",
       "weight": 1.0,
       "source": "components_studio_studiopanel",
       "target": "lib_studio_display_signal_peekdisplaysignal",
@@ -38673,7 +38703,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L47",
+      "source_location": "L48",
       "weight": 1.0,
       "source": "components_studio_studiopanel",
       "target": "lib_studio_engine",
@@ -38684,7 +38714,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L47",
+      "source_location": "L48",
       "weight": 1.0,
       "source": "components_studio_studiopanel",
       "target": "lib_studio_engine_studioengine",
@@ -38695,7 +38725,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L48",
+      "source_location": "L49",
       "weight": 1.0,
       "source": "components_studio_studiopanel",
       "target": "lib_studio_render_timeline",
@@ -38706,7 +38736,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L48",
+      "source_location": "L49",
       "weight": 1.0,
       "source": "components_studio_studiopanel",
       "target": "lib_studio_render_timeline_exportstudiomix",
@@ -38724,11 +38754,22 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "components/studio/StudioPanel.tsx",
+      "source_location": "L28",
+      "weight": 1.0,
+      "source": "components_studio_studiopanel",
+      "target": "lib_studio_timeline_issoloing",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L40",
+      "source_location": "L41",
       "weight": 1.0,
       "source": "components_studio_studiopanel",
       "target": "lib_studio_timeline_math",
@@ -38739,7 +38780,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L40",
+      "source_location": "L41",
       "weight": 1.0,
       "source": "components_studio_studiopanel",
       "target": "lib_studio_timeline_math_clampzoom",
@@ -38816,7 +38857,7 @@
       "context": "field",
       "confidence": "EXTRACTED",
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L84",
+      "source_location": "L85",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiotake",
       "target": "lib_audio_remix_automationevent",
@@ -38827,7 +38868,7 @@
       "context": "field",
       "confidence": "EXTRACTED",
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L83",
+      "source_location": "L84",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiotake",
       "target": "lib_audio_remix_remixparams",
@@ -38838,7 +38879,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L326",
+      "source_location": "L329",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "components_studio_studiopanel_makeclipid",
@@ -38849,7 +38890,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L311",
+      "source_location": "L314",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "components_studio_studiopanel_bufferkey",
@@ -38860,7 +38901,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L316",
+      "source_location": "L319",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "components_studio_studiopanel_decodedbytes",
@@ -38871,7 +38912,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L137",
+      "source_location": "L138",
       "weight": 1.0,
       "source": "components_studio_studiopanel_transportclock",
       "target": "lib_format_formattimetenths",
@@ -38883,7 +38924,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L251",
+      "source_location": "L254",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "hooks_usenowplaying_usenowplaying"
@@ -38894,7 +38935,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L252",
+      "source_location": "L255",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "hooks_useunloadguard_useunloadguard"
@@ -38905,7 +38946,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L314",
+      "source_location": "L317",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_audio_decode_decodeaudiofile"
@@ -38916,7 +38957,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L238",
+      "source_location": "L241",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_audio_remix_automationevent"
@@ -38927,7 +38968,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L766",
+      "source_location": "L854",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_audio_remix_coupledsemitones"
@@ -38938,7 +38979,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L477",
+      "source_location": "L481",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_audio_remix_remixparams"
@@ -38949,7 +38990,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L606",
+      "source_location": "L656",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_files_download_downloadblob"
@@ -38960,7 +39001,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L392",
+      "source_location": "L396",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_files_tool_handoff_takestudiofiles"
@@ -38971,7 +39012,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L839",
+      "source_location": "L927",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_format_formattimetenths"
@@ -38982,7 +39023,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L317",
+      "source_location": "L320",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_i18n_index_i18ncontextvalue_t"
@@ -38993,7 +39034,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L149",
+      "source_location": "L150",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_i18n_index_usei18n"
@@ -39004,7 +39045,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L500",
+      "source_location": "L504",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_studio_display_signal_forgetdisplaysignals"
@@ -39015,7 +39056,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L380",
+      "source_location": "L384",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_studio_display_signal_getdisplaysignal"
@@ -39026,7 +39067,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L371",
+      "source_location": "L375",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_studio_display_signal_peekdisplaysignal"
@@ -39037,7 +39078,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L541",
+      "source_location": "L591",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_studio_engine_studioengine_setparams"
@@ -39048,7 +39089,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L329",
+      "source_location": "L332",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_studio_engine_studioengine_start"
@@ -39059,7 +39100,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L599",
+      "source_location": "L649",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_studio_render_timeline_exportstudiomix"
@@ -39070,7 +39111,18 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L529",
+      "source_location": "L580",
+      "weight": 1.0,
+      "source": "components_studio_studiopanel_studiopanel",
+      "target": "lib_studio_timeline_issoloing"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "components/studio/StudioPanel.tsx",
+      "source_location": "L577",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_studio_timeline_math_clampzoom"
@@ -39081,7 +39133,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L645",
+      "source_location": "L695",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_studio_timeline_moveclip"
@@ -39092,7 +39144,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L514",
+      "source_location": "L518",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_studio_timeline_splitclip"
@@ -39103,7 +39155,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L299",
+      "source_location": "L302",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_studio_timeline_timelineduration"
@@ -39114,7 +39166,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L650",
+      "source_location": "L700",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_studio_timeline_trimclipend"
@@ -39125,7 +39177,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L647",
+      "source_location": "L697",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "lib_studio_timeline_trimclipstart"
@@ -39136,7 +39188,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L372",
+      "source_location": "L376",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "scripts_octave_map_hit"
@@ -39147,7 +39199,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "components/studio/StudioPanel.tsx",
-      "source_location": "L340",
+      "source_location": "L344",
       "weight": 1.0,
       "source": "components_studio_studiopanel_studiopanel",
       "target": "tests_studio_timeline_test_clip"
@@ -39156,7 +39208,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L50",
+      "source_location": "L51",
       "weight": 1.0,
       "source": "components_studio_timeline",
       "target": "components_studio_timeline_dragstate",
@@ -39166,7 +39218,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L55",
+      "source_location": "L57",
       "weight": 1.0,
       "source": "components_studio_timeline",
       "target": "components_studio_timeline_timeline",
@@ -39232,7 +39284,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L44",
+      "source_location": "L45",
       "weight": 1.0,
       "source": "components_studio_timeline",
       "target": "lib_studio_display_signal",
@@ -39243,7 +39295,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L44",
+      "source_location": "L45",
       "weight": 1.0,
       "source": "components_studio_timeline",
       "target": "lib_studio_display_signal_displaysignal",
@@ -39387,7 +39439,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L371",
+      "source_location": "L485",
       "weight": 1.0,
       "source": "components_studio_timeline_timeline",
       "target": "lib_format_formattime"
@@ -39398,7 +39450,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L242",
+      "source_location": "L310",
       "weight": 1.0,
       "source": "components_studio_timeline_timeline",
       "target": "lib_format_formattimetenths"
@@ -39409,7 +39461,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L360",
+      "source_location": "L462",
       "weight": 1.0,
       "source": "components_studio_timeline_timeline",
       "target": "lib_i18n_index_i18ncontextvalue_t"
@@ -39420,7 +39472,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L92",
+      "source_location": "L105",
       "weight": 1.0,
       "source": "components_studio_timeline_timeline",
       "target": "lib_i18n_index_usei18n"
@@ -39431,7 +39483,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L106",
+      "source_location": "L119",
       "weight": 1.0,
       "source": "components_studio_timeline_timeline",
       "target": "lib_studio_timeline_assigndisplayrows"
@@ -39442,7 +39494,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L192",
+      "source_location": "L247",
       "weight": 1.0,
       "source": "components_studio_timeline_timeline",
       "target": "lib_studio_timeline_clipduration"
@@ -39453,7 +39505,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L453",
+      "source_location": "L568",
       "weight": 1.0,
       "source": "components_studio_timeline_timeline",
       "target": "lib_studio_timeline_math_clampzoom"
@@ -39464,7 +39516,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L345",
+      "source_location": "L444",
       "weight": 1.0,
       "source": "components_studio_timeline_timeline",
       "target": "lib_studio_timeline_math_rulerstepseconds"
@@ -39475,7 +39527,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L276",
+      "source_location": "L349",
       "weight": 1.0,
       "source": "components_studio_timeline_timeline",
       "target": "lib_studio_timeline_math_snapclipstart"
@@ -39486,7 +39538,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L146",
+      "source_location": "L201",
       "weight": 1.0,
       "source": "components_studio_timeline_timeline",
       "target": "lib_studio_timeline_math_zoomatcursor"
@@ -39497,7 +39549,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L202",
+      "source_location": "L257",
       "weight": 1.0,
       "source": "components_studio_timeline_timeline",
       "target": "lib_studio_timeline_math_zoomtofit"
@@ -39508,7 +39560,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L279",
+      "source_location": "L352",
       "weight": 1.0,
       "source": "components_studio_timeline_timeline",
       "target": "lib_studio_timeline_snapcandidates"
@@ -39519,7 +39571,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L108",
+      "source_location": "L121",
       "weight": 1.0,
       "source": "components_studio_timeline_timeline",
       "target": "lib_studio_timeline_timelineduration"
@@ -39530,7 +39582,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "components/studio/Timeline.tsx",
-      "source_location": "L278",
+      "source_location": "L351",
       "weight": 1.0,
       "source": "components_studio_timeline_timeline",
       "target": "tests_studio_timeline_test_clip"
@@ -43762,7 +43814,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "tests/studio-timeline.test.ts",
-      "source_location": "L25",
+      "source_location": "L26",
       "weight": 1.0,
       "source": "tests_studio_timeline_test",
       "target": "lib_audio_remix",
@@ -43859,7 +43911,7 @@
       "context": "field",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L57",
+      "source_location": "L65",
       "weight": 1.0,
       "source": "lib_studio_engine_studioengine",
       "target": "lib_audio_remix_remixparams",
@@ -43870,7 +43922,7 @@
       "context": "parameter_type",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L60",
+      "source_location": "L68",
       "weight": 1.0,
       "source": "lib_studio_engine_studioengine_constructor",
       "target": "lib_audio_remix_remixparams",
@@ -43881,7 +43933,7 @@
       "context": "parameter_type",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L246",
+      "source_location": "L285",
       "weight": 1.0,
       "source": "lib_studio_engine_studioengine_setparams",
       "target": "lib_audio_remix_remixparams",
@@ -43992,7 +44044,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L266",
+      "source_location": "L305",
       "weight": 1.0,
       "source": "lib_studio_engine_studioengine_setparams",
       "target": "lib_audio_remix_applyreverbeqparams"
@@ -44047,7 +44099,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L265",
+      "source_location": "L304",
       "weight": 1.0,
       "source": "lib_studio_engine_studioengine_setparams",
       "target": "lib_audio_remix_applyeffectparams"
@@ -44113,7 +44165,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L261",
+      "source_location": "L300",
       "weight": 1.0,
       "source": "lib_studio_engine_studioengine_setparams",
       "target": "lib_audio_remix_remixgain"
@@ -44156,7 +44208,7 @@
       "context": "return_type",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L102",
+      "source_location": "L110",
       "weight": 1.0,
       "source": "lib_studio_engine_studioengine_ensurechain",
       "target": "lib_audio_remix_remixchain",
@@ -44190,7 +44242,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L105",
+      "source_location": "L113",
       "weight": 1.0,
       "source": "lib_studio_engine_studioengine_ensurechain",
       "target": "lib_audio_remix_buildremixchain"
@@ -44310,7 +44362,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "tests/studio-timeline.test.ts",
-      "source_location": "L25",
+      "source_location": "L26",
       "weight": 1.0,
       "source": "tests_studio_timeline_test",
       "target": "lib_audio_remix_automatedoutputduration",
@@ -46357,7 +46409,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/i18n/locales/en.ts",
-      "source_location": "L966",
+      "source_location": "L973",
       "weight": 1.0,
       "source": "lib_i18n_locales_en",
       "target": "lib_i18n_locales_en_dictkey",
@@ -49167,7 +49219,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L165",
+      "source_location": "L194",
       "weight": 1.0,
       "source": "lib_studio_engine_studioengine",
       "target": "lib_studio_engine_studioengine_armendtimer",
@@ -49177,7 +49229,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L60",
+      "source_location": "L68",
       "weight": 1.0,
       "source": "lib_studio_engine_studioengine",
       "target": "lib_studio_engine_studioengine_constructor",
@@ -49187,7 +49239,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L275",
+      "source_location": "L314",
       "weight": 1.0,
       "source": "lib_studio_engine_studioengine",
       "target": "lib_studio_engine_studioengine_dispose",
@@ -49197,7 +49249,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L102",
+      "source_location": "L110",
       "weight": 1.0,
       "source": "lib_studio_engine_studioengine",
       "target": "lib_studio_engine_studioengine_ensurechain",
@@ -49207,7 +49259,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L89",
+      "source_location": "L97",
       "weight": 1.0,
       "source": "lib_studio_engine_studioengine",
       "target": "lib_studio_engine_studioengine_ensurecontext",
@@ -49217,7 +49269,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L79",
+      "source_location": "L87",
       "weight": 1.0,
       "source": "lib_studio_engine_studioengine",
       "target": "lib_studio_engine_studioengine_getoutputtime",
@@ -49227,7 +49279,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L70",
+      "source_location": "L78",
       "weight": 1.0,
       "source": "lib_studio_engine_studioengine",
       "target": "lib_studio_engine_studioengine_getposition",
@@ -49237,7 +49289,17 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L65",
+      "source_location": "L186",
+      "weight": 1.0,
+      "source": "lib_studio_engine_studioengine",
+      "target": "lib_studio_engine_studioengine_passend",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/studio/engine.ts",
+      "source_location": "L73",
       "weight": 1.0,
       "source": "lib_studio_engine_studioengine",
       "target": "lib_studio_engine_studioengine_playing",
@@ -49247,7 +49309,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L209",
+      "source_location": "L248",
       "weight": 1.0,
       "source": "lib_studio_engine_studioengine",
       "target": "lib_studio_engine_studioengine_seek",
@@ -49257,7 +49319,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L270",
+      "source_location": "L309",
       "weight": 1.0,
       "source": "lib_studio_engine_studioengine",
       "target": "lib_studio_engine_studioengine_setclipgain",
@@ -49267,7 +49329,17 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L246",
+      "source_location": "L119",
+      "weight": 1.0,
+      "source": "lib_studio_engine_studioengine",
+      "target": "lib_studio_engine_studioengine_setloop",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/studio/engine.ts",
+      "source_location": "L285",
       "weight": 1.0,
       "source": "lib_studio_engine_studioengine",
       "target": "lib_studio_engine_studioengine_setparams",
@@ -49277,7 +49349,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L223",
+      "source_location": "L262",
       "weight": 1.0,
       "source": "lib_studio_engine_studioengine",
       "target": "lib_studio_engine_studioengine_setspeedlive",
@@ -49287,7 +49359,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L110",
+      "source_location": "L126",
       "weight": 1.0,
       "source": "lib_studio_engine_studioengine",
       "target": "lib_studio_engine_studioengine_start",
@@ -49297,7 +49369,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L175",
+      "source_location": "L213",
       "weight": 1.0,
       "source": "lib_studio_engine_studioengine",
       "target": "lib_studio_engine_studioengine_stop",
@@ -49307,10 +49379,21 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L186",
+      "source_location": "L224",
       "weight": 1.0,
       "source": "lib_studio_engine_studioengine",
       "target": "lib_studio_engine_studioengine_stopsources",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "field",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/studio/engine.ts",
+      "source_location": "L63",
+      "weight": 1.0,
+      "source": "lib_studio_engine_studioengine",
+      "target": "lib_studio_timeline_studioclip",
       "confidence_score": 1.0
     },
     {
@@ -49318,7 +49401,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L232",
+      "source_location": "L271",
       "weight": 1.0,
       "source": "lib_studio_engine_studioengine_setspeedlive",
       "target": "lib_studio_engine_studioengine_getposition",
@@ -49329,7 +49412,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L177",
+      "source_location": "L215",
       "weight": 1.0,
       "source": "lib_studio_engine_studioengine_stop",
       "target": "lib_studio_engine_studioengine_getposition",
@@ -49340,7 +49423,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L116",
+      "source_location": "L134",
       "weight": 1.0,
       "source": "lib_studio_engine_studioengine_start",
       "target": "lib_studio_engine_studioengine_ensurecontext",
@@ -49351,7 +49434,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L118",
+      "source_location": "L136",
       "weight": 1.0,
       "source": "lib_studio_engine_studioengine_start",
       "target": "lib_studio_engine_studioengine_ensurechain",
@@ -49362,10 +49445,10 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L159",
+      "source_location": "L203",
       "weight": 1.0,
-      "source": "lib_studio_engine_studioengine_start",
-      "target": "lib_studio_engine_studioengine_armendtimer",
+      "source": "lib_studio_engine_studioengine_armendtimer",
+      "target": "lib_studio_engine_studioengine_start",
       "confidence_score": 1.0
     },
     {
@@ -49373,7 +49456,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L111",
+      "source_location": "L127",
       "weight": 1.0,
       "source": "lib_studio_engine_studioengine_start",
       "target": "lib_studio_engine_studioengine_stopsources",
@@ -49385,7 +49468,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L123",
+      "source_location": "L144",
       "weight": 1.0,
       "source": "lib_studio_engine_studioengine_start",
       "target": "lib_studio_timeline_computeclipschedule"
@@ -49395,7 +49478,7 @@
       "context": "parameter_type",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L110",
+      "source_location": "L126",
       "weight": 1.0,
       "source": "lib_studio_engine_studioengine_start",
       "target": "lib_studio_timeline_studioclip",
@@ -49407,7 +49490,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L112",
+      "source_location": "L130",
       "weight": 1.0,
       "source": "lib_studio_engine_studioengine_start",
       "target": "lib_studio_timeline_timelineduration"
@@ -49417,7 +49500,18 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L169",
+      "source_location": "L195",
+      "weight": 1.0,
+      "source": "lib_studio_engine_studioengine_armendtimer",
+      "target": "lib_studio_engine_studioengine_passend",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/studio/engine.ts",
+      "source_location": "L207",
       "weight": 1.0,
       "source": "lib_studio_engine_studioengine_armendtimer",
       "target": "lib_studio_engine_studioengine_stopsources",
@@ -49428,7 +49522,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L238",
+      "source_location": "L277",
       "weight": 1.0,
       "source": "lib_studio_engine_studioengine_setspeedlive",
       "target": "lib_studio_engine_studioengine_armendtimer",
@@ -49439,7 +49533,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L178",
+      "source_location": "L216",
       "weight": 1.0,
       "source": "lib_studio_engine_studioengine_stop",
       "target": "lib_studio_engine_studioengine_stopsources",
@@ -49450,7 +49544,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L276",
+      "source_location": "L315",
       "weight": 1.0,
       "source": "lib_studio_engine_studioengine_dispose",
       "target": "lib_studio_engine_studioengine_stopsources",
@@ -49461,7 +49555,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/engine.ts",
-      "source_location": "L255",
+      "source_location": "L294",
       "weight": 1.0,
       "source": "lib_studio_engine_studioengine_setparams",
       "target": "lib_studio_engine_studioengine_setspeedlive",
@@ -49578,7 +49672,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/timeline-math.ts",
-      "source_location": "L34",
+      "source_location": "L36",
       "weight": 1.0,
       "source": "lib_studio_timeline_math",
       "target": "lib_studio_timeline_math_clampzoom",
@@ -49588,7 +49682,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/timeline-math.ts",
-      "source_location": "L112",
+      "source_location": "L114",
       "weight": 1.0,
       "source": "lib_studio_timeline_math",
       "target": "lib_studio_timeline_math_rulerstepseconds",
@@ -49598,7 +49692,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/timeline-math.ts",
-      "source_location": "L87",
+      "source_location": "L89",
       "weight": 1.0,
       "source": "lib_studio_timeline_math",
       "target": "lib_studio_timeline_math_snapclipstart",
@@ -49608,7 +49702,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/timeline-math.ts",
-      "source_location": "L66",
+      "source_location": "L68",
       "weight": 1.0,
       "source": "lib_studio_timeline_math",
       "target": "lib_studio_timeline_math_snaptime",
@@ -49618,7 +49712,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/timeline-math.ts",
-      "source_location": "L26",
+      "source_location": "L28",
       "weight": 1.0,
       "source": "lib_studio_timeline_math",
       "target": "lib_studio_timeline_math_timetox",
@@ -49628,7 +49722,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/timeline-math.ts",
-      "source_location": "L30",
+      "source_location": "L32",
       "weight": 1.0,
       "source": "lib_studio_timeline_math",
       "target": "lib_studio_timeline_math_xtotime",
@@ -49638,7 +49732,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/timeline-math.ts",
-      "source_location": "L43",
+      "source_location": "L45",
       "weight": 1.0,
       "source": "lib_studio_timeline_math",
       "target": "lib_studio_timeline_math_zoomatcursor",
@@ -49648,7 +49742,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/timeline-math.ts",
-      "source_location": "L55",
+      "source_location": "L57",
       "weight": 1.0,
       "source": "lib_studio_timeline_math",
       "target": "lib_studio_timeline_math_zoomtofit",
@@ -49659,7 +49753,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "tests/studio-timeline.test.ts",
-      "source_location": "L16",
+      "source_location": "L17",
       "weight": 1.0,
       "source": "tests_studio_timeline_test",
       "target": "lib_studio_timeline_math",
@@ -49670,7 +49764,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/timeline-math.ts",
-      "source_location": "L49",
+      "source_location": "L51",
       "weight": 1.0,
       "source": "lib_studio_timeline_math_zoomatcursor",
       "target": "lib_studio_timeline_math_clampzoom",
@@ -49681,7 +49775,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/timeline-math.ts",
-      "source_location": "L57",
+      "source_location": "L59",
       "weight": 1.0,
       "source": "lib_studio_timeline_math_zoomtofit",
       "target": "lib_studio_timeline_math_clampzoom",
@@ -49692,7 +49786,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "tests/studio-timeline.test.ts",
-      "source_location": "L16",
+      "source_location": "L17",
       "weight": 1.0,
       "source": "tests_studio_timeline_test",
       "target": "lib_studio_timeline_math_zoomatcursor",
@@ -49703,7 +49797,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "tests/studio-timeline.test.ts",
-      "source_location": "L16",
+      "source_location": "L17",
       "weight": 1.0,
       "source": "tests_studio_timeline_test",
       "target": "lib_studio_timeline_math_zoomtofit",
@@ -49714,7 +49808,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/timeline-math.ts",
-      "source_location": "L93",
+      "source_location": "L95",
       "weight": 1.0,
       "source": "lib_studio_timeline_math_snapclipstart",
       "target": "lib_studio_timeline_math_snaptime",
@@ -49725,7 +49819,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "tests/studio-timeline.test.ts",
-      "source_location": "L16",
+      "source_location": "L17",
       "weight": 1.0,
       "source": "tests_studio_timeline_test",
       "target": "lib_studio_timeline_math_snaptime",
@@ -49736,7 +49830,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "tests/studio-timeline.test.ts",
-      "source_location": "L16",
+      "source_location": "L17",
       "weight": 1.0,
       "source": "tests_studio_timeline_test",
       "target": "lib_studio_timeline_math_snapclipstart",
@@ -49747,7 +49841,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "tests/studio-timeline.test.ts",
-      "source_location": "L16",
+      "source_location": "L17",
       "weight": 1.0,
       "source": "tests_studio_timeline_test",
       "target": "lib_studio_timeline_math_rulerstepseconds",
@@ -49757,7 +49851,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/timeline.ts",
-      "source_location": "L56",
+      "source_location": "L58",
       "weight": 1.0,
       "source": "lib_studio_timeline",
       "target": "lib_studio_timeline_assigndisplayrows",
@@ -49767,7 +49861,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/timeline.ts",
-      "source_location": "L36",
+      "source_location": "L38",
       "weight": 1.0,
       "source": "lib_studio_timeline",
       "target": "lib_studio_timeline_clipduration",
@@ -49777,7 +49871,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/timeline.ts",
-      "source_location": "L40",
+      "source_location": "L42",
       "weight": 1.0,
       "source": "lib_studio_timeline",
       "target": "lib_studio_timeline_cliptimelineend",
@@ -49787,7 +49881,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/timeline.ts",
-      "source_location": "L106",
+      "source_location": "L108",
       "weight": 1.0,
       "source": "lib_studio_timeline",
       "target": "lib_studio_timeline_computeclipschedule",
@@ -49797,7 +49891,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/timeline.ts",
-      "source_location": "L74",
+      "source_location": "L76",
       "weight": 1.0,
       "source": "lib_studio_timeline",
       "target": "lib_studio_timeline_fadepoint",
@@ -49807,7 +49901,17 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/timeline.ts",
-      "source_location": "L184",
+      "source_location": "L170",
+      "weight": 1.0,
+      "source": "lib_studio_timeline",
+      "target": "lib_studio_timeline_issoloing",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/studio/timeline.ts",
+      "source_location": "L195",
       "weight": 1.0,
       "source": "lib_studio_timeline",
       "target": "lib_studio_timeline_moveclip",
@@ -49817,7 +49921,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/timeline.ts",
-      "source_location": "L81",
+      "source_location": "L83",
       "weight": 1.0,
       "source": "lib_studio_timeline",
       "target": "lib_studio_timeline_scheduledclip",
@@ -49827,7 +49931,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/timeline.ts",
-      "source_location": "L168",
+      "source_location": "L179",
       "weight": 1.0,
       "source": "lib_studio_timeline",
       "target": "lib_studio_timeline_snapcandidates",
@@ -49837,7 +49941,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/timeline.ts",
-      "source_location": "L210",
+      "source_location": "L221",
       "weight": 1.0,
       "source": "lib_studio_timeline",
       "target": "lib_studio_timeline_splitclip",
@@ -49857,7 +49961,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/timeline.ts",
-      "source_location": "L45",
+      "source_location": "L47",
       "weight": 1.0,
       "source": "lib_studio_timeline",
       "target": "lib_studio_timeline_timelineduration",
@@ -49867,7 +49971,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/timeline.ts",
-      "source_location": "L201",
+      "source_location": "L212",
       "weight": 1.0,
       "source": "lib_studio_timeline",
       "target": "lib_studio_timeline_trimclipend",
@@ -49877,7 +49981,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/timeline.ts",
-      "source_location": "L190",
+      "source_location": "L201",
       "weight": 1.0,
       "source": "lib_studio_timeline",
       "target": "lib_studio_timeline_trimclipstart",
@@ -49910,7 +50014,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/timeline.ts",
-      "source_location": "L41",
+      "source_location": "L43",
       "weight": 1.0,
       "source": "lib_studio_timeline_cliptimelineend",
       "target": "lib_studio_timeline_clipduration",
@@ -49921,7 +50025,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/timeline.ts",
-      "source_location": "L114",
+      "source_location": "L120",
       "weight": 1.0,
       "source": "lib_studio_timeline_computeclipschedule",
       "target": "lib_studio_timeline_clipduration",
@@ -49932,7 +50036,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/timeline.ts",
-      "source_location": "L185",
+      "source_location": "L196",
       "weight": 1.0,
       "source": "lib_studio_timeline_moveclip",
       "target": "lib_studio_timeline_clipduration",
@@ -49943,7 +50047,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/timeline.ts",
-      "source_location": "L216",
+      "source_location": "L227",
       "weight": 1.0,
       "source": "lib_studio_timeline_splitclip",
       "target": "lib_studio_timeline_clipduration",
@@ -49965,7 +50069,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/timeline.ts",
-      "source_location": "L68",
+      "source_location": "L70",
       "weight": 1.0,
       "source": "lib_studio_timeline_assigndisplayrows",
       "target": "lib_studio_timeline_cliptimelineend",
@@ -49976,7 +50080,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/timeline.ts",
-      "source_location": "L176",
+      "source_location": "L187",
       "weight": 1.0,
       "source": "lib_studio_timeline_snapcandidates",
       "target": "lib_studio_timeline_cliptimelineend",
@@ -49987,7 +50091,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "lib/studio/timeline.ts",
-      "source_location": "L47",
+      "source_location": "L49",
       "weight": 1.0,
       "source": "lib_studio_timeline_timelineduration",
       "target": "lib_studio_timeline_cliptimelineend",
@@ -49999,7 +50103,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "lib/studio/timeline.ts",
-      "source_location": "L47",
+      "source_location": "L49",
       "weight": 1.0,
       "source": "lib_studio_timeline_timelineduration",
       "target": "tests_studio_timeline_test_clip"
@@ -50021,7 +50125,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "lib/studio/timeline.ts",
-      "source_location": "L68",
+      "source_location": "L70",
       "weight": 1.0,
       "source": "lib_studio_timeline_assigndisplayrows",
       "target": "tests_studio_timeline_test_clip"
@@ -50043,7 +50147,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "lib/studio/timeline.ts",
-      "source_location": "L114",
+      "source_location": "L120",
       "weight": 1.0,
       "source": "lib_studio_timeline_computeclipschedule",
       "target": "tests_studio_timeline_test_clip"
@@ -50060,12 +50164,23 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/studio-timeline.test.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "tests_studio_timeline_test",
+      "target": "lib_studio_timeline_issoloing",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "indirect_call",
       "context": "argument",
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "lib/studio/timeline.ts",
-      "source_location": "L176",
+      "source_location": "L187",
       "weight": 1.0,
       "source": "lib_studio_timeline_snapcandidates",
       "target": "tests_studio_timeline_test_clip"
@@ -56477,7 +56592,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/studio-timeline.test.ts",
-      "source_location": "L30",
+      "source_location": "L31",
       "weight": 1.0,
       "source": "tests_studio_timeline_test",
       "target": "tests_studio_timeline_test_clip",
@@ -56487,7 +56602,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/studio-timeline.test.ts",
-      "source_location": "L28",
+      "source_location": "L29",
       "weight": 1.0,
       "source": "tests_studio_timeline_test",
       "target": "tests_studio_timeline_test_makeid",
@@ -56498,7 +56613,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "tests/studio-timeline.test.ts",
-      "source_location": "L32",
+      "source_location": "L33",
       "weight": 1.0,
       "source": "tests_studio_timeline_test_clip",
       "target": "tests_studio_timeline_test_makeid",
@@ -57228,5 +57343,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "b81063a94ecf0b9c871c3be66ebd25c5ac91bcaf"
+  "built_at_commit": "998fc16a57c6c22cfd6d3205cb9eb531352bc8a4"
 }

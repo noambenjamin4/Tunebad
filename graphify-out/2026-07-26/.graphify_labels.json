@@ -65,12 +65,12 @@
   "63": "CamelotHubPage.tsx",
   "64": "downloadBlob",
   "65": "page.tsx",
-  "66": "timeline-math.ts",
   "67": "constants.ts",
   "68": "page.tsx",
   "69": "youtube-playlist.ts",
   "70": "useFileDrop",
   "71": "page.tsx",
+  "72": "useWindowFileDrop",
   "73": "PAGE_SIZE",
   "74": "page.tsx",
   "75": "page.tsx",
@@ -80,7 +80,12 @@
   "79": "usePlaylistBatch.ts",
   "80": "getEnvStrings",
   "81": "octave-map.mjs",
+  "82": "page.tsx",
+  "83": "page.tsx",
   "84": "page.tsx",
+  "85": "page.tsx",
   "86": "BassBoosterTool.tsx",
-  "87": "page.tsx"
+  "87": "page.tsx",
+  "88": "page.tsx",
+  "89": "page.tsx"
 }
