@@ -762,12 +762,19 @@ export async function renderRemixAutomated(
         const preset = EFFECTS[event.value] ?? EFFECTS.none;
         const start = Math.max(t, effectFadeEnd);
 
-        // Filter/drive settings jump at the switch. When the fx path is
-        // already audible the jump is masked by the crossfade below; when it
-        // is muted (coming from "none") nothing is passing through it yet.
-        effectNodes.highpass.frequency.setValueAtTime(preset.highpassHz, start);
-        effectNodes.lowpass.frequency.setValueAtTime(preset.lowpassHz, start);
-        effectNodes.drive.gain.setValueAtTime(preset.drive, start);
+        // Sweep the filters exactly as the live engine does — same duration,
+        // same exponential shape for the cutoffs. This used to jump them and
+        // crossfade the paths in 30 ms, which made a performed effect switch
+        // a THIRD as long in the file as it was under the finger.
+        const sweep = (param: AudioParam, from: number, to: number, exponential: boolean) => {
+          param.setValueAtTime(from, start);
+          if (exponential) param.exponentialRampToValueAtTime(Math.max(1, to), start + EFFECT_GLIDE_SECONDS);
+          else param.linearRampToValueAtTime(to, start + EFFECT_GLIDE_SECONDS);
+        };
+        const from = EFFECTS[currentEffect] ?? EFFECTS.none;
+        sweep(effectNodes.highpass.frequency, from.highpassHz, preset.highpassHz, true);
+        sweep(effectNodes.lowpass.frequency, from.lowpassHz, preset.lowpassHz, true);
+        sweep(effectNodes.drive.gain, from.drive, preset.drive, false);
 
         const wasClean = currentEffect === "none";
         const isClean = event.value === "none";
@@ -776,23 +783,23 @@ export async function renderRemixAutomated(
           // other, and ride fxGain's makeup level along with it.
           if (isClean) {
             effectNodes.fxGain.gain.setValueAtTime(EFFECTS[currentEffect].level, start);
-            effectNodes.fxGain.gain.linearRampToValueAtTime(0, start + XFADE_SECONDS);
+            effectNodes.fxGain.gain.linearRampToValueAtTime(0, start + EFFECT_GLIDE_SECONDS);
             effectNodes.cleanGain.gain.setValueAtTime(0, start);
-            effectNodes.cleanGain.gain.linearRampToValueAtTime(1, start + XFADE_SECONDS);
+            effectNodes.cleanGain.gain.linearRampToValueAtTime(1, start + EFFECT_GLIDE_SECONDS);
           } else {
             effectNodes.fxGain.gain.setValueAtTime(0, start);
-            effectNodes.fxGain.gain.linearRampToValueAtTime(preset.level, start + XFADE_SECONDS);
+            effectNodes.fxGain.gain.linearRampToValueAtTime(preset.level, start + EFFECT_GLIDE_SECONDS);
             effectNodes.cleanGain.gain.setValueAtTime(1, start);
-            effectNodes.cleanGain.gain.linearRampToValueAtTime(0, start + XFADE_SECONDS);
+            effectNodes.cleanGain.gain.linearRampToValueAtTime(0, start + EFFECT_GLIDE_SECONDS);
           }
         } else {
           // fx -> fx: the clean path stays muted, only the makeup level moves.
           effectNodes.fxGain.gain.setValueAtTime(EFFECTS[currentEffect].level, start);
-          effectNodes.fxGain.gain.linearRampToValueAtTime(preset.level, start + XFADE_SECONDS);
+          effectNodes.fxGain.gain.linearRampToValueAtTime(preset.level, start + EFFECT_GLIDE_SECONDS);
         }
 
         currentEffect = event.value;
-        effectFadeEnd = start + XFADE_SECONDS;
+        effectFadeEnd = start + EFFECT_GLIDE_SECONDS;
         break;
       }
     }
