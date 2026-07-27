@@ -33,6 +33,7 @@ import {
   zoomToFit,
 } from "../lib/studio/timeline-math";
 import {
+  type AutomationEvent,
   type RemixParams,
   NEUTRAL_REVERB_EQ,
   automatedOutputDuration,
@@ -856,4 +857,50 @@ test("the tail covers the wettest and longest reverb a take ever reaches", () =>
   assert.equal(reverbTailSeconds(dry, [{ t: 2, kind: "bassBoostDb", value: 4 }]), 0);
   // A wet mix keeps its tail with no automation at all.
   assert.equal(reverbTailSeconds({ ...dry, reverb: 40, reverbType: "hall" }), 2.8);
+});
+
+/* ------------------- export paths, pinned by measurement ------------------- */
+/* These two are the most intricate paths in the tool and were verified by
+   exporting real WAVs and measuring them. The numbers below are those
+   measurements, kept so the composition can't drift silently. */
+
+test("a recorded speed drop lengthens the bounce by exactly the right amount", () => {
+  // Measured: a 12s clip, recorded at speed 1, dropped to 0.5 three seconds
+  // in. The take read "0:21.1" and the exported WAV was 21.05s, with the tone
+  // pure 440 Hz at t=1 and pure 220 Hz from t=6 — a clean octave, i.e. the
+  // performance really is in the file.
+  const events: AutomationEvent[] = [{ t: 3, kind: "speed", value: 0.5 }];
+  // 3s consumed at 1x, the remaining 9s of source stretched to 18s of output.
+  assert.equal(automatedOutputDuration(12, 1, events), 21);
+
+  // The take's label and the render length come from this one function, so
+  // they cannot disagree — that is why the measurement matched.
+  assert.equal(automatedOutputDuration(12, 1, []), 12);
+  // A move made after the source has already run out changes nothing.
+  assert.equal(automatedOutputDuration(12, 1, [{ t: 99, kind: "speed", value: 0.25 }]), 12);
+});
+
+test("lock pitch + loop-only export slices the STRETCHED clock, not the timeline", () => {
+  // Measured: one 12s clip, speed 0.5, lock pitch on, loop 4s->8s of the
+  // timeline, exported loop-only. The WAV came out 8.000s with the pitch
+  // unmoved at 440 Hz — 4s of timeline heard at half speed.
+  //
+  // The trap is that the loop is authored in TIMELINE seconds while the
+  // playback set is on a stretched clock, so the window has to be converted
+  // with it. Slicing at the raw 4->8 would bounce the wrong four seconds.
+  const speed = 0.5;
+  const clips = [clip({ id: "a", timelineStart: 0, clipStart: 0, clipEnd: 12 })];
+  const stretched = scaleClipsForLock(clips, speed);
+  // Pre-stretched audio is 1/speed as long and plays at rate 1.
+  assert.equal(clipDuration(stretched[0]), 24);
+
+  const window = sliceClipsToWindow(stretched, 4 / speed, 8 / speed);
+  assert.equal(window.length, 1);
+  assert.equal(audibleDuration(window), 8, "the bounce is 8s of audio");
+  // And it is the RIGHT eight seconds. Timeline seconds are speed-1 seconds,
+  // so timeline 4->8 is source 4->8; the stretched copy is twice as long, so
+  // that material sits at 8->16 in it. (Getting this backwards is easy — I
+  // did, writing this test, and only the exported WAV settled it.)
+  assert.equal(window[0].clipStart, 8);
+  assert.equal(window[0].clipEnd, 16);
 });
