@@ -42,12 +42,16 @@ const nextConfig = {
     "/song/[slug]": ["./app/_og/Display-Bold.ttf"],
   },
   serverExternalPackages: ["ffmpeg-static"],
-  webpack: (config, { isServer }) => {
-    if (!isServer) {
-      // essentia.js's emscripten build probes Node builtins it never uses in the browser
-      config.resolve.fallback = { ...config.resolve.fallback, fs: false, path: false, crypto: false };
-    }
-    return config;
+  // Next 16 builds with Turbopack. This replaces the old webpack block, whose
+  // only job was stubbing Node builtins for essentia.js's emscripten glue —
+  // Turbopack spells that as a browser-conditional alias to a real module
+  // rather than webpack's `false`.
+  turbopack: {
+    resolveAlias: {
+      fs: { browser: "./lib/empty-module.js" },
+      path: { browser: "./lib/empty-module.js" },
+      crypto: { browser: "./lib/empty-module.js" },
+    },
   },
   async headers() {
     // Stable public assets: cache forever, rename on change. Repeat visitors
