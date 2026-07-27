@@ -385,9 +385,24 @@ export class StudioEngine {
     return false;
   }
 
+  /**
+   * Live response for the clip-volume slider, while the drag is happening.
+   *
+   * DELIBERATELY NOT the whole story. This node also carries the clip's fade
+   * envelope, and assigning a value into the middle of scheduled automation
+   * is spec-equivalent to setValueAtTime(v, now): the step lands, but the
+   * NEXT fade point still holds the OLD gain, so the level ramps straight
+   * back to where it was over the rest of the clip. Pull a faded clip down
+   * and it climbs back up on its own — measured 0.13 -> 0.30 over nine
+   * seconds on a clip set to a fifth of its volume.
+   *
+   * So the caller must also reschedule, which rebuilds the envelope around
+   * the new gain. This exists to make the slider feel connected in the
+   * meantime, glided rather than stepped so a drag doesn't zipper.
+   */
   setClipGain(clipId: string, gain: number): void {
     const node = this.graph?.clipGains.get(clipId);
-    if (node) node.gain.value = gain;
+    if (node && this.ctx) glideTo(node.gain, gain, this.ctx);
   }
 
   dispose(): void {

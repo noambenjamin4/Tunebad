@@ -475,12 +475,16 @@ export function StudioPanel() {
    *   "defer" continuous gesture (trim handle, fade field, speed knob) —
    *           coalesced to one reschedule after the gesture settles, so a
    *           slider dragged at pointer-move rate rebuilds once, not 60x
-   *   "never" already applied live to the running graph (clip gain)
+   *
+   * There is no "never": clip gain looked like it qualified, since the engine
+   * can move that node live — but the same node carries the clip's fade
+   * envelope, so a live poke gets undone by the next scheduled fade point.
+   * Everything that changes a clip has to rebuild the schedule eventually.
    */
   const rescheduleTimerRef = useRef(0);
   const requestReschedule = useCallback(
-    (mode: "now" | "defer" | "never") => {
-      if (mode === "never" || !engine.playing) return;
+    (mode: "now" | "defer") => {
+      if (!engine.playing) return;
       window.clearTimeout(rescheduleTimerRef.current);
       if (mode === "now") {
         if (isRecording()) bankTime();
@@ -502,7 +506,7 @@ export function StudioPanel() {
     (
       id: string,
       edit: (clip: StudioClip) => StudioClip | null,
-      options: { undoable?: boolean; reschedule?: "now" | "defer" | "never" } = {},
+      options: { undoable?: boolean; reschedule?: "now" | "defer" } = {},
     ) => {
       const { undoable = true, reschedule = "now" } = options;
       if (undoable) pushUndo();
@@ -996,9 +1000,12 @@ export function StudioPanel() {
               partner={overlapPartner(clips, selectedClip.id)?.partner ?? null}
               onGainPointerDown={pushUndo}
               onGain={(gain) => {
+                // "defer", not "never": the live poke below only holds until
+                // the clip's next fade point, so the schedule has to be
+                // rebuilt once the drag settles.
                 editClip(selectedClip.id, (c) => ({ ...c, gain }), {
                   undoable: false,
-                  reschedule: "never",
+                  reschedule: "defer",
                 });
                 engine.setClipGain(selectedClip.id, gain);
               }}
