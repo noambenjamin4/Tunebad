@@ -33,6 +33,8 @@ export interface TakeRecorder {
   recordMove: (event: AutomationEvent) => void;
   begin: (base: RemixParams, startOffset: number) => void;
   finish: () => void;
+  /** Throw away every take — the arrangement they belong to is gone. */
+  clear: () => void;
 }
 
 /**
@@ -111,6 +113,15 @@ export function useTakeRecorder(
     setSelectedTakeId(take.id);
   }, [getTimelineSeconds, t]);
 
+  const clear = useCallback(() => {
+    recordingRef.current = false;
+    setRecording(false);
+    eventsRef.current = [];
+    takeBaseRef.current = null;
+    setTakes([]);
+    setSelectedTakeId(null);
+  }, []);
+
   return {
     takes,
     selectedTakeId,
@@ -121,5 +132,6 @@ export function useTakeRecorder(
     recordMove,
     begin,
     finish,
+    clear,
   };
 }

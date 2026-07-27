@@ -155,6 +155,8 @@ export function StudioPanel() {
   const [loop, setLoopState] = useState<{ start: number; end: number } | null>(null);
   const [follow, setFollow] = useState(true);
   const [exportLoopOnly, setExportLoopOnly] = useState(false);
+  // First click arms the session wipe, second click performs it.
+  const [clearArmed, setClearArmed] = useState(false);
 
   const clipsRef = useRef(clips);
   clipsRef.current = clips;
@@ -186,6 +188,7 @@ export function StudioPanel() {
     recording,
     begin: beginTake,
     finish: finishTake,
+    clear: clearTakes,
   } = recorder;
 
   endedRef.current = () => {
@@ -351,6 +354,7 @@ export function StudioPanel() {
    * envelope, so a live poke gets undone by the next scheduled fade point.
    * Everything that changes a clip has to rebuild the schedule eventually.
    */
+  const clearArmTimerRef = useRef(0);
   const rescheduleTimerRef = useRef(0);
   const requestReschedule = useCallback(
     (mode: "now" | "defer") => {
@@ -369,6 +373,7 @@ export function StudioPanel() {
   );
 
   useEffect(() => () => window.clearTimeout(rescheduleTimerRef.current), []);
+  useEffect(() => () => window.clearTimeout(clearArmTimerRef.current), []);
 
   const step = useCallback((from: StudioClip[][], to: StudioClip[][]) => {
     const previous = from.pop();
@@ -725,6 +730,43 @@ export function StudioPanel() {
     requestReschedule("now");
   }, [selectedId, pushUndo, requestReschedule, t]);
 
+  /**
+   * Start over: empty the timeline AND forget the saved copy.
+   *
+   * It used to do only the second half, which made it a button that
+   * appeared to do nothing — the clips stayed on screen, and the very next
+   * edit autosaved them straight back into the storage it had just emptied.
+   *
+   * Destructive, so the first click only arms it, the same way the history
+   * panel guards its own wipe. The arm lapses after a few seconds so a
+   * stray click cannot lie in wait.
+   */
+  const handleClearSession = useCallback(() => {
+    if (!clearArmed) {
+      setClearArmed(true);
+      window.clearTimeout(clearArmTimerRef.current);
+      clearArmTimerRef.current = window.setTimeout(() => setClearArmed(false), 4000);
+      return;
+    }
+    window.clearTimeout(clearArmTimerRef.current);
+    setClearArmed(false);
+
+    stopPreview();
+    for (const id of new Set(clipsRef.current.map((c) => c.bufferId))) releaseBuffer(id);
+    setClips([]);
+    setSelectedId(null);
+    applyLoop(null);
+    // Takes are automation over an arrangement that no longer exists; leaving
+    // them would apply the old performance to whatever is loaded next.
+    clearTakes();
+    undoStackRef.current = [];
+    redoStackRef.current = [];
+    syncHistory();
+    void clearSession();
+    setStatus(t("studio.cleared"));
+    setStatusIsError(false);
+  }, [clearArmed, stopPreview, applyLoop, clearTakes, t]);
+
   const handleToggleMute = useCallback(() => {
     if (!selectedId) return;
     editClip(selectedId, (c) => ({ ...c, muted: !c.muted }));
@@ -980,16 +1022,13 @@ export function StudioPanel() {
               {t("studio.follow")}
             </button>
             <button
-              className="text-button"
+              className={`text-button${clearArmed ? " active" : ""}`}
               type="button"
-              onClick={() => {
-                void clearSession();
-                setStatus("");
-              }}
+              onClick={handleClearSession}
               disabled={working || clips.length === 0}
-              title={t("studio.clearSession")}
+              title={t("studio.clearSessionHint")}
             >
-              {t("studio.clearSession")}
+              {clearArmed ? t("studio.clearConfirm") : t("studio.clearSession")}
             </button>
             <button
               className="text-button"
