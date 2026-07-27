@@ -4658,7 +4658,13 @@ tbody tr:last-child td {
 }
 .studio-track {
   position: relative;
-  touch-action: none;
+  /* Matches .studio-scroll deliberately. The track covers the whole scroller,
+     so every touch lands here first — `none` on this element made the pan-x
+     below unreachable and left the timeline impossible to pan with a finger,
+     even though the pointer handler explicitly declines the gesture so the
+     scroller can have it. Not `auto`: a two-finger pinch is the timeline's
+     own zoom, and auto would hand it to the browser to zoom the page. */
+  touch-action: pan-x pan-y;
   cursor: crosshair;
   outline: none;
   min-width: 100%;
@@ -4917,7 +4923,8 @@ tbody tr:last-child td {
 }
 .studio-clip,
 .studio-loop-lane {
-  /* These are dragged, so the browser must not steal the gesture. */
+  /* These are dragged, so the browser must not steal the gesture. The track
+     underneath them stays pannable — see .studio-track. */
   touch-action: none;
 }
 .studio-clip-grip { width: 12px; }
