@@ -181,7 +181,6 @@ export function StudioPanel() {
   // drag every handler built on top of it along. Each of these is stable.
   const {
     isRecording,
-    bankTime,
     recordMove,
     outputNow,
     recording,
@@ -261,10 +260,9 @@ export function StudioPanel() {
   }, [undo, redo]);
 
   const stopPreview = useCallback(() => {
-    if (isRecording()) bankTime();
     engine.stop();
     setPlaying(false);
-  }, [engine, isRecording, bankTime]);
+  }, [engine]);
 
   useNowPlaying(NOW_PLAYING_SOURCE, playing, stopPreview);
   useUnloadGuard(clips.length > 0 || working);
@@ -487,17 +485,15 @@ export function StudioPanel() {
       if (!engine.playing) return;
       window.clearTimeout(rescheduleTimerRef.current);
       if (mode === "now") {
-        if (isRecording()) bankTime();
         queueMicrotask(() => restartAt(engine.getPosition()));
         return;
       }
       rescheduleTimerRef.current = window.setTimeout(() => {
         if (!engine.playing) return;
-        if (isRecording()) bankTime();
         restartAt(engine.getPosition());
       }, RESCHEDULE_SETTLE_MS);
     },
-    [engine, restartAt, isRecording, bankTime],
+    [engine, restartAt],
   );
 
   useEffect(() => () => window.clearTimeout(rescheduleTimerRef.current), []);

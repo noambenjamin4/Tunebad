@@ -31,8 +31,6 @@ export interface TakeRecorder {
   /** Current time on the take's clock, for stamping an automation event. */
   outputNow: () => number;
   recordMove: (event: AutomationEvent) => void;
-  /** Bank elapsed output time before the engine is torn down and rebuilt. */
-  bankTime: () => void;
   begin: (base: RemixParams, startOffset: number) => void;
   finish: () => void;
 }
@@ -42,12 +40,15 @@ export interface TakeRecorder {
  * timestamped automation events and replayed by renderRemixAutomated at
  * export, so a bounce reproduces the performance instead of a static mix.
  *
- * The clock is the subtle part. Events are stamped in OUTPUT seconds, but
- * every reschedule (a clip edit, a speed change) tears the engine down and
- * gives the next one a fresh AudioContext whose clock restarts at zero — so
- * elapsed time is banked into `recordBase` before each teardown and added
- * back. `getTimelineSeconds` is a getter rather than a value because a take
- * can outlive several arrangements of the clips underneath it.
+ * Events are stamped in OUTPUT seconds, which the ENGINE keeps. It has to:
+ * graphs are replaced constantly (a clip edit, a speed change, a seek, a loop
+ * wrap) and each one only knows its own lifetime. This used to bank the
+ * elapsed time here instead, which worked for the restarts the panel caused
+ * and silently failed for the one it could not see — the loop wrap, which
+ * restarts playback from inside the engine.
+ *
+ * `getTimelineSeconds` is a getter rather than a value because a take can
+ * outlive several arrangements of the clips underneath it.
  */
 export function useTakeRecorder(
   engine: StudioEngine,
@@ -61,35 +62,27 @@ export function useTakeRecorder(
   takesRef.current = takes;
 
   const recordingRef = useRef(false);
-  const recordBaseRef = useRef(0);
   const eventsRef = useRef<AutomationEvent[]>([]);
   const takeBaseRef = useRef<RemixParams | null>(null);
   const takeStartRef = useRef(0);
 
   const isRecording = useCallback(() => recordingRef.current, []);
 
-  const outputNow = useCallback(
-    () => recordBaseRef.current + engine.getOutputTime(),
-    [engine],
-  );
+  const outputNow = useCallback(() => engine.getOutputTime(), [engine]);
 
   const recordMove = useCallback((event: AutomationEvent) => {
     if (!recordingRef.current) return;
     eventsRef.current.push(event);
   }, []);
 
-  const bankTime = useCallback(() => {
-    recordBaseRef.current += engine.getOutputTime();
-  }, [engine]);
-
   const begin = useCallback((base: RemixParams, startOffset: number) => {
     takeBaseRef.current = base;
     takeStartRef.current = startOffset;
-    recordBaseRef.current = 0;
+    engine.resetOutputClock();
     eventsRef.current = [];
     recordingRef.current = true;
     setRecording(true);
-  }, []);
+  }, [engine]);
 
   const finish = useCallback(() => {
     recordingRef.current = false;
@@ -126,7 +119,6 @@ export function useTakeRecorder(
     isRecording,
     outputNow,
     recordMove,
-    bankTime,
     begin,
     finish,
   };

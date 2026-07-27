@@ -99,11 +99,49 @@ export class StudioEngine {
     return internal * this.playbackScale;
   }
 
-  /** Wall-clock output seconds since start — the take recorder's clock. */
+  /**
+   * Output seconds elapsed since the take recorder last reset this — the
+   * clock every automation event is stamped with.
+   *
+   * It has to be the ENGINE's job, because a graph only knows its own
+   * lifetime and graphs are replaced constantly: a reschedule, a seek, and —
+   * the one that was silently wrong — a LOOP WRAP. The wrap restarts
+   * playback from inside the engine, where no caller can see it, so a take
+   * recorded over a loop had every move after the first pass stamped with
+   * time-since-the-wrap. Recording 8 s over a 3.2 s loop timestamped the
+   * move at 1.6 s, and the bounce applied it there.
+   */
+  private outputBase = 0;
+  /**
+   * ctx time the current graph's output counting began. Deliberately NOT
+   * graph.startedAt: the transport position is measured from that, so
+   * re-anchoring it to start a take would teleport the playhead.
+   */
+  private outputAnchor = 0;
+
+  private bankOutputTime(): void {
+    if (!this.graph || !this.ctx) return;
+    const now = this.ctx.currentTime;
+    this.outputBase += Math.max(0, now - this.outputAnchor);
+    this.outputAnchor = now; // idempotent: banking twice adds nothing
+  }
+
+  /**
+   * Zero the output clock — a take begins.
+   *
+   * Re-anchors as well as zeroing, because recording usually starts while
+   * something is ALREADY playing, and without this the first event would be
+   * stamped with however long the current graph had been running. Measured
+   * at 1.7 s on a take begun a couple of seconds into playback.
+   */
+  resetOutputClock(): void {
+    this.outputBase = 0;
+    this.outputAnchor = this.ctx?.currentTime ?? 0;
+  }
+
   getOutputTime(): number {
-    const g = this.graph;
-    if (!g || !this.ctx) return 0;
-    return Math.max(0, this.ctx.currentTime - g.startedAt);
+    if (!this.graph || !this.ctx) return this.outputBase;
+    return this.outputBase + Math.max(0, this.ctx.currentTime - this.outputAnchor);
   }
 
   /**
@@ -199,6 +237,8 @@ export class StudioEngine {
     timelinePosition = this.position * this.playbackScale,
   ): void {
     const position = Math.max(0, timelinePosition) / this.playbackScale;
+    // Whatever this graph played counts toward the take, however it ends.
+    this.bankOutputTime();
     this.stopSources();
     this.lastClips = clips;
     this.lastBuffers = buffers;
@@ -246,6 +286,10 @@ export class StudioEngine {
     mixBus.gain.setValueAtTime(0, resumeAt);
     mixBus.gain.linearRampToValueAtTime(1, t0 + FADE_SECONDS);
 
+    // The output clock counts from here. Set explicitly rather than left to
+    // bankOutputTime, which returns early when nothing was playing — starting
+    // from stopped would otherwise carry a stale anchor.
+    this.outputAnchor = t0;
     this.graph = {
       sources,
       clipGains,
@@ -295,6 +339,7 @@ export class StudioEngine {
   private stopSources(): void {
     const g = this.graph;
     if (!g) return;
+    this.bankOutputTime();
     this.graph = null;
     window.clearTimeout(g.endTimer);
 
