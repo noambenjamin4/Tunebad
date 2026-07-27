@@ -32,8 +32,22 @@ export interface StoredArrangement {
   loop: { start: number; end: number } | null;
   gridOn: boolean;
   pxPerSecond: number;
+  /**
+   * Recorded performances. Optional, and deliberately NOT a schema bump:
+   * payloads written before takes were stored are still perfectly readable,
+   * and bumping the version would throw away every session in the wild to
+   * add a field that older code simply ignores.
+   */
+  takes?: unknown[];
   savedAt: number;
 }
+
+/**
+ * Ceiling for the whole arrangement in localStorage, which is a few MB total.
+ * A take is a list of timestamped knob moves and a long drag writes one per
+ * input event, so performances are the part that can run away.
+ */
+const MAX_ARRANGEMENT_BYTES = 2 * 1024 * 1024;
 
 /* ----------------------------- IndexedDB ----------------------------- */
 
@@ -110,7 +124,14 @@ export async function clearSessionFiles(): Promise<void> {
 export function saveArrangement(data: Omit<StoredArrangement, "version" | "savedAt">): void {
   try {
     const payload: StoredArrangement = { ...data, version: SCHEMA_VERSION, savedAt: Date.now() };
-    localStorage.setItem(ARRANGEMENT_KEY, JSON.stringify(payload));
+    let json = JSON.stringify(payload);
+    if (json.length > MAX_ARRANGEMENT_BYTES && payload.takes?.length) {
+      // The clips are the work; the performances are a bonus on top of them.
+      // If the pair will not fit, the arrangement is what survives — writing
+      // neither, which is what a quota error would do, is the worst outcome.
+      json = JSON.stringify({ ...payload, takes: [] });
+    }
+    localStorage.setItem(ARRANGEMENT_KEY, json);
   } catch {
     // Quota or disabled storage: the editor keeps working, unsaved.
   }
@@ -125,6 +146,17 @@ export function loadArrangement(): StoredArrangement | null {
     // restoring an arrangement whose fields mean something else now.
     if (parsed.version !== SCHEMA_VERSION) return null;
     if (!Array.isArray(parsed.clips) || parsed.clips.length === 0) return null;
+    // localStorage is user-editable, and a malformed take would surface as a
+    // broken export rather than a broken load. Anything that isn't shaped
+    // like a take is dropped here, where it is still cheap.
+    if (!Array.isArray(parsed.takes)) parsed.takes = [];
+    parsed.takes = parsed.takes.filter(
+      (take) =>
+        !!take &&
+        typeof take === "object" &&
+        Array.isArray((take as { events?: unknown }).events) &&
+        !!(take as { base?: unknown }).base,
+    );
     return parsed;
   } catch {
     return null;

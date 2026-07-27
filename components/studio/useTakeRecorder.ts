@@ -21,6 +21,21 @@ export interface StudioTake {
 let nextTakeId = 1;
 const makeTakeId = () => `take-${nextTakeId++}`;
 
+/**
+ * Move the counter past every restored id, so a take recorded after a reload
+ * cannot be handed an id a restored one already has. Same hazard the clip ids
+ * have: nothing crashes, the two takes just become indistinguishable to every
+ * id-keyed operation, including which one gets exported.
+ */
+function reserveTakeIds(takes: StudioTake[]): void {
+  for (const take of takes) {
+    const match = /^take-(\d+)$/.exec(take.id);
+    if (!match) continue;
+    const n = Number(match[1]);
+    if (Number.isFinite(n) && n >= nextTakeId) nextTakeId = n + 1;
+  }
+}
+
 export interface TakeRecorder {
   takes: StudioTake[];
   selectedTakeId: string | null;
@@ -35,6 +50,8 @@ export interface TakeRecorder {
   finish: () => void;
   /** Throw away every take — the arrangement they belong to is gone. */
   clear: () => void;
+  /** Install performances recovered from a saved session. */
+  adopt: (takes: StudioTake[]) => void;
 }
 
 /**
@@ -122,6 +139,12 @@ export function useTakeRecorder(
     setSelectedTakeId(null);
   }, []);
 
+  const adopt = useCallback((restored: StudioTake[]) => {
+    if (restored.length === 0) return;
+    reserveTakeIds(restored);
+    setTakes(restored);
+  }, []);
+
   return {
     takes,
     selectedTakeId,
@@ -133,5 +156,6 @@ export function useTakeRecorder(
     begin,
     finish,
     clear,
+    adopt,
   };
 }

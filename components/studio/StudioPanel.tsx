@@ -196,6 +196,7 @@ export function StudioPanel() {
     begin: beginTake,
     finish: finishTake,
     clear: clearTakes,
+    adopt: adoptTakes,
   } = recorder;
 
   endedRef.current = () => {
@@ -816,6 +817,11 @@ export function StudioPanel() {
     loop,
     gridOn,
     pxPerSecond,
+    // Read off `recorder` rather than the destructured `takes`, which is a
+    // render-time value pulled out further down next to the export code. The
+    // array identity only changes when a take does, so the autosave effect
+    // still fires exactly when it should.
+    takes: recorder.takes,
     onHandoffFiles: (files) => void addFiles(files),
     onRestored: (saved) => {
       // Before anything else: ids minted from here on must not collide with
@@ -832,6 +838,9 @@ export function StudioPanel() {
       beatGrid.setGridOn(saved.gridOn);
       if (saved.loop) applyLoop(saved.loop);
       if (saved.pxPerSecond) setPxPerSecond(clampZoom(saved.pxPerSecond));
+      // The performances belong to this arrangement; without them the mix
+      // came back and the thing recorded over it did not.
+      adoptTakes(saved.takes);
     },
     setStatus,
   });

@@ -55,6 +55,7 @@ import { buildPeakPyramid } from "../lib/studio/waveform-pyramid";
 import { scaleClipsForLock, stretchedIdFor } from "../lib/studio/lock-pitch";
 import { makeClipId, reserveClipIds, resetClipIds } from "../lib/studio/clip-ids";
 import { reachableBufferIds } from "../lib/studio/buffer-store";
+import { loadArrangement, saveArrangement } from "../lib/studio/session";
 
 const DRY_PARAMS: RemixParams = {
   speed: 1,
@@ -997,4 +998,64 @@ test("reachability spans the timeline, both history stacks, and provenance", () 
 
   // Nothing on the timeline and nothing in history means nothing is alive.
   assert.equal(reachableBufferIds([]).size, 0);
+});
+
+// A tiny localStorage so the arrangement's save/load rules can be exercised
+// without a browser. Only the four methods session.ts actually uses.
+function stubLocalStorage(): { store: Map<string, string> } {
+  const store = new Map<string, string>();
+  (globalThis as { localStorage?: unknown }).localStorage = {
+    getItem: (k: string) => store.get(k) ?? null,
+    setItem: (k: string, v: string) => void store.set(k, v),
+    removeItem: (k: string) => void store.delete(k),
+    clear: () => store.clear(),
+  };
+  return { store };
+}
+
+const arrangement = (takes: unknown[]) => ({
+  clips: [{ id: "clip-1", bufferId: "b", timelineStart: 0, clipStart: 0, clipEnd: 5 }] as never,
+  params: {},
+  grid: null,
+  loop: null,
+  gridOn: true,
+  pxPerSecond: 25,
+  takes,
+});
+
+test("a performance too large to store loses the performance, not the arrangement", () => {
+  stubLocalStorage();
+  // One take carrying more automation than localStorage can hold alongside
+  // the clips. Writing neither — which a quota error would do — is worse than
+  // writing the clips alone.
+  const huge = [{ id: "take-1", base: {}, events: new Array(200_000).fill({ at: 0, kind: "speed", value: 1 }) }];
+  saveArrangement(arrangement(huge));
+  const back = loadArrangement();
+  assert.ok(back, "the arrangement itself must survive");
+  assert.equal(back.clips.length, 1);
+  assert.deepEqual(back.takes, []);
+
+  // A performance that does fit is kept in full.
+  saveArrangement(arrangement([{ id: "take-1", base: {}, events: [{ at: 1, kind: "speed", value: 0.8 }] }]));
+  assert.equal(loadArrangement()?.takes?.length, 1);
+});
+
+test("takes that aren't shaped like takes are dropped at load", () => {
+  const { store } = stubLocalStorage();
+  saveArrangement(arrangement([{ id: "take-1", base: {}, events: [] }]));
+  // localStorage is user-editable; a malformed take would otherwise surface
+  // much later as a broken export.
+  const payload = JSON.parse(store.get("tunebadStudioSession")!);
+  payload.takes = [null, 42, { id: "no-events", base: {} }, { id: "no-base", events: [] }, payload.takes[0]];
+  store.set("tunebadStudioSession", JSON.stringify(payload));
+
+  const back = loadArrangement();
+  assert.equal(back?.takes?.length, 1);
+  assert.equal((back!.takes![0] as { id: string }).id, "take-1");
+
+  // takes missing entirely (a session saved before they were stored) is fine.
+  const older = JSON.parse(store.get("tunebadStudioSession")!);
+  delete older.takes;
+  store.set("tunebadStudioSession", JSON.stringify(older));
+  assert.deepEqual(loadArrangement()?.takes, []);
 });

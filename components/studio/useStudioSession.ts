@@ -15,6 +15,7 @@ import {
   saveArrangement,
 } from "@/lib/studio/session";
 import type { StudioClip } from "@/lib/studio/timeline";
+import type { StudioTake } from "./useTakeRecorder";
 import { takeStudioFiles } from "@/lib/files/tool-handoff";
 
 /** What a restore hands back once its audio is decoded and usable. */
@@ -25,6 +26,7 @@ export interface RestoredArrangement {
   gridOn: boolean;
   loop: { start: number; end: number } | null;
   pxPerSecond: number | null;
+  takes: StudioTake[];
 }
 
 interface SessionOptions {
@@ -35,6 +37,8 @@ interface SessionOptions {
   loop: { start: number; end: number } | null;
   gridOn: boolean;
   pxPerSecond: number;
+  /** Recorded performances, saved alongside the arrangement they belong to. */
+  takes: StudioTake[];
   /** Files arriving from another tool's "Open in DAW" button. */
   onHandoffFiles: (files: File[]) => void;
   /** Apply a recovered arrangement to component state. */
@@ -134,6 +138,7 @@ export function useStudioSession(options: SessionOptions): void {
           gridOn: saved.gridOn !== false,
           loop: saved.loop ?? null,
           pxPerSecond: saved.pxPerSecond ?? null,
+          takes: (saved.takes ?? []) as StudioTake[],
         });
         setStatus(t("studio.restored"));
       } catch {
@@ -151,7 +156,7 @@ export function useStudioSession(options: SessionOptions): void {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const { clips, params, grid, loop, gridOn, pxPerSecond } = options;
+  const { clips, params, grid, loop, gridOn, pxPerSecond, takes } = options;
 
   // Debounced: dragging a clip fires this on every pointer move.
   useEffect(() => {
@@ -161,8 +166,8 @@ export function useStudioSession(options: SessionOptions): void {
         void clearSession();
         return;
       }
-      saveArrangement({ clips, params, grid, loop, gridOn, pxPerSecond });
+      saveArrangement({ clips, params, grid, loop, gridOn, pxPerSecond, takes });
     }, 600);
     return () => window.clearTimeout(timer);
-  }, [clips, params, grid, loop, gridOn, pxPerSecond, restoring]);
+  }, [clips, params, grid, loop, gridOn, pxPerSecond, takes, restoring]);
 }
