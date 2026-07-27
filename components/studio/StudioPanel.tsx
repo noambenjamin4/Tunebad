@@ -236,101 +236,6 @@ export function StudioPanel() {
 
   /* ------------------------------ files in ------------------------------ */
 
-  const addFiles = useCallback(
-    async (files: File[]) => {
-      if (files.length === 0) return;
-      setDecoding(true);
-      setStatus("");
-      setStatusIsError(false);
-      let added = 0;
-      let cursor = timelineDuration(clipsRef.current);
-      let full = false;
-      // Snapshot the count ONCE: clipsRef re-points on every render, and this
-      // loop awaits a decode per file, so re-reading it mid-loop would count
-      // each new clip twice (once in the ref, once in `added`) and stop
-      // roughly half-way to the real limit.
-      const startingCount = clipsRef.current.length;
-
-      // Decode ALL of them at once. decodeAudioData is off-thread, so a
-      // serial loop just idles between files; four songs used to cost the
-      // sum of their decodes instead of the slowest one. Failures are kept
-      // per-file so one bad drop can't sink the batch.
-      const accepted = files.slice(0, Math.max(0, MAX_CLIPS - startingCount));
-      if (accepted.length < files.length) full = true;
-      const decoded = await Promise.all(
-        accepted.map(async (file) => {
-          const key = bufferKey(file);
-          if (bufferMap.has(key)) return { file, key, ok: true as const };
-          try {
-            const { buffer } = await decodeAudioFile(file);
-            return { file, key, ok: true as const, buffer };
-          } catch {
-            return { file, key, ok: false as const };
-          }
-        }),
-      );
-
-      for (const entry of decoded) {
-        const { file, key } = entry;
-        try {
-          if (!entry.ok) throw new Error("decode failed");
-          if (!bufferMap.has(key)) {
-            const fresh = entry.buffer!;
-            const bytes = fresh.length * fresh.numberOfChannels * 4;
-            // Budget is checked as each buffer is ADMITTED, so a batch that
-            // overshoots keeps the files that fit instead of all-or-nothing.
-            if (decodedBytes() + bytes > MAX_DECODED_BYTES) {
-              setStatus(t("studio.memoryFull"));
-              setStatusIsError(true);
-              break;
-            }
-            bufferMap.set(key, fresh);
-            // Keep the original file so a refresh can rebuild this clip.
-            // Compressed source, not decoded audio: a 4-minute MP3 is a few
-            // MB where its PCM is ~40.
-            void (async () => {
-              const stored = await loadSessionFiles();
-              if (sessionBytes(stored) + file.size > MAX_SESSION_BYTES) {
-                setStatus(t("studio.sessionFull"));
-                return;
-              }
-              await saveSessionFile(key, file);
-            })();
-          }
-          const buffer = bufferMap.get(key)!;
-          const start = Math.min(cursor, MAX_TIMELINE_SECONDS - buffer.duration);
-          const clip: StudioClip = {
-            id: makeClipId(),
-            name: file.name.replace(/\.[^.]+$/, ""),
-            bufferId: key,
-            timelineStart: Math.max(0, start),
-            clipStart: 0,
-            clipEnd: buffer.duration,
-            gain: 1,
-            fadeInSec: 0,
-            fadeOutSec: 0,
-            muted: false,
-            soloed: false,
-            colorIndex: (startingCount + added) % 3,
-          };
-          cursor = clip.timelineStart + buffer.duration;
-          pushUndo();
-          setClips((prev) => [...prev, clip]);
-          setSelectedId(clip.id);
-          added += 1;
-        } catch {
-          setStatus(t("studio.decodeFailed", { name: file.name }));
-          setStatusIsError(true);
-        }
-      }
-      if (full) {
-        setStatus(t("studio.slotsFull", { count: MAX_CLIPS }));
-        setStatusIsError(true);
-      }
-      setDecoding(false);
-    },
-    [t, pushUndo],
-  );
 
   const signals = useDisplaySignals(clips, params.effect);
   const beatGrid = useBeatGrid(clips, signals);
@@ -528,6 +433,114 @@ export function StudioPanel() {
     [pushUndo, requestReschedule],
   );
 
+  const addFiles = useCallback(
+    async (files: File[]) => {
+      if (files.length === 0) return;
+      setDecoding(true);
+      setStatus("");
+      setStatusIsError(false);
+      let added = 0;
+      let cursor = timelineDuration(clipsRef.current);
+      let full = false;
+      // Snapshot the count ONCE: clipsRef re-points on every render, and this
+      // loop awaits a decode per file, so re-reading it mid-loop would count
+      // each new clip twice (once in the ref, once in `added`) and stop
+      // roughly half-way to the real limit.
+      const startingCount = clipsRef.current.length;
+
+      // Decode ALL of them at once. decodeAudioData is off-thread, so a
+      // serial loop just idles between files; four songs used to cost the
+      // sum of their decodes instead of the slowest one. Failures are kept
+      // per-file so one bad drop can't sink the batch.
+      const accepted = files.slice(0, Math.max(0, MAX_CLIPS - startingCount));
+      if (accepted.length < files.length) full = true;
+      const decoded = await Promise.all(
+        accepted.map(async (file) => {
+          const key = bufferKey(file);
+          if (bufferMap.has(key)) return { file, key, ok: true as const };
+          try {
+            const { buffer } = await decodeAudioFile(file);
+            return { file, key, ok: true as const, buffer };
+          } catch {
+            return { file, key, ok: false as const };
+          }
+        }),
+      );
+
+      for (const entry of decoded) {
+        const { file, key } = entry;
+        try {
+          if (!entry.ok) throw new Error("decode failed");
+          if (!bufferMap.has(key)) {
+            const fresh = entry.buffer!;
+            const bytes = fresh.length * fresh.numberOfChannels * 4;
+            // Budget is checked as each buffer is ADMITTED, so a batch that
+            // overshoots keeps the files that fit instead of all-or-nothing.
+            if (decodedBytes() + bytes > MAX_DECODED_BYTES) {
+              setStatus(t("studio.memoryFull"));
+              setStatusIsError(true);
+              break;
+            }
+            bufferMap.set(key, fresh);
+            // Keep the original file so a refresh can rebuild this clip.
+            // Compressed source, not decoded audio: a 4-minute MP3 is a few
+            // MB where its PCM is ~40.
+            void (async () => {
+              const stored = await loadSessionFiles();
+              if (sessionBytes(stored) + file.size > MAX_SESSION_BYTES) {
+                setStatus(t("studio.sessionFull"));
+                return;
+              }
+              await saveSessionFile(key, file);
+            })();
+          }
+          const buffer = bufferMap.get(key)!;
+          const start = Math.min(cursor, MAX_TIMELINE_SECONDS - buffer.duration);
+          const clip: StudioClip = {
+            id: makeClipId(),
+            name: file.name.replace(/\.[^.]+$/, ""),
+            bufferId: key,
+            timelineStart: Math.max(0, start),
+            clipStart: 0,
+            clipEnd: buffer.duration,
+            gain: 1,
+            fadeInSec: 0,
+            fadeOutSec: 0,
+            muted: false,
+            soloed: false,
+            colorIndex: (startingCount + added) % 3,
+          };
+          cursor = clip.timelineStart + buffer.duration;
+          pushUndo();
+          setClips((prev) => [...prev, clip]);
+          setSelectedId(clip.id);
+          added += 1;
+        } catch {
+          setStatus(t("studio.decodeFailed", { name: file.name }));
+          setStatusIsError(true);
+        }
+      }
+      if (full) {
+        setStatus(t("studio.slotsFull", { count: MAX_CLIPS }));
+        setStatusIsError(true);
+      }
+      setDecoding(false);
+      // Once, after the whole batch. A clip the engine has never been told
+      // about is not merely inaudible: the end timer is still armed for the
+      // OLD timeline length, so the transport stops where the timeline used
+      // to finish and the song you just dropped never plays at all.
+      //
+      // "defer", not "now", and the distinction is not cosmetic. addFiles is
+      // async, so its setClips calls are still pending when this line runs —
+      // "now" reschedules on a microtask, before React commits, and rebuilds
+      // the graph from the clip list as it was BEFORE the drop. Deferring
+      // lets the commit land first. (Synchronous handlers like split are fine
+      // with "now" because React flushes them before microtasks run.)
+      if (added > 0) requestReschedule("defer");
+    },
+    [t, pushUndo, requestReschedule],
+  );
+
   const bufferDurationOf = (clip: StudioClip): number =>
     bufferMap.get(clip.bufferId)?.duration ?? clip.clipEnd;
 
@@ -557,7 +570,12 @@ export function StudioPanel() {
     pushUndo();
     setClips((prev) => prev.flatMap((c) => (c.id === clip.id ? halves : [c])));
     setSelectedId(halves[1].id);
-  }, [selectedId, engine, pushUndo, t]);
+    // Duplicate and crossfade already did this; split did not. The cut zeroes
+    // the fades either side of it, and the halves are new clips with new ids,
+    // so the running graph knows neither the new envelope nor which gain node
+    // belongs to what.
+    requestReschedule("now");
+  }, [selectedId, engine, pushUndo, requestReschedule, t]);
 
   /**
    * Beatmatch: stretch the selected clip so its tempo equals the project's,
