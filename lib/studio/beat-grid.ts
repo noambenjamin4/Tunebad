@@ -88,25 +88,40 @@ export function beatTimesInRange(
  * same distance from a perfect match.
  */
 /**
- * Widen a region outward to the bar lines around it.
+ * Widen a region outward to the bar lines around it, without running off the
+ * end of the audio.
  *
  * A loop that starts three-quarters of a beat into a bar does not sound like
  * a loop, it sounds like a stutter — the ear hears the downbeat land in the
- * wrong place on every pass. Always widening (never narrowing) means the
- * region the caller asked for is still entirely inside the result.
+ * wrong place on every pass. So the region grows outward, never inward, and
+ * whatever was asked for stays entirely inside the result.
+ *
+ * `limitSec` is where the material ends, and it wins over bar alignment.
+ * Reaching forward to the next bar line past the last clip buys a tidy number
+ * of bars and pays for it with silence on every single pass, which is the one
+ * thing a loop must not do. A short final bar is the better trade.
  */
 export function expandToBars(
   region: { start: number; end: number },
   grid: BeatGrid,
+  limitSec = Infinity,
 ): { start: number; end: number } {
   const bar = beatPeriod(grid.bpm) * Math.max(1, grid.beatsPerBar);
   if (!Number.isFinite(bar) || bar <= 0) return region;
   const barsFrom = (t: number) => (t - grid.anchorSec) / bar;
-  const start = grid.anchorSec + Math.floor(barsFrom(region.start) + 1e-6) * bar;
-  const end = grid.anchorSec + Math.ceil(barsFrom(region.end) - 1e-6) * bar;
   // The anchor can sit after zero, which would put the first bar line at a
   // negative time; the transport has no material there.
-  return { start: Math.max(0, start), end: Math.max(start + bar, end) };
+  const start = Math.max(0, grid.anchorSec + Math.floor(barsFrom(region.start) + 1e-6) * bar);
+  const widened = grid.anchorSec + Math.ceil(barsFrom(region.end) - 1e-6) * bar;
+  // Never past the material, but never shorter than the caller asked for
+  // either — those two only conflict if the request itself overran.
+  const ceiling = Math.max(region.end, limitSec);
+  const end = Math.min(widened, ceiling);
+  // A clip shorter than one bar cannot be bar-aligned at both ends; it keeps
+  // its own length rather than gaining silence.
+  const atLeastOneBar = Math.min(start + bar, ceiling);
+  const settled = Math.max(end, atLeastOneBar);
+  return settled > start ? { start, end: settled } : region;
 }
 
 /** How many bars a region spans on this grid, for the readout. */

@@ -781,3 +781,31 @@ test("overlapPartner is the one scan behind loop, crossfade and the key check", 
   assert.deepEqual(loopRegionFor([a, graze, real], "a"), { start: 22, end: 30 });
   assert.equal(overlapPartner([a], "a"), null);
 });
+
+test("a bar-aligned loop never runs past the end of the audio", () => {
+  // The regression this exists for: one 13s clip on a 120 BPM grid (2s bars).
+  // Reaching forward to the next bar line gives a tidy 14s = 7 bars, and one
+  // full second of silence on every single pass.
+  const grid: BeatGrid = { bpm: 120, anchorSec: 0, beatsPerBar: 4 };
+  const material = 13;
+  const loop = expandToBars({ start: 0, end: material }, grid, material);
+  assert.equal(loop.start, 0);
+  assert.equal(loop.end, material, "loop must stop where the audio stops");
+
+  // With room to spare it still snaps outward as before.
+  const midMix = expandToBars({ start: 3.1, end: 6.4 }, grid, 60);
+  assert.deepEqual(midMix, { start: 2, end: 8 });
+
+  // Omitting the limit keeps the old behaviour for callers that have no
+  // material to run out of.
+  assert.deepEqual(expandToBars({ start: 0, end: 13 }, grid), { start: 0, end: 14 });
+});
+
+test("a clip shorter than one bar loops over itself, not over silence", () => {
+  // 1.2s of audio on a 2s grid cannot be bar-aligned at both ends. Gaining
+  // 0.8s of silence to make the numbers tidy is the wrong trade.
+  const grid: BeatGrid = { bpm: 120, anchorSec: 0, beatsPerBar: 4 };
+  const loop = expandToBars({ start: 0, end: 1.2 }, grid, 1.2);
+  assert.equal(loop.end, 1.2);
+  assert.ok(loop.end > loop.start, "a loop must still have length");
+});

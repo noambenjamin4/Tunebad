@@ -675,7 +675,10 @@ export function StudioPanel() {
     if (!selectedId) return;
     const region = loopRegionFor(clipsRef.current, selectedId);
     if (!region) return;
-    applyLoop(grid ? expandToBars(region, grid) : region);
+    // Bar alignment stops at the end of the audio: looping past the last clip
+    // would play silence on every pass.
+    const limit = timelineDuration(clipsRef.current);
+    applyLoop(grid ? expandToBars(region, grid, limit) : region);
   }, [loop, selectedId, applyLoop, grid]);
 
   /**
