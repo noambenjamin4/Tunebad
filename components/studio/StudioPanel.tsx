@@ -225,39 +225,6 @@ export function StudioPanel() {
   }, []);
 
   /** Move one state between the two stacks. Undo and redo are mirror images. */
-  const step = useCallback((from: StudioClip[][], to: StudioClip[][]) => {
-    const previous = from.pop();
-    if (!previous) return;
-    to.push(clipsRef.current);
-    setClips(previous);
-    setSelectedId((current) => (previous.some((c) => c.id === current) ? current : null));
-    syncHistory();
-  }, []);
-
-  const undo = useCallback(() => {
-    step(undoStackRef.current, redoStackRef.current);
-  }, [step]);
-
-  const redo = useCallback(() => {
-    step(redoStackRef.current, undoStackRef.current);
-  }, [step]);
-
-  // Cmd/Ctrl+Z anywhere on the page except while typing in a field; add
-  // Shift for redo (and Ctrl+Y, which is what Windows habits reach for).
-  useEffect(() => {
-    const onKey = (event: KeyboardEvent) => {
-      if (!(event.metaKey || event.ctrlKey)) return;
-      const key = event.key.toLowerCase();
-      if (key !== "z" && key !== "y") return;
-      const target = event.target as HTMLElement | null;
-      if (target && /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName)) return;
-      event.preventDefault();
-      if (key === "y" || event.shiftKey) redo();
-      else undo();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [undo, redo]);
 
   const stopPreview = useCallback(() => {
     engine.stop();
@@ -497,6 +464,44 @@ export function StudioPanel() {
   );
 
   useEffect(() => () => window.clearTimeout(rescheduleTimerRef.current), []);
+
+  const step = useCallback((from: StudioClip[][], to: StudioClip[][]) => {
+    const previous = from.pop();
+    if (!previous) return;
+    to.push(clipsRef.current);
+    setClips(previous);
+    setSelectedId((current) => (previous.some((c) => c.id === current) ? current : null));
+    // The engine is still playing the arrangement we just replaced. Without
+    // this, undo moves the picture and leaves the sound alone — a muted clip
+    // stays silent while the inspector says it is not.
+    requestReschedule("now");
+    syncHistory();
+  }, [requestReschedule]);
+
+  const undo = useCallback(() => {
+    step(undoStackRef.current, redoStackRef.current);
+  }, [step]);
+
+  const redo = useCallback(() => {
+    step(redoStackRef.current, undoStackRef.current);
+  }, [step]);
+
+  // Cmd/Ctrl+Z anywhere on the page except while typing in a field; add
+  // Shift for redo (and Ctrl+Y, which is what Windows habits reach for).
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (!(event.metaKey || event.ctrlKey)) return;
+      const key = event.key.toLowerCase();
+      if (key !== "z" && key !== "y") return;
+      const target = event.target as HTMLElement | null;
+      if (target && /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName)) return;
+      event.preventDefault();
+      if (key === "y" || event.shiftKey) redo();
+      else undo();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [undo, redo]);
 
   const editClip = useCallback(
     (
