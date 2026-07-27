@@ -34,6 +34,41 @@ export function decodedBytes(): number {
 }
 
 /**
+ * Every buffer id the given clip sets can still reach.
+ *
+ * "Still reachable" is the only safe test for whether audio is dead, and it
+ * has to include the undo history: deleting a clip used to free its buffer
+ * immediately, so undoing the delete brought the clip back with no audio
+ * behind it — silent, no waveform, and no way to recover it short of
+ * reloading the page.
+ *
+ * `sourceBufferId` counts too. A beatmatched clip plays a stretched buffer
+ * that is never stored, and is rebuilt on restore from the origin it records;
+ * forget the origin and the clip cannot come back.
+ */
+export function reachableBufferIds(...clipSets: { bufferId: string; sourceBufferId?: string }[][]): Set<string> {
+  const reachable = new Set<string>();
+  for (const clips of clipSets) {
+    for (const clip of clips) {
+      reachable.add(clip.bufferId);
+      if (clip.sourceBufferId) reachable.add(clip.sourceBufferId);
+    }
+  }
+  return reachable;
+}
+
+/** Free every buffer outside `reachable`. Returns the ids actually dropped. */
+export function releaseUnreachable(reachable: Set<string>): string[] {
+  const dropped: string[] = [];
+  for (const id of [...bufferMap.keys()]) {
+    if (reachable.has(id)) continue;
+    releaseBuffer(id);
+    dropped.push(id);
+  }
+  return dropped;
+}
+
+/**
  * Drop a buffer and everything derived from it: the drawn waveforms (one per
  * character effect) and any pitch-locked stretches. Call this only once no
  * clip references the id — a split leaves two clips on one buffer.

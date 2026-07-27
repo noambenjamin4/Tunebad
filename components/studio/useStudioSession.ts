@@ -5,12 +5,13 @@ import { useI18n } from "@/lib/i18n";
 import { decodeAudioFile } from "@/lib/audio/decode";
 import type { RemixParams } from "@/lib/audio/remix";
 import type { BeatGrid } from "@/lib/studio/beat-grid";
-import { bufferMap } from "@/lib/studio/buffer-store";
+import { bufferMap, reachableBufferIds } from "@/lib/studio/buffer-store";
 import { getStretchedBuffer } from "@/lib/studio/lock-pitch";
 import {
   clearSession,
   loadArrangement,
   loadSessionFiles,
+  pruneSessionFiles,
   saveArrangement,
 } from "@/lib/studio/session";
 import type { StudioClip } from "@/lib/studio/timeline";
@@ -89,9 +90,13 @@ export function useStudioSession(options: SessionOptions): void {
     void (async () => {
       try {
         const files = await loadSessionFiles();
+        // Only what this arrangement actually plays. The store used to be
+        // decoded in full, so every track ever auditioned and thrown away was
+        // still costing a decode and a slab of memory on every single load.
+        const needed = reachableBufferIds(saved.clips);
         for (const [id, file] of files) {
           if (cancelled) return;
-          if (bufferMap.has(id)) continue;
+          if (!needed.has(id) || bufferMap.has(id)) continue;
           try {
             const { buffer } = await decodeAudioFile(file);
             bufferMap.set(id, buffer);
@@ -118,6 +123,10 @@ export function useStudioSession(options: SessionOptions): void {
           setStatus("");
           return;
         }
+        // Now that the arrangement is known good, forget the files nothing in
+        // it refers to. This is where a session that has been worked on for a
+        // while gets its storage back.
+        void pruneSessionFiles(reachableBufferIds(usable));
         optionsRef.current.onRestored({
           clips: usable,
           params: (saved.params as RemixParams | null) ?? null,

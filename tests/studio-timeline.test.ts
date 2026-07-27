@@ -54,6 +54,7 @@ import {
 import { buildPeakPyramid } from "../lib/studio/waveform-pyramid";
 import { scaleClipsForLock, stretchedIdFor } from "../lib/studio/lock-pitch";
 import { makeClipId, reserveClipIds, resetClipIds } from "../lib/studio/clip-ids";
+import { reachableBufferIds } from "../lib/studio/buffer-store";
 
 const DRY_PARAMS: RemixParams = {
   speed: 1,
@@ -972,4 +973,28 @@ test("mono streams put the tag at the mono side-info offset", () => {
   for (let i = 0; i < mono.length; i += 417) mono[i + 3] = 0xc0; // channel mode 3
   const tagged = withGaplessHeader(mono, 44100);
   assert.equal(String.fromCharCode(...tagged.subarray(4 + 17, 4 + 17 + 4)), "Info");
+});
+
+test("reachability spans the timeline, both history stacks, and provenance", () => {
+  const onTimeline = [{ bufferId: "a" }];
+  const undone = [[{ bufferId: "a" }, { bufferId: "deleted-but-undoable" }]];
+  const redone = [[{ bufferId: "redoable" }]];
+
+  const reachable = reachableBufferIds(onTimeline, ...undone, ...redone);
+  // The clip sitting in the undo stack keeps its audio: freeing it there is
+  // what made "delete, then undo" produce a silent clip.
+  assert.ok(reachable.has("deleted-but-undoable"));
+  assert.ok(reachable.has("redoable"));
+  assert.ok(reachable.has("a"));
+  assert.equal(reachable.size, 3);
+
+  // A beatmatched clip plays a stretched buffer that is never stored, and is
+  // rebuilt from the origin it records — so the origin counts as reachable.
+  const matched = reachableBufferIds([
+    { bufferId: "a:stretched:1.09", sourceBufferId: "a" },
+  ]);
+  assert.deepEqual([...matched].sort(), ["a", "a:stretched:1.09"]);
+
+  // Nothing on the timeline and nothing in history means nothing is alive.
+  assert.equal(reachableBufferIds([]).size, 0);
 });

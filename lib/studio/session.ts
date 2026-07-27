@@ -150,3 +150,43 @@ export function sessionBytes(files: Map<string, File>): number {
   for (const file of files.values()) total += file.size;
   return total;
 }
+
+/**
+ * Delete every stored file outside `reachable`.
+ *
+ * Nothing used to remove a file, ever. Deleting a clip freed its decoded
+ * audio and left the source sitting in IndexedDB forever, so a session where
+ * six tracks were auditioned and two kept held all six — and since the
+ * MAX_SESSION_BYTES check counts total stored bytes, the abandoned ones
+ * eventually fill the budget and the songs actually in use stop being saved.
+ *
+ * The caller passes what is still reachable rather than what was just
+ * deleted, so an undone delete keeps its audio (the clip is still in the undo
+ * history, so still reachable) and a beatmatched clip keeps the origin it
+ * rebuilds from.
+ */
+export async function pruneSessionFiles(reachable: Set<string>): Promise<number> {
+  try {
+    const db = await openDb();
+    const keys = await new Promise<IDBValidKey[]>((resolve, reject) => {
+      const request = db.transaction(STORE, "readonly").objectStore(STORE).getAllKeys();
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+    const dead = keys.filter((key) => typeof key === "string" && !reachable.has(key));
+    if (dead.length > 0) {
+      await new Promise<void>((resolve, reject) => {
+        const transaction = db.transaction(STORE, "readwrite");
+        const store = transaction.objectStore(STORE);
+        for (const key of dead) store.delete(key);
+        transaction.oncomplete = () => resolve();
+        transaction.onerror = () => reject(transaction.error);
+      });
+    }
+    db.close();
+    return dead.length;
+  } catch {
+    // Storage unavailable: nothing to prune, and never break the editor.
+    return 0;
+  }
+}

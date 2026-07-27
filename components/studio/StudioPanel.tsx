@@ -47,7 +47,13 @@ import {
   trimClipStart,
 } from "@/lib/studio/timeline";
 import { DEFAULT_PX_PER_SECOND, clampZoom } from "@/lib/studio/timeline-math";
-import { bufferKey, bufferMap, decodedBytes, releaseBuffer } from "@/lib/studio/buffer-store";
+import {
+  bufferKey,
+  bufferMap,
+  decodedBytes,
+  reachableBufferIds,
+  releaseUnreachable,
+} from "@/lib/studio/buffer-store";
 import { makeClipId, reserveClipIds } from "@/lib/studio/clip-ids";
 import { getDisplaySignal } from "@/lib/studio/display-signal";
 import { StudioEngine } from "@/lib/studio/engine";
@@ -55,6 +61,7 @@ import {
   MAX_SESSION_BYTES,
   clearSession,
   loadSessionFiles,
+  pruneSessionFiles,
   saveSessionFile,
   sessionBytes,
 } from "@/lib/studio/session";
@@ -549,17 +556,32 @@ export function StudioPanel() {
   const bufferDurationOf = (clip: StudioClip): number =>
     bufferMap.get(clip.bufferId)?.duration ?? clip.clipEnd;
 
+  /**
+   * Free whatever the session can no longer reach — decoded audio in memory,
+   * source files in storage.
+   *
+   * Reachability is computed from the timeline AND both history stacks, which
+   * is the whole point: this used to free the deleted clip's buffer on the
+   * spot, so undoing the delete brought back a clip with no audio behind it
+   * (silent, no waveform, unrecoverable without a page reload). A clip sitting
+   * in the undo stack is still reachable, so its audio stays.
+   */
+  const collectGarbage = useCallback(() => {
+    const reachable = reachableBufferIds(
+      clipsRef.current,
+      ...undoStackRef.current,
+      ...redoStackRef.current,
+    );
+    releaseUnreachable(reachable);
+    void pruneSessionFiles(reachable);
+  }, []);
+
   const handleDeleteSelected = useCallback(() => {
     if (!selectedId) return;
-    const gone = clipsRef.current.find((c) => c.id === selectedId);
     editClip(selectedId, () => null);
     setSelectedId(null);
-    // Last clip using that buffer? Its decoded audio and every drawn or
-    // stretched copy of it are dead weight.
-    if (gone && !clipsRef.current.some((c) => c.id !== selectedId && c.bufferId === gone.bufferId)) {
-      releaseBuffer(gone.bufferId);
-    }
-  }, [selectedId, editClip]);
+    collectGarbage();
+  }, [selectedId, editClip, collectGarbage]);
 
   const handleSplitSelected = useCallback(() => {
     if (!selectedId) return;
@@ -752,7 +774,7 @@ export function StudioPanel() {
     setClearArmed(false);
 
     stopPreview();
-    for (const id of new Set(clipsRef.current.map((c) => c.bufferId))) releaseBuffer(id);
+    releaseUnreachable(new Set());
     setClips([]);
     setSelectedId(null);
     applyLoop(null);
