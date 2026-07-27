@@ -32,7 +32,12 @@ import {
   zoomAtCursor,
   zoomToFit,
 } from "../lib/studio/timeline-math";
-import { automatedOutputDuration } from "../lib/audio/remix";
+import {
+  type RemixParams,
+  NEUTRAL_REVERB_EQ,
+  automatedOutputDuration,
+  reverbTailSeconds,
+} from "../lib/audio/remix";
 import { keysMix } from "../lib/audio/harmonic";
 import {
   type BeatGrid,
@@ -47,6 +52,17 @@ import {
 import { buildPeakPyramid } from "../lib/studio/waveform-pyramid";
 import { scaleClipsForLock, stretchedIdFor } from "../lib/studio/lock-pitch";
 import { makeClipId, reserveClipIds, resetClipIds } from "../lib/studio/clip-ids";
+
+const DRY_PARAMS: RemixParams = {
+  speed: 1,
+  reverb: 0,
+  bassBoostDb: 0,
+  lockPitch: false,
+  pitchSemitones: 0,
+  reverbType: "hall",
+  reverbEq: NEUTRAL_REVERB_EQ,
+  effect: "none",
+};
 
 let nextId = 100;
 const makeId = () => `t${nextId++}`;
@@ -808,4 +824,36 @@ test("a clip shorter than one bar loops over itself, not over silence", () => {
   const loop = expandToBars({ start: 0, end: 1.2 }, grid, 1.2);
   assert.equal(loop.end, 1.2);
   assert.ok(loop.end > loop.start, "a loop must still have length");
+});
+
+/* ------------------------------ reverb tail ------------------------------ */
+
+test("a dry mix gets no reverb tail", () => {
+  // The convolver is the only node with a tail, so padding a mix with no
+  // reverb just staples digital silence onto every exported file — and puts
+  // a gap in any loop bounced out of the tool.
+  const dry: RemixParams = { ...DRY_PARAMS, reverb: 0 };
+  assert.equal(reverbTailSeconds(dry), 0);
+  // Even with a long reverb TYPE selected, if the amount is zero it is
+  // inaudible and costs nothing to leave room for.
+  assert.equal(reverbTailSeconds({ ...dry, reverbType: "cathedral" }), 0);
+});
+
+test("the tail covers the wettest and longest reverb a take ever reaches", () => {
+  const dry: RemixParams = { ...DRY_PARAMS, reverb: 0, reverbType: "room" };
+  // Silent at the start but turned up mid-performance: the tail must appear.
+  assert.equal(reverbTailSeconds(dry, [{ t: 4, kind: "reverb", value: 60 }]), 0.9);
+  // ...and follow a type swap to the longest one used, not the last one set.
+  assert.equal(
+    reverbTailSeconds(dry, [
+      { t: 4, kind: "reverb", value: 60 },
+      { t: 6, kind: "reverbType", value: "cathedral" },
+      { t: 9, kind: "reverbType", value: "room" },
+    ]),
+    5.5,
+  );
+  // Automation that never turns anything up still gets no tail.
+  assert.equal(reverbTailSeconds(dry, [{ t: 2, kind: "bassBoostDb", value: 4 }]), 0);
+  // A wet mix keeps its tail with no automation at all.
+  assert.equal(reverbTailSeconds({ ...dry, reverb: 40, reverbType: "hall" }), 2.8);
 });

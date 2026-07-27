@@ -262,6 +262,34 @@ export interface EffectNodes {
 export const EFFECT_GLIDE_SECONDS = 0.12;
 
 /**
+ * Seconds of silence a render must leave for the reverb to decay into.
+ *
+ * ZERO when no reverb is ever audible. The convolver is the only node in the
+ * chain with a tail, so padding a dry mix does not capture anything — it just
+ * staples digital silence onto the end of every file. That is wrong for a
+ * plain bounce and actively harmful for a loop, which then has a gap in it
+ * the moment anyone plays it end to end.
+ *
+ * A take can turn the reverb up partway through, or swap the type, so the
+ * whole automation is scanned rather than only the parameters it starts on.
+ */
+export function reverbTailSeconds(
+  params: RemixParams,
+  events: readonly AutomationEvent[] = [],
+): number {
+  let wettest = params.reverb;
+  let longest = (REVERB_TYPES[params.reverbType] ?? REVERB_TYPES.hall).seconds;
+  for (const event of events) {
+    if (event.kind === "reverb") wettest = Math.max(wettest, Number(event.value));
+    if (event.kind === "reverbType") {
+      const type = REVERB_TYPES[event.value as ReverbType];
+      if (type) longest = Math.max(longest, type.seconds);
+    }
+  }
+  return wettest > 0 ? longest : 0;
+}
+
+/**
  * Move the effect chain to a preset.
  *
  * Without `glide` every value is assigned outright, which is correct at build
@@ -473,8 +501,7 @@ export async function renderRemix(
 ): Promise<{ channels: Float32Array[]; sampleRate: number }> {
   const numberOfChannels = Math.min(2, buffer.numberOfChannels);
   const effectiveSpeed = params.lockPitch ? 1 : params.speed;
-  // Tail padding must cover the selected reverb type's impulse length.
-  const tail = (REVERB_TYPES[params.reverbType] ?? REVERB_TYPES.hall).seconds;
+  const tail = reverbTailSeconds(params);
   const length = Math.ceil((buffer.duration / effectiveSpeed + tail) * buffer.sampleRate);
   const offline = new OfflineAudioContext(numberOfChannels, length, buffer.sampleRate);
 
@@ -656,11 +683,9 @@ export async function renderRemixAutomated(
   // scheduling below then both work in output time with no further offsetting.
   const ordered = shiftEvents(events, takeOutputStart(baseParams, startOffset)).sort((a, b) => a.t - b.t);
 
-  // The tail has to cover the longest reverb the recording ever touches, not
-  // just the one it ends on.
-  const usedTypes: ReverbType[] = [baseParams.reverbType];
-  for (const event of ordered) if (event.kind === "reverbType") usedTypes.push(event.value);
-  const tail = Math.max(...usedTypes.map((type) => (REVERB_TYPES[type] ?? REVERB_TYPES.hall).seconds));
+  // Covers the longest reverb the recording ever touches, not just the one it
+  // ends on — and nothing at all if it never turns any reverb up.
+  const tail = reverbTailSeconds(baseParams, ordered);
 
   const baseSpeed = baseEffectiveSpeed(baseParams);
   const outputDuration = automatedOutputDuration(buffer.duration, baseSpeed, ordered);
