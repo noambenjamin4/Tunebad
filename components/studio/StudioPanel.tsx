@@ -1104,10 +1104,22 @@ export function StudioPanel() {
                 engine.setClipGain(selectedClip.id, gain);
               }}
               onFadeIn={(fadeInSec) =>
-                editClip(selectedClip.id, (c) => ({ ...c, fadeInSec }), { reschedule: "defer" })
+                editClip(
+                  selectedClip.id,
+                  // Typing a length means a plain fade from silence. A half
+                  // left over from a split carries a window onto part of its
+                  // parent's curve, and keeping that here would start the
+                  // brand-new fade partway up instead of at zero.
+                  (c) => ({ ...c, fadeInSec, fadeInFrom: undefined, fadeInTo: undefined }),
+                  { reschedule: "defer" },
+                )
               }
               onFadeOut={(fadeOutSec) =>
-                editClip(selectedClip.id, (c) => ({ ...c, fadeOutSec }), { reschedule: "defer" })
+                editClip(
+                  selectedClip.id,
+                  (c) => ({ ...c, fadeOutSec, fadeOutFrom: undefined, fadeOutTo: undefined }),
+                  { reschedule: "defer" },
+                )
               }
               onFadeCurve={(fadeCurve) =>
                 editClip(selectedClip.id, (c) => ({ ...c, fadeCurve }))

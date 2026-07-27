@@ -34,6 +34,10 @@ export function ClipCanvas({
   fadeInSec,
   fadeOutSec,
   fadeCurve,
+  fadeInFrom,
+  fadeInTo,
+  fadeOutFrom,
+  fadeOutTo,
   gain,
   muted,
   widthPx,
@@ -51,6 +55,11 @@ export function ClipCanvas({
   fadeInSec: number;
   fadeOutSec: number;
   fadeCurve: FadeCurve | undefined;
+  /** Which part of each fade curve this clip covers — see StudioClip. */
+  fadeInFrom?: number;
+  fadeInTo?: number;
+  fadeOutFrom?: number;
+  fadeOutTo?: number;
   gain: number;
   muted: boolean;
   /** Width of the visible slice in CSS px. */
@@ -109,7 +118,16 @@ export function ClipCanvas({
       const local = (t0 + t1) / 2 - clipStart;
       const level = Math.max(
         0,
-        gain * fadeGain(local, clipLength, fadeInSec, fadeOutSec, fadeCurve),
+        gain *
+          fadeGain(local, clipLength, {
+            fadeInSec,
+            fadeOutSec,
+            fadeCurve,
+            fadeInFrom,
+            fadeInTo,
+            fadeOutFrom,
+            fadeOutTo,
+          }),
       );
 
       // Canvas y grows downward: max (positive) is the TOP of the column.
@@ -143,6 +161,10 @@ export function ClipCanvas({
     fadeInSec,
     fadeOutSec,
     fadeCurve,
+    fadeInFrom,
+    fadeInTo,
+    fadeOutFrom,
+    fadeOutTo,
     gain,
     muted,
     widthPx,

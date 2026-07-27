@@ -23,6 +23,22 @@ export interface StudioClip {
    * curves existed must keep sounding the way they were authored.
    */
   fadeCurve?: FadeCurve;
+  /**
+   * Where along its own curve each fade starts and ends, 0 = silent end,
+   * 1 = full. Absent means the whole curve (0 -> 1 in, 1 -> 0 out), which is
+   * every fade anyone types by hand.
+   *
+   * They exist for SPLIT. Cutting a clip inside a fade leaves each half with
+   * a piece of that fade, and a piece cannot be described by a length alone:
+   * the second half has to pick up where the first left off instead of
+   * restarting from silence. Positions along the curve rather than raw gains,
+   * so the two pieces reproduce the original exactly for a curved fade as
+   * well as a straight one.
+   */
+  fadeInFrom?: number;
+  fadeInTo?: number;
+  fadeOutFrom?: number;
+  fadeOutTo?: number;
   /** Silenced without losing its gain setting; skipped by the scheduler. */
   muted: boolean;
   /** When ANY clip is soloed, only soloed clips play — live AND on export. */
@@ -93,21 +109,46 @@ export function fitFades(
  * side to a quarter-cosine so that gainA² + gainB² stays 1 across a matched
  * overlap, and the level holds.
  */
-export function fadeGain(
-  local: number,
-  length: number,
-  fadeInSec: number,
-  fadeOutSec: number,
-  curve: FadeCurve = "linear",
-): number {
-  const { fadeIn, fadeOut } = fitFades(fadeInSec, fadeOutSec, length);
+/** The fade half of a clip. A StudioClip satisfies it as-is. */
+export interface FadeShape {
+  fadeInSec: number;
+  fadeOutSec: number;
+  fadeCurve?: FadeCurve;
+  fadeInFrom?: number;
+  fadeInTo?: number;
+  fadeOutFrom?: number;
+  fadeOutTo?: number;
+}
+
+export function fadeGain(local: number, length: number, fade: FadeShape): number {
+  const { fadeIn, fadeOut } = fitFades(fade.fadeInSec, fade.fadeOutSec, length);
+  const curve = fade.fadeCurve ?? "linear";
+  const shape = (p: number) => {
+    const clamped = Math.max(0, Math.min(1, p));
+    return curve === "equalPower" ? Math.sin((Math.PI / 2) * clamped) : clamped;
+  };
+
+  // Each side contributes a position along its own curve; the quieter wins.
+  // A fade that covers only part of the curve holds its end position through
+  // the flat middle, which is what makes the two halves of a split clip sum
+  // back to the envelope they were cut from.
   let progress = 1;
-  if (fadeIn > 0 && local < fadeIn) progress = Math.min(progress, local / fadeIn);
-  if (fadeOut > 0 && local > length - fadeOut) {
-    progress = Math.min(progress, (length - local) / fadeOut);
+  if (fadeIn > 0) {
+    const from = fade.fadeInFrom ?? 0;
+    const to = fade.fadeInTo ?? 1;
+    const along = local < fadeIn ? Math.max(0, local) / fadeIn : 1;
+    progress = Math.min(progress, from + (to - from) * along);
   }
-  progress = Math.max(0, Math.min(1, progress));
-  return curve === "equalPower" ? Math.sin((Math.PI / 2) * progress) : progress;
+  if (fadeOut > 0) {
+    const from = fade.fadeOutFrom ?? 1;
+    const to = fade.fadeOutTo ?? 0;
+    // Runs 1 at the start of the fade down to 0 at the clip's end, so the
+    // curve is sampled in the same direction it is for a fade-in — a
+    // quarter-cosine, not one-minus-a-quarter-sine.
+    const left = local > length - fadeOut ? Math.max(0, length - local) / fadeOut : 1;
+    progress = Math.min(progress, to + (from - to) * left);
+  }
+  return shape(progress);
 }
 
 export const MIN_CLIP_SECONDS = 0.1;
@@ -234,7 +275,12 @@ export function computeClipSchedule(
         if (t < startT || t > end) continue;
         points.push({
           at: toWall(t),
-          gain: fadeGain(t - clip.timelineStart, duration, fadeIn, fadeOut, curve) * clip.gain,
+          gain:
+            fadeGain(t - clip.timelineStart, duration, {
+              ...clip,
+              fadeInSec: fadeIn,
+              fadeOutSec: fadeOut,
+            }) * clip.gain,
         });
       }
     }
@@ -504,9 +550,22 @@ export function splitClip(
   timelinePosition: number,
   makeId: () => string,
 ): [StudioClip, StudioClip] | null {
+  const duration = clipDuration(clip);
   const into = timelinePosition - clip.timelineStart;
-  if (into < MIN_CLIP_SECONDS || clipDuration(clip) - into < MIN_CLIP_SECONDS) return null;
+  if (into < MIN_CLIP_SECONDS || duration - into < MIN_CLIP_SECONDS) return null;
   const cutInBuffer = clip.clipStart + into;
+
+  // Splitting must not change what you hear — it is a structural edit, not a
+  // mixing one. Measured before this: a 20 s clip with an 8 s fade-in, cut at
+  // 4 s, jumped from 0.500 to 1.000 at the cut, because each half kept the
+  // whole fade and fitFades then squeezed it into the half's own length. Six
+  // decibels, from an operation that is supposed to be silent.
+  //
+  // Fades are measured against the FITTED values, since those are what is
+  // actually heard when the two of them together exceed the clip.
+  const { fadeIn, fadeOut } = fitFades(clip.fadeInSec, clip.fadeOutSec, duration);
+  const lerp = (from: number, to: number, at: number) => from + (to - from) * at;
+
   const left: StudioClip = { ...clip, clipEnd: cutInBuffer, fadeOutSec: 0 };
   const right: StudioClip = {
     ...clip,
@@ -515,5 +574,35 @@ export function splitClip(
     timelineStart: timelinePosition,
     fadeInSec: 0,
   };
+  delete left.fadeOutFrom;
+  delete left.fadeOutTo;
+  delete right.fadeInFrom;
+  delete right.fadeInTo;
+
+  if (fadeIn > 0 && into < fadeIn) {
+    // The cut lands inside the fade-in, so the left half is nothing BUT fade
+    // and the right half has to resume partway up the curve.
+    const from = clip.fadeInFrom ?? 0;
+    const to = clip.fadeInTo ?? 1;
+    const atCut = lerp(from, to, into / fadeIn);
+    left.fadeInSec = into;
+    left.fadeInFrom = from;
+    left.fadeInTo = atCut;
+    right.fadeInSec = fadeIn - into;
+    right.fadeInFrom = atCut;
+    right.fadeInTo = to;
+  } else if (fadeOut > 0 && into > duration - fadeOut) {
+    // Mirror image: the cut is inside the fade-out, so the left half ends
+    // partway down and the right half is all tail.
+    const from = clip.fadeOutFrom ?? 1;
+    const to = clip.fadeOutTo ?? 0;
+    const atCut = lerp(to, from, (duration - into) / fadeOut);
+    left.fadeOutSec = into - (duration - fadeOut);
+    left.fadeOutFrom = from;
+    left.fadeOutTo = atCut;
+    right.fadeOutSec = duration - into;
+    right.fadeOutFrom = atCut;
+    right.fadeOutTo = to;
+  }
   return [left, right];
 }

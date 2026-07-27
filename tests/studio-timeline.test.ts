@@ -558,10 +558,10 @@ test("equal power holds level where two linear fades would dip", () => {
     // its fade-in from zero.
     const outAt = 10 - SPAN + u * SPAN;
     const inAt = u * SPAN;
-    const outLin = fadeGain(outAt, 10, 0, SPAN, "linear");
-    const inLin = fadeGain(inAt, 10, SPAN, 0, "linear");
-    const outEq = fadeGain(outAt, 10, 0, SPAN, "equalPower");
-    const inEq = fadeGain(inAt, 10, SPAN, 0, "equalPower");
+    const outLin = fadeGain(outAt, 10, { fadeInSec: 0, fadeOutSec: SPAN, fadeCurve: "linear" });
+    const inLin = fadeGain(inAt, 10, { fadeInSec: SPAN, fadeOutSec: 0, fadeCurve: "linear" });
+    const outEq = fadeGain(outAt, 10, { fadeInSec: 0, fadeOutSec: SPAN, fadeCurve: "equalPower" });
+    const inEq = fadeGain(inAt, 10, { fadeInSec: SPAN, fadeOutSec: 0, fadeCurve: "equalPower" });
     worstLinear = Math.min(worstLinear, Math.hypot(outLin, inLin));
     worstEqual = Math.min(worstEqual, Math.hypot(outEq, inEq));
   }
@@ -573,13 +573,13 @@ test("equal power holds level where two linear fades would dip", () => {
 
 test("fadeGain is unchanged for clips with no curve recorded", () => {
   // Sessions saved before curves existed must sound exactly as authored.
-  assert.equal(fadeGain(1, 10, 2, 0), 0.5);
-  assert.equal(fadeGain(9.5, 10, 0, 1), 0.5);
-  assert.equal(fadeGain(5, 10, 2, 2), 1);
+  assert.equal(fadeGain(1, 10, { fadeInSec: 2, fadeOutSec: 0 }), 0.5);
+  assert.equal(fadeGain(9.5, 10, { fadeInSec: 0, fadeOutSec: 1 }), 0.5);
+  assert.equal(fadeGain(5, 10, { fadeInSec: 2, fadeOutSec: 2 }), 1);
   // A fade longer than the clip stretches across ALL of it rather than
   // being capped at half — with no fade at the other end there is nothing
   // for it to collide with.
-  assert.equal(fadeGain(5, 10, 40, 0), 0.5);
+  assert.equal(fadeGain(5, 10, { fadeInSec: 40, fadeOutSec: 0 }), 0.5);
   // Two fades that would collide are scaled down together, keeping their
   // ratio, so the clip still reaches full level at exactly one instant.
   const fitted = fitFades(30, 10, 10);
@@ -633,8 +633,8 @@ test("a long overlap crossfades over ALL of it, so the two fades coincide", () =
 
   // And the level holds all the way across it.
   for (let u = 0; u <= 1.0001; u += 0.1) {
-    const gOut = fadeGain(clipDuration(outgoing) - 6 + u * 6, clipDuration(outgoing), 0, 6, "equalPower");
-    const gIn = fadeGain(u * 6, clipDuration(incoming), 6, 0, "equalPower");
+    const gOut = fadeGain(clipDuration(outgoing) - 6 + u * 6, clipDuration(outgoing), { fadeInSec: 0, fadeOutSec: 6, fadeCurve: "equalPower" });
+    const gIn = fadeGain(u * 6, clipDuration(incoming), { fadeInSec: 6, fadeOutSec: 0, fadeCurve: "equalPower" });
     assert.ok(Math.abs(Math.hypot(gOut, gIn) - 1) < 1e-9, `power dipped at u=${u}`);
   }
 });
@@ -1058,4 +1058,68 @@ test("takes that aren't shaped like takes are dropped at load", () => {
   delete older.takes;
   store.set("tunebadStudioSession", JSON.stringify(older));
   assert.deepEqual(loadArrangement()?.takes, []);
+});
+
+test("splitting a clip does not change what it sounds like", () => {
+  // A split is structural. Before fade windows existed, each half kept the
+  // whole fade and fitFades squeezed it into the half's own length, so a
+  // 20 s clip with an 8 s fade-in cut at 4 s jumped 0.500 -> 1.000 at the
+  // cut: six decibels, from an edit that is supposed to be silent.
+  const base = clip({ id: "clip-1", timelineStart: 0, clipStart: 0, clipEnd: 20 });
+  const envelope = (clips: StudioClip[], t: number) => {
+    for (const c of clips) {
+      const local = t - c.timelineStart;
+      if (local < 0 || local > clipDuration(c)) continue;
+      return fadeGain(local, clipDuration(c), c);
+    }
+    return 0;
+  };
+  const transparent = (source: StudioClip, cut: number, probes: number[]) => {
+    const halves = splitClip(source, cut, () => "split-half");
+    assert.ok(halves, "the split itself must succeed");
+    for (const t of probes) {
+      assert.ok(
+        Math.abs(envelope([source], t) - envelope(halves, t)) < 1e-9,
+        `envelope moved at t=${t}: ${envelope([source], t)} -> ${envelope(halves, t)}`,
+      );
+    }
+  };
+
+  // Cut inside the fade-in, inside the fade-out, and in the flat middle.
+  transparent({ ...base, fadeInSec: 8, fadeOutSec: 0 }, 4, [1, 2, 3, 4, 5, 6, 8, 12, 19]);
+  transparent({ ...base, fadeInSec: 0, fadeOutSec: 6 }, 17, [10, 14, 16, 17, 18, 19, 19.9]);
+  transparent({ ...base, fadeInSec: 3, fadeOutSec: 3 }, 10, [1, 2, 5, 10, 15, 18, 19]);
+
+  // Curved fades too: the windows are positions along the curve rather than
+  // raw gains precisely so a quarter-cosine survives being cut in half.
+  transparent(
+    { ...base, fadeInSec: 8, fadeOutSec: 0, fadeCurve: "equalPower" },
+    4,
+    [1, 2, 4, 6, 8, 12],
+  );
+
+  // And a half that is split again — the case that forces the windows to
+  // compose rather than assume they start from silence.
+  const once = splitClip({ ...base, fadeInSec: 8, fadeOutSec: 0 }, 4, () => "half")!;
+  transparent(once[1], 8, [5, 6, 7, 8, 10, 12]);
+});
+
+test("a fade window with no split behaves exactly as before", () => {
+  // Every clip anyone has ever saved has these fields absent. Defaults must
+  // reproduce the old two-argument behaviour to the bit.
+  for (const curve of ["linear", "equalPower"] as const) {
+    for (const t of [0, 0.5, 1, 2, 3, 4, 5]) {
+      const withWindows = fadeGain(t, 5, { fadeInSec: 2, fadeOutSec: 2, fadeCurve: curve });
+      const explicit = fadeGain(t, 5, {
+        fadeInSec: 2,
+        fadeOutSec: 2,
+        fadeCurve: curve,
+        fadeInFrom: 0,
+        fadeInTo: 1,
+        fadeOutFrom: 1,
+        fadeOutTo: 0,
+      });
+      assert.equal(withWindows, explicit, `curve ${curve} at t=${t}`);
+    }
+  }
 });
