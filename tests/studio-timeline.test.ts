@@ -40,6 +40,7 @@ import {
   reverbTailSeconds,
 } from "../lib/audio/remix";
 import { keysMix } from "../lib/audio/harmonic";
+import { withGaplessHeader } from "../lib/audio/mp3-tag";
 import {
   type BeatGrid,
   barsIn,
@@ -903,4 +904,72 @@ test("lock pitch + loop-only export slices the STRETCHED clock, not the timeline
   // did, writing this test, and only the exported WAV settled it.)
   assert.equal(window[0].clipStart, 8);
   assert.equal(window[0].clipEnd, 16);
+});
+
+/* --------------------------- mp3 gapless header --------------------------- */
+
+/** Minimal CBR MPEG-1 Layer III frame header: 128 kbps, 44.1 kHz, stereo. */
+function mp3Stream(frames: number): Uint8Array {
+  const frameLength = Math.floor((144 * 128 * 1000) / 44100); // 417
+  const out = new Uint8Array(frameLength * frames);
+  for (let f = 0; f < frames; f++) {
+    const at = f * frameLength;
+    out[at] = 0xff;
+    out[at + 1] = 0xfb; // MPEG-1, Layer III, no CRC
+    out[at + 2] = 0x90; // bitrate index 9 (128k), sample index 0 (44.1k)
+    out[at + 3] = 0x00; // stereo
+  }
+  return out;
+}
+
+test("an exported MP3 declares its encoder delay", () => {
+  // The measured defect: a 10.000s mix decoded as 10.032s with 1,016 samples
+  // of silence in front, because nothing in the stream said how much of the
+  // first frame is lookahead.
+  const pcmSamples = 44100 * 10;
+  const raw = mp3Stream(384);
+  const tagged = withGaplessHeader(raw, pcmSamples);
+
+  const frameLength = 417;
+  assert.equal(tagged.length, raw.length + frameLength, "exactly one frame added");
+  // The tag frame copies the stream's own header, so it can never claim a
+  // different format than the frames it introduces.
+  assert.deepEqual([...tagged.subarray(0, 2)], [0xff, 0xfb]);
+
+  const text = (from: number, len: number) =>
+    String.fromCharCode(...tagged.subarray(from, from + len));
+  // "Info" (not "Xing") sits after the 32-byte stereo side-info block.
+  assert.equal(text(4 + 32, 4), "Info");
+  assert.equal(text(4 + 32 + 16, 9), "LAME3.100");
+
+  // Delay and padding are packed as 12 bits each across three bytes.
+  const at = 4 + 32 + 16 + 9 + 11;
+  const delay = (tagged[at] << 4) | (tagged[at + 1] >> 4);
+  const padding = ((tagged[at + 1] & 0x0f) << 8) | tagged[at + 2];
+  assert.equal(delay, 576, "LAME's fixed encoder delay");
+  // Delay + audio + padding must fill whole frames exactly — that identity is
+  // the entire point of the pair, and getting it wrong shifts the whole file.
+  const frames = Math.ceil((pcmSamples + delay) / 1152);
+  assert.equal(delay + pcmSamples + padding, frames * 1152);
+});
+
+test("a stream that isn't recognisable MP3 is left completely alone", () => {
+  // A bogus leading frame is a worse defect than the missing metadata, so
+  // anything unparseable passes straight through.
+  const notMp3 = new Uint8Array([0x00, 0x01, 0x02, 0x03, 0x04]);
+  assert.equal(withGaplessHeader(notMp3, 1000), notMp3);
+  assert.equal(withGaplessHeader(new Uint8Array(2), 1000).length, 2);
+  // Layer II is not Layer III: refuse rather than mislabel it.
+  const layer2 = mp3Stream(4);
+  layer2[1] = 0xfd;
+  assert.equal(withGaplessHeader(layer2, 1000), layer2);
+});
+
+test("mono streams put the tag at the mono side-info offset", () => {
+  // 17 bytes for MPEG-1 mono, not 32. At the wrong offset the tag is
+  // invisible and the delay goes unreported.
+  const mono = mp3Stream(8);
+  for (let i = 0; i < mono.length; i += 417) mono[i + 3] = 0xc0; // channel mode 3
+  const tagged = withGaplessHeader(mono, 44100);
+  assert.equal(String.fromCharCode(...tagged.subarray(4 + 17, 4 + 17 + 4)), "Info");
 });

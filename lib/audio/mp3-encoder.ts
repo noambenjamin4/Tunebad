@@ -6,6 +6,7 @@
 // exports skip the fetch+compile.
 import { createEncoder } from "wasm-media-encoders";
 import { decodeAudioFile } from "./decode";
+import { withGaplessHeader } from "./mp3-tag";
 
 type Mp3Encoder = Awaited<ReturnType<typeof createEncoder<"audio/mpeg">>>;
 
@@ -150,7 +151,18 @@ export async function encodeMp3FromChannels(inputChannels: Float32Array[], sampl
   const flushed = encoder.finalize();
   if (flushed.length) chunks.push(new Uint8Array(flushed));
 
-  return new Blob(chunks as BlobPart[], { type: "audio/mpeg" });
+  // Stamp the stream with its own encoder delay. Without this the file
+  // decodes ~23 ms late with silence in front of it, because nothing tells
+  // the player how much of the first frame is lookahead rather than music.
+  let total = 0;
+  for (const chunk of chunks) total += chunk.length;
+  const stream = new Uint8Array(total);
+  let at = 0;
+  for (const chunk of chunks) {
+    stream.set(chunk, at);
+    at += chunk.length;
+  }
+  return new Blob([withGaplessHeader(stream, left.length)] as BlobPart[], { type: "audio/mpeg" });
 }
 
 export async function convertFileToMp3(file: File, kbps: number, trimSilence: boolean): Promise<Blob> {
