@@ -24,6 +24,7 @@ import {
   snapCandidates,
   withFadeIn,
   withFadeOut,
+  MAX_TIMELINE_SECONDS,
 } from "../lib/studio/timeline";
 import {
   MAX_PX_PER_SECOND,
@@ -1167,4 +1168,18 @@ test("withFadeIn / withFadeOut drop the window they replace, and only that one",
   assert.equal(outSet.fadeOutFrom, undefined);
   assert.equal(outSet.fadeOutTo, undefined);
   assert.equal(outSet.fadeInFrom, 0.3);
+});
+
+test("every way a clip gets placed respects the end of the timeline", () => {
+  // Drag, drop and duplicate all put a clip somewhere; they must agree about
+  // where the timeline stops. Duplicate used to set timelineStart directly and
+  // was the one path that could push a copy past the cap.
+  const long = clip({ id: "a", timelineStart: MAX_TIMELINE_SECONDS - 300, clipStart: 0, clipEnd: 300 });
+  const dragged = moveClip(long, MAX_TIMELINE_SECONDS + 500);
+  assert.equal(dragged.timelineStart, MAX_TIMELINE_SECONDS - 300);
+
+  // What the duplicate handler computes: one clip length further along.
+  const duplicated = moveClip({ ...long, id: "a2" }, long.timelineStart + clipDuration(long));
+  assert.equal(duplicated.timelineStart + clipDuration(duplicated), MAX_TIMELINE_SECONDS);
+  assert.ok(duplicated.timelineStart >= 0);
 });

@@ -695,11 +695,13 @@ export function StudioPanel() {
       setStatusIsError(true);
       return;
     }
-    const copy: StudioClip = {
-      ...clip,
-      id: makeClipId(),
-      timelineStart: clip.timelineStart + (clip.clipEnd - clip.clipStart),
-    };
+    // Through moveClip, so the copy obeys the same end-of-timeline clamp as a
+    // drag and a drop do. Setting timelineStart directly was the one placement
+    // path that could put a clip past MAX_TIMELINE_SECONDS.
+    const copy: StudioClip = moveClip(
+      { ...clip, id: makeClipId() },
+      clip.timelineStart + (clip.clipEnd - clip.clipStart),
+    );
     pushUndo();
     setClips((prev) => [...prev, copy]);
     setSelectedId(copy.id);
