@@ -801,7 +801,12 @@ export function StudioPanel() {
       reserveClipIds(saved.clips);
       setClips(saved.clips);
       if (saved.params) setParams(saved.params);
-      if (saved.grid) beatGrid.setGrid(saved.grid);
+      // The grid belongs to the earliest clip — the one the detector would
+      // otherwise re-measure on mount and overwrite it with.
+      const gridSource = [...saved.clips].sort(
+        (a, b) => a.timelineStart - b.timelineStart,
+      )[0]?.bufferId;
+      if (saved.grid && gridSource) beatGrid.adoptGrid(saved.grid, gridSource);
       beatGrid.setGridOn(saved.gridOn);
       if (saved.loop) applyLoop(saved.loop);
       if (saved.pxPerSecond) setPxPerSecond(clampZoom(saved.pxPerSecond));

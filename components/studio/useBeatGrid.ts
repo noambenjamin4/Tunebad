@@ -18,7 +18,11 @@ import type { StudioClip } from "@/lib/studio/timeline";
 export interface BeatGridState {
   /** Project grid, or null while unknown. Null also means "draw no bars". */
   grid: BeatGrid | null;
-  setGrid: (grid: BeatGrid | null) => void;
+  /**
+   * Install a grid recovered from a saved session and protect it from
+   * re-detection, against the source clip it was measured on.
+   */
+  adoptGrid: (grid: BeatGrid, sourceBufferId: string) => void;
   gridOn: boolean;
   setGridOn: React.Dispatch<React.SetStateAction<boolean>>;
   detecting: boolean;
@@ -50,7 +54,28 @@ export function useBeatGrid(
   const [failed, setFailed] = useState(false);
   const [clipInfo, setClipInfo] = useState<Map<string, ClipAnalysis>>(new Map());
   const gridSourceRef = useRef<string | null>(null);
+  // The buffer whose tempo the USER settled, by typing it or by restoring a
+  // saved session. Detection may not overwrite it.
+  //
+  // Detection used to win unconditionally on mount, which quietly destroyed
+  // the correction: type 140 over a detected 70, reload, and the estimate is
+  // back on screen AND the autosave writes it over the 140 on disk. The
+  // octave miss is exactly why the field is editable, so the one fix for it
+  // could not survive a refresh.
+  //
+  // Pinned to the SOURCE rather than set as a global flag, so dropping in a
+  // genuinely different opening track still detects — the pin protects a
+  // decision about one piece of audio, not the session forever.
+  const pinnedSourceRef = useRef<string | null>(null);
   const bpmRequestedRef = useRef<Set<string>>(new Set());
+
+  // The clip the grid comes from: in a beat switch that is the track
+  // everything else lines up with. Read by the effect below and by
+  // setGridBpm, which needs it before the effect next runs.
+  const firstBufferId =
+    [...clips].sort((a, b) => a.timelineStart - b.timelineStart)[0]?.bufferId ?? null;
+  const firstBufferRef = useRef<string | null>(null);
+  firstBufferRef.current = firstBufferId;
 
   // Compile the tempo engine while the user is still choosing files, so the
   // first detection is not a cold start racing its own timeout.
@@ -65,10 +90,12 @@ export function useBeatGrid(
     const first = [...clips].sort((a, b) => a.timelineStart - b.timelineStart)[0];
     if (!first) {
       gridSourceRef.current = null;
+      pinnedSourceRef.current = null;
       setGrid(null);
       setFailed(false);
       return;
     }
+    if (pinnedSourceRef.current === first.bufferId) return;
     if (gridSourceRef.current === first.bufferId) return;
     const buffer = bufferMap.get(first.bufferId);
     const signal = signals.get(first.bufferId);
@@ -119,8 +146,14 @@ export function useBeatGrid(
     setClipInfo((prev) => new Map(prev).set(bufferId, info));
   }, []);
 
+  const adoptGrid = useCallback((grid: BeatGrid, sourceBufferId: string) => {
+    pinnedSourceRef.current = sourceBufferId;
+    setGrid(grid);
+  }, []);
+
   const setGridBpm = useCallback((bpm: number) => {
     if (!Number.isFinite(bpm) || bpm < MIN_BPM || bpm > MAX_BPM) return;
+    pinnedSourceRef.current = firstBufferRef.current;
     setGrid((prev) =>
       prev
         ? { ...prev, bpm: Math.round(bpm) }
@@ -131,7 +164,7 @@ export function useBeatGrid(
 
   return {
     grid,
-    setGrid,
+    adoptGrid,
     gridOn,
     setGridOn,
     detecting,
