@@ -22,6 +22,8 @@ import {
   overlapPartner,
   sliceClipsToWindow,
   snapCandidates,
+  withFadeIn,
+  withFadeOut,
 } from "../lib/studio/timeline";
 import {
   MAX_PX_PER_SECOND,
@@ -1122,4 +1124,47 @@ test("a fade window with no split behaves exactly as before", () => {
       assert.equal(withWindows, explicit, `curve ${curve} at t=${t}`);
     }
   }
+});
+
+test("a crossfade always starts from silence, even on a half cut out of a fade", () => {
+  // Split a clip inside its fade-in and the right half carries a window onto
+  // the upper part of that curve. Crossfade used to overwrite the LENGTH and
+  // keep the window, so the incoming song appeared instantly at -3 dBFS at
+  // the head of the crossfade — a step, on the one feature whose whole job is
+  // that there isn't one.
+  const parent = clip({ id: "a", timelineStart: 0, clipStart: 0, clipEnd: 20, fadeInSec: 8 });
+  const half = splitClip(parent, 4, () => "a2")![1];
+  assert.equal(half.fadeInFrom, 0.5, "the half should carry a window in the first place");
+
+  const other = clip({ id: "b", timelineStart: 0, clipStart: 0, clipEnd: 10 });
+  const faded = crossfadeOverlap([other, { ...half, timelineStart: 6 }], half.id);
+  assert.ok(faded);
+  const incoming = faded.find((c) => c.id === half.id)!;
+
+  assert.equal(incoming.fadeInFrom, undefined);
+  assert.equal(incoming.fadeInTo, undefined);
+  assert.equal(fadeGain(0, clipDuration(incoming), incoming), 0);
+  // And it is a real ramp, not a jump to full either.
+  assert.ok(fadeGain(incoming.fadeInSec / 2, clipDuration(incoming), incoming) < 1);
+});
+
+test("withFadeIn / withFadeOut drop the window they replace, and only that one", () => {
+  const both = clip({
+    id: "a", timelineStart: 0, clipStart: 0, clipEnd: 10,
+    fadeInSec: 2, fadeOutSec: 2,
+    fadeInFrom: 0.3, fadeInTo: 0.9, fadeOutFrom: 0.8, fadeOutTo: 0.2,
+  });
+  const inSet = withFadeIn(both, 4);
+  assert.equal(inSet.fadeInSec, 4);
+  assert.equal(inSet.fadeInFrom, undefined);
+  assert.equal(inSet.fadeInTo, undefined);
+  // The other end is a separate decision and must survive untouched.
+  assert.equal(inSet.fadeOutFrom, 0.8);
+  assert.equal(inSet.fadeOutTo, 0.2);
+
+  const outSet = withFadeOut(both, 5);
+  assert.equal(outSet.fadeOutSec, 5);
+  assert.equal(outSet.fadeOutFrom, undefined);
+  assert.equal(outSet.fadeOutTo, undefined);
+  assert.equal(outSet.fadeInFrom, 0.3);
 });

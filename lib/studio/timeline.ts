@@ -109,6 +109,32 @@ export function fitFades(
  * side to a quarter-cosine so that gainA² + gainB² stays 1 across a matched
  * overlap, and the level holds.
  */
+/**
+ * Set a fade to a plain one: silence to full, or full to silence.
+ *
+ * Any window left over from a split is dropped. Asking for "a fade over N
+ * seconds" means the WHOLE curve, and a half cut out of a bigger fade carries
+ * a window onto part of it — reuse that and the new fade starts partway up,
+ * which at the head of a crossfade is a step in level, not a fade.
+ *
+ * A function rather than four spread-in `undefined`s at each call site: this
+ * has to hold everywhere a fade length is written, and remembering it per
+ * caller is how crossfade came to disagree with the inspector.
+ */
+export function withFadeIn<T extends FadeShape>(clip: T, fadeInSec: number): T {
+  const next = { ...clip, fadeInSec };
+  delete next.fadeInFrom;
+  delete next.fadeInTo;
+  return next;
+}
+
+export function withFadeOut<T extends FadeShape>(clip: T, fadeOutSec: number): T {
+  const next = { ...clip, fadeOutSec };
+  delete next.fadeOutFrom;
+  delete next.fadeOutTo;
+  return next;
+}
+
 /** The fade half of a clip. A StudioClip satisfies it as-is. */
 export interface FadeShape {
   fadeInSec: number;
@@ -535,8 +561,8 @@ export function crossfadeOverlap(clips: StudioClip[], clipId: string): StudioCli
   if (seconds < MIN_CROSSFADE_SECONDS) return null;
 
   return clips.map((c) => {
-    if (c.id === outgoing.id) return { ...c, fadeOutSec: seconds, fadeCurve: "equalPower" as const };
-    if (c.id === incoming.id) return { ...c, fadeInSec: seconds, fadeCurve: "equalPower" as const };
+    if (c.id === outgoing.id) return { ...withFadeOut(c, seconds), fadeCurve: "equalPower" as const };
+    if (c.id === incoming.id) return { ...withFadeIn(c, seconds), fadeCurve: "equalPower" as const };
     return c;
   });
 }
