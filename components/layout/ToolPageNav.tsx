@@ -17,6 +17,7 @@ import { LanguageMenu } from "@/components/ui/LanguageMenu";
 const LINKS: { href: string; labelKey: DictKey }[] = [
   { href: "/converter", labelKey: "nav.converter" },
   { href: "/key-bpm-finder", labelKey: "nav.analysis" },
+  { href: "/daw", labelKey: "nav.daw" },
   { href: "/delay-reverb-calculator", labelKey: "nav.delay" },
   { href: "/bpm-tap", labelKey: "nav.bpm" },
   { href: "/pitch-shifter", labelKey: "nav.pitch" },

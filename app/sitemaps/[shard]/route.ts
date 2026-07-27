@@ -44,6 +44,7 @@ const STATIC_ENTRIES: ToolEntry[] = [
   { path: "/guides/what-is-lufs-streaming-loudness", changefreq: "monthly", priority: 0.6 },
   { path: "/guides/how-to-make-slowed-and-reverb", changefreq: "monthly", priority: 0.6 },
   { path: "/guides/how-to-make-a-ringtone", changefreq: "monthly", priority: 0.6 },
+  { path: "/guides/how-to-make-a-beat-switch", changefreq: "monthly", priority: 0.6 },
   { path: "/tunebad-vs-tunebat", changefreq: "monthly", priority: 0.6 },
   { path: "/tools", changefreq: "weekly", priority: 0.8 },
   { path: "/image-converter", changefreq: "weekly", priority: 0.9 },

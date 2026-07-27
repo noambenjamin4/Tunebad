@@ -10,14 +10,15 @@ import type { DictKey } from "@/lib/i18n/locales/en";
 // + trend interest — nightcore/8D/bass-boost audio is what people actually
 // look for), then video, then image, then PDF/ZIP utilities last.
 const FILE_TOOLS: { href: string; nameKey: DictKey; descKey: DictKey }[] = [
-  // Audio
+  // Audio. The DAW leads: it is the only tool here that puts several songs on
+  // one timeline, and it was buried at seventh with a single inbound link.
+  { href: "/daw", nameKey: "tools.cardDaw", descKey: "tools.descDaw" },
   { href: "/audio-mastering", nameKey: "tools.cardMastering", descKey: "tools.descMastering" },
   { href: "/nightcore-maker", nameKey: "tools.cardNightcore", descKey: "tools.descNightcore" },
   { href: "/8d-audio", nameKey: "tools.card8dAudio", descKey: "tools.desc8dAudio" },
   { href: "/bass-booster", nameKey: "tools.cardBassBooster", descKey: "tools.descBassBooster" },
   { href: "/audio-converter", nameKey: "tools.cardAudioConvert", descKey: "tools.descAudioConvert" },
   { href: "/audio-joiner", nameKey: "tools.cardAudioJoiner", descKey: "tools.descAudioJoiner" },
-  { href: "/daw", nameKey: "tools.cardDaw", descKey: "tools.descDaw" },
   { href: "/flac-to-mp3", nameKey: "tools.cardFlacMp3", descKey: "tools.descFlacMp3" },
   { href: "/wav-to-mp3", nameKey: "tools.cardWavMp3", descKey: "tools.descWavMp3" },
   // Video

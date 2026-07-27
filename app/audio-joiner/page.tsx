@@ -23,7 +23,7 @@ export default function Page() {
           { q: "joinertool.faq3Q", a: "joinertool.faq3A" },
         ]}
       />
-      <RelatedTools tools={["audio-converter", "wav-to-mp3", "flac-to-mp3"]} />
+      <RelatedTools tools={["daw", "audio-converter", "wav-to-mp3", "flac-to-mp3"]} />
     </ToolPageShell>
   );
 }

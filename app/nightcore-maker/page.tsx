@@ -23,7 +23,7 @@ export default function Page() {
           { q: "nightcoretool.faq3Q", a: "nightcoretool.faq3A" },
         ]}
       />
-      <RelatedTools tools={["bass-booster", "8d-audio", "audio-converter"]} />
+      <RelatedTools tools={["daw", "bass-booster", "8d-audio", "audio-converter"]} />
     </ToolPageShell>
   );
 }

@@ -79,6 +79,7 @@ export default function Page() {
       </p>
 
       <p>
+        Related: <Link href="/guides/how-to-make-a-beat-switch">How to make a beat switch</Link> ·{" "}
         Related: <Link href="/guides/find-key-and-bpm-of-any-song">How to find the key and BPM of any song</Link> ·{" "}
         <Link href="/guides/what-is-lufs-streaming-loudness">What is LUFS?</Link>
       </p>

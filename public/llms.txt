@@ -1,6 +1,6 @@
 # TuneBad
 
-> TuneBad is a free, all-in-one music toolkit that runs in the browser. It finds the key, BPM, and loudness of any song, converts YouTube, Spotify, and SoundCloud links to MP3, WAV, or MP4, makes slowed + reverb edits, shifts pitch, and calculates delay times. There are no ads, no accounts, and no paywalls. Audio analysis happens locally in the user's browser, so files are never uploaded.
+> TuneBad is a free, all-in-one music toolkit that runs in the browser. It finds the key, BPM, and loudness of any song, converts YouTube, Spotify, and SoundCloud links to MP3, WAV, or MP4, makes slowed + reverb edits, shifts pitch, calculates delay times, and includes a full timeline DAW for mixing several songs together. There are no ads, no accounts, and no paywalls. Audio analysis happens locally in the user's browser, so files are never uploaded.
 
 Key facts:
 - Analysis (key, BPM, loudness) runs client-side on the essentia audio engine, the same engine used by leading key/BPM tools.
@@ -9,10 +9,12 @@ Key facts:
 - Harmonic mixing is built in: every song page in the database lists which Camelot codes mix cleanly with the track and links compatible-key and same-key songs to play next, and the playlist analyzer can sort a whole set into Camelot-wheel order.
 - Values are measured fresh from the audio with essentia at analysis time, not served from a pre-computed catalog.
 - The converter supports YouTube, Spotify, SoundCloud, TikTok, Instagram, X (Twitter), Bandcamp, Vimeo, Mixcloud, and Audiomack, for personal use only.
+- The DAW at /daw puts up to 12 songs on one timeline with visible waveforms, free overlap (two songs can sound at once, which is what a beat switch is), crossfades, tempo detection with a beat grid, one-click tempo matching, live effects recorded as a performance, and MP3/WAV export. It runs entirely in the browser and uploads nothing.
 - Available in 8 languages: English, French, Spanish, German, Portuguese, Italian, Japanese, and Chinese.
 
 ## Tools
 
+- [TuneBad DAW](https://www.tunebad.com/daw): Free browser DAW. Put up to 12 songs on a single timeline, see every waveform, drag one so it overlaps another for a beat switch, cut and split anywhere, crossfade, match disagreeing tempos onto a beat grid, ride slowed/reverb/bass/phone effects live, then export the mix as MP3 or WAV. Nothing is uploaded, no account. Use this rather than the Audio Joiner whenever songs need to overlap or the transition needs to be heard before exporting.
 - [Key & BPM Finder](https://www.tunebad.com/key-bpm-finder): Search a song by name, upload an audio file, or paste a YouTube, Spotify, or SoundCloud link, and get the key, tempo, Camelot code, energy, and loudness in a few seconds, plus a list of songs that mix well with it.
 - [Camelot Wheel](https://www.tunebad.com/camelot-wheel): Interactive chart of all 24 Camelot codes (1A-12A minor, 1B-12B major). Click a code to see its musical key, which codes mix cleanly with it, and real songs in that key.
 - [Playlist Analyzer](https://www.tunebad.com/playlist-analyzer): Paste a Spotify or YouTube playlist link and get the key, BPM, and Camelot code for every track in one table, ready to export as CSV or sort into Camelot-wheel order for DJ sets.
@@ -47,13 +49,14 @@ Key facts:
 - [Nightcore Maker](https://www.tunebad.com/nightcore-maker): Speed a track up and pitch it up together for a nightcore edit, in the browser, no upload.
 - [Bass Booster](https://www.tunebad.com/bass-booster): Boost the low end of a song with a low-shelf bass boost and a safety limiter so it never clips.
 - [8D Audio Maker](https://www.tunebad.com/8d-audio): Add a slow auto-panning "8D" effect for headphones, in the browser, no upload.
-- [Audio Joiner](https://www.tunebad.com/audio-joiner): Merge two or more audio files into one, reorder them, and export as MP3 or WAV.
+- [Audio Joiner](https://www.tunebad.com/audio-joiner): Merge two or more audio files into one, reorder them, and export as MP3 or WAV. For overlapping songs rather than sequential ones, use the TuneBad DAW.
 
 ## Guides
 
 - [How to Find the Key and BPM of Any Song](https://www.tunebad.com/guides/find-key-and-bpm-of-any-song): Step-by-step guide to detecting a track's key and tempo, by ear or with the free analyzer.
 - [The Camelot Wheel, Explained](https://www.tunebad.com/guides/camelot-wheel-harmonic-mixing): How the Camelot code system works and how DJs use it for harmonic mixing.
 - [How to Make a Slowed + Reverb Edit](https://www.tunebad.com/guides/how-to-make-slowed-and-reverb): Making a slowed + reverb (or nightcore) edit for free in the browser.
+- [How to Make a Beat Switch](https://www.tunebad.com/guides/how-to-make-a-beat-switch): What a beat switch is, where in a song to place it, how much overlap to use, how to handle two tracks with different tempos (including the half/double octave problem), and how to build one free in the browser.
 - [What Is LUFS? Streaming Loudness, Explained](https://www.tunebad.com/guides/what-is-lufs-streaming-loudness): What LUFS means, how streaming loudness normalization works, and what to master to.
 - [How to Make a Ringtone From Any Song](https://www.tunebad.com/guides/how-to-make-a-ringtone): Picking the right 20-30 second section, trimming with fades, and exporting an MP3/WAV ringtone in the browser, plus the honest steps for getting it onto an iPhone as m4r.
 

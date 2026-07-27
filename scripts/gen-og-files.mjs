@@ -27,6 +27,7 @@ const CARDS = [
   ["wav-to-mp3", "WAV TO", "MP3"],
   ["camelot-wheel", "CAMELOT", "WHEEL"],
   ["guide-ringtone", "MAKE A", "RINGTONE"],
+  ["guide-beat-switch", "MAKE A", "BEAT SWITCH"],
   ["audio-mastering", "AUDIO", "MASTERING"],
   ["nightcore-maker", "NIGHTCORE", "MAKER"],
   ["bass-booster", "BASS", "BOOSTER"],

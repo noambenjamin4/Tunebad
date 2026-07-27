@@ -21,6 +21,7 @@ const VALUE_KEYS: { title: DictKey; body: DictKey }[] = [
 // link so it also works as a plain sitemap for crawlers.
 const TOUR_KEYS: { title: DictKey; body: DictKey; link: DictKey; href: string }[] = [
   { title: "landing.tour1Title", body: "landing.tour1Body", link: "landing.tour1Link", href: "/key-bpm-finder" },
+  { title: "landing.tour7Title", body: "landing.tour7Body", link: "landing.tour7Link", href: "/daw" },
   { title: "landing.tour2Title", body: "landing.tour2Body", link: "landing.tour2Link", href: "/songs" },
   { title: "landing.tour3Title", body: "landing.tour3Body", link: "landing.tour3Link", href: "/mp3-cutter" },
   { title: "landing.tour4Title", body: "landing.tour4Body", link: "landing.tour4Link", href: "/slowed-reverb" },
@@ -46,6 +47,7 @@ const FAQ_KEYS: { q: DictKey; a: DictKey; linkHref?: string; linkText?: DictKey 
   { q: "landing.faq10Q", a: "landing.faq10A", linkHref: "/mp3-cutter", linkText: "landing.faq10Link" },
   { q: "landing.faq11Q", a: "landing.faq11A", linkHref: "/loudness", linkText: "landing.faq11Link" },
   { q: "landing.faq12Q", a: "landing.faq12A", linkHref: "/tunebad-vs-tunebat", linkText: "landing.faq12Link" },
+  { q: "landing.faq13Q", a: "landing.faq13A", linkHref: "/daw", linkText: "landing.faq13Link" },
 ];
 
 // Canonical English schema, independent of the visitor's UI language.
