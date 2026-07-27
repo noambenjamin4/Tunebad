@@ -627,8 +627,23 @@ export function Timeline({
     return out;
   }, [innerSeconds, step]);
 
+  const selected = clips.find((c) => c.id === selectedId) ?? null;
+
   return (
     <div className="studio-timeline">
+      {/* The track is role="application", so the browser hands every keypress
+          straight to us and announces nothing by itself. Up/Down picking a
+          clip is therefore silent unless the result is said out loud. */}
+      <p className="sr-only" role="status" aria-live="polite">
+        {selected
+          ? t("studio.clipLabel", {
+              name: selected.name,
+              from: formatTime(selected.timelineStart),
+              to: formatTime(selected.timelineStart + clipDuration(selected)),
+              row: (rows.get(selected.id) ?? 0) + 1,
+            })
+          : ""}
+      </p>
       <div className="studio-scroll" ref={scrollRef}>
         <div
           ref={trackRef}
@@ -697,6 +712,12 @@ export function Timeline({
               <div
                 key={clip.id}
                 data-clip-id={clip.id}
+                aria-label={t("studio.clipLabel", {
+                  name: clip.name,
+                  from: formatTime(clip.timelineStart),
+                  to: formatTime(clip.timelineStart + length),
+                  row: row + 1,
+                })}
                 className={[
                   "studio-clip",
                   clip.id === selectedId ? "selected" : "",

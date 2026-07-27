@@ -1005,6 +1005,9 @@ export function StudioPanel() {
               onFadeOut={(fadeOutSec) =>
                 editClip(selectedClip.id, (c) => ({ ...c, fadeOutSec }), { reschedule: "defer" })
               }
+              onFadeCurve={(fadeCurve) =>
+                editClip(selectedClip.id, (c) => ({ ...c, fadeCurve }))
+              }
               onToggleMute={handleToggleMute}
               onToggleSolo={handleToggleSolo}
               onMatchTempo={() => void handleMatchTempo()}

@@ -8,7 +8,7 @@ import { useI18n } from "@/lib/i18n";
 import type { BeatGrid, ClipAnalysis } from "@/lib/studio/beat-grid";
 import { needsTempoMatch, tempoMatchRatio } from "@/lib/studio/beat-grid";
 import { keysMix } from "@/lib/audio/harmonic";
-import type { StudioClip } from "@/lib/studio/timeline";
+import type { FadeCurve, StudioClip } from "@/lib/studio/timeline";
 
 export function ClipInspector({
   clip,
@@ -20,6 +20,7 @@ export function ClipInspector({
   onGain,
   onFadeIn,
   onFadeOut,
+  onFadeCurve,
   onToggleMute,
   onToggleSolo,
   onMatchTempo,
@@ -40,6 +41,7 @@ export function ClipInspector({
   onGain: (gain: number) => void;
   onFadeIn: (seconds: number) => void;
   onFadeOut: (seconds: number) => void;
+  onFadeCurve: (curve: FadeCurve) => void;
   onToggleMute: () => void;
   onToggleSolo: () => void;
   onMatchTempo: () => void;
@@ -102,6 +104,29 @@ export function ClipInspector({
           onChange={(e) => onFadeOut(Math.max(0, Number(e.target.value) || 0))}
         />
       </label>
+      {(clip.fadeInSec > 0 || clip.fadeOutSec > 0) && (
+        <div
+          className="studio-pills"
+          role="group"
+          aria-label={t("studio.fadeShape")}
+          title={t("studio.fadeShapeHint")}
+        >
+          {(["linear", "equalPower"] as const).map((curve) => {
+            const active = (clip.fadeCurve ?? "linear") === curve;
+            return (
+              <button
+                key={curve}
+                className={`cutter-format-pill${active ? " active" : ""}`}
+                type="button"
+                aria-pressed={active}
+                onClick={() => onFadeCurve(curve)}
+              >
+                {curve === "linear" ? t("studio.fadeLinear") : t("studio.fadeEqualPower")}
+              </button>
+            );
+          })}
+        </div>
+      )}
       <button
         className={`text-button${clip.muted ? " active" : ""}`}
         type="button"
