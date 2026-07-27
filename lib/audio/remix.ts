@@ -262,6 +262,19 @@ export interface EffectNodes {
 export const EFFECT_GLIDE_SECONDS = 0.12;
 
 /**
+ * Time constant for a KNOB glide (reverb amount, bass). setTargetAtTime
+ * approaches exponentially, so it is ~99.9% there after 7x this — 70 ms,
+ * inside the gap between two pointer-move events, so a drag still tracks the
+ * finger while each individual step is smoothed.
+ *
+ * Lives here rather than in the engine because the offline renderer has to
+ * use the SAME number: a recorded slider drag is a dense stream of discrete
+ * events, and stepping between them instead of gliding puts zipper noise in
+ * the exported file that the preview does not have.
+ */
+export const KNOB_GLIDE_TAU = 0.01;
+
+/**
  * Seconds of silence a render must leave for the reverb to decay into.
  *
  * ZERO when no reverb is ever audible. The convolver is the only node in the
@@ -738,13 +751,14 @@ export async function renderRemixAutomated(
         source.playbackRate.setValueAtTime(Math.max(MIN_SPEED, event.value), t);
         break;
       case "reverb": {
+        // Glided, not stepped — same time constant the live engine uses.
         const mix = remixGain(event.value);
-        wetGain.gain.setValueAtTime(mix.wet, t);
-        dryGain.gain.setValueAtTime(mix.dry, t);
+        wetGain.gain.setTargetAtTime(mix.wet, t, KNOB_GLIDE_TAU);
+        dryGain.gain.setTargetAtTime(mix.dry, t, KNOB_GLIDE_TAU);
         break;
       }
       case "bassBoostDb":
-        bassFilter.gain.setValueAtTime(event.value, t);
+        bassFilter.gain.setTargetAtTime(event.value, t, KNOB_GLIDE_TAU);
         break;
       case "reverbEq":
         scheduleReverbEq(reverbEq, event.value, t);

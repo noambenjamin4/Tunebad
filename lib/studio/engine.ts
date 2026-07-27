@@ -23,6 +23,7 @@ import {
   type RemixParams,
   type RemixChain,
   buildRemixChain,
+  KNOB_GLIDE_TAU,
   remixGain,
   applyEffectParams,
   applyReverbEqParams,
@@ -31,14 +32,6 @@ import { type StudioClip, computeClipSchedule, loopPassEnd, timelineDuration } f
 
 /** Long enough to kill the click, short enough to read as instant. */
 const FADE_SECONDS = 0.012;
-
-/**
- * Time constant for knob glides. setTargetAtTime approaches exponentially,
- * so it is ~99.9% of the way there after 7x this — 70 ms, well inside the
- * gap between two pointer-move events, which means a drag still tracks the
- * finger while each individual step is smoothed.
- */
-const KNOB_GLIDE_TAU = 0.01;
 
 function glideTo(param: AudioParam, target: number, ctx: BaseAudioContext): void {
   if (param.value === target) return;
