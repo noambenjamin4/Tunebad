@@ -18,6 +18,7 @@ import {
   audibleDuration,
   isSoloing,
   loopPassEnd,
+  loopRegionFor,
   sliceClipsToWindow,
   snapCandidates,
 } from "../lib/studio/timeline";
@@ -33,7 +34,9 @@ import {
 import { automatedOutputDuration } from "../lib/audio/remix";
 import {
   type BeatGrid,
+  barsIn,
   beatTimesInRange,
+  expandToBars,
   estimateBeatPhase,
   nearestGridTime,
   needsTempoMatch,
@@ -680,4 +683,53 @@ test("a duplicated clip gets an id of its own", () => {
   assert.notEqual(original.id, copy.id);
   // The edit path matches on id, so a collision here would move both.
   assert.equal([original, copy].filter((c) => c.id === original.id).length, 1);
+});
+
+/* ------------------------------ loop region ------------------------------ */
+
+test("Loop targets the transition, not the whole song", () => {
+  // A 180s track with a 12s beat switch at its tail. Looping all 180s is
+  // useless for judging the switch — the overlap is the part worth repeating.
+  const a = clip({ id: "a", timelineStart: 0, clipStart: 0, clipEnd: 180 });
+  const b = clip({ id: "b", timelineStart: 168, clipStart: 0, clipEnd: 180 });
+  assert.deepEqual(loopRegionFor([a, b], "a"), { start: 168, end: 180 });
+  // Either clip of the pair gives the same transition.
+  assert.deepEqual(loopRegionFor([a, b], "b"), { start: 168, end: 180 });
+});
+
+test("with nothing to transition into, Loop covers the clip itself", () => {
+  const only = clip({ id: "only", timelineStart: 4, clipStart: 0, clipEnd: 10 });
+  assert.deepEqual(loopRegionFor([only], "only"), { start: 4, end: 14 });
+  assert.equal(loopRegionFor([only], "missing"), null);
+});
+
+test("Loop picks the biggest overlap when a clip touches several", () => {
+  const a = clip({ id: "a", timelineStart: 0, clipStart: 0, clipEnd: 30 });
+  const grazes = clip({ id: "grazes", timelineStart: 29, clipStart: 0, clipEnd: 10 });
+  const real = clip({ id: "real", timelineStart: 22, clipStart: 0, clipEnd: 10 });
+  assert.deepEqual(loopRegionFor([a, grazes, real], "a"), { start: 22, end: 30 });
+});
+
+test("a loop widens to whole bars, never narrower than asked", () => {
+  // 120 BPM, 4/4 -> a bar is 2s, and the grid is anchored at 0.5s.
+  const grid: BeatGrid = { bpm: 120, anchorSec: 0.5, beatsPerBar: 4 };
+  const widened = expandToBars({ start: 3.1, end: 6.4 }, grid);
+  // Bar lines sit at 0.5, 2.5, 4.5, 6.5 ... so 3.1 falls back to 2.5 and
+  // 6.4 reaches forward to 6.5.
+  assert.deepEqual(widened, { start: 2.5, end: 6.5 });
+  assert.ok(widened.start <= 3.1 && widened.end >= 6.4, "must contain the request");
+  assert.equal(barsIn(widened, grid), 2);
+
+  // A region already on the lines is left exactly alone — widening a loop
+  // that is already right would make it wrong.
+  assert.deepEqual(expandToBars({ start: 2.5, end: 6.5 }, grid), { start: 2.5, end: 6.5 });
+});
+
+test("a bar-aligned loop never starts before the timeline does", () => {
+  // Anchor after zero: the bar line below the region is at a negative time,
+  // where there is no material to play.
+  const grid: BeatGrid = { bpm: 120, anchorSec: 1.5, beatsPerBar: 4 };
+  const widened = expandToBars({ start: 0.2, end: 1.0 }, grid);
+  assert.ok(widened.start >= 0, `loop started at ${widened.start}`);
+  assert.ok(widened.end > widened.start, "a loop must have length");
 });

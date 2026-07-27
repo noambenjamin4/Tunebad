@@ -351,6 +351,27 @@ export function Timeline({
   const clipElOf = (clipId: string): HTMLElement | null =>
     trackRef.current?.querySelector(`[data-clip-id="${CSS.escape(clipId)}"]`) ?? null;
 
+  /**
+   * Snap a bare timeline TIME (a trim edge, the playhead) to the same
+   * landmarks a dragged clip uses. Moving a clip needs snapClipStart instead,
+   * because there two edges compete; here there is only one.
+   *
+   * Holding Alt turns it off, matching the drag.
+   */
+  const snapEdge = (
+    raw: number,
+    options: { excludeClipId?: string | null; withPlayhead?: boolean; free?: boolean },
+  ): number => {
+    if (options.free) return raw;
+    const candidates = snapCandidates(
+      clipsRef.current,
+      options.excludeClipId ?? null,
+      options.withPlayhead === false ? null : getPositionRef.current(),
+    );
+    if (grid) candidates.push(nearestGridTime(raw, grid));
+    return snapTime(raw, candidates, pxPerSecond);
+  };
+
   const handleTrackPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     if (disabled) return;
     const target = event.target as HTMLElement;
@@ -359,7 +380,10 @@ export function Timeline({
 
     if (target.closest(".studio-loop-lane")) {
       // Drag the lane to set a loop; a plain click clears it.
-      const anchorSec = secondsFromClientX(event.clientX);
+      const anchorSec = snapEdge(secondsFromClientX(event.clientX), {
+        withPlayhead: false,
+        free: event.altKey,
+      });
       dragRef.current = { kind: "loop", anchorSec };
       onSetLoop(null);
       try {
@@ -414,32 +438,17 @@ export function Timeline({
     }
   };
 
-  /**
-   * Snap a bare timeline TIME (a trim edge, the playhead) to the same
-   * landmarks a dragged clip uses. Moving a clip needs snapClipStart instead,
-   * because there two edges compete; here there is only one.
-   *
-   * Holding Alt turns it off, matching the drag.
-   */
-  const snapEdge = (
-    raw: number,
-    options: { excludeClipId?: string | null; withPlayhead?: boolean; free?: boolean },
-  ): number => {
-    if (options.free) return raw;
-    const candidates = snapCandidates(
-      clipsRef.current,
-      options.excludeClipId ?? null,
-      options.withPlayhead === false ? null : getPositionRef.current(),
-    );
-    if (grid) candidates.push(nearestGridTime(raw, grid));
-    return snapTime(raw, candidates, pxPerSecond);
-  };
-
   const handleTrackPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
     const drag = dragRef.current;
     if (!drag) return;
     if (drag.kind === "loop") {
-      const here = secondsFromClientX(event.clientX);
+      // The loop lane snaps like everything else. This is the surface where
+      // it matters MOST: a loop is how you work a transition, and one that
+      // starts off the beat is unusable for that.
+      const here = snapEdge(secondsFromClientX(event.clientX), {
+        withPlayhead: false,
+        free: event.altKey,
+      });
       onSetLoop({ start: Math.min(drag.anchorSec, here), end: Math.max(drag.anchorSec, here) });
       return;
     }

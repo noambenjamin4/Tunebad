@@ -394,6 +394,39 @@ export function trimClipEnd(clip: StudioClip, newClipEnd: number, bufferDuration
   return { ...clip, clipEnd };
 }
 
+/**
+ * What "Loop" should actually cover for a clip.
+ *
+ * Looping a whole song is not a loop in any useful sense — a 3-minute clip
+ * comes back around long after you have stopped caring. When the clip
+ * overlaps another, the thing worth hearing over and over is the OVERLAP:
+ * that is the transition, and working it until it sits right is the entire
+ * reason the loop exists. With nothing to transition into, the clip's own
+ * span is the honest answer.
+ *
+ * Returns null when the clip isn't there.
+ */
+export function loopRegionFor(
+  clips: StudioClip[],
+  clipId: string,
+): { start: number; end: number } | null {
+  const clip = clips.find((c) => c.id === clipId);
+  if (!clip) return null;
+
+  let best: { start: number; end: number } | null = null;
+  let longest = MIN_CROSSFADE_SECONDS;
+  for (const other of clips) {
+    if (other.id === clip.id) continue;
+    const start = Math.max(clip.timelineStart, other.timelineStart);
+    const end = Math.min(clipTimelineEnd(clip), clipTimelineEnd(other));
+    if (end - start > longest) {
+      longest = end - start;
+      best = { start, end };
+    }
+  }
+  return best ?? { start: clip.timelineStart, end: clipTimelineEnd(clip) };
+}
+
 /** Shortest overlap worth crossfading — below this it is a butt join. */
 const MIN_CROSSFADE_SECONDS = 0.05;
 

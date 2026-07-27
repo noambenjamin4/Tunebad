@@ -86,6 +86,35 @@ export function beatTimesInRange(
  * scored in log space, where "twice as fast" and "half as fast" are the
  * same distance from a perfect match.
  */
+/**
+ * Widen a region outward to the bar lines around it.
+ *
+ * A loop that starts three-quarters of a beat into a bar does not sound like
+ * a loop, it sounds like a stutter — the ear hears the downbeat land in the
+ * wrong place on every pass. Always widening (never narrowing) means the
+ * region the caller asked for is still entirely inside the result.
+ */
+export function expandToBars(
+  region: { start: number; end: number },
+  grid: BeatGrid,
+): { start: number; end: number } {
+  const bar = beatPeriod(grid.bpm) * Math.max(1, grid.beatsPerBar);
+  if (!Number.isFinite(bar) || bar <= 0) return region;
+  const barsFrom = (t: number) => (t - grid.anchorSec) / bar;
+  const start = grid.anchorSec + Math.floor(barsFrom(region.start) + 1e-6) * bar;
+  const end = grid.anchorSec + Math.ceil(barsFrom(region.end) - 1e-6) * bar;
+  // The anchor can sit after zero, which would put the first bar line at a
+  // negative time; the transport has no material there.
+  return { start: Math.max(0, start), end: Math.max(start + bar, end) };
+}
+
+/** How many bars a region spans on this grid, for the readout. */
+export function barsIn(region: { start: number; end: number }, grid: BeatGrid): number {
+  const bar = beatPeriod(grid.bpm) * Math.max(1, grid.beatsPerBar);
+  if (!Number.isFinite(bar) || bar <= 0) return 0;
+  return (region.end - region.start) / bar;
+}
+
 export function tempoMatchRatio(clipBpm: number, targetBpm: number): number {
   if (!(clipBpm > 0) || !(targetBpm > 0)) return 1;
   let best = 1;

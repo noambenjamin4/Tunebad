@@ -37,6 +37,7 @@ import {
   MAX_TOTAL_CLIPS,
   crossfadeOverlap,
   isSoloing,
+  loopRegionFor,
   sliceClipsToWindow,
   moveClip,
   splitClip,
@@ -59,7 +60,9 @@ import {
 import {
   MAX_BPM,
   MIN_BPM,
+  barsIn,
   estimateBeatPhase,
+  expandToBars,
   nearestGridTime,
   needsTempoMatch,
   tempoMatchRatio,
@@ -654,16 +657,22 @@ export function StudioPanel() {
     [engine],
   );
 
+  /**
+   * Loop what is worth hearing twice. For a clip that overlaps another that
+   * is the TRANSITION, not the whole song — and it is widened to the bars
+   * around it, because a loop that restarts three-quarters of a beat into a
+   * bar reads as a stutter rather than a repeat.
+   */
   const handleLoopSelection = useCallback(() => {
     if (loop) {
       applyLoop(null);
       return;
     }
-    const clip = clipsRef.current.find((c) => c.id === selectedId);
-    if (clip) {
-      applyLoop({ start: clip.timelineStart, end: clip.timelineStart + (clip.clipEnd - clip.clipStart) });
-    }
-  }, [loop, selectedId, applyLoop]);
+    if (!selectedId) return;
+    const region = loopRegionFor(clipsRef.current, selectedId);
+    if (!region) return;
+    applyLoop(grid ? expandToBars(region, grid) : region);
+  }, [loop, selectedId, applyLoop, grid]);
 
   /**
    * One click turns an overlap into a transition. Deliberately not automatic
@@ -1051,6 +1060,11 @@ export function StudioPanel() {
           {soloing && <p className="studio-notice">{t("studio.soloNotice")}</p>}
           {loop && (
             <label className="studio-field studio-lock">
+              <span className="studio-hint num">
+                {grid
+                  ? t("studio.loopBars", { bars: barsIn(loop, grid).toFixed(barsIn(loop, grid) % 1 ? 2 : 0) })
+                  : t("studio.loopLength", { seconds: (loop.end - loop.start).toFixed(1) })}
+              </span>
               <input
                 type="checkbox"
                 checked={exportLoopOnly}
