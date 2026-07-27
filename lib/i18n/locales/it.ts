@@ -886,6 +886,8 @@ const it: Record<keyof typeof en, string> = {
   "studio.clearSession": "Cancella sessione",
   "studio.sessionFull": "Sessione troppo grande — l'arrangiamento è salvato, l'audio no",
   "studio.clipBpm": "{bpm} BPM",
+  "studio.keysFit": "Tonalità compatibili: {a} + {b}",
+  "studio.keysClash": "Tonalità in contrasto: {a} / {b}",
   "studio.match": "Allinea alla griglia",
   "studio.matchHint": "Allunga questo clip al tempo del progetto, tonalità invariata",
   "studio.crossfade": "Dissolvenza incrociata",

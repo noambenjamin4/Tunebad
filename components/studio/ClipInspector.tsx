@@ -5,15 +5,17 @@
 // graph has to be rescheduled now or after the gesture settles).
 
 import { useI18n } from "@/lib/i18n";
-import type { BeatGrid } from "@/lib/studio/beat-grid";
+import type { BeatGrid, ClipAnalysis } from "@/lib/studio/beat-grid";
 import { needsTempoMatch, tempoMatchRatio } from "@/lib/studio/beat-grid";
+import { keysMix } from "@/lib/audio/harmonic";
 import type { StudioClip } from "@/lib/studio/timeline";
 
 export function ClipInspector({
   clip,
   working,
   grid,
-  clipBpms,
+  clipInfo,
+  partner,
   onGainPointerDown,
   onGain,
   onFadeIn,
@@ -30,7 +32,9 @@ export function ClipInspector({
   clip: StudioClip;
   working: boolean;
   grid: BeatGrid | null;
-  clipBpms: Map<string, number>;
+  clipInfo: Map<string, ClipAnalysis>;
+  /** The clip this one overlaps, if any — the transition to judge. */
+  partner: StudioClip | null;
   /** Fires before the drag starts, so one undo step covers the whole slide. */
   onGainPointerDown: () => void;
   onGain: (gain: number) => void;
@@ -47,8 +51,17 @@ export function ClipInspector({
   onDelete: () => void;
 }) {
   const { t } = useI18n();
-  const bpm = clipBpms.get(clip.bufferId);
+  const info = clipInfo.get(clip.bufferId);
+  const bpm = info?.bpm;
   const offGrid = bpm !== undefined && grid !== null && needsTempoMatch(tempoMatchRatio(bpm, grid.bpm));
+
+  // Tempo is only half of "will these two mix". Two songs beatmatched to the
+  // same BPM in clashing keys still sound wrong together, and that is the
+  // mistake this catches while the transition is still being built.
+  const partnerInfo = partner ? clipInfo.get(partner.bufferId) : undefined;
+  const here = info?.camelot ?? "";
+  const there = partnerInfo?.camelot ?? "";
+  const harmony = here && there ? { fits: keysMix(here, there), here, there } : null;
 
   return (
     <div className="studio-inspector">
@@ -99,6 +112,18 @@ export function ClipInspector({
       </button>
       {bpm !== undefined && (
         <span className="studio-hint num">{t("studio.clipBpm", { bpm })}</span>
+      )}
+      {info?.key && (
+        <span className="studio-hint num">
+          {info.camelot ? `${info.camelot} · ${info.key}` : info.key}
+        </span>
+      )}
+      {harmony && (
+        <span className={`studio-hint num${harmony.fits ? "" : " warn"}`}>
+          {harmony.fits
+            ? t("studio.keysFit", { a: harmony.here, b: harmony.there })
+            : t("studio.keysClash", { a: harmony.here, b: harmony.there })}
+        </span>
       )}
       {offGrid && (
         <button

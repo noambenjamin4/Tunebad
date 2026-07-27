@@ -394,6 +394,37 @@ export function trimClipEnd(clip: StudioClip, newClipEnd: number, bufferDuration
   return { ...clip, clipEnd };
 }
 
+/** Shortest overlap worth crossfading — below this it is a butt join. */
+const MIN_CROSSFADE_SECONDS = 0.05;
+
+/**
+ * The clip this one runs INTO: whichever overlaps it for longest.
+ *
+ * Three features ask the same question — what is this clip transitioning
+ * with — so they ask it in one place: the crossfade needs the pair, the loop
+ * needs the region, and the inspector needs to compare their keys. Returns
+ * null when the clip stands alone.
+ */
+export function overlapPartner(
+  clips: StudioClip[],
+  clipId: string,
+): { partner: StudioClip; start: number; end: number } | null {
+  const clip = clips.find((c) => c.id === clipId);
+  if (!clip) return null;
+  let best: { partner: StudioClip; start: number; end: number } | null = null;
+  let longest = MIN_CROSSFADE_SECONDS;
+  for (const other of clips) {
+    if (other.id === clip.id) continue;
+    const start = Math.max(clip.timelineStart, other.timelineStart);
+    const end = Math.min(clipTimelineEnd(clip), clipTimelineEnd(other));
+    if (end - start > longest) {
+      longest = end - start;
+      best = { partner: other, start, end };
+    }
+  }
+  return best;
+}
+
 /**
  * What "Loop" should actually cover for a clip.
  *
@@ -412,23 +443,11 @@ export function loopRegionFor(
 ): { start: number; end: number } | null {
   const clip = clips.find((c) => c.id === clipId);
   if (!clip) return null;
-
-  let best: { start: number; end: number } | null = null;
-  let longest = MIN_CROSSFADE_SECONDS;
-  for (const other of clips) {
-    if (other.id === clip.id) continue;
-    const start = Math.max(clip.timelineStart, other.timelineStart);
-    const end = Math.min(clipTimelineEnd(clip), clipTimelineEnd(other));
-    if (end - start > longest) {
-      longest = end - start;
-      best = { start, end };
-    }
-  }
-  return best ?? { start: clip.timelineStart, end: clipTimelineEnd(clip) };
+  const hit = overlapPartner(clips, clipId);
+  return hit
+    ? { start: hit.start, end: hit.end }
+    : { start: clip.timelineStart, end: clipTimelineEnd(clip) };
 }
-
-/** Shortest overlap worth crossfading — below this it is a butt join. */
-const MIN_CROSSFADE_SECONDS = 0.05;
 
 /**
  * Turn an overlap into a crossfade.
@@ -446,20 +465,10 @@ const MIN_CROSSFADE_SECONDS = 0.05;
 export function crossfadeOverlap(clips: StudioClip[], clipId: string): StudioClip[] | null {
   const clip = clips.find((c) => c.id === clipId);
   if (!clip) return null;
-
-  let partner: StudioClip | null = null;
-  let best = MIN_CROSSFADE_SECONDS;
-  for (const other of clips) {
-    if (other.id === clip.id) continue;
-    const overlap =
-      Math.min(clipTimelineEnd(clip), clipTimelineEnd(other)) -
-      Math.max(clip.timelineStart, other.timelineStart);
-    if (overlap > best) {
-      best = overlap;
-      partner = other;
-    }
-  }
-  if (!partner) return null;
+  const hit = overlapPartner(clips, clipId);
+  if (!hit) return null;
+  const partner = hit.partner;
+  const best = hit.end - hit.start;
 
   // Whichever starts first is the one going OUT. A tie would make the
   // direction arbitrary, so the shorter clip yields and fades in.

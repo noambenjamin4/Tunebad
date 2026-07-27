@@ -19,6 +19,7 @@ import {
   isSoloing,
   loopPassEnd,
   loopRegionFor,
+  overlapPartner,
   sliceClipsToWindow,
   snapCandidates,
 } from "../lib/studio/timeline";
@@ -32,6 +33,7 @@ import {
   zoomToFit,
 } from "../lib/studio/timeline-math";
 import { automatedOutputDuration } from "../lib/audio/remix";
+import { keysMix } from "../lib/audio/harmonic";
 import {
   type BeatGrid,
   barsIn,
@@ -732,4 +734,50 @@ test("a bar-aligned loop never starts before the timeline does", () => {
   const widened = expandToBars({ start: 0.2, end: 1.0 }, grid);
   assert.ok(widened.start >= 0, `loop started at ${widened.start}`);
   assert.ok(widened.end > widened.start, "a loop must have length");
+});
+
+/* --------------------------- harmonic mixing --------------------------- */
+
+test("keysMix accepts the DJ neighbour set and nothing else", () => {
+  // Same key, one step either way round the wheel, and the relative
+  // major/minor. 8A is A Minor.
+  assert.ok(keysMix("8A", "8A"), "same key");
+  assert.ok(keysMix("8A", "9A"), "energy up");
+  assert.ok(keysMix("8A", "7A"), "energy down");
+  assert.ok(keysMix("8A", "8B"), "relative major");
+  // Two steps is the classic clash.
+  assert.ok(!keysMix("8A", "10A"));
+  assert.ok(!keysMix("8A", "2B"));
+  // The wheel wraps: 12 and 1 are neighbours, not ten steps apart.
+  assert.ok(keysMix("12A", "1A"));
+  assert.ok(keysMix("1A", "12A"));
+  // Compatibility is symmetric — an asymmetric verdict would let the
+  // inspector say different things about the same pair of clips.
+  for (const [a, b] of [["8A", "9A"], ["8A", "2B"], ["12B", "1B"], ["3A", "6B"]]) {
+    assert.equal(keysMix(a, b), keysMix(b, a), `${a}/${b} disagreed on order`);
+  }
+});
+
+test("an unknown key is never reported as a fit", () => {
+  // Saying two songs are in key when nobody knows is worse than saying
+  // nothing — the inspector hides the verdict on a falsy result.
+  assert.equal(keysMix("", "8A"), false);
+  assert.equal(keysMix("8A", ""), false);
+  assert.equal(keysMix("banana", "8A"), false);
+  assert.equal(keysMix("13A", "8A"), false);
+  assert.equal(keysMix("0A", "8A"), false);
+  // Lower case and stray spacing still resolve.
+  assert.ok(keysMix("8a", " 9a "));
+});
+
+test("overlapPartner is the one scan behind loop, crossfade and the key check", () => {
+  const a = clip({ id: "a", timelineStart: 0, clipStart: 0, clipEnd: 30 });
+  const graze = clip({ id: "graze", timelineStart: 29.99, clipStart: 0, clipEnd: 10 });
+  const real = clip({ id: "real", timelineStart: 22, clipStart: 0, clipEnd: 10 });
+  const hit = overlapPartner([a, graze, real], "a");
+  assert.equal(hit?.partner.id, "real");
+  assert.deepEqual({ start: hit?.start, end: hit?.end }, { start: 22, end: 30 });
+  // The same answer the loop and the crossfade act on.
+  assert.deepEqual(loopRegionFor([a, graze, real], "a"), { start: 22, end: 30 });
+  assert.equal(overlapPartner([a], "a"), null);
 });

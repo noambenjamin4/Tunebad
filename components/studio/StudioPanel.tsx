@@ -37,6 +37,7 @@ import {
   MAX_TOTAL_CLIPS,
   crossfadeOverlap,
   isSoloing,
+  overlapPartner,
   loopRegionFor,
   sliceClipsToWindow,
   moveClip,
@@ -368,7 +369,7 @@ export function StudioPanel() {
 
   const signals = useDisplaySignals(clips, params.effect);
   const beatGrid = useBeatGrid(clips, signals);
-  const { grid, gridOn, clipBpms, noteClipBpm } = beatGrid;
+  const { grid, gridOn, clipInfo, noteClipInfo } = beatGrid;
 
   /* ------------------------------ transport ------------------------------ */
 
@@ -563,10 +564,10 @@ export function StudioPanel() {
   const handleMatchTempo = useCallback(async () => {
     const clip = clipsRef.current.find((c) => c.id === selectedId);
     if (!clip || !grid) return;
-    const sourceBpm = clipBpms.get(clip.bufferId);
+    const info = clipInfo.get(clip.bufferId);
     const source = bufferMap.get(clip.bufferId);
-    if (!sourceBpm || !source) return;
-    const ratio = tempoMatchRatio(sourceBpm, grid.bpm);
+    if (!info || !source) return;
+    const ratio = tempoMatchRatio(info.bpm, grid.bpm);
     if (!needsTempoMatch(ratio)) return;
 
     setWorking(true);
@@ -575,7 +576,10 @@ export function StudioPanel() {
       const stretched = await getStretchedBuffer(clip.bufferId, source, ratio);
       const id = stretchedIdFor(clip.bufferId, ratio);
       bufferMap.set(id, stretched);
-      noteClipBpm(id, Math.round(sourceBpm * ratio));
+      // The stretch changes tempo and leaves pitch alone, so the KEY carries
+      // over untouched — dropping it here would blank the harmonic readout
+      // for exactly the clips that were just matched.
+      noteClipInfo(id, { ...info, bpm: Math.round(info.bpm * ratio), bpmAlternate: null });
 
       // The stretched buffer is 1/ratio as long, so every source-time field
       // scales with it.
@@ -622,7 +626,7 @@ export function StudioPanel() {
       setStage(null);
       setWorking(false);
     }
-  }, [selectedId, grid, clipBpms, noteClipBpm, pushUndo, requestReschedule, t]);
+  }, [selectedId, grid, clipInfo, noteClipInfo, pushUndo, requestReschedule, t]);
 
   const handleToggleSolo = useCallback(() => {
     if (!selectedId) return;
@@ -985,7 +989,8 @@ export function StudioPanel() {
               clip={selectedClip}
               working={working}
               grid={grid}
-              clipBpms={clipBpms}
+              clipInfo={clipInfo}
+              partner={overlapPartner(clips, selectedClip.id)?.partner ?? null}
               onGainPointerDown={pushUndo}
               onGain={(gain) => {
                 editClip(selectedClip.id, (c) => ({ ...c, gain }), {

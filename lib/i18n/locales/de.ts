@@ -886,6 +886,8 @@ const de: Record<keyof typeof en, string> = {
   "studio.clearSession": "Sitzung löschen",
   "studio.sessionFull": "Sitzung zu groß — das Arrangement wird gesichert, das Audio nicht",
   "studio.clipBpm": "{bpm} BPM",
+  "studio.keysFit": "Tonarten passen: {a} + {b}",
+  "studio.keysClash": "Tonarten beißen sich: {a} / {b}",
   "studio.match": "Ans Raster angleichen",
   "studio.matchHint": "Diesen Clip auf das Projekttempo dehnen, Tonhöhe bleibt",
   "studio.crossfade": "Überblendung",

@@ -884,6 +884,8 @@ const ja: Record<keyof typeof en, string> = {
   "studio.clearSession": "セッションを消去",
   "studio.sessionFull": "セッションが大きすぎます — 構成は保存、音声は保存しません",
   "studio.clipBpm": "{bpm} BPM",
+  "studio.keysFit": "キーが合います: {a} + {b}",
+  "studio.keysClash": "キーが衝突: {a} / {b}",
   "studio.match": "グリッドに合わせる",
   "studio.matchHint": "ピッチはそのままにクリップをプロジェクトのテンポへ伸縮",
   "studio.crossfade": "クロスフェード",

@@ -4764,6 +4764,11 @@ tbody tr:last-child td {
 .studio-transport { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .studio-clock { color: var(--muted); font-size: 13px; }
 
+/* A hint that is a WARNING. Monochrome house style: no red — it earns
+   attention with the strong ink colour and weight, the same way the meter's
+   clip light does. */
+.studio-hint.warn { color: var(--display); font-weight: 600; }
+
 /* Master meter. Monochrome like everything else: level is shown by LENGTH,
    and "too hot" by a shift to the strong ink colour, never by turning red. */
 .studio-meter { display: inline-flex; align-items: center; gap: 8px; }

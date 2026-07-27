@@ -883,6 +883,8 @@ const zh: Record<keyof typeof en, string> = {
   "studio.clearSession": "清除会话",
   "studio.sessionFull": "会话过大 — 已保存编排，未保存音频",
   "studio.clipBpm": "{bpm} BPM",
+  "studio.keysFit": "调性相合：{a} + {b}",
+  "studio.keysClash": "调性冲突：{a} / {b}",
   "studio.match": "对齐到网格",
   "studio.matchHint": "将此片段拉伸到项目速度，音高不变",
   "studio.crossfade": "交叉淡化",

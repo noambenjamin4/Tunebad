@@ -935,6 +935,8 @@ const en = {
   "studio.clearSession": "Clear session",
   "studio.sessionFull": "Session too large to save — the arrangement is kept, the audio is not",
   "studio.clipBpm": "{bpm} BPM",
+  "studio.keysFit": "Keys fit: {a} + {b}",
+  "studio.keysClash": "Key clash: {a} vs {b}",
   "studio.match": "Match to grid",
   "studio.matchHint": "Time-stretch this clip to the project tempo, pitch unchanged",
   "studio.crossfade": "Crossfade",

@@ -15,6 +15,7 @@
 // scripts/octave-map.mjs) and lets it be typed in, because a producer knows
 // their own track's tempo better than any estimator does.
 
+import { camelot } from "@/lib/audio/constants";
 import type { WorkerRequest, WorkerResponse } from "@/types/analysis";
 import { monoSamples, resampleMono } from "@/lib/audio/decode";
 import type { DisplaySignal } from "./display-signal";
@@ -213,7 +214,7 @@ function ensureWorker(): Worker {
 }
 
 /**
- * Compile the essentia WASM before anyone asks for a tempo.
+ * Compile the essentia WASM before anyone asks for a tempo or a key.
  *
  * Without this the FIRST detection pays the whole download-and-compile cost
  * while a timeout runs against it, and on a cold cache that surfaced as a
@@ -222,7 +223,7 @@ function ensureWorker(): Worker {
  * (8-second drums detect fine). useAnalyzer already warms the same worker
  * on the analyzer page; the DAW simply never did.
  */
-export function warmTempoWorker(): void {
+export function warmAnalysisWorker(): void {
   try {
     ensureWorker().postMessage({ warmup: true });
   } catch {
@@ -230,19 +231,27 @@ export function warmTempoWorker(): void {
   }
 }
 
-export interface DetectedTempo {
+export interface ClipAnalysis {
   bpm: number;
   /** The other octave, when the estimator flagged one — feeds the x2 / ÷2 UI. */
   bpmAlternate: number | null;
+  /** e.g. "A Minor". Empty when the estimator had nothing useful to say. */
+  key: string;
+  /** Camelot code, e.g. "8A". Empty when the key is unknown. */
+  camelot: string;
 }
 
 /**
- * Tempo for one buffer, via the shared analysis worker. The 16 kHz `samples`
- * field drives key detection, which we do not use here but the worker
- * requires; tempo reads `bpmSamples` at the native rate, which is what its
+ * Tempo AND key for one buffer, via the shared analysis worker.
+ *
+ * Both come back from a single pass. The DAW used to send the 16 kHz
+ * `samples` field purely because the worker required it, let it estimate the
+ * key, and then drop the answer on the floor — so the key here is free, and
+ * for deciding whether two songs will actually mix it is worth as much as
+ * the tempo. Tempo reads `bpmSamples` at the native rate, which is what its
  * frame sizes are specified for.
  */
-export async function detectTempo(buffer: AudioBuffer): Promise<DetectedTempo | null> {
+export async function analyseClip(buffer: AudioBuffer): Promise<ClipAnalysis | null> {
   try {
     const native = monoSamples(buffer);
     const sixteen = await resampleMono(native, buffer.sampleRate, 16000);
@@ -270,7 +279,14 @@ export async function detectTempo(buffer: AudioBuffer): Promise<DetectedTempo | 
       ensureWorker().postMessage(request);
     });
     if (!response.bpm || response.bpm < MIN_BPM || response.bpm > MAX_BPM) return null;
-    return { bpm: Math.round(response.bpm), bpmAlternate: response.bpmAlternate ?? null };
+    return {
+      bpm: Math.round(response.bpm),
+      bpmAlternate: response.bpmAlternate ?? null,
+      key: response.key ?? "",
+      // The worker reports the key by name; the wheel position comes from the
+      // same table the analyzer and the song pages use.
+      camelot: camelot[response.key] ?? "",
+    };
   } catch {
     return null; // no grid is a fine outcome; a wrong grid is not
   }

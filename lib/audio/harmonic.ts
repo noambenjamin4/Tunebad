@@ -29,6 +29,19 @@ export function camelotNeighbors(code: string): CamelotCode[] {
   ];
 }
 
+/**
+ * Will these two mix in key? True for the same code, one step either way
+ * around the wheel, or the relative major/minor — the four-neighbour set DJs
+ * actually use. Unknown or unparseable codes return false rather than a
+ * cheerful guess: claiming two songs are in key when nobody knows is worse
+ * than saying nothing.
+ */
+export function keysMix(a: string, b: string): boolean {
+  const options = camelotNeighbors(a);
+  if (options.length === 0) return false;
+  return options.includes(b.trim().toUpperCase());
+}
+
 /** Compatible codes excluding the track's own key (for "mix it with" lists). */
 export function compatibleCodes(code: string): CamelotCode[] {
   const p = parse(code);

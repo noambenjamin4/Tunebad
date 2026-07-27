@@ -886,6 +886,8 @@ const pt: Record<keyof typeof en, string> = {
   "studio.clearSession": "Limpar sessão",
   "studio.sessionFull": "Sessão grande demais — o arranjo é guardado, o áudio não",
   "studio.clipBpm": "{bpm} BPM",
+  "studio.keysFit": "Tons combinam: {a} + {b}",
+  "studio.keysClash": "Conflito de tom: {a} / {b}",
   "studio.match": "Alinhar à grade",
   "studio.matchHint": "Esticar este clipe para o tempo do projeto, sem mudar o tom",
   "studio.crossfade": "Fusão cruzada",

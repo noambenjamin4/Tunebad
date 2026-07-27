@@ -7,9 +7,10 @@ import {
   DEFAULT_BEATS_PER_BAR,
   MAX_BPM,
   MIN_BPM,
-  detectTempo,
+  type ClipAnalysis,
+  analyseClip,
   estimateBeatPhase,
-  warmTempoWorker,
+  warmAnalysisWorker,
 } from "@/lib/studio/beat-grid";
 import type { DisplaySignal } from "@/lib/studio/display-signal";
 import type { StudioClip } from "@/lib/studio/timeline";
@@ -22,10 +23,10 @@ export interface BeatGridState {
   setGridOn: React.Dispatch<React.SetStateAction<boolean>>;
   detecting: boolean;
   failed: boolean;
-  /** Detected tempo per BUFFER id, for the inspector and beatmatch. */
-  clipBpms: Map<string, number>;
-  /** Record a tempo for a buffer produced by stretching (beatmatch). */
-  noteClipBpm: (bufferId: string, bpm: number) => void;
+  /** Tempo AND key per BUFFER id, for the inspector and beatmatch. */
+  clipInfo: Map<string, ClipAnalysis>;
+  /** Record analysis for a buffer produced by stretching (beatmatch). */
+  noteClipInfo: (bufferId: string, info: ClipAnalysis) => void;
   /** Set the project tempo by hand — the BPM field and the x2 / ÷2 buttons. */
   setGridBpm: (bpm: number) => void;
 }
@@ -47,14 +48,14 @@ export function useBeatGrid(
   const [gridOn, setGridOn] = useState(true);
   const [detecting, setDetecting] = useState(false);
   const [failed, setFailed] = useState(false);
-  const [clipBpms, setClipBpms] = useState<Map<string, number>>(new Map());
+  const [clipInfo, setClipInfo] = useState<Map<string, ClipAnalysis>>(new Map());
   const gridSourceRef = useRef<string | null>(null);
   const bpmRequestedRef = useRef<Set<string>>(new Set());
 
   // Compile the tempo engine while the user is still choosing files, so the
   // first detection is not a cold start racing its own timeout.
   useEffect(() => {
-    warmTempoWorker();
+    warmAnalysisWorker();
   }, []);
 
   // Detection runs once per source clip; the phase pass needs that clip's
@@ -77,7 +78,7 @@ export function useBeatGrid(
     setDetecting(true);
     setFailed(false);
     let cancelled = false;
-    void detectTempo(buffer).then((tempo) => {
+    void analyseClip(buffer).then((tempo) => {
       if (cancelled) return;
       setDetecting(false);
       if (!tempo) {
@@ -107,15 +108,15 @@ export function useBeatGrid(
       const buffer = bufferMap.get(id);
       if (!buffer) continue;
       bpmRequestedRef.current.add(id);
-      void detectTempo(buffer).then((tempo) => {
-        if (!tempo) return;
-        setClipBpms((prev) => new Map(prev).set(id, tempo.bpm));
+      void analyseClip(buffer).then((info) => {
+        if (!info) return;
+        setClipInfo((prev) => new Map(prev).set(id, info));
       });
     }
   }, [clips]);
 
-  const noteClipBpm = useCallback((bufferId: string, bpm: number) => {
-    setClipBpms((prev) => new Map(prev).set(bufferId, bpm));
+  const noteClipInfo = useCallback((bufferId: string, info: ClipAnalysis) => {
+    setClipInfo((prev) => new Map(prev).set(bufferId, info));
   }, []);
 
   const setGridBpm = useCallback((bpm: number) => {
@@ -135,8 +136,8 @@ export function useBeatGrid(
     setGridOn,
     detecting,
     failed,
-    clipBpms,
-    noteClipBpm,
+    clipInfo,
+    noteClipInfo,
     setGridBpm,
   };
 }
