@@ -6,6 +6,7 @@ import { bufferMap } from "@/lib/studio/buffer-store";
 import {
   type DisplaySignal,
   getDisplaySignal,
+  displayKey,
   peekDisplaySignal,
 } from "@/lib/studio/display-signal";
 import type { StudioClip } from "@/lib/studio/timeline";
@@ -28,23 +29,33 @@ export function useDisplaySignals(
 
   useEffect(() => {
     let cancelled = false;
-    const ids = [...new Set(clips.map((c) => c.bufferId))];
+    // One entry per DISTINCT (buffer, clip effect) pair, not per buffer: two
+    // clips can share audio and disagree about the effect on it, and two
+    // clips that agree still share a single render.
+    const wanted = new Map<string, { bufferId: string; chain: EffectId[] }>();
+    for (const clip of clips) {
+      wanted.set(displayKey(clip.bufferId, clip.effect, effect), {
+        bufferId: clip.bufferId,
+        chain: [clip.effect ?? "none", effect],
+      });
+    }
 
     const immediate = new Map<string, DisplaySignal>();
     const missing: string[] = [];
-    for (const id of ids) {
-      const hit = peekDisplaySignal(id, effect);
-      if (hit) immediate.set(id, hit);
-      else missing.push(id);
+    for (const key of wanted.keys()) {
+      const hit = peekDisplaySignal(key);
+      if (hit) immediate.set(key, hit);
+      else missing.push(key);
     }
     setSignals(immediate);
 
-    for (const id of missing) {
-      const buffer = bufferMap.get(id);
+    for (const key of missing) {
+      const want = wanted.get(key)!;
+      const buffer = bufferMap.get(want.bufferId);
       if (!buffer) continue;
-      void getDisplaySignal(id, buffer, effect).then((signal) => {
+      void getDisplaySignal(key, buffer, want.chain).then((signal) => {
         if (cancelled) return;
-        setSignals((prev) => new Map(prev).set(id, signal));
+        setSignals((prev) => new Map(prev).set(key, signal));
       });
     }
     return () => {

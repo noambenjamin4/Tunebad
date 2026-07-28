@@ -44,7 +44,8 @@ import {
   zoomAtCursor,
   zoomToFit,
 } from "@/lib/studio/timeline-math";
-import type { DisplaySignal } from "@/lib/studio/display-signal";
+import type { EffectId } from "@/lib/audio/remix";
+import { type DisplaySignal, displayKey } from "@/lib/studio/display-signal";
 import { type BeatGrid, beatTimesInRange, nearestGridTime } from "@/lib/studio/beat-grid";
 import { ClipCanvas } from "./ClipCanvas";
 
@@ -63,6 +64,7 @@ type DragState =
 export function Timeline({
   clips,
   signals,
+  masterEffect,
   selectedId,
   playing,
   pxPerSecond,
@@ -87,6 +89,8 @@ export function Timeline({
 }: {
   clips: StudioClip[];
   signals: Map<string, DisplaySignal>;
+  /** Needed only to look a clip's signal up by the same key the hook used. */
+  masterEffect: EffectId;
   selectedId: string | null;
   playing: boolean;
   pxPerSecond: number;
@@ -692,7 +696,9 @@ export function Timeline({
           </div>
 
           {clips.map((clip) => {
-            const signal = signals.get(clip.bufferId);
+            // Same key the hook wrote, so the wave drawn on a clip is the
+            // one rendered for THAT clip's effect chain.
+            const signal = signals.get(displayKey(clip.bufferId, clip.effect, masterEffect));
             const row = rows.get(clip.id) ?? 0;
             const length = clipDuration(clip);
             const widthPx = Math.max(8, length * pxPerSecond);

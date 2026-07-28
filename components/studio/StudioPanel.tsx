@@ -57,7 +57,7 @@ import {
   releaseUnreachable,
 } from "@/lib/studio/buffer-store";
 import { makeClipId, reserveClipIds } from "@/lib/studio/clip-ids";
-import { getDisplaySignal } from "@/lib/studio/display-signal";
+import { displayKey, getDisplaySignal } from "@/lib/studio/display-signal";
 import { StudioEngine } from "@/lib/studio/engine";
 import {
   MAX_SESSION_BYTES,
@@ -645,7 +645,11 @@ export function StudioPanel() {
       // human makes by ear. So find where this clip's beats actually fall
       // and slide it (by less than half a beat) until they land on the grid.
       let nextStart = clip.timelineStart;
-      const signal = await getDisplaySignal(id, stretched, paramsRef.current.effect);
+      const signal = await getDisplaySignal(
+        displayKey(id, clip.effect, paramsRef.current.effect),
+        stretched,
+        [clip.effect ?? "none", paramsRef.current.effect],
+      );
       const phase = estimateBeatPhase(signal, grid.bpm);
       const beatOnTimeline = clip.timelineStart + (phase - nextClipStart);
       const correction = nearestGridTime(beatOnTimeline, grid) - beatOnTimeline;
@@ -988,6 +992,7 @@ export function StudioPanel() {
           <Timeline
             clips={clips}
             signals={signals}
+            masterEffect={params.effect}
             selectedId={selectedId}
             playing={playing}
             pxPerSecond={pxPerSecond}
