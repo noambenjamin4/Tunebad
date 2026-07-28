@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { jsonLdString } from "@/lib/seo/jsonld";
 import type { ReactNode } from "react";
 
 // Shared server-rendered shell for the English guide pages. Mirrors the
@@ -33,15 +34,15 @@ export function GuideShell({
         <Link href="/" className="brand" aria-label="TuneBad, back to home">
           <span className="brand-logo-wrap">
             <picture>
-              <source media="(prefers-color-scheme: dark)" srcSet="/logo-dark.png" />
-              <img src="/logo-light.png" alt="" width={34} height={34} className="brand-logo" />
+              <source media="(prefers-color-scheme: dark)" srcSet="/logo-dark-76.webp" />
+              <img src="/logo-light-76.webp" alt="" width={34} height={34} className="brand-logo" />
             </picture>
           </span>
           <span className="brand-wordmark">TUNEBAD</span>
         </Link>
       </header>
 
-      <main>
+      <main id="main-content">
         <article className="legal guide">
           {children}
           <p className="legal-back">
@@ -54,8 +55,8 @@ export function GuideShell({
         <div className="site-footer-inner">
           <div className="site-footer-brand">
             <picture>
-              <source media="(prefers-color-scheme: dark)" srcSet="/logo-dark.png" />
-              <img src="/logo-light.png" alt="" width={24} height={24} className="site-footer-logo" loading="lazy" />
+              <source media="(prefers-color-scheme: dark)" srcSet="/logo-dark-76.webp" />
+              <img src="/logo-light-76.webp" alt="" width={24} height={24} className="site-footer-logo" loading="lazy" />
             </picture>
             <span className="site-footer-wordmark">TUNEBAD</span>
           </div>
@@ -63,7 +64,7 @@ export function GuideShell({
         </div>
       </footer>
 
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(articleLd) }} />
     </div>
   );
 }

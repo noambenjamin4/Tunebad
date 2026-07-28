@@ -14,7 +14,7 @@ import { useI18n } from "@/lib/i18n";
 import type { DictKey } from "@/lib/i18n/locales/en";
 import en from "@/lib/i18n/locales/en";
 import { SITE_URL } from "@/lib/site";
-import { howToJsonLd } from "@/lib/seo/jsonld";
+import { jsonLdString, howToJsonLd } from "@/lib/seo/jsonld";
 
 const STEP_KEYS = ["studio.how1", "studio.how2", "studio.how3", "studio.how4"] as const;
 
@@ -74,7 +74,7 @@ export function DawSeo() {
         </table>
       </div>
 
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(HOW_TO) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(HOW_TO) }} />
     </section>
   );
 }

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { jsonLdString } from "@/lib/seo/jsonld";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
@@ -225,8 +226,8 @@ async function SongPageInner({ params }: { params: Promise<{ slug: string }> }) 
         <Link href="/" className="brand" aria-label="TuneBad, back to home">
           <span className="brand-logo-wrap">
             <picture>
-              <source media="(prefers-color-scheme: dark)" srcSet="/logo-dark.png" />
-              <img src="/logo-light.png" alt="" width={34} height={34} className="brand-logo" />
+              <source media="(prefers-color-scheme: dark)" srcSet="/logo-dark-76.webp" />
+              <img src="/logo-light-76.webp" alt="" width={34} height={34} className="brand-logo" />
             </picture>
           </span>
           <span className="brand-wordmark">TUNEBAD</span>
@@ -400,8 +401,8 @@ async function SongPageInner({ params }: { params: Promise<{ slug: string }> }) 
         <div className="site-footer-inner">
           <div className="site-footer-brand">
             <picture>
-              <source media="(prefers-color-scheme: dark)" srcSet="/logo-dark.png" />
-              <img src="/logo-light.png" alt="" width={24} height={24} className="site-footer-logo" loading="lazy" />
+              <source media="(prefers-color-scheme: dark)" srcSet="/logo-dark-76.webp" />
+              <img src="/logo-light-76.webp" alt="" width={24} height={24} className="site-footer-logo" loading="lazy" />
             </picture>
             <span className="site-footer-wordmark">TUNEBAD</span>
           </div>
@@ -409,10 +410,10 @@ async function SongPageInner({ params }: { params: Promise<{ slug: string }> }) 
         </div>
       </footer>
 
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(musicJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(musicJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(breadcrumbJsonLd) }} />
       {mixMatchesJsonLd && (
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(mixMatchesJsonLd) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(mixMatchesJsonLd) }} />
       )}
     </div>
   );

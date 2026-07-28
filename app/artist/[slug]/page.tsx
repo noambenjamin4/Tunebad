@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { jsonLdString } from "@/lib/seo/jsonld";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { readAllSongs, SONG_READ_CAP } from "@/lib/server/link-analysis";
@@ -61,6 +62,7 @@ export async function generateMetadata({
     title: artistMetaTitle(artist.name),
     description: `The key, BPM, and Camelot code for ${artist.songs.length} songs by ${artist.name}, ranging ${bpmRange}. Useful for DJs building sets and producers sampling ${artist.name} tracks.`,
     alternates: { canonical: `/artist/${slug}` },
+    openGraph: { url: `/artist/${slug}`, title: artistMetaTitle(artist.name) },
   };
 }
 
@@ -92,8 +94,8 @@ export default async function ArtistPage({ params }: { params: Promise<{ slug: s
         <Link href="/" className="brand" aria-label="TuneBad, back to home">
           <span className="brand-logo-wrap">
             <picture>
-              <source media="(prefers-color-scheme: dark)" srcSet="/logo-dark.png" />
-              <img src="/logo-light.png" alt="" width={34} height={34} className="brand-logo" />
+              <source media="(prefers-color-scheme: dark)" srcSet="/logo-dark-76.webp" />
+              <img src="/logo-light-76.webp" alt="" width={34} height={34} className="brand-logo" />
             </picture>
           </span>
           <span className="brand-wordmark">TUNEBAD</span>
@@ -152,8 +154,8 @@ export default async function ArtistPage({ params }: { params: Promise<{ slug: s
         <div className="site-footer-inner">
           <div className="site-footer-brand">
             <picture>
-              <source media="(prefers-color-scheme: dark)" srcSet="/logo-dark.png" />
-              <img src="/logo-light.png" alt="" width={24} height={24} className="site-footer-logo" loading="lazy" />
+              <source media="(prefers-color-scheme: dark)" srcSet="/logo-dark-76.webp" />
+              <img src="/logo-light-76.webp" alt="" width={24} height={24} className="site-footer-logo" loading="lazy" />
             </picture>
             <span className="site-footer-wordmark">TUNEBAD</span>
           </div>
@@ -161,7 +163,7 @@ export default async function ArtistPage({ params }: { params: Promise<{ slug: s
         </div>
       </footer>
 
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(listJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(listJsonLd) }} />
     </div>
   );
 }

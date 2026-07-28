@@ -7,7 +7,7 @@ import { compatibleCodes, keyToSlug } from "@/lib/audio/harmonic";
 import { CamelotWheel } from "./CamelotWheel";
 import { MinimalFooter } from "@/components/layout/MinimalFooter";
 import { SITE_URL } from "@/lib/site";
-import { breadcrumbJsonLd, faqPageJsonLd } from "@/lib/seo/jsonld";
+import { jsonLdString, breadcrumbJsonLd, faqPageJsonLd } from "@/lib/seo/jsonld";
 
 // Standalone, crawlable Camelot wheel page: an interactive chart (client
 // island) on top of fully server-rendered reference content — the 24-code
@@ -166,8 +166,8 @@ export default function CamelotWheelPage() {
 
       <MinimalFooter />
 
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(breadcrumbs) }} />
     </div>
   );
 }

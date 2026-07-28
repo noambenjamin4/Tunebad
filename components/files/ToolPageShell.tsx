@@ -4,7 +4,7 @@ import { Footer } from "@/components/layout/Footer";
 import { ToolPageNav } from "@/components/layout/ToolPageNav";
 import { PageDropGuard } from "@/components/files/PageDropGuard";
 import { SITE_URL } from "@/lib/site";
-import { breadcrumbJsonLd } from "@/lib/seo/jsonld";
+import { jsonLdString, breadcrumbJsonLd } from "@/lib/seo/jsonld";
 
 // Standalone page shell for the file tools (image/video/pdf/zip). These pages
 // live OUTSIDE the TunebadApp SPA (the top nav is over budget), so each wraps
@@ -34,7 +34,7 @@ export function ToolPageShell({
             this a stray drop would navigate away and destroy the session. */}
         <PageDropGuard />
         <ToolPageNav />
-        <main>
+        <main id="main-content">
           <div className="tool-page">{children}</div>
           <Footer />
         </main>
@@ -42,7 +42,7 @@ export function ToolPageShell({
 
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdString(breadcrumbs) }}
       />
     </div>
   );

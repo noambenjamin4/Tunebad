@@ -9,12 +9,14 @@ export function MinimalFooter() {
       <div className="site-footer-inner">
         <div className="site-footer-brand">
           <picture>
-            <source media="(prefers-color-scheme: dark)" srcSet="/logo-dark.png" />
-            <img src="/logo-light.png" alt="" width={24} height={24} className="site-footer-logo" loading="lazy" />
+            <source media="(prefers-color-scheme: dark)" srcSet="/logo-dark-76.webp" />
+            <img src="/logo-light-76.webp" alt="" width={24} height={24} className="site-footer-logo" loading="lazy" />
           </picture>
           <span className="site-footer-wordmark">TUNEBAD</span>
         </div>
-        <p className="site-footer-copyright">© 2026 TuneBad</p>
+        <p className="site-footer-copyright">
+          © 2026 TuneBad · <a href="/privacy">Privacy</a> · <a href="/copyright">Copyright</a>
+        </p>
       </div>
     </footer>
   );

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { jsonLdString } from "@/lib/seo/jsonld";
 import { notFound } from "next/navigation";
 import { countSongsByKey, readSongsByKey } from "@/lib/server/link-analysis";
 import { keyToSlug, slugToKey, compatibleCodes, relationLabel } from "@/lib/audio/harmonic";
@@ -82,8 +83,8 @@ export async function KeyHubPage({ slug, page }: { slug: string; page: number })
         <Link href="/" className="brand" aria-label="TuneBad, back to home">
           <span className="brand-logo-wrap">
             <picture>
-              <source media="(prefers-color-scheme: dark)" srcSet="/logo-dark.png" />
-              <img src="/logo-light.png" alt="" width={34} height={34} className="brand-logo" />
+              <source media="(prefers-color-scheme: dark)" srcSet="/logo-dark-76.webp" />
+              <img src="/logo-light-76.webp" alt="" width={34} height={34} className="brand-logo" />
             </picture>
           </span>
           <span className="brand-wordmark">TUNEBAD</span>
@@ -163,7 +164,7 @@ export async function KeyHubPage({ slug, page }: { slug: string; page: number })
 
       <MinimalFooter />
 
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(listJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(listJsonLd) }} />
     </div>
   );
 }

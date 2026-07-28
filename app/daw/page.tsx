@@ -5,7 +5,7 @@ import { ToolFaq } from "@/components/files/ToolFaq";
 import { StudioClient } from "@/components/studio/StudioClient";
 import { DawSeo } from "@/components/studio/DawSeo";
 import { SITE_URL } from "@/lib/site";
-import { softwareAppJsonLd } from "@/lib/seo/jsonld";
+import { jsonLdString, softwareAppJsonLd } from "@/lib/seo/jsonld";
 
 const DESCRIPTION =
   "Put up to 12 songs on one timeline, see the waveforms, drag them to overlap for a beat switch, cut and split, add live slowed + reverb and phone effects, then export as MP3 or WAV. Free, in your browser, nothing uploaded.";
@@ -62,7 +62,7 @@ export default function Page() {
       <RelatedTools tools={["audio-joiner", "audio-converter", "wav-to-mp3"]} />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(SOFTWARE) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdString(SOFTWARE) }}
       />
     </ToolPageShell>
   );

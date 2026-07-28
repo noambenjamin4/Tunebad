@@ -221,7 +221,7 @@ export function TunebadApp({
           <div className="grain-overlay" aria-hidden="true" />
           <GlobalDropCatcher view={view} />
           <TopBar />
-          <main>
+          <main id="main-content">
             <section
               className={`page-view${view === "analysis" ? " active" : ""}`}
               data-view="analysis"

@@ -4,7 +4,7 @@ import { I18nProvider } from "@/lib/i18n";
 import { ToolPageNav } from "@/components/layout/ToolPageNav";
 import { PlaylistAnalyzer } from "@/components/playlist/PlaylistAnalyzer";
 import { MinimalFooter } from "@/components/layout/MinimalFooter";
-import { faqPageJsonLd } from "@/lib/seo/jsonld";
+import { jsonLdString, faqPageJsonLd } from "@/lib/seo/jsonld";
 
 export const metadata: Metadata = {
   title: "Free Playlist Analyzer: Key & BPM of Every Track",
@@ -78,7 +78,7 @@ export default function PlaylistAnalyzerPage() {
             ))}
           </section>
 
-          <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+          <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(faqJsonLd) }} />
         </article>
       </main>
 

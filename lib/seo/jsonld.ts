@@ -1,6 +1,30 @@
 // Shared JSON-LD builders for the schema.org blocks that used to be built
 // inline on every page. Pure functions returning plain objects — callers
-// JSON.stringify them into a <script type="application/ld+json"> tag.
+// serialize them into a <script type="application/ld+json"> tag with
+// jsonLdString below, never with bare JSON.stringify.
+
+/**
+ * Serialize an object for a <script type="application/ld+json"> block.
+ *
+ * JSON.stringify alone is NOT safe here. Some of what goes into these blocks
+ * is third-party text — song titles arrive from platform oEmbed endpoints,
+ * i.e. whatever someone named their video — and the HTML parser ends a
+ * <script> element at the first "</script" it sees, ignoring string context.
+ * JSON.stringify escapes quotes but not "<", so a title containing
+ * "</script><script>…" broke out of the block, and the CSP's 'unsafe-inline'
+ * (required by Next's own bootstrap) would have run it: stored XSS on
+ * permanently-cached pages.
+ *
+ * Escaping <, >, and & as \u003c-style sequences is still valid JSON — the
+ * data parses identically — while making the markup structurally inert. This
+ * is the same approach Next/React use for their own inline JSON payloads.
+ */
+export function jsonLdString(value: unknown): string {
+  return JSON.stringify(value)
+    .replace(/</g, "\\u003c")
+    .replace(/>/g, "\\u003e")
+    .replace(/&/g, "\\u0026");
+}
 
 export function faqPageJsonLd(items: { q: string; a: string }[]) {
   return {

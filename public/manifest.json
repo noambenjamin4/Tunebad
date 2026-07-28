@@ -1,12 +1,12 @@
 {
   "name": "TuneBad",
   "short_name": "TuneBad",
-  "description": "A music utility for file analysis, BPM, pitch, delay, reverb, and MP3 conversion.",
+  "description": "Free music tools in the browser: key & BPM finder, a multi-song timeline DAW, slowed + reverb, MP3 cutter, converters, mastering, and file utilities. Nothing is uploaded.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#111111",
+  "theme_color": "#ffffff",
   "icons": [
     {
       "src": "/icon-192.png",
@@ -19,6 +19,12 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
+    },
+    {
+      "src": "/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }

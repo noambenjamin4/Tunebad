@@ -8,7 +8,7 @@
 import { useI18n } from "@/lib/i18n";
 import en from "@/lib/i18n/locales/en";
 import type { DictKey } from "@/lib/i18n/locales/en";
-import { faqPageJsonLd } from "@/lib/seo/jsonld";
+import { jsonLdString, faqPageJsonLd } from "@/lib/seo/jsonld";
 
 export type FaqEntry = { q: DictKey; a: DictKey };
 
@@ -26,7 +26,7 @@ export function ToolFaq({ faqs }: { faqs: FaqEntry[] }) {
           </details>
         ))}
       </div>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(jsonLd) }} />
     </section>
   );
 }

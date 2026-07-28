@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { jsonLdString } from "@/lib/seo/jsonld";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { readSongsByBpmRangeAll } from "@/lib/server/link-analysis";
@@ -36,6 +37,7 @@ export async function generateMetadata({
     title: `${activity.min}-${activity.max} BPM Songs for ${activity.label}`,
     description: `Songs at ${activity.min}-${activity.max} BPM for ${activity.label.toLowerCase()}, picked from real analyzed tracks with their exact BPM and key.`,
     alternates: { canonical: `/songs/bpm-for/${activity.slug}` },
+    openGraph: { url: `/songs/bpm-for/${activity.slug}`, title: `${activity.min}-${activity.max} BPM Songs for ${activity.label}` },
   };
 }
 
@@ -106,8 +108,8 @@ export default async function ActivityBpmPage({ params }: { params: Promise<{ ac
         <Link href="/" className="brand" aria-label="TuneBad, back to home">
           <span className="brand-logo-wrap">
             <picture>
-              <source media="(prefers-color-scheme: dark)" srcSet="/logo-dark.png" />
-              <img src="/logo-light.png" alt="" width={34} height={34} className="brand-logo" />
+              <source media="(prefers-color-scheme: dark)" srcSet="/logo-dark-76.webp" />
+              <img src="/logo-light-76.webp" alt="" width={34} height={34} className="brand-logo" />
             </picture>
           </span>
           <span className="brand-wordmark">TUNEBAD</span>
@@ -194,8 +196,8 @@ export default async function ActivityBpmPage({ params }: { params: Promise<{ ac
         <div className="site-footer-inner">
           <div className="site-footer-brand">
             <picture>
-              <source media="(prefers-color-scheme: dark)" srcSet="/logo-dark.png" />
-              <img src="/logo-light.png" alt="" width={24} height={24} className="site-footer-logo" loading="lazy" />
+              <source media="(prefers-color-scheme: dark)" srcSet="/logo-dark-76.webp" />
+              <img src="/logo-light-76.webp" alt="" width={24} height={24} className="site-footer-logo" loading="lazy" />
             </picture>
             <span className="site-footer-wordmark">TUNEBAD</span>
           </div>
@@ -203,8 +205,8 @@ export default async function ActivityBpmPage({ params }: { params: Promise<{ ac
         </div>
       </footer>
 
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(listJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(listJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(faqJsonLd) }} />
     </div>
   );
 }

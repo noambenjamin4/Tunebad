@@ -6,9 +6,10 @@ export const metadata: Metadata = {
   description:
     "TuneBad's privacy policy: what the website and the Chrome extension do and don't collect. Short version: no accounts, no tracking profiles, audio stays on your device.",
   alternates: { canonical: "/privacy" },
+  openGraph: { url: "/privacy", title: "Privacy Policy" },
 };
 
-const LAST_UPDATED = "2026-07-20";
+const LAST_UPDATED = "2026-07-28";
 
 // English-only for now (unlike /copyright): this page is the compliance
 // reference the Chrome Web Store links to, and its audience reads English.
@@ -21,8 +22,8 @@ export default function PrivacyPage() {
         <Link href="/" className="brand" aria-label="TuneBad, back to home">
           <span className="brand-logo-wrap">
             <picture>
-              <source media="(prefers-color-scheme: dark)" srcSet="/logo-dark.png" />
-              <img src="/logo-light.png" alt="" width={34} height={34} className="brand-logo" />
+              <source media="(prefers-color-scheme: dark)" srcSet="/logo-dark-76.webp" />
+              <img src="/logo-light-76.webp" alt="" width={34} height={34} className="brand-logo" />
             </picture>
           </span>
           <span className="brand-wordmark">TUNEBAD</span>
@@ -93,10 +94,20 @@ export default function PrivacyPage() {
                 the shortcut act on the tab you are viewing, only when you invoke it.
               </li>
               <li>Side panel: lets you dock the toolkit beside the page.</li>
+              <li>
+                tunebad.com (host permission): exists for exactly one feature, the
+                &quot;Open in DAW&quot; button. A small script runs on tunebad.com/daw
+                only, and its only job is to hand the clip you just recorded or edited
+                to the timeline on that page — the audio goes straight from your
+                browser&apos;s extension to your browser&apos;s tab, never through a
+                server. It runs on no other site and no other page of ours, reads
+                nothing from any page, and transmits nothing.
+              </li>
             </ul>
             <p>
-              The extension declares no host permissions and injects no scripts into
-              websites, so it cannot read the pages you visit.
+              Outside of that one page, the extension injects no scripts into websites
+              and cannot read the pages you visit. It has no access to any site other
+              than tunebad.com.
             </p>
           </section>
 
@@ -127,8 +138,8 @@ export default function PrivacyPage() {
         <div className="site-footer-inner">
           <div className="site-footer-brand">
             <picture>
-              <source media="(prefers-color-scheme: dark)" srcSet="/logo-dark.png" />
-              <img src="/logo-light.png" alt="" width={24} height={24} className="site-footer-logo" loading="lazy" />
+              <source media="(prefers-color-scheme: dark)" srcSet="/logo-dark-76.webp" />
+              <img src="/logo-light-76.webp" alt="" width={24} height={24} className="site-footer-logo" loading="lazy" />
             </picture>
             <span className="site-footer-wordmark">TUNEBAD</span>
           </div>

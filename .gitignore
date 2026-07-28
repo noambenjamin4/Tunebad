@@ -22,3 +22,6 @@ AUTONOMOUS-QUEUE.md
 
 # Local DB backups (4MB+ dumps, never commit)
 backups/
+
+# graphify build artifacts (regenerated on every run; includes live pid/log)
+graphify-out/

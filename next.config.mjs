@@ -5,8 +5,12 @@ const isDev = process.env.NODE_ENV !== "production";
 // Static-compatible CSP: the app's pages are prerendered at build time, so a
 // per-request nonce (middleware) can never match the baked HTML — that setup
 // blocks every script on Vercel. 'unsafe-inline' is required for Next's inline
-// bootstrap on static pages; the app has no HTML-injection sinks (no
-// dangerouslySetInnerHTML, React-escaped rendering throughout).
+// bootstrap on static pages. The app DOES have dangerouslySetInnerHTML sinks —
+// the ~21 JSON-LD <script> blocks — which is precisely why every one of them
+// serializes through jsonLdString (lib/seo/jsonld.ts), escaping < > & so
+// third-party text (song titles come from platform oEmbed responses) cannot
+// close the script element. An earlier version of this comment claimed no such
+// sinks existed; that claim was false and briefly a stored-XSS hole.
 // 'unsafe-eval' is REQUIRED in production: essentia.js's emscripten WASM glue
 // (the analyzer's BPM/key engine, run in a Web Worker) calls `new Function(...)`,
 // which 'wasm-unsafe-eval' does NOT permit. Without it the worker throws an
@@ -31,6 +35,7 @@ const csp = [
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  poweredByHeader: false,
   outputFileTracingRoot: import.meta.dirname,
   // Force the OG-card font into that route's serverless bundle. Webpack rewrites
   // new URL(...import.meta.url) to a bare asset path that fetch() can't parse, so
@@ -65,10 +70,15 @@ const nextConfig = {
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "Referrer-Policy", value: "no-referrer" },
           { key: "X-Frame-Options", value: "DENY" },
+          // Vercel injects HSTS for custom domains anyway; asserted here so
+          // the policy is ours and survives a host change.
+          { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains" },
           { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
         ],
       },
       { source: "/logo-:variant.png", headers: [immutable] },
+      { source: "/logo-:variant-76.webp", headers: [immutable] },
+      { source: "/icon-512-maskable.png", headers: [immutable] },
       { source: "/icon-:size.png", headers: [immutable] },
       { source: "/icon.svg", headers: [immutable] },
       { source: "/apple-touch-icon.png", headers: [immutable] },

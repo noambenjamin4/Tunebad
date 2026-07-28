@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: "Analysis History",
   robots: { index: false, follow: true },
   alternates: { canonical: "/history" },
+  openGraph: { url: "/history", title: "Analysis History" },
 };
 
 export default function Page() {

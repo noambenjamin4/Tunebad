@@ -8,7 +8,7 @@
 import { useI18n } from "@/lib/i18n";
 import en from "@/lib/i18n/locales/en";
 import type { DictKey } from "@/lib/i18n/locales/en";
-import { faqPageJsonLd } from "@/lib/seo/jsonld";
+import { jsonLdString, faqPageJsonLd } from "@/lib/seo/jsonld";
 
 const VALUE_KEYS: { title: DictKey; body: DictKey }[] = [
   { title: "landing.value1Title", body: "landing.value1Body" },
@@ -110,7 +110,7 @@ export function LandingSeo({ songCount }: { songCount?: number }) {
         </div>
       </div>
 
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(FAQ_JSON_LD) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(FAQ_JSON_LD) }} />
     </section>
   );
 }

@@ -56,8 +56,8 @@ export function TopBar() {
           <a className="brand" href="/" aria-label="TuneBad home" onClick={() => setMenuOpen(false)}>
             <span className={`brand-logo-wrap${playing ? " spinning" : ""}`}>
               <picture>
-                <source media="(prefers-color-scheme: dark)" srcSet="/logo-dark.png" />
-                <img src="/logo-light.png" alt="" width={38} height={38} className="brand-logo" loading="eager" />
+                <source media="(prefers-color-scheme: dark)" srcSet="/logo-dark-76.webp" />
+                <img src="/logo-light-76.webp" alt="" width={38} height={38} className="brand-logo" loading="eager" />
               </picture>
             </span>
             <span className="brand-wordmark">TUNEBAD</span>

@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { jsonLdString } from "@/lib/seo/jsonld";
 import { Geist, Geist_Mono, Baloo_2 } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
@@ -76,10 +77,12 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
   },
+  // Card TYPE only, no title/description. Next merges this `twitter` object
+  // wholesale into every child page, so a title here overrode ~50 pages'
+  // correct og:title with the homepage's — X and friends fall back to og:*
+  // when twitter:* is absent, which is exactly the behaviour we want.
   twitter: {
     card: "summary_large_image",
-    title: TITLE,
-    description: DESCRIPTION,
   },
   icons: {
     // Adaptive, transparent favicon first: black logo in light mode, white in
@@ -194,10 +197,16 @@ export default function RootLayout({
       <head>
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(STRUCTURED_DATA) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdString(STRUCTURED_DATA) }}
         />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} ${baloo2.variable}`}>
+        {/* First tabbable element on every page. The full footer alone holds
+            34 links; without this, keyboard and screen-reader users walk the
+            whole chrome before reaching any tool (WCAG 2.4.1). */}
+        <a href="#main-content" className="skip-link">
+          Skip to content
+        </a>
         {children}
         {/* Cookieless, anonymous page-view counts (no-op in dev). Audio never
             leaves the visitor's device; this does not change that. */}
