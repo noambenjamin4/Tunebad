@@ -888,6 +888,8 @@ const zh: Record<keyof typeof en, string> = {
   "studio.restoring": "正在恢复上次的会话…",
   "studio.restored": "已恢复上次的会话",
   "studio.clearSession": "清除会话",
+  "studio.clipEffect": "此片段的效果",
+  "studio.clipEffectHint": "只作用于这个片段，位于主效果之前。可以给进来的那首歌加电话效果，而让退出的那首保持干净。",
   "studio.clearConfirm": "清除全部？",
   "studio.clearSessionHint": "清空时间轴并丢弃已保存的会话",
   "studio.cleared": "会话已清除",

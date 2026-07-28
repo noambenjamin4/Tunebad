@@ -397,6 +397,34 @@ function buildEffectChain(ctx: BaseAudioContext, input: AudioNode, output: Audio
   return nodes;
 }
 
+/**
+ * Connect a clip's output to the mix, through its own character effect when
+ * it has one.
+ *
+ * The live engine and the offline renderer both call this on the SAME
+ * ScheduledClip, which is the only reason a per-clip effect can be trusted:
+ * the routing decision exists once, so an export cannot disagree with what
+ * the preview played. Effect "none" (or absent) builds nothing at all, so a
+ * timeline without clip effects costs exactly what it did before.
+ *
+ * The effect sits AFTER the clip's gain and fades, which is the usual DAW
+ * order — the clip envelope belongs to the clip, inserts come next. It does
+ * mean a fade-in ramps INTO the saturator rather than after it, which is
+ * what putting an insert on a fading clip sounds like anywhere else.
+ */
+export function connectThroughEffect(
+  ctx: BaseAudioContext,
+  from: AudioNode,
+  to: AudioNode,
+  effect: EffectId | undefined,
+): void {
+  if (!effect || effect === "none") {
+    from.connect(to);
+    return;
+  }
+  buildEffectChain(ctx, from, to, effect);
+}
+
 // Wet/dry mix for the reverb send. Kept as a pure function so it can be unit
 // tested without touching the Web Audio API.
 export function remixGain(reverb: number): { wet: number; dry: number } {

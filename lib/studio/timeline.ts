@@ -2,6 +2,10 @@
 // Everything here is unit-tested in tests/studio-timeline.test.ts — the live
 // engine and the offline renderer both consume computeClipSchedule, so this
 // file is the single source of truth for WHERE clips land in time.
+//
+// The one import is a TYPE: EffectId is a string union, so this stays pure
+// data and pulls no Web Audio in behind it.
+import type { EffectId } from "@/lib/audio/remix";
 
 export interface StudioClip {
   id: string;
@@ -39,6 +43,17 @@ export interface StudioClip {
   fadeInTo?: number;
   fadeOutFrom?: number;
   fadeOutTo?: number;
+  /**
+   * Character effect on THIS clip, before the master chain. Absent means
+   * none, and none builds no nodes at all.
+   *
+   * Master effects are a performance — they are recorded into a take and can
+   * be ridden while the timeline plays. A clip effect is part of the
+   * arrangement instead: it belongs to the clip, travels with it, and is
+   * undone like any other clip edit. Putting the phone effect on the incoming
+   * track of a beat switch is an arrangement decision, not a move.
+   */
+  effect?: EffectId;
   /** Silenced without losing its gain setting; skipped by the scheduler. */
   muted: boolean;
   /** When ANY clip is soloed, only soloed clips play — live AND on export. */
@@ -247,6 +262,8 @@ export interface ScheduledClip {
    * linearRamp between consecutive points. Empty when no fades apply.
    */
   fadePoints: FadePoint[];
+  /** This clip's own character effect, if any. */
+  effect?: EffectId;
 }
 
 /**
@@ -314,6 +331,7 @@ export function computeClipSchedule(
     out.push({
       clipId: clip.id,
       bufferId: clip.bufferId,
+      effect: clip.effect,
       when,
       offsetInBuffer,
       sourceDuration,

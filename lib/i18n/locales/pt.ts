@@ -891,6 +891,8 @@ const pt: Record<keyof typeof en, string> = {
   "studio.restoring": "Restaurando sua última sessão…",
   "studio.restored": "Última sessão restaurada",
   "studio.clearSession": "Limpar sessão",
+  "studio.clipEffect": "Efeito neste clipe",
+  "studio.clipEffectHint": "Vale só para este clipe, antes do efeito master. Ponha o efeito telefone na música que entra e deixe limpa a que sai.",
   "studio.clearConfirm": "Apagar tudo?",
   "studio.clearSessionHint": "Esvazia a linha do tempo e esquece a sessão guardada",
   "studio.cleared": "Sessão apagada",

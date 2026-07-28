@@ -27,6 +27,7 @@ import {
   remixGain,
   applyEffectParams,
   applyReverbEqParams,
+  connectThroughEffect,
 } from "@/lib/audio/remix";
 import { type StudioClip, computeClipSchedule, loopPassEnd, timelineDuration } from "./timeline";
 
@@ -274,7 +275,9 @@ export class StudioEngine {
         }
       }
       source.connect(gainNode);
-      gainNode.connect(mixBus);
+      // Through the clip's own effect when it has one. Same call the offline
+      // renderer makes on the same ScheduledClip.
+      connectThroughEffect(ctx, gainNode, mixBus, scheduled.effect);
       source.start(t0 + scheduled.when, scheduled.offsetInBuffer, scheduled.sourceDuration);
       sources.push(source);
       clipGains.set(scheduled.clipId, gainNode);

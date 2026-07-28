@@ -940,6 +940,8 @@ const en = {
   "studio.restoring": "Restoring your last session…",
   "studio.restored": "Restored your last session",
   "studio.clearSession": "Clear session",
+  "studio.clipEffect": "Effect on this clip",
+  "studio.clipEffectHint": "Applies to this clip alone, before the master effect. Put the phone effect on the song coming in and leave the one going out clean.",
   "studio.clearConfirm": "Clear everything?",
   "studio.clearSessionHint": "Empty the timeline and forget the saved session",
   "studio.cleared": "Session cleared",

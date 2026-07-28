@@ -889,6 +889,8 @@ const ja: Record<keyof typeof en, string> = {
   "studio.restoring": "前回のセッションを復元中…",
   "studio.restored": "前回のセッションを復元しました",
   "studio.clearSession": "セッションを消去",
+  "studio.clipEffect": "このクリップのエフェクト",
+  "studio.clipEffectHint": "このクリップだけに、マスターエフェクトの前段でかかります。入ってくる曲に電話エフェクトをかけ、出ていく曲はそのままにできます。",
   "studio.clearConfirm": "すべて消去しますか？",
   "studio.clearSessionHint": "タイムラインを空にし、保存されたセッションを破棄します",
   "studio.cleared": "セッションを消去しました",

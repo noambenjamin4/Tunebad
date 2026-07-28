@@ -14,6 +14,7 @@ import {
   type RemixParams,
   renderRemix,
   renderRemixAutomated,
+  connectThroughEffect,
 } from "@/lib/audio/remix";
 import { limitPeak } from "@/lib/audio/bass-boost";
 import { encodeMp3FromChannels, encodeWavFromChannels } from "@/lib/audio/mp3-encoder";
@@ -56,7 +57,7 @@ export async function renderTimeline(
       }
     }
     source.connect(gainNode);
-    gainNode.connect(offline.destination);
+    connectThroughEffect(offline, gainNode, offline.destination, scheduled.effect);
     source.start(scheduled.when, scheduled.offsetInBuffer, scheduled.sourceDuration);
   }
 

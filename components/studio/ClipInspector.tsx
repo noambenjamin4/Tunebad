@@ -9,6 +9,16 @@ import type { BeatGrid, ClipAnalysis } from "@/lib/studio/beat-grid";
 import { needsTempoMatch, tempoMatchRatio } from "@/lib/studio/beat-grid";
 import { keysMix } from "@/lib/audio/harmonic";
 import type { FadeCurve, StudioClip } from "@/lib/studio/timeline";
+import type { EffectId } from "@/lib/audio/remix";
+
+// Same four the master offers, in the same order, so the two rows read as the
+// same control applied at two different places.
+const CLIP_EFFECTS: { id: EffectId; labelKey: "remix.effectNone" | "remix.effectUnderwater" | "remix.effectPhone" | "remix.effectLofi" }[] = [
+  { id: "none", labelKey: "remix.effectNone" },
+  { id: "underwater", labelKey: "remix.effectUnderwater" },
+  { id: "phone", labelKey: "remix.effectPhone" },
+  { id: "lofi", labelKey: "remix.effectLofi" },
+];
 
 export function ClipInspector({
   clip,
@@ -21,6 +31,7 @@ export function ClipInspector({
   onFadeIn,
   onFadeOut,
   onFadeCurve,
+  onEffect,
   onToggleMute,
   onToggleSolo,
   onMatchTempo,
@@ -42,6 +53,7 @@ export function ClipInspector({
   onFadeIn: (seconds: number) => void;
   onFadeOut: (seconds: number) => void;
   onFadeCurve: (curve: FadeCurve) => void;
+  onEffect: (effect: EffectId) => void;
   onToggleMute: () => void;
   onToggleSolo: () => void;
   onMatchTempo: () => void;
@@ -127,6 +139,28 @@ export function ClipInspector({
           })}
         </div>
       )}
+      <div
+        className="studio-pills"
+        role="group"
+        aria-label={t("studio.clipEffect")}
+        title={t("studio.clipEffectHint")}
+      >
+        {CLIP_EFFECTS.map((option) => {
+          const active = (clip.effect ?? "none") === option.id;
+          return (
+            <button
+              key={option.id}
+              className={`cutter-format-pill${active ? " active" : ""}`}
+              type="button"
+              aria-pressed={active}
+              disabled={working}
+              onClick={() => onEffect(option.id)}
+            >
+              {t(option.labelKey)}
+            </button>
+          );
+        })}
+      </div>
       <button
         className={`text-button${clip.muted ? " active" : ""}`}
         type="button"

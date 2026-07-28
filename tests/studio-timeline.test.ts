@@ -1183,3 +1183,29 @@ test("every way a clip gets placed respects the end of the timeline", () => {
   assert.equal(duplicated.timelineStart + clipDuration(duplicated), MAX_TIMELINE_SECONDS);
   assert.ok(duplicated.timelineStart >= 0);
 });
+
+test("a clip's effect rides along with its schedule", () => {
+  // The live engine and the offline renderer both read the effect off the
+  // ScheduledClip and hand it to the same routing helper. If it did not
+  // travel with the schedule, each would need its own copy of the decision,
+  // which is exactly how a preview comes to disagree with an export.
+  const scheduled = computeClipSchedule(
+    [
+      clip({ id: "dry", timelineStart: 0, clipStart: 0, clipEnd: 10 }),
+      clip({ id: "wet", timelineStart: 10, clipStart: 0, clipEnd: 10, effect: "phone" }),
+    ],
+    0,
+    1,
+  );
+  assert.equal(scheduled.find((s) => s.clipId === "dry")?.effect, undefined);
+  assert.equal(scheduled.find((s) => s.clipId === "wet")?.effect, "phone");
+
+  // Master speed must not disturb it — the effect is a graph decision, not a
+  // time one.
+  const fast = computeClipSchedule(
+    [clip({ id: "wet", timelineStart: 4, clipStart: 0, clipEnd: 10, effect: "underwater" })],
+    0,
+    1.5,
+  );
+  assert.equal(fast[0]?.effect, "underwater");
+});

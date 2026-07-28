@@ -1116,6 +1116,15 @@ export function StudioPanel() {
               onFadeCurve={(fadeCurve) =>
                 editClip(selectedClip.id, (c) => ({ ...c, fadeCurve }))
               }
+              onEffect={(effect) =>
+                // A clip effect changes the graph rather than a parameter on
+                // it, so the schedule has to be rebuilt — same as any other
+                // clip edit, and undoable like one.
+                editClip(selectedClip.id, (c) => ({
+                  ...c,
+                  effect: effect === "none" ? undefined : effect,
+                }))
+              }
               onToggleMute={handleToggleMute}
               onToggleSolo={handleToggleSolo}
               onMatchTempo={() => void handleMatchTempo()}
