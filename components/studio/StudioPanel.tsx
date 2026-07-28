@@ -1045,7 +1045,7 @@ export function StudioPanel() {
               className={`text-button${gridOn && grid ? " active" : ""}`}
               type="button"
               onClick={() => beatGrid.setGridOn((g) => !g)}
-              disabled={working || (!grid && !beatGrid.failed)}
+              disabled={working || (!grid && !beatGrid.failure)}
               aria-pressed={gridOn && Boolean(grid)}
               title={t("studio.gridHint")}
             >
@@ -1127,7 +1127,7 @@ export function StudioPanel() {
             />
           )}
 
-          {(beatGrid.detecting || grid || beatGrid.failed) && (
+          {(beatGrid.detecting || grid || beatGrid.failure) && (
             <div className="studio-tempo">
               {beatGrid.detecting && <span className="studio-hint">{t("studio.gridDetecting")}</span>}
               {!beatGrid.detecting && (
@@ -1165,8 +1165,12 @@ export function StudioPanel() {
                   >
                     {t("studio.gridDouble")}
                   </button>
-                  {beatGrid.failed && !grid && (
-                    <span className="studio-hint">{t("studio.gridNone")}</span>
+                  {beatGrid.failure && !grid && (
+                    <span className="studio-hint">
+                      {/* "No beat here" and "the detector never ran" are
+                          different problems and want different next steps. */}
+                      {t(beatGrid.failure === "no-beat" ? "studio.gridNone" : "studio.gridUnavailable")}
+                    </span>
                   )}
                 </>
               )}

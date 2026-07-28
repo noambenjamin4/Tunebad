@@ -7,8 +7,10 @@ import {
   DEFAULT_BEATS_PER_BAR,
   MAX_BPM,
   MIN_BPM,
+  type AnalysisFailure,
   type ClipAnalysis,
   analyseClip,
+  analyseClipResult,
   estimateBeatPhase,
   warmAnalysisWorker,
 } from "@/lib/studio/beat-grid";
@@ -26,7 +28,8 @@ export interface BeatGridState {
   gridOn: boolean;
   setGridOn: React.Dispatch<React.SetStateAction<boolean>>;
   detecting: boolean;
-  failed: boolean;
+  /** Why there is no grid, or null when there is one (or none was asked for). */
+  failure: AnalysisFailure | null;
   /** Tempo AND key per BUFFER id, for the inspector and beatmatch. */
   clipInfo: Map<string, ClipAnalysis>;
   /** Record analysis for a buffer produced by stretching (beatmatch). */
@@ -51,7 +54,7 @@ export function useBeatGrid(
   const [grid, setGrid] = useState<BeatGrid | null>(null);
   const [gridOn, setGridOn] = useState(true);
   const [detecting, setDetecting] = useState(false);
-  const [failed, setFailed] = useState(false);
+  const [failure, setFailure] = useState<AnalysisFailure | null>(null);
   const [clipInfo, setClipInfo] = useState<Map<string, ClipAnalysis>>(new Map());
   const gridSourceRef = useRef<string | null>(null);
   // The buffer whose tempo the USER settled, by typing it or by restoring a
@@ -92,7 +95,7 @@ export function useBeatGrid(
       gridSourceRef.current = null;
       pinnedSourceRef.current = null;
       setGrid(null);
-      setFailed(false);
+      setFailure(null);
       return;
     }
     if (pinnedSourceRef.current === first.bufferId) return;
@@ -103,16 +106,17 @@ export function useBeatGrid(
 
     gridSourceRef.current = first.bufferId;
     setDetecting(true);
-    setFailed(false);
+    setFailure(null);
     let cancelled = false;
-    void analyseClip(buffer).then((tempo) => {
+    void analyseClipResult(buffer).then((result) => {
       if (cancelled) return;
       setDetecting(false);
-      if (!tempo) {
-        setFailed(true);
+      if (!result.ok) {
+        setFailure(result.reason);
         setGrid(null);
         return;
       }
+      const tempo = result.analysis;
       // Phase is measured in SOURCE seconds; map it onto the timeline through
       // the clip's own trim and position.
       const phase = estimateBeatPhase(signal, tempo.bpm);
@@ -159,7 +163,7 @@ export function useBeatGrid(
         ? { ...prev, bpm: Math.round(bpm) }
         : { bpm: Math.round(bpm), anchorSec: 0, beatsPerBar: DEFAULT_BEATS_PER_BAR },
     );
-    setFailed(false);
+    setFailure(null);
   }, []);
 
   return {
@@ -168,7 +172,7 @@ export function useBeatGrid(
     gridOn,
     setGridOn,
     detecting,
-    failed,
+    failure,
     clipInfo,
     noteClipInfo,
     setGridBpm,

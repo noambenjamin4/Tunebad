@@ -930,6 +930,7 @@ const it: Record<keyof typeof en, string> = {
   "studio.bpm": "BPM",
   "studio.gridDetecting": "Ricerca del tempo…",
   "studio.gridNone": "Nessun tempo rilevato: scrivine uno per usare la griglia",
+  "studio.gridUnavailable": "Il rilevamento del tempo non è andato a buon fine — scrivi un BPM, oppure ricarica e riprova",
   "studio.gridHalf": "÷2",
   "studio.gridDouble": "×2",
   "studio.exportLoopOnly": "Esporta solo il loop",

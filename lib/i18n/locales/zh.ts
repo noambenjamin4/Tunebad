@@ -927,6 +927,7 @@ const zh: Record<keyof typeof en, string> = {
   "studio.bpm": "BPM",
   "studio.gridDetecting": "正在检测速度…",
   "studio.gridNone": "未检测到速度 — 手动输入即可使用网格",
+  "studio.gridUnavailable": "速度检测没有完成 — 请手动输入 BPM，或重新加载后再试",
   "studio.gridHalf": "÷2",
   "studio.gridDouble": "×2",
   "studio.exportLoopOnly": "仅导出循环段",

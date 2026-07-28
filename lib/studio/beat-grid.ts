@@ -266,7 +266,26 @@ export interface ClipAnalysis {
  * the tempo. Tempo reads `bpmSamples` at the native rate, which is what its
  * frame sizes are specified for.
  */
+/**
+ * Why a clip has no tempo. Six different failures used to collapse to the
+ * same `null`, which is exactly what made one real report — "No tempo
+ * detected" on a track that worked at a different length — impossible to
+ * chase: the message could not tell "this audio has no steady beat" from
+ * "the engine never ran".
+ */
+export type AnalysisFailure = "no-beat" | "timed-out" | "unavailable";
+
+export type ClipAnalysisResult =
+  | { ok: true; analysis: ClipAnalysis }
+  | { ok: false; reason: AnalysisFailure };
+
+/** Back-compatible shape for callers that only care whether it worked. */
 export async function analyseClip(buffer: AudioBuffer): Promise<ClipAnalysis | null> {
+  const result = await analyseClipResult(buffer);
+  return result.ok ? result.analysis : null;
+}
+
+export async function analyseClipResult(buffer: AudioBuffer): Promise<ClipAnalysisResult> {
   try {
     const native = monoSamples(buffer);
     const sixteen = await resampleMono(native, buffer.sampleRate, 16000);
@@ -293,16 +312,28 @@ export async function analyseClip(buffer: AudioBuffer): Promise<ClipAnalysis | n
       // Structured clone, never transfer: the caller still owns these arrays.
       ensureWorker().postMessage(request);
     });
-    if (!response.bpm || response.bpm < MIN_BPM || response.bpm > MAX_BPM) return null;
+    if (!response.bpm || response.bpm < MIN_BPM || response.bpm > MAX_BPM) {
+      // The worker already folds octaves, so a number outside 40-220 means it
+      // genuinely found nothing steady rather than that we are discarding a
+      // usable reading.
+      return { ok: false, reason: "no-beat" };
+    }
     return {
-      bpm: Math.round(response.bpm),
-      bpmAlternate: response.bpmAlternate ?? null,
-      key: response.key ?? "",
-      // The worker reports the key by name; the wheel position comes from the
-      // same table the analyzer and the song pages use.
-      camelot: camelot[response.key] ?? "",
+      ok: true,
+      analysis: {
+        bpm: Math.round(response.bpm),
+        bpmAlternate: response.bpmAlternate ?? null,
+        key: response.key ?? "",
+        // The worker reports the key by name; the wheel position comes from
+        // the same table the analyzer and the song pages use.
+        camelot: camelot[response.key] ?? "",
+      },
     };
-  } catch {
-    return null; // no grid is a fine outcome; a wrong grid is not
+  } catch (error) {
+    // No grid is a fine outcome; a wrong grid is not. But say WHICH kind of
+    // nothing, both to the visitor and to whoever reads the console next.
+    const timedOut = error instanceof Error && /timed out/.test(error.message);
+    console.warn("[studio] tempo detection failed:", error);
+    return { ok: false, reason: timedOut ? "timed-out" : "unavailable" };
   }
 }

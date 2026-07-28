@@ -930,6 +930,7 @@ const es: Record<keyof typeof en, string> = {
   "studio.bpm": "BPM",
   "studio.gridDetecting": "Buscando el tempo…",
   "studio.gridNone": "No se detectó tempo: escribe uno para usar la rejilla",
+  "studio.gridUnavailable": "La detección de tempo no terminó — escribe un BPM, o recarga e inténtalo de nuevo",
   "studio.gridHalf": "÷2",
   "studio.gridDouble": "×2",
   "studio.exportLoopOnly": "Exportar solo el bucle",

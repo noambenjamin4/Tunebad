@@ -979,6 +979,7 @@ const en = {
   "studio.bpm": "BPM",
   "studio.gridDetecting": "Finding the tempo…",
   "studio.gridNone": "No tempo detected — type one to use the grid",
+  "studio.gridUnavailable": "Tempo detection didn't finish — type a BPM, or reload and try again",
   "studio.gridHalf": "÷2",
   "studio.gridDouble": "×2",
   "studio.exportLoopOnly": "Export the loop only",

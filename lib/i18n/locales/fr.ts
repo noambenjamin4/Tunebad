@@ -937,6 +937,7 @@ const fr: Record<keyof typeof en, string> = {
   "studio.bpm": "BPM",
   "studio.gridDetecting": "Recherche du tempo…",
   "studio.gridNone": "Aucun tempo détecté — saisissez-en un pour la grille",
+  "studio.gridUnavailable": "La détection du tempo n'a pas abouti — saisissez un BPM, ou rechargez et réessayez",
   "studio.gridHalf": "÷2",
   "studio.gridDouble": "×2",
   "studio.exportLoopOnly": "Exporter seulement la boucle",

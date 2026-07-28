@@ -930,6 +930,7 @@ const de: Record<keyof typeof en, string> = {
   "studio.bpm": "BPM",
   "studio.gridDetecting": "Tempo wird gesucht…",
   "studio.gridNone": "Kein Tempo erkannt – gib eines ein, um das Raster zu nutzen",
+  "studio.gridUnavailable": "Die Tempoerkennung ist nicht fertig geworden — gib ein BPM ein oder lade neu und versuch es nochmal",
   "studio.gridHalf": "÷2",
   "studio.gridDouble": "×2",
   "studio.exportLoopOnly": "Nur den Loop exportieren",

@@ -928,6 +928,7 @@ const ja: Record<keyof typeof en, string> = {
   "studio.bpm": "BPM",
   "studio.gridDetecting": "テンポを検出中…",
   "studio.gridNone": "テンポを検出できません — 入力するとグリッドを使えます",
+  "studio.gridUnavailable": "テンポ検出が完了しませんでした。BPM を入力するか、再読み込みしてやり直してください",
   "studio.gridHalf": "÷2",
   "studio.gridDouble": "×2",
   "studio.exportLoopOnly": "ループだけを書き出す",
