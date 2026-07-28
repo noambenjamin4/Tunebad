@@ -85,6 +85,7 @@ import {
 } from "@/lib/studio/lock-pitch";
 import { exportStudioMix } from "@/lib/studio/render-timeline";
 import { ClipInspector } from "./ClipInspector";
+import { useExtensionHandoff } from "./useExtensionHandoff";
 import { LevelMeter } from "./LevelMeter";
 import { MasterControls } from "./MasterControls";
 import { Timeline } from "./Timeline";
@@ -852,6 +853,10 @@ export function StudioPanel() {
     },
     setStatus,
   });
+
+  // A clip handed over by the browser extension lands the same way a dropped
+  // file does — same caps, same decode, same undo entry.
+  useExtensionHandoff(useCallback((files: File[]) => void addFiles(files), [addFiles]));
 
   /* ------------------------------ master params ------------------------------ */
 
