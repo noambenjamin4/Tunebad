@@ -48,6 +48,7 @@ import type { EffectId } from "@/lib/audio/remix";
 import { type DisplaySignal, displayKey } from "@/lib/studio/display-signal";
 import { type BeatGrid, beatTimesInRange, nearestGridTime } from "@/lib/studio/beat-grid";
 import { ClipCanvas } from "./ClipCanvas";
+import { useThemeSignal } from "./useThemeSignal";
 
 const CLIP_PAD = 6;
 const WAVE_HEIGHT = ROW_HEIGHT - 26;
@@ -115,6 +116,8 @@ export function Timeline({
   headSignal?: number;
   disabled?: boolean;
 }) {
+  // Repaints every waveform when the OS theme flips — see useThemeSignal.
+  const themeSignal = useThemeSignal();
   const { t } = useI18n();
   const scrollRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -742,6 +745,7 @@ export function Timeline({
                 <span className="studio-clip-name">{clip.name}</span>
                 {signal && visible ? (
                   <ClipCanvas
+                    themeSignal={themeSignal}
                     signal={signal}
                     clipStart={clip.clipStart}
                     clipEnd={clip.clipEnd}
