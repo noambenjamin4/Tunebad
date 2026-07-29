@@ -1227,3 +1227,49 @@ test("jsonLdString cannot be broken out of by a hostile title", () => {
   // And it is still the same data — the escapes are valid JSON.
   assert.deepEqual(JSON.parse(out), hostile);
 });
+
+test("a loop slice enters and leaves at the level the full timeline plays", () => {
+  // Export-loop-only slices clips to the window. It used to copy fade lengths
+  // through untouched, so a window opening past a clip's 8 s fade-in re-fired
+  // the whole fade from silence inside the bounce — live played 1.0, the
+  // export started at 0.0 with 8 of its 10 seconds under a phantom fade.
+  const faded = clip({ id: "a", timelineStart: 0, clipStart: 0, clipEnd: 20, fadeInSec: 8 });
+
+  // Window entirely past the fade: no fade in the slice at all.
+  const [past] = sliceClipsToWindow([faded], 10, 20);
+  assert.equal(past.fadeInSec, 0);
+  assert.equal(fadeGain(0, clipDuration(past), past), 1);
+
+  // Window opening halfway up the fade: the slice resumes at 0.5 and rises
+  // to 1 over the remaining 4 s — exactly what live plays from t=4.
+  const [mid] = sliceClipsToWindow([faded], 4, 20);
+  assert.equal(mid.fadeInSec, 4);
+  assert.equal(fadeGain(0, clipDuration(mid), mid), 0.5);
+  assert.equal(fadeGain(4, clipDuration(mid), mid), 1);
+
+  // Mirror image on the way out: a 6 s fade-out, window closing 3 s into it.
+  const tail = clip({ id: "b", timelineStart: 0, clipStart: 0, clipEnd: 20, fadeOutSec: 6 });
+  const [out] = sliceClipsToWindow([tail], 0, 17);
+  assert.equal(out.fadeOutSec, 3);
+  assert.equal(fadeGain(17, clipDuration(out), out), 0.5);
+
+  // A crossfade straddling the window edge keeps both sides continuous: the
+  // outgoing clip's sliced fade-out starts at full and ends at the level the
+  // full timeline would be at when the window closes.
+  const xfadeOut = clip({
+    id: "c", timelineStart: 0, clipStart: 0, clipEnd: 10,
+    fadeOutSec: 4, fadeCurve: "equalPower",
+  });
+  const [xs] = sliceClipsToWindow([xfadeOut], 0, 8);
+  assert.equal(xs.fadeOutSec, 2);
+  assert.equal(xs.fadeOutFrom, 1);
+  assert.equal(xs.fadeOutTo, 0.5);
+
+  // Windows compose: a half from a split (already carrying a window) sliced
+  // again still lands on the right curve segment.
+  const parent = clip({ id: "d", timelineStart: 0, clipStart: 0, clipEnd: 20, fadeInSec: 8 });
+  const half = splitClip(parent, 4, () => "d2")![1]; // window 0.5 -> 1 over 4 s
+  const [resliced] = sliceClipsToWindow([{ ...half }], 6, 20); // 2 s into the half
+  assert.equal(resliced.fadeInSec, 2);
+  assert.equal(fadeGain(0, clipDuration(resliced), resliced), 0.75);
+});

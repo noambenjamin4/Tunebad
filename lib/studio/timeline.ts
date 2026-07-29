@@ -379,12 +379,54 @@ export function sliceClipsToWindow(
     const nextStart = clip.clipStart + headCut;
     const nextEnd = clip.clipEnd - tailCut;
     if (nextEnd - nextStart < MIN_CLIP_SECONDS) continue;
-    out.push({
+
+    const sliced: StudioClip = {
       ...clip,
       timelineStart: Math.max(0, clip.timelineStart - start),
       clipStart: nextStart,
       clipEnd: nextEnd,
-    });
+    };
+
+    // Slicing must not change what the window SOUNDS like — same law as
+    // splitClip, measured the same way. This used to copy the fade lengths
+    // through untouched, so a loop window opening past a clip's fade-in
+    // re-fired the whole fade from silence inside the bounce: a 10 s loop of
+    // a full-level passage came back starting at zero with 8 of its 10
+    // seconds under a fade the live loop never played. The cure is the same
+    // curve-windowing a split uses: keep only the part of each fade that
+    // overlaps the window, entering and leaving at the levels the full
+    // timeline would be at.
+    const duration = clipDuration(clip);
+    const sliceLen = nextEnd - nextStart;
+    const { fadeIn, fadeOut } = fitFades(clip.fadeInSec, clip.fadeOutSec, duration);
+    const lerp = (from: number, to: number, at: number) => from + (to - from) * at;
+
+    delete sliced.fadeInFrom;
+    delete sliced.fadeInTo;
+    delete sliced.fadeOutFrom;
+    delete sliced.fadeOutTo;
+
+    const keptIn = Math.max(0, Math.min(fadeIn - headCut, sliceLen));
+    sliced.fadeInSec = keptIn;
+    if (fadeIn > 0 && keptIn > 0) {
+      const from = clip.fadeInFrom ?? 0;
+      const to = clip.fadeInTo ?? 1;
+      sliced.fadeInFrom = lerp(from, to, headCut / fadeIn);
+      sliced.fadeInTo = lerp(from, to, (headCut + keptIn) / fadeIn);
+    }
+
+    const keptOut = Math.max(0, Math.min(fadeOut - tailCut, sliceLen));
+    sliced.fadeOutSec = keptOut;
+    if (fadeOut > 0 && keptOut > 0) {
+      // Levels along a fade-out are addressed by distance from the ORIGINAL
+      // end: lerp(to, from, distance / fadeOut) — same frame splitClip uses.
+      const from = clip.fadeOutFrom ?? 1;
+      const to = clip.fadeOutTo ?? 0;
+      sliced.fadeOutFrom = lerp(to, from, (tailCut + keptOut) / fadeOut);
+      sliced.fadeOutTo = lerp(to, from, tailCut / fadeOut);
+    }
+
+    out.push(sliced);
   }
   return out;
 }
