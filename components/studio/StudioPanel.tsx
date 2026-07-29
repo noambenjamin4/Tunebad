@@ -945,10 +945,33 @@ export function StudioPanel() {
         exportLoopOnly && loop
           ? sliceClipsToWindow(set.clips, loop.start / set.scale, loop.end / set.scale)
           : set.clips;
+      // A take's startOffset is the song position it began at, on the SAME
+      // plain timeline the loop region is drawn on — renderRemixAutomated
+      // divides it by base speed internally (see takeOutputStart), which is
+      // exactly the stretched-clock conversion clipsToBounce already went
+      // through, so no extra scaling belongs here.
+      //
+      // Un-rebased, this used to be measured against the FULL mixdown's
+      // length and handed unchanged to the LOOP-sliced one instead: any
+      // event timed past the loop's own (much shorter) duration schedules
+      // past the end of that render and never fires at all. A take recorded
+      // once, early in the song, then bounced by looping a later section
+      // came back with NONE of its automation -- the loop-only export
+      // sounded exactly like no take was selected.
+      //
+      // Negative offsets (the take began before the window) clamp to 0
+      // inside takeOutputStart, so the automation applies from the start of
+      // the bounce rather than being dropped -- correct to within the take's
+      // own recording latency (typically under the 120ms effect glide), not
+      // exact to the sample: a fully exact version would need to collapse
+      // whatever was active AT the window's start into the take's base
+      // params, which is a bigger change than this bug warranted.
+      const takeToBounce =
+        exportLoopOnly && loop && take ? { ...take, startOffset: take.startOffset - loop.start } : take;
       const blob = await exportStudioMix(clipsToBounce, set.buffers, {
         format,
         params: exportParams,
-        take,
+        take: takeToBounce,
         onStage: setStage,
       });
       const base = clipsRef.current[0]?.name || "tunebad-mix";

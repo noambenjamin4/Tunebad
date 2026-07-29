@@ -41,6 +41,7 @@ import {
   NEUTRAL_REVERB_EQ,
   automatedOutputDuration,
   reverbTailSeconds,
+  takeOutputStart,
 } from "../lib/audio/remix";
 import { keysMix } from "../lib/audio/harmonic";
 import { withGaplessHeader } from "../lib/audio/mp3-tag";
@@ -1272,4 +1273,34 @@ test("a loop slice enters and leaves at the level the full timeline plays", () =
   const [resliced] = sliceClipsToWindow([{ ...half }], 6, 20); // 2 s into the half
   assert.equal(resliced.fadeInSec, 2);
   assert.equal(fadeGain(0, clipDuration(resliced), resliced), 0.75);
+});
+
+test("a loop-only export rebases the take's start against the WINDOW, not the whole song", () => {
+  // The bug this pins: a take recorded early in the song, then bounced by
+  // looping a LATER section, came back with none of its automation at all --
+  // exportStudioMix measured the take's event times against the full song's
+  // length while the mixdown it actually rendered was only the loop's much
+  // shorter length, so every event scheduled past the end of that render and
+  // never fired. StudioPanel now feeds takeOutputStart the delta against the
+  // loop's start instead of the take's raw startOffset.
+  const base: RemixParams = {
+    speed: 1, lockPitch: false, pitchSemitones: 0, bassBoostDb: 0,
+    reverb: 0, reverbType: "hall", reverbEq: NEUTRAL_REVERB_EQ, effect: "none",
+  };
+
+  // Recorded at song position 9 (well before a [12, 20) loop window).
+  const rawStart = takeOutputStart(base, 9);
+  const windowed = takeOutputStart(base, 9 - 12); // what the fix actually computes
+  assert.equal(rawStart, 9, "sanity: unshifted, this is the bug's own number");
+  // Negative -> clamped to the window's own t=0, so the automation is
+  // audible from the start of the bounce instead of scheduled past its end.
+  assert.equal(windowed, 0);
+
+  // Recorded mid-window (song position 14, loop [12, 20)): the event should
+  // land 2s into the 8s bounce, not 14s into a render that is only 8s long.
+  assert.equal(takeOutputStart(base, 14 - 12), 2);
+
+  // A loop starting at 0 must be a no-op -- the common case, and the one
+  // that would have hidden this bug from a naive smoke test.
+  assert.equal(takeOutputStart(base, 9 - 0), 9);
 });
