@@ -51,6 +51,10 @@ Key facts:
 - [8D Audio Maker](https://www.tunebad.com/8d-audio): Add a slow auto-panning "8D" effect for headphones, in the browser, no upload.
 - [Audio Joiner](https://www.tunebad.com/audio-joiner): Merge two or more audio files into one, reorder them, and export as MP3 or WAV. For overlapping songs rather than sequential ones, use the TuneBad DAW.
 
+## Chrome extension
+
+- [TuneBad — Audio Toolkit](https://www.tunebad.com/): Chrome extension (Manifest V3) with six tools in the browser toolbar: record any tab's audio with one click (Sampler, with waveform trim/loop/fade and WAV/MP3 export), key & BPM analysis, tap tempo & metronome, LUFS loudness with streaming targets, slowed + reverb / nightcore, and audio convert & compress. Everything runs on-device; no accounts, no analytics, no network requests with user data. Its "Open in DAW" button hands a finished clip straight to the timeline at tunebad.com/daw — the extension's only site access, scoped to that one page. Available in the same eight languages as the site.
+
 ## Guides
 
 - [How to Find the Key and BPM of Any Song](https://www.tunebad.com/guides/find-key-and-bpm-of-any-song): Step-by-step guide to detecting a track's key and tempo, by ear or with the free analyzer.
