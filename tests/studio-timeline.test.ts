@@ -475,6 +475,59 @@ test("beat grid: phase finds where the beats actually are", () => {
   assert.ok(Math.abs(phase - 0.25) < 0.008, `phase ${phase} should be ~0.25`);
 });
 
+test("beat grid: phase must be estimated from CLEAN audio, not an effect-filtered copy", () => {
+  // Why StudioPanel asks for displayKey(id, "none", "none") when matching to
+  // grid, instead of reusing the effect-filtered signal the timeline draws.
+  //
+  // A kick at the true beat plus a quiet hat sitting 25 ms behind it, the way
+  // a real drum pattern sits. Full-band, the kick dominates the onset
+  // envelope and phase lands on the beat. Highpassed -- what the Phone effect
+  // (400 Hz) does to a mix -- the kick is gone and the envelope has only the
+  // late hat to lock onto, so the SAME clip on the SAME grid gets placed
+  // ~23 ms later purely because an effect was switched on.
+  const rate = 11025;
+  const seconds = 8;
+  const truePhase = 0.18;
+  const beatPeriod = 0.5; // 120 BPM
+
+  const build = (withKick: boolean): Float32Array => {
+    const data = new Float32Array(rate * seconds);
+    for (let beat = 0; ; beat++) {
+      const at = truePhase + beat * beatPeriod;
+      if (at >= seconds) break;
+      const start = Math.floor(at * rate);
+      if (withKick) {
+        const len = Math.floor(0.09 * rate);
+        for (let i = 0; i < len && start + i < data.length; i++) {
+          data[start + i] += Math.exp(-i / (rate * 0.03)) * Math.sin((2 * Math.PI * 60 * i) / rate);
+        }
+      }
+      const lateBy = Math.floor(0.025 * rate);
+      const hatLen = Math.floor(0.012 * rate);
+      for (let i = 0; i < hatLen && start + lateBy + i < data.length; i++) {
+        data[start + lateBy + i] +=
+          0.25 * Math.exp(-i / (rate * 0.004)) * Math.sin((2 * Math.PI * 6000 * i) / rate);
+      }
+    }
+    return data;
+  };
+
+  const phaseOf = (data: Float32Array) =>
+    estimateBeatPhase({ data, pyramid: buildPeakPyramid(data), sampleRate: rate }, 120);
+
+  const clean = phaseOf(build(true));
+  const highpassed = phaseOf(build(false));
+
+  // Clean audio recovers the real downbeat to within one onset frame.
+  assert.ok(Math.abs(clean - truePhase) < 0.008, `clean phase ${clean} should be ~${truePhase}`);
+  // The filtered copy does NOT -- it is off by roughly the hat's own lateness,
+  // which is why it must never be the input to a beatmatch.
+  assert.ok(
+    highpassed - clean > 0.015,
+    `highpassed phase ${highpassed} should lag clean ${clean} by >15ms`,
+  );
+});
+
 test("beat grid: phase on silence is harmless, not NaN", () => {
   const data = new Float32Array(11025 * 2);
   const signal = { data, pyramid: buildPeakPyramid(data), sampleRate: 11025 };

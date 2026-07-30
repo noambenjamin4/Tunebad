@@ -649,11 +649,16 @@ export function StudioPanel() {
       // human makes by ear. So find where this clip's beats actually fall
       // and slide it (by less than half a beat) until they land on the grid.
       let nextStart = clip.timelineStart;
-      const signal = await getDisplaySignal(
-        displayKey(id, clip.effect, paramsRef.current.effect),
-        stretched,
-        [clip.effect ?? "none", paramsRef.current.effect],
-      );
+      // Phase comes off the CLEAN signal, never the effect-filtered one the
+      // timeline draws. Where the beat sits is a property of the music; a
+      // character effect is a lens over it. Measured: a 400 Hz highpass
+      // (Phone) removes the kick, so the onset envelope locks onto the hat
+      // sitting 25 ms behind it and the clip lands 23 ms late -- a different
+      // placement for the same clip on the same grid purely because an effect
+      // was on. Costs nothing extra: render() skips "none", so this is plain
+      // decimation, and it's the same key the timeline uses whenever no
+      // effect is active (the common case), so it usually hits cache.
+      const signal = await getDisplaySignal(displayKey(id, "none", "none"), stretched, ["none", "none"]);
       const phase = estimateBeatPhase(signal, grid.bpm);
       const beatOnTimeline = clip.timelineStart + (phase - nextClipStart);
       const correction = nearestGridTime(beatOnTimeline, grid) - beatOnTimeline;
