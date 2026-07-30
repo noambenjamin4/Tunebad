@@ -8,9 +8,43 @@ import { useI18n } from "@/lib/i18n";
 import {
   type EffectId,
   type RemixParams,
+  type ReverbEqParams,
   type ReverbType,
+  NEUTRAL_REVERB_EQ,
   coupledSemitones,
 } from "@/lib/audio/remix";
+import { ReverbEq } from "@/components/remix/ReverbEq";
+
+/**
+ * One-click starting points, mirroring the slowed-reverb tool's presets
+ * (same speed/reverb values — see PRESETS in components/remix/RemixStudio.tsx)
+ * plus a Clean reset. Applied through the SAME param handlers as the sliders,
+ * so pressing one during a take records each changed knob as its own move.
+ */
+export type StudioPreset = {
+  name: string;
+  speed: number;
+  reverb: number;
+  bassBoostDb: number;
+  reverbType: ReverbType;
+  effect: EffectId;
+};
+
+export const STUDIO_PRESETS: StudioPreset[] = [
+  { name: "Slowed + Reverb", speed: 0.8, reverb: 40, bassBoostDb: 0, reverbType: "hall", effect: "none" },
+  { name: "Nightcore", speed: 1.25, reverb: 0, bassBoostDb: 0, reverbType: "hall", effect: "none" },
+  { name: "", speed: 1, reverb: 0, bassBoostDb: 0, reverbType: "hall", effect: "none" }, // Clean — label from i18n
+];
+
+function presetActive(preset: StudioPreset, params: RemixParams): boolean {
+  return (
+    Math.abs(preset.speed - params.speed) < 0.005 &&
+    preset.reverb === params.reverb &&
+    preset.bassBoostDb === params.bassBoostDb &&
+    preset.reverbType === params.reverbType &&
+    preset.effect === params.effect
+  );
+}
 
 const REVERB_TYPE_OPTIONS: {
   type: ReverbType;
@@ -52,6 +86,8 @@ export function MasterControls({
   onBass,
   onReverbType,
   onEffect,
+  onReverbEq,
+  onPreset,
 }: {
   params: RemixParams;
   working: boolean;
@@ -62,11 +98,27 @@ export function MasterControls({
   onBass: (bassBoostDb: number) => void;
   onReverbType: (type: ReverbType) => void;
   onEffect: (effect: EffectId) => void;
+  onReverbEq: (eq: ReverbEqParams) => void;
+  onPreset: (preset: StudioPreset) => void;
 }) {
   const { t } = useI18n();
 
   return (
     <div className="studio-master">
+      <div className="studio-pills" role="group" aria-label={t("studio.presets")}>
+        {STUDIO_PRESETS.map((preset, i) => (
+          <button
+            key={preset.name || "clean"}
+            className={`cutter-format-pill${presetActive(preset, params) ? " active" : ""}`}
+            type="button"
+            aria-pressed={presetActive(preset, params)}
+            disabled={working}
+            onClick={() => onPreset(preset)}
+          >
+            {i === STUDIO_PRESETS.length - 1 ? t("studio.presetClean") : preset.name}
+          </button>
+        ))}
+      </div>
       <label className="studio-field studio-lock" title={t("studio.lockPitchHint")}>
         <input
           type="checkbox"
@@ -143,6 +195,19 @@ export function MasterControls({
           </button>
         ))}
       </div>
+
+      {/* The wet-path EQ the engine has applied since day one, finally with a
+          control surface. Collapsed by default: it's a shaping tool, not a
+          transport control, and the drag surface is tall. */}
+      <details className="studio-eq">
+        <summary>{t("remix.reverbEqTitle")}</summary>
+        <div className="studio-eq-body">
+          <ReverbEq eq={params.reverbEq} onChange={onReverbEq} disabled={working} />
+          <button className="text-button" type="button" onClick={() => onReverbEq(NEUTRAL_REVERB_EQ)}>
+            {t("remix.reverbEqReset")}
+          </button>
+        </div>
+      </details>
     </div>
   );
 }

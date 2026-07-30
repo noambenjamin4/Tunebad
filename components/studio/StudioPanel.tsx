@@ -26,6 +26,7 @@ import {
   type AutomationEvent,
   type EffectId,
   type RemixParams,
+  type ReverbEqParams,
   type ReverbType,
   NEUTRAL_REVERB_EQ,
 } from "@/lib/audio/remix";
@@ -88,7 +89,7 @@ import { exportStudioMix } from "@/lib/studio/render-timeline";
 import { ClipInspector } from "./ClipInspector";
 import { useExtensionHandoff } from "./useExtensionHandoff";
 import { LevelMeter } from "./LevelMeter";
-import { MasterControls } from "./MasterControls";
+import { MasterControls, type StudioPreset } from "./MasterControls";
 import { Timeline } from "./Timeline";
 import { useBeatGrid } from "./useBeatGrid";
 import { useDisplaySignals } from "./useDisplaySignals";
@@ -159,6 +160,9 @@ export function StudioPanel() {
   const [working, setWorking] = useState(false);
   const [decoding, setDecoding] = useState(false);
   const [format, setFormat] = useState<"wav" | "mp3">("mp3");
+  const [mp3Kbps, setMp3Kbps] = useState<128 | 192 | 320>(320);
+  const [exportName, setExportName] = useState("");
+  const [editingTakeId, setEditingTakeId] = useState<string | null>(null);
   const [headSignal, setHeadSignal] = useState(0);
   // Clip-state history for Cmd/Ctrl+Z. Buffers live outside state, so a
   // snapshot is just an array of small plain objects.
@@ -916,6 +920,31 @@ export function StudioPanel() {
     applyParams({ ...paramsRef.current, reverbType }, [{ t: now(), kind: "reverbType", value: reverbType }]);
   const setEffect = (effect: EffectId) =>
     applyParams({ ...paramsRef.current, effect }, [{ t: now(), kind: "effect", value: effect }]);
+  const setReverbEq = (reverbEq: ReverbEqParams) =>
+    applyParams({ ...paramsRef.current, reverbEq }, [{ t: now(), kind: "reverbEq", value: reverbEq }]);
+
+  // A preset is just the sliders moved together: one param update, but one
+  // recorded move PER CHANGED KNOB, so replaying a take reproduces the press
+  // exactly and an unchanged knob records nothing.
+  const applyPreset = (preset: StudioPreset) => {
+    const prev = paramsRef.current;
+    const next = {
+      ...prev,
+      speed: preset.speed,
+      reverb: preset.reverb,
+      bassBoostDb: preset.bassBoostDb,
+      reverbType: preset.reverbType,
+      effect: preset.effect,
+    };
+    const at = now();
+    const moves: AutomationEvent[] = [];
+    if (Math.abs(next.speed - prev.speed) > 1e-9) moves.push({ t: at, kind: "speed", value: next.speed });
+    if (next.reverb !== prev.reverb) moves.push({ t: at, kind: "reverb", value: next.reverb });
+    if (next.bassBoostDb !== prev.bassBoostDb) moves.push({ t: at, kind: "bassBoostDb", value: next.bassBoostDb });
+    if (next.reverbType !== prev.reverbType) moves.push({ t: at, kind: "reverbType", value: next.reverbType });
+    if (next.effect !== prev.effect) moves.push({ t: at, kind: "effect", value: next.effect });
+    applyParams(next, moves);
+  };
 
   /* ------------------------------ record ------------------------------ */
 
@@ -980,12 +1009,17 @@ export function StudioPanel() {
         exportLoopOnly && loop && take ? { ...take, startOffset: take.startOffset - loop.start } : take;
       const blob = await exportStudioMix(clipsToBounce, set.buffers, {
         format,
+        mp3Kbps,
         params: exportParams,
         take: takeToBounce,
         onStage: setStage,
       });
-      const base = clipsRef.current[0]?.name || "tunebad-mix";
-      downloadBlob(blob, `${base}-daw.${format}`);
+      // User-typed name wins; strip filesystem-hostile characters rather than
+      // rejecting (a title with a colon should still export). Empty -> the
+      // same default the placeholder shows.
+      const typed = exportName.trim().replace(/[\\/:*?"<>|]/g, "").slice(0, 80);
+      const base = typed || `${clipsRef.current[0]?.name || "tunebad-mix"}-daw`;
+      downloadBlob(blob, `${base}.${format}`);
       setStatus(t("studio.exportDone"));
     } catch {
       setStatus(t("studio.exportFailed"));
@@ -994,7 +1028,7 @@ export function StudioPanel() {
       setStage(null);
       setWorking(false);
     }
-  }, [working, format, takes, selectedTakeId, stopPreview, buildPlaybackSet, exportLoopOnly, loop, t]);
+  }, [working, format, mp3Kbps, exportName, takes, selectedTakeId, stopPreview, buildPlaybackSet, exportLoopOnly, loop, t]);
 
   /* ------------------------------ render ------------------------------ */
 
@@ -1072,6 +1106,14 @@ export function StudioPanel() {
             >
               {recording ? t("studio.recordStop") : t("studio.record")}
             </button>
+            {recording && (
+              <span className="studio-hint" role="status">
+                {t("remix.recordingReadout", {
+                  time: formatTimeTenths(recorder.recordElapsed),
+                  count: recorder.moveCount,
+                })}
+              </span>
+            )}
             <TransportClock getPosition={() => engine.getPosition()} playing={playing} total={duration} />
             <LevelMeter getLevel={() => engine.getPeakLevel()} playing={playing} />
             <button
@@ -1257,6 +1299,8 @@ export function StudioPanel() {
             onBass={setBass}
             onReverbType={setReverbType}
             onEffect={setEffect}
+            onReverbEq={setReverbEq}
+            onPreset={applyPreset}
           />
 
           {takes.length > 0 && (
@@ -1268,16 +1312,48 @@ export function StudioPanel() {
               >
                 {t("studio.takeNone")}
               </button>
-              {takes.map((take) => (
-                <button
-                  key={take.id}
-                  className={`cutter-format-pill${selectedTakeId === take.id ? " active" : ""}`}
-                  type="button"
-                  onClick={() => recorder.setSelectedTakeId(take.id)}
-                >
-                  {take.label} · {formatTimeTenths(take.outDuration)}
-                </button>
-              ))}
+              {takes.map((take) =>
+                editingTakeId === take.id ? (
+                  <input
+                    key={take.id}
+                    className="num studio-take-rename"
+                    type="text"
+                    defaultValue={take.label}
+                    autoFocus
+                    maxLength={40}
+                    aria-label={t("studio.renameTake")}
+                    onBlur={(e) => {
+                      recorder.renameTake(take.id, e.target.value);
+                      setEditingTakeId(null);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+                      if (e.key === "Escape") setEditingTakeId(null);
+                    }}
+                  />
+                ) : (
+                  <span key={take.id} className="studio-take-row">
+                    <button
+                      className={`cutter-format-pill${selectedTakeId === take.id ? " active" : ""}`}
+                      type="button"
+                      title={t("studio.renameTakeHint")}
+                      onClick={() => recorder.setSelectedTakeId(take.id)}
+                      onDoubleClick={() => setEditingTakeId(take.id)}
+                    >
+                      {take.label} · {formatTimeTenths(take.outDuration)}
+                    </button>
+                    <button
+                      className="text-button danger-pill"
+                      type="button"
+                      aria-label={`${t("remix.deleteTake")} ${take.label}`}
+                      disabled={recording || working}
+                      onClick={() => recorder.deleteTake(take.id)}
+                    >
+                      {t("remix.deleteTake")}
+                    </button>
+                  </span>
+                ),
+              )}
             </div>
           )}
 
@@ -1295,6 +1371,30 @@ export function StudioPanel() {
                 </button>
               ))}
             </div>
+            {format === "mp3" && (
+              <div className="cutter-format-pills" role="group" aria-label={t("mediatool.bitrate")}>
+                {([128, 192, 320] as const).map((k) => (
+                  <button
+                    key={k}
+                    className={`cutter-format-pill${mp3Kbps === k ? " active" : ""}`}
+                    type="button"
+                    aria-pressed={mp3Kbps === k}
+                    onClick={() => setMp3Kbps(k)}
+                  >
+                    {k}
+                  </button>
+                ))}
+              </div>
+            )}
+            <input
+              className="num studio-export-name"
+              type="text"
+              value={exportName}
+              maxLength={80}
+              placeholder={`${clips[0]?.name || "tunebad-mix"}-daw`}
+              aria-label={t("studio.exportName")}
+              onChange={(e) => setExportName(e.target.value)}
+            />
             <button className="primary-button" type="button" onClick={() => void handleExport()} disabled={working || clips.length === 0}>
               {working && stage ? t(STAGE_LABELS[stage]) : t("studio.export")}
             </button>

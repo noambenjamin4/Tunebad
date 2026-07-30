@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useI18n } from "@/lib/i18n";
 import {
   type AutomationEvent,
@@ -52,6 +52,13 @@ export interface TakeRecorder {
   clear: () => void;
   /** Install performances recovered from a saved session. */
   adopt: (takes: StudioTake[]) => void;
+  /** Drop one take. Selection moves off it if it was the exported one. */
+  deleteTake: (id: string) => void;
+  /** User-supplied label; empty input keeps the old one. */
+  renameTake: (id: string, label: string) => void;
+  /** Readout while recording: moves captured and seconds on the take clock. */
+  moveCount: number;
+  recordElapsed: number;
 }
 
 /**
@@ -89,16 +96,36 @@ export function useTakeRecorder(
 
   const outputNow = useCallback(() => engine.getOutputTime(), [engine]);
 
+  // Mirrors of the in-progress take, purely for the readout: events stay in a
+  // ref so finish() can read them synchronously (same reasoning as
+  // RemixStudio's recorder), and these two exist only so the UI re-renders.
+  const [moveCount, setMoveCount] = useState(0);
+  const [recordElapsed, setRecordElapsed] = useState(0);
+
   const recordMove = useCallback((event: AutomationEvent) => {
     if (!recordingRef.current) return;
     eventsRef.current.push(event);
+    setMoveCount(eventsRef.current.length);
   }, []);
+
+  // Elapsed ticks on the OUTPUT clock — the same reference the events are
+  // stamped in — so the readout agrees with where a move would land. A plain
+  // interval, not rAF: it must keep counting in a backgrounded tab.
+  useEffect(() => {
+    if (!recording) return;
+    const tick = () => setRecordElapsed(Math.max(0, engine.getOutputTime()));
+    tick();
+    const id = window.setInterval(tick, 500);
+    return () => window.clearInterval(id);
+  }, [recording, engine]);
 
   const begin = useCallback((base: RemixParams, startOffset: number) => {
     takeBaseRef.current = base;
     takeStartRef.current = startOffset;
     engine.resetOutputClock();
     eventsRef.current = [];
+    setMoveCount(0);
+    setRecordElapsed(0);
     recordingRef.current = true;
     setRecording(true);
   }, [engine]);
@@ -145,6 +172,17 @@ export function useTakeRecorder(
     setTakes(restored);
   }, []);
 
+  const deleteTake = useCallback((id: string) => {
+    setTakes((prev) => prev.filter((take) => take.id !== id));
+    setSelectedTakeId((prev) => (prev === id ? null : prev));
+  }, []);
+
+  const renameTake = useCallback((id: string, label: string) => {
+    const trimmed = label.trim();
+    if (!trimmed) return;
+    setTakes((prev) => prev.map((take) => (take.id === id ? { ...take, label: trimmed } : take)));
+  }, []);
+
   return {
     takes,
     selectedTakeId,
@@ -157,5 +195,9 @@ export function useTakeRecorder(
     finish,
     clear,
     adopt,
+    deleteTake,
+    renameTake,
+    moveCount,
+    recordElapsed,
   };
 }

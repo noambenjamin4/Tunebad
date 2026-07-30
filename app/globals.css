@@ -4825,6 +4825,48 @@ tbody tr:last-child td {
   border: 1px solid var(--line);
   border-radius: var(--radius-inner);
 }
+/* A take pill with its delete affordance beside it, moving as one unit. */
+.studio-take-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.studio-take-rename,
+.studio-export-name {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-field, 12px);
+  background: var(--fill, transparent);
+  color: inherit;
+  font: inherit;
+  padding: 8px 12px;
+  min-width: 0;
+}
+.studio-take-rename {
+  width: 180px;
+}
+.studio-export-name {
+  width: 220px;
+}
+/* Collapsed wet-path EQ; the drag surface only costs height when opened. */
+.studio-eq {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-inner);
+  padding: 10px 14px;
+}
+.studio-eq > summary {
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+}
+.studio-eq-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+.studio-eq-body .text-button {
+  align-self: flex-end;
+}
 .studio-inspector-name {
   font-size: 13px;
   font-weight: 600;
