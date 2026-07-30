@@ -65,6 +65,8 @@ Key facts:
 - [How to Make a Beat Switch](https://www.tunebad.com/guides/how-to-make-a-beat-switch): What a beat switch is, where in a song to place it, how much overlap to use, how to handle two tracks with different tempos (including the half/double octave problem), and how to build one free in the browser.
 - [What Is LUFS? Streaming Loudness, Explained](https://www.tunebad.com/guides/what-is-lufs-streaming-loudness): What LUFS means, how streaming loudness normalization works, and what to master to.
 - [How to Make a Ringtone From Any Song](https://www.tunebad.com/guides/how-to-make-a-ringtone): Picking the right 20-30 second section, trimming with fades, and exporting an MP3/WAV ringtone in the browser, plus the honest steps for getting it onto an iPhone as m4r.
+- [How to Convert a YouTube Link to MP3](https://www.tunebad.com/guides/how-to-convert-a-youtube-link-to-mp3): The real steps for turning a link into an audio file, why a pasted link is fetched server-side while local files convert in the browser, which bitrate to pick and why 320 kbps adds headroom rather than detail, MP3 vs WAV vs MP4 vs OPUS, embedded title/cover-art tags, section-only downloads, and the personal-use framing.
+- [How to Compress a Video for Discord](https://www.tunebad.com/guides/how-to-compress-a-video-for-discord): What Discord's upload limit is (about 10 MB free, ~50 MB Nitro Basic, ~500 MB Nitro, all subject to change), why it is enforced per file so splitting works, the size = bitrate x duration math with a kbps budget per clip length, why trimming beats compressing harder, the browser workflow (ffmpeg.wasm, single-threaded, 720p/1080p caps, 30 fps, H.264 MP4), and the cases that cannot work such as a five-minute 4K clip at 10 MB.
 
 ## Pages
 

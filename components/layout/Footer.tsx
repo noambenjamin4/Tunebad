@@ -85,6 +85,8 @@ export function Footer() {
           <Link href="/guides/how-to-make-slowed-and-reverb">Slowed + reverb guide</Link>
           <Link href="/guides/how-to-make-a-ringtone">Ringtone guide</Link>
           <Link href="/guides/how-to-make-a-beat-switch">Beat switch guide</Link>
+          <Link href="/guides/how-to-compress-a-video-for-discord">Discord video guide</Link>
+          <Link href="/guides/how-to-convert-a-youtube-link-to-mp3">YouTube to MP3 guide</Link>
         </nav>
         <p className="site-footer-copyright">{t("footer.copyright")}</p>
         <p className="site-footer-legal">

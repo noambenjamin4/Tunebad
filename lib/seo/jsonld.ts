@@ -54,16 +54,23 @@ export function breadcrumbJsonLd(trail: { name: string; item: string }[]) {
 /**
  * HowTo for a tool page. `steps` are plain sentences in canonical English —
  * the same policy as faqPageJsonLd, so the schema doesn't change with the
- * visitor's UI language.
+ * visitor's UI language. `toolName` defaults to the DAW because that was the
+ * only caller; pages about a different tool should name their own.
  */
-export function howToJsonLd(input: { name: string; description: string; steps: string[]; url: string }) {
+export function howToJsonLd(input: {
+  name: string;
+  description: string;
+  steps: string[];
+  url: string;
+  toolName?: string;
+}) {
   return {
     "@context": "https://schema.org",
     "@type": "HowTo",
     name: input.name,
     description: input.description,
     totalTime: "PT3M",
-    tool: [{ "@type": "HowToTool", name: "TuneBad DAW" }],
+    tool: [{ "@type": "HowToTool", name: input.toolName ?? "TuneBad DAW" }],
     step: input.steps.map((text, index) => ({
       "@type": "HowToStep",
       position: index + 1,

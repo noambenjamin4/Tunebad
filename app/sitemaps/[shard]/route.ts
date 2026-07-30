@@ -47,6 +47,8 @@ const STATIC_ENTRIES: ToolEntry[] = [
   { path: "/guides/how-to-make-slowed-and-reverb", changefreq: "monthly", priority: 0.6 },
   { path: "/guides/how-to-make-a-ringtone", changefreq: "monthly", priority: 0.6 },
   { path: "/guides/how-to-make-a-beat-switch", changefreq: "monthly", priority: 0.6 },
+  { path: "/guides/how-to-compress-a-video-for-discord", changefreq: "monthly", priority: 0.6 },
+  { path: "/guides/how-to-convert-a-youtube-link-to-mp3", changefreq: "monthly", priority: 0.6 },
   { path: "/tunebad-vs-tunebat", changefreq: "monthly", priority: 0.6 },
   { path: "/tools", changefreq: "weekly", priority: 0.8 },
   { path: "/guides", changefreq: "monthly", priority: 0.7 },

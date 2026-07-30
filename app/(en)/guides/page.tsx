@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   openGraph: { title: TITLE, description: DESCRIPTION, url: "/guides" },
 };
 
-// The six guides, newest-value first. This page exists because the leaf
+// The guides, newest-value first. This page exists because the leaf
 // guides had no index: they were reachable only from the footer and from
 // whichever tool page happened to link one, so the set never read as a
 // library and a visitor who finished one had nowhere obvious to go next.
@@ -54,6 +54,18 @@ const GUIDES: { path: string; title: string; blurb: string }[] = [
     path: "/guides/how-to-make-a-ringtone",
     title: "How to make a ringtone",
     blurb: "Trim a song to the right length, fade it properly, and save it in a format your phone accepts.",
+  },
+  {
+    path: "/guides/how-to-convert-a-youtube-link-to-mp3",
+    title: "How to convert a YouTube link to MP3",
+    blurb:
+      "Which bitrate to pick, why 320 kbps is headroom rather than extra detail, MP3 vs WAV vs MP4, and where the line is on personal use.",
+  },
+  {
+    path: "/guides/how-to-compress-a-video-for-discord",
+    title: "How to compress a video for Discord",
+    blurb:
+      "What the upload limit is, why it applies per file, the bitrate math behind every target size, and when 10 MB is simply not reachable.",
   },
 ];
 
