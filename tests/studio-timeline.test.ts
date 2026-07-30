@@ -1675,6 +1675,42 @@ test("computeClipSchedule multiplies the fade envelope BY the gain envelope, sam
   assert.equal(atFadeEnd?.gain, 0.625);
 });
 
+test("a plain trim leaves gain points OUTSIDE the new bounds untouched, and playback still gets the right absolute continuation", () => {
+  // trimClipStart/trimClipEnd deliberately do not touch gainPoints (same as
+  // fadeInSec/fadeOutSec) -- gain points are buffer-absolute, so a point can
+  // legitimately end up outside [clipStart, clipEnd] after a trim without
+  // being "orphaned": it's still part of the same absolute automation curve,
+  // just outside the window currently playing. gainEnvelopeAt is a pure
+  // function of the point list, so it must still report the correct
+  // interpolated value for whatever window survives.
+  const source = clip({
+    id: "a",
+    timelineStart: 0,
+    clipStart: 0,
+    clipEnd: 10,
+    gainPoints: [{ at: 2, gain: 0.2 }, { at: 8, gain: 1.0 }],
+  });
+
+  // Trim the start forward past the first point (2 -> now outside [5,10]).
+  const trimmedStart = trimClipStart(source, 5, 30);
+  assert.deepEqual(trimmedStart.gainPoints, source.gainPoints, "trim must not rewrite the points themselves");
+  const [scheduledStart] = computeClipSchedule([trimmedStart], 0, 1);
+  // At buffer=5 (the new play start), the curve is still ramping 0.2->1.0
+  // between the two original points: 0.2 + 0.8*(5-2)/(8-2) = 0.6.
+  const startCorner = scheduledStart.fadePoints.find((p) => Math.abs(p.at - trimmedStart.timelineStart) < 1e-9);
+  assert.ok(startCorner, "the new clip start must still be a sampled corner");
+  assert.ok(Math.abs((startCorner?.gain ?? 0) - 0.6) < 1e-9);
+
+  // Trim the end back before the second point (8 -> now outside [0,6]).
+  const trimmedEnd = trimClipEnd(source, 6, 30);
+  assert.deepEqual(trimmedEnd.gainPoints, source.gainPoints, "trim must not rewrite the points themselves");
+  const [scheduledEnd] = computeClipSchedule([trimmedEnd], 0, 1);
+  const endCorner = scheduledEnd.fadePoints[scheduledEnd.fadePoints.length - 1];
+  // At buffer=6 (the new play end), same ramp: 0.2 + 0.8*(6-2)/(8-2) = 0.7333...
+  assert.ok(Math.abs(endCorner.at - (trimmedEnd.timelineStart + 6)) < 1e-9);
+  assert.ok(Math.abs(endCorner.gain - (0.2 + 0.8 * ((6 - 2) / (8 - 2)))) < 1e-9);
+});
+
 test("scaleClipsForLock still scales fades after sharing scaleClipTiming", () => {
   // Regression check for the refactor: scaleClipsForLock used to inline this
   // same division; it must produce identical numbers now that both callers
