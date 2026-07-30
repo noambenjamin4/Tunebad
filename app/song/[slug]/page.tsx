@@ -3,6 +3,7 @@ import { jsonLdString } from "@/lib/seo/jsonld";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
+  READ_IMMUTABLE,
   readAnalysisBySlug,
   readAllSongs,
   readSongsByCamelot,
@@ -74,7 +75,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const song = await readAnalysisBySlug(slug);
+  const song = await readAnalysisBySlug(slug, READ_IMMUTABLE);
   if (!song) return { title: "Song not found | TuneBad", robots: { index: false, follow: true } };
   const name = displayTitle(song);
   const alt = song.bpm_alt ? ` (or ${Math.round(song.bpm_alt)})` : "";
@@ -139,7 +140,13 @@ export default async function SongPage(props: { params: Promise<{ slug: string }
 
 async function SongPageInner({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const song = await readAnalysisBySlug(slug);
+  // Every fetch in this render passes READ_IMMUTABLE: the page's
+  // `revalidate = false` only holds if NO fetch in the render carries a
+  // numeric revalidate (the minimum fetch window becomes the route's ISR
+  // window — the mechanism that silently re-broke the July 15 billing fix).
+  // Freezing the similar-songs/count data alongside is correct: the rendered
+  // HTML is frozen until the next deploy anyway, and a deploy refreshes both.
+  const song = await readAnalysisBySlug(slug, READ_IMMUTABLE);
   if (!song) notFound();
 
   const name = displayTitle(song);
@@ -152,7 +159,7 @@ async function SongPageInner({ params }: { params: Promise<{ slug: string }> }) 
   // actually render (>=2 songs — same rule as app/artist/[slug]/page.tsx),
   // so this never links to a 404. countSongsByArtistName is a targeted
   // count on the exact name already on hand, not a full-catalog scan.
-  const artistSongCount = song.artist ? await countSongsByArtistName(song.artist) : 0;
+  const artistSongCount = song.artist ? await countSongsByArtistName(song.artist, READ_IMMUTABLE) : 0;
   const artistHref = song.artist && artistSongCount >= 2 ? `/artist/${artistSlug(song.artist)}` : null;
 
   // Harmonic-mix neighbours (real songs the DJ can beatmatch into). One
@@ -161,7 +168,7 @@ async function SongPageInner({ params }: { params: Promise<{ slug: string }> }) 
   // rules as /api/similar, kept in lib/server/mix-matches.ts.
   const compat = camelot ? compatibleCodes(camelot) : [];
   const relatedByKey = camelot
-    ? await readSongsByCamelot(camelotNeighbors(camelot), song.slug, 60)
+    ? await readSongsByCamelot(camelotNeighbors(camelot), song.slug, 60, READ_IMMUTABLE)
     : [];
   const sameKey = relatedByKey.filter((s) => s.camelot === camelot).slice(0, 6);
   const mixable = relatedByKey.filter((s) => s.camelot !== camelot).slice(0, 6);
@@ -172,7 +179,7 @@ async function SongPageInner({ params }: { params: Promise<{ slug: string }> }) 
   const others =
     relatedByKey.length >= 4
       ? []
-      : (await readAllSongs(40)).filter((s) => s.slug !== song.slug).slice(0, 8);
+      : (await readAllSongs(40, READ_IMMUTABLE)).filter((s) => s.slug !== song.slug).slice(0, 8);
 
   // The whole reason this page exists — the key — was missing from the
   // machine-readable layer; it lived only in the h1/lede/description. musicalKey

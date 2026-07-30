@@ -16,7 +16,7 @@
 // generated `artist_slug` column in Supabase with an index, not a smarter
 // client-side algorithm.
 import { cache } from "react";
-import { readArtistNames, readSongsByArtistNames, type CachedAnalysis } from "./link-analysis";
+import { READ_WEEKLY, readArtistNames, readSongsByArtistNames, SONG_READ_CAP, type CachedAnalysis } from "./link-analysis";
 
 // Generic over the row shape: the grouper only reads `artist`, so both a full
 // CachedAnalysis and a slim projection (e.g. the sitemap's facet columns) work.
@@ -88,12 +88,15 @@ export function groupSongsByArtist<T extends { artist: string | null }>(
  *  generateMetadata and the component only pays for it once per render.
  */
 export const readSongsByArtist = cache(async (slug: string): Promise<ArtistGroup | null> => {
-  const names = await readArtistNames();
+  // READ_WEEKLY matches /artist/[slug]'s own `revalidate = 604_800` — the
+  // default daily fetch window would clamp the page's ISR to a day (the
+  // minimum fetch revalidate in a render wins; see ReadCache in link-analysis).
+  const names = await readArtistNames(SONG_READ_CAP, READ_WEEKLY);
   const match = groupSongsByArtist(names).get(slug);
   if (!match) return null;
   // Every distinct raw spelling that collapses into this slug.
   const spellings = [...new Set(match.songs.map((s) => s.artist).filter((a): a is string => Boolean(a)))];
-  const songs = await readSongsByArtistNames(spellings);
+  const songs = await readSongsByArtistNames(spellings, READ_WEEKLY);
   if (songs.length === 0) return null;
   return { slug, name: match.name, songs };
 });

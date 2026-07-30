@@ -4,7 +4,7 @@
 // catalogs, and results are cached in a Supabase table (server-only env vars;
 // the browser never talks to Supabase directly).
 import { canonicalYouTubeUrl, validateSpotifyUrl, validateMediaUrl } from "@/lib/media-url";
-import { REVALIDATE_DATA } from "@/lib/cache-policy";
+import { REVALIDATE_ARTIST, REVALIDATE_DATA } from "@/lib/cache-policy";
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
@@ -33,6 +33,30 @@ export type CachedAnalysis = {
 };
 
 const FETCH_TIMEOUT_MS = 6000;
+
+/**
+ * How a read is cached — chosen by the CALLER, because the same read can feed
+ * pages with very different lifetimes, and in the App Router the MINIMUM
+ * fetch-level revalidate used during a render becomes the route's own ISR
+ * window. That rule is what re-broke the July 15 billing fix: every read here
+ * carried `next: { revalidate: 86_400 }`, so `/song/[slug]`'s page-level
+ * `revalidate = false` was silently clamped to a day and all ~163k song pages
+ * went back to regenerating per crawl (measured in .next/prerender-manifest.json:
+ * every /song/* route at 86400 despite the page saying false).
+ *
+ * READ_IMMUTABLE is for reads that feed the never-expiring song pages: the
+ * rows are first-write-wins immutable, so caching them forever is correct.
+ * The "song-data" tag is the manual override — after a DB backfill, call
+ * revalidateTag("song-data") (or purge the Data Cache in Vercel) alongside
+ * the deploy that refreshes the pages themselves.
+ *
+ * READ_WEEKLY matches the artist pages' own `revalidate = 604_800`, which the
+ * old blanket daily option was also silently clamping to a day.
+ */
+export type ReadCache = { cache: "force-cache"; next: { tags: string[] } } | { next: { revalidate: number } };
+export const READ_IMMUTABLE: ReadCache = { cache: "force-cache", next: { tags: ["song-data"] } };
+export const READ_WEEKLY: ReadCache = { next: { revalidate: REVALIDATE_ARTIST } };
+const READ_DAILY: ReadCache = { next: { revalidate: REVALIDATE_DATA } };
 
 function restHeaders(): Record<string, string> {
   return {
@@ -92,12 +116,12 @@ export async function readRecentAnalyses(limit: number): Promise<CachedAnalysis[
 }
 
 /** A cached song by its SEO slug — backs the /song/<slug> pages. */
-export async function readAnalysisBySlug(slug: string): Promise<CachedAnalysis | null> {
+export async function readAnalysisBySlug(slug: string, cacheAs: ReadCache = READ_DAILY): Promise<CachedAnalysis | null> {
   if (!isLinkAnalysisConfigured) return null;
   try {
     const res = await fetch(
       `${SUPABASE_URL}/rest/v1/link_analysis?slug=eq.${encodeURIComponent(slug)}&limit=1`,
-      { headers: restHeaders(), signal: AbortSignal.timeout(FETCH_TIMEOUT_MS), next: { revalidate: REVALIDATE_DATA } },
+      { headers: restHeaders(), signal: AbortSignal.timeout(FETCH_TIMEOUT_MS), ...cacheAs },
     );
     if (!res.ok) return null;
     const rows = (await res.json()) as CachedAnalysis[];
@@ -113,13 +137,14 @@ export async function readSongsByCamelot(
   codes: string[],
   exclude: string,
   limit = 12,
+  cacheAs: ReadCache = READ_DAILY,
 ): Promise<CachedAnalysis[]> {
   if (!isLinkAnalysisConfigured || codes.length === 0) return [];
   try {
     const inList = codes.map((c) => `"${encodeURIComponent(c)}"`).join(",");
     const res = await fetch(
       `${SUPABASE_URL}/rest/v1/link_analysis?camelot=in.(${inList})&slug=neq.${encodeURIComponent(exclude)}&order=created_at.desc&limit=${limit}`,
-      { headers: restHeaders(), signal: AbortSignal.timeout(FETCH_TIMEOUT_MS), next: { revalidate: REVALIDATE_DATA } },
+      { headers: restHeaders(), signal: AbortSignal.timeout(FETCH_TIMEOUT_MS), ...cacheAs },
     );
     if (!res.ok) return [];
     return (await res.json()) as CachedAnalysis[];
@@ -231,7 +256,7 @@ export type SongFacet = Pick<CachedAnalysis, "key" | "bpm" | "camelot" | "artist
 // so a caller that wants rows [offset, offset+limit) fetches ONLY those rows.
 // readAllSongs always started at 0, which meant a sitemap shard asking for
 // rows 40k-60k still had to read the first 40k and slice them off.
-async function readSongRange<T>(columns: string, offset: number, limit: number): Promise<T[]> {
+async function readSongRange<T>(columns: string, offset: number, limit: number, cacheAs: ReadCache = READ_DAILY): Promise<T[]> {
   if (!isLinkAnalysisConfigured) return [];
   const PAGE = 1000;
   const BATCH = 10;
@@ -239,7 +264,7 @@ async function readSongRange<T>(columns: string, offset: number, limit: number):
   const fetchPage = async (pageOffset: number, pageLimit: number): Promise<T[]> => {
     const res = await fetch(
       `${SUPABASE_URL}/rest/v1/link_analysis?select=${columns}&order=created_at.desc&limit=${pageLimit}&offset=${pageOffset}`,
-      { headers: restHeaders(), signal: AbortSignal.timeout(FETCH_TIMEOUT_MS), next: { revalidate: REVALIDATE_DATA } },
+      { headers: restHeaders(), signal: AbortSignal.timeout(FETCH_TIMEOUT_MS), ...cacheAs },
     );
     if (!res.ok) return [];
     return (await res.json()) as T[];
@@ -274,7 +299,7 @@ export async function readSongFacets(limit: number): Promise<SongFacet[]> {
   return readSongRange<SongFacet>("key,bpm,camelot,artist", 0, limit);
 }
 
-export async function readAllSongs(limit = 10000): Promise<CachedAnalysis[]> {
+export async function readAllSongs(limit = 10000, cacheAs: ReadCache = READ_DAILY): Promise<CachedAnalysis[]> {
   if (!isLinkAnalysisConfigured) return [];
   const PAGE = 1000;
   const BATCH = 10;
@@ -282,7 +307,7 @@ export async function readAllSongs(limit = 10000): Promise<CachedAnalysis[]> {
   const fetchPage = async (offset: number): Promise<CachedAnalysis[]> => {
     const res = await fetch(
       `${SUPABASE_URL}/rest/v1/link_analysis?select=*&order=created_at.desc&limit=${Math.min(PAGE, limit - offset)}&offset=${offset}`,
-      { headers: restHeaders(), signal: AbortSignal.timeout(FETCH_TIMEOUT_MS), next: { revalidate: REVALIDATE_DATA } },
+      { headers: restHeaders(), signal: AbortSignal.timeout(FETCH_TIMEOUT_MS), ...cacheAs },
     );
     if (!res.ok) return [];
     return (await res.json()) as CachedAnalysis[];
@@ -371,13 +396,13 @@ export async function countSongs(): Promise<number | null> {
 /** Artist strings only — the cheapest possible catalog scan, used to resolve a
  *  derived slug back to its real artist name(s). ~30KB/1000 rows vs ~310KB for
  *  select=*. */
-export async function readArtistNames(limit = SONG_READ_CAP): Promise<{ artist: string | null }[]> {
-  return readSongRange<{ artist: string | null }>("artist", 0, limit);
+export async function readArtistNames(limit = SONG_READ_CAP, cacheAs?: ReadCache): Promise<{ artist: string | null }[]> {
+  return readSongRange<{ artist: string | null }>("artist", 0, limit, cacheAs);
 }
 
 /** Every song by these exact artist strings, in one targeted query. Takes a
  *  list because several spellings can slugify to the same artist page. */
-export async function readSongsByArtistNames(names: string[]): Promise<CachedAnalysis[]> {
+export async function readSongsByArtistNames(names: string[], cacheAs: ReadCache = READ_DAILY): Promise<CachedAnalysis[]> {
   if (!isLinkAnalysisConfigured || names.length === 0) return [];
   // PostgREST in.() needs each value double-quoted, with embedded quotes and
   // backslashes escaped, or a comma in an artist name would split the list.
@@ -385,7 +410,7 @@ export async function readSongsByArtistNames(names: string[]): Promise<CachedAna
   try {
     const res = await fetch(
       `${SUPABASE_URL}/rest/v1/link_analysis?select=*&artist=in.(${encodeURIComponent(list)})&order=created_at.desc&limit=1000`,
-      { headers: restHeaders(), signal: AbortSignal.timeout(FETCH_TIMEOUT_MS), next: { revalidate: REVALIDATE_DATA } },
+      { headers: restHeaders(), signal: AbortSignal.timeout(FETCH_TIMEOUT_MS), ...cacheAs },
     );
     if (!res.ok) return [];
     return (await res.json()) as CachedAnalysis[];
@@ -394,13 +419,13 @@ export async function readSongsByArtistNames(names: string[]): Promise<CachedAna
   }
 }
 
-export async function countSongsByArtistName(name: string): Promise<number> {
+export async function countSongsByArtistName(name: string, cacheAs: ReadCache = READ_DAILY): Promise<number> {
   if (!isLinkAnalysisConfigured || !name.trim()) return 0;
   try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/link_analysis?select=id&artist=eq.${encodeURIComponent(name)}&limit=1`, {
       headers: { ...restHeaders(), Prefer: "count=exact", Range: "0-0" },
       signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
-      next: { revalidate: REVALIDATE_DATA },
+      ...cacheAs,
     });
     if (!res.ok) return 0;
     const range = res.headers.get("content-range");

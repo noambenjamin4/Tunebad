@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { readAnalysisBySlug } from "@/lib/server/link-analysis";
+import { READ_IMMUTABLE, readAnalysisBySlug } from "@/lib/server/link-analysis";
 
 // Per-song share card. When a /song/<slug> link is posted to Discord, iMessage,
 // Twitter, etc., this renders a branded 1200x630 image with the track's key,
@@ -30,7 +30,7 @@ function loadFont(): Buffer {
 export default async function Image({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const font = loadFont();
-  const song = await readAnalysisBySlug(slug);
+  const song = await readAnalysisBySlug(slug, READ_IMMUTABLE);
 
   const title = song?.title ?? "TuneBad";
   const artist = song?.artist ?? "";

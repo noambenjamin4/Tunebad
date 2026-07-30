@@ -93,8 +93,21 @@ export const REVALIDATE_SITEMAP = 86_400; // 1 day
 /**
  * Upstream Supabase reads (`next: { revalidate }` on fetch).
  *
- * This is the Data Cache, NOT the ISR page cache — it dedupes the REST calls
- * behind a render. Keeping it a day means a page regeneration that DOES fire
- * usually costs zero Supabase round-trips.
+ * ⚠️ A fetch-level revalidate is NOT "just the Data Cache". In the App
+ * Router, the MINIMUM revalidate across every fetch made during a render
+ * becomes the route's own ISR window — a numeric value here silently
+ * overrides a page's `revalidate = false` or a longer page window. An
+ * earlier version of this comment claimed otherwise, and that belief
+ * re-broke the July 15 fix: every /song/[slug] page (declared `false`)
+ * shipped at `initialRevalidateSeconds: 86400` in the prerender manifest,
+ * regenerating per crawl again. scripts/check-isr.mjs now gates the build
+ * on the manifest so this cannot regress silently a second time.
+ *
+ * The rule that follows: the fetch option must be chosen per CALLER, not
+ * baked into the shared read helper. See `ReadCache` in
+ * lib/server/link-analysis.ts — song-page renders pass READ_IMMUTABLE
+ * (force-cache, tagged "song-data" for manual invalidation after a
+ * backfill), artist-page renders pass READ_WEEKLY, and only genuinely
+ * daily surfaces (hubs, home, sitemaps) use this default.
  */
 export const REVALIDATE_DATA = 86_400; // 1 day
