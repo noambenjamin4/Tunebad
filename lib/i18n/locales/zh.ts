@@ -962,6 +962,7 @@ const zh: Record<keyof typeof en, string> = {
   "studio.keysHint": "空格 播放 · ↑↓ 选择片段 · ←→ 微调 · S 分割 · D 复制 · L 循环 · ⌫ 删除 · Home/End · ⌘Z 撤销 · 捏合缩放",
   "studio.clipGain": "片段音量",
   "studio.gainEnvelope": "音量包络 — 点击线条添加节点，拖动节点移动，双击删除",
+  "studio.clipActions": "片段操作",
   "studio.fadeIn": "淡入（秒）",
   "studio.fadeOut": "淡出（秒）",
   "studio.split": "在播放头处分割",

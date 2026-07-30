@@ -1259,6 +1259,7 @@ export function StudioPanel() {
             onDeleteSelected={handleDeleteSelected}
             onSplitSelected={handleSplitSelected}
             onDuplicateSelected={handleDuplicate}
+            onToggleMute={handleToggleMute}
             onToggleLoop={handleLoopSelection}
             onChangeZoom={handleChangeZoom}
             loop={loop}

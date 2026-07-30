@@ -965,6 +965,7 @@ const de: Record<keyof typeof en, string> = {
   "studio.keysHint": "Leertaste Wiedergabe · ↑↓ Clip wählen · ←→ verschieben · S teilen · D duplizieren · L Loop · ⌫ löschen · Pos1/Ende · ⌘Z rückgängig · Pinch zum Zoomen",
   "studio.clipGain": "Clip-Lautstärke",
   "studio.gainEnvelope": "Lautstärkeverlauf — Linie anklicken für einen neuen Punkt, Punkt ziehen zum Verschieben, Doppelklick zum Löschen",
+  "studio.clipActions": "Clip-Aktionen",
   "studio.fadeIn": "Einblenden (s)",
   "studio.fadeOut": "Ausblenden (s)",
   "studio.split": "Am Abspielkopf teilen",

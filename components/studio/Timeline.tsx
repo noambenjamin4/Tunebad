@@ -83,6 +83,7 @@ export function Timeline({
   onDeleteSelected,
   onSplitSelected,
   onDuplicateSelected,
+  onToggleMute,
   onToggleLoop,
   onChangeZoom,
   loop,
@@ -113,6 +114,7 @@ export function Timeline({
   onDeleteSelected: () => void;
   onSplitSelected: () => void;
   onDuplicateSelected: () => void;
+  onToggleMute: () => void;
   onToggleLoop: () => void;
   onChangeZoom: (pxPerSecond: number) => void;
   loop: { start: number; end: number } | null;
@@ -139,6 +141,18 @@ export function Timeline({
   zoomRef.current = pxPerSecond;
   // Time badge shown beside a clip while it is being dragged or trimmed.
   const [dragLabel, setDragLabel] = useState<string | null>(null);
+  // Touch-only quick actions: press and hold a clip to get Split/Duplicate/
+  // Mute/Remove at the touch point, without needing to scroll down to the
+  // inspector panel first.
+  const [clipPopover, setClipPopover] = useState<{ clipId: string; x: number; y: number } | null>(null);
+  const longPressTimerRef = useRef<number | null>(null);
+  const longPressStartRef = useRef<{ x: number; y: number } | null>(null);
+  const clearLongPress = () => {
+    if (longPressTimerRef.current !== null) window.clearTimeout(longPressTimerRef.current);
+    longPressTimerRef.current = null;
+    longPressStartRef.current = null;
+  };
+  useEffect(() => clearLongPress, []);
   // The slice of timeline the clip canvases cover. Rendering the whole song
   // blows past the browser's max canvas width and its memory (see
   // ClipCanvas), so canvases are viewport-sized and follow the scroll.
@@ -459,6 +473,24 @@ export function Timeline({
           latestStart: clip.timelineStart,
         };
         setDragLabel(formatTimeTenths(clip.timelineStart));
+        // A body press on touch might turn into a long-press for the quick-
+        // actions popover instead of a drag; the move above still starts
+        // immediately so a genuine drag has zero latency, and gets cancelled
+        // below if the press turns out to be a hold instead.
+        if (event.pointerType === "touch") {
+          const { clientX, clientY } = event;
+          longPressStartRef.current = { x: clientX, y: clientY };
+          longPressTimerRef.current = window.setTimeout(() => {
+            longPressTimerRef.current = null;
+            if (dragRef.current?.kind !== "move" || dragRef.current.clipId !== clipId) return;
+            dragRef.current = null;
+            setDragLabel(null);
+            const el = clipElOf(clipId);
+            if (el) el.style.left = `${clip.timelineStart * pxPerSecond}px`;
+            onSelect(clipId);
+            setClipPopover({ clipId, x: clientX, y: clientY });
+          }, 500);
+        }
       }
     } else {
       onSelect(null);
@@ -478,6 +510,13 @@ export function Timeline({
   };
 
   const handleTrackPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    // Past a few px this is a drag, not a hold -- the popover must not pop up
+    // out from under a finger that is actively moving the clip.
+    if (longPressStartRef.current) {
+      const dx = event.clientX - longPressStartRef.current.x;
+      const dy = event.clientY - longPressStartRef.current.y;
+      if (Math.hypot(dx, dy) > 10) clearLongPress();
+    }
     const drag = dragRef.current;
     if (!drag) return;
     if (drag.kind === "loop") {
@@ -564,6 +603,7 @@ export function Timeline({
   };
 
   const handleTrackPointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
+    clearLongPress();
     const drag = dragRef.current;
     dragRef.current = null;
     setDragLabel(null);
@@ -830,6 +870,73 @@ export function Timeline({
           <div className="studio-head" aria-hidden="true" />
         </div>
       </div>
+
+      {clipPopover &&
+        (() => {
+          // A quick-actions menu for touch: press and hold a clip instead of
+          // scrolling down to the inspector for Split/Duplicate/Mute/Remove.
+          // Reuses the SAME selected-clip handlers the inspector already
+          // calls -- onSelect(clipId) already ran when the press landed, so
+          // by the time the hold fires, selectedId matches this clip.
+          const popClip = clips.find((c) => c.id === clipPopover.clipId);
+          if (!popClip) return null;
+          return (
+            <>
+              <div className="studio-clip-popover-backdrop" onPointerDown={() => setClipPopover(null)} />
+              <div
+                className="studio-clip-popover"
+                role="menu"
+                aria-label={t("studio.clipActions")}
+                style={{ left: `${clipPopover.x}px`, top: `${clipPopover.y}px` }}
+              >
+                <button
+                  className="text-button"
+                  type="button"
+                  role="menuitem"
+                  onClick={() => {
+                    onToggleMute();
+                    setClipPopover(null);
+                  }}
+                >
+                  {popClip.muted ? t("studio.unmute") : t("studio.mute")}
+                </button>
+                <button
+                  className="text-button"
+                  type="button"
+                  role="menuitem"
+                  onClick={() => {
+                    onSplitSelected();
+                    setClipPopover(null);
+                  }}
+                >
+                  {t("studio.split")}
+                </button>
+                <button
+                  className="text-button"
+                  type="button"
+                  role="menuitem"
+                  onClick={() => {
+                    onDuplicateSelected();
+                    setClipPopover(null);
+                  }}
+                >
+                  {t("studio.duplicate")}
+                </button>
+                <button
+                  className="text-button"
+                  type="button"
+                  role="menuitem"
+                  onClick={() => {
+                    onDeleteSelected();
+                    setClipPopover(null);
+                  }}
+                >
+                  {t("studio.remove")}
+                </button>
+              </div>
+            </>
+          );
+        })()}
 
       <div className="studio-zoom">
         <button

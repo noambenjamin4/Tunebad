@@ -5015,6 +5015,38 @@ tbody tr:last-child td {
   margin: 0;
 }
 
+/* Touch quick-actions: press and hold a clip (see Timeline's long-press
+   timer) instead of scrolling down to the inspector panel. Fixed position,
+   because clipPopover's x/y are viewport (clientX/clientY) coordinates from
+   the touch point, not scroll-relative ones. */
+.studio-clip-popover-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+}
+.studio-clip-popover {
+  position: fixed;
+  z-index: 21;
+  transform: translate(-50%, -100%) translateY(-12px);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface, var(--fill, #fff));
+  box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.4);
+  min-width: 140px;
+}
+.studio-clip-popover .text-button {
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: 6px;
+}
+.studio-clip-popover .text-button:active {
+  background: var(--hover);
+}
+
 /* Lock-pitch toggle sits with the master controls. */
 .studio-lock {
   flex-direction: row;
