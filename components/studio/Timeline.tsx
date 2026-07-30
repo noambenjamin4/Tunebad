@@ -294,6 +294,14 @@ export function Timeline({
       startDistance = spread(event.touches);
       startZoom = zoomRef.current;
     };
+    // A pinch fires touchmove far faster than the screen refreshes, and each
+    // zoom commit re-renders every visible clip canvas — the one gesture that
+    // bypassed the "style-only while the finger is down" discipline clip
+    // drags follow. Coalesce to one commit per frame: the ratio below is
+    // relative to the CURRENT zoom, so dropping intermediate events changes
+    // nothing about where the gesture lands.
+    let frame = 0;
+    let pending: { factor: number; midX: number } | null = null;
     const onMove = (event: TouchEvent) => {
       if (event.touches.length !== 2 || startDistance <= 0) return;
       event.preventDefault();
@@ -301,10 +309,26 @@ export function Timeline({
       const midX = (event.touches[0].clientX + event.touches[1].clientX) / 2 - rect.left;
       // Relative to the zoom the pinch STARTED at, so the gesture is
       // absolute rather than accumulating drift over many move events.
-      applyZoom((spread(event.touches) / startDistance) * (startZoom / zoomRef.current), midX);
+      pending = { factor: (spread(event.touches) / startDistance) * (startZoom / zoomRef.current), midX };
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        if (pending) applyZoom(pending.factor, pending.midX);
+        pending = null;
+      });
     };
     const onEnd = () => {
       startDistance = 0;
+      // Commit whatever the last frame did not get to, so the gesture never
+      // ends a few pixels short of where the fingers left it.
+      if (frame) {
+        cancelAnimationFrame(frame);
+        frame = 0;
+      }
+      if (pending) {
+        applyZoom(pending.factor, pending.midX);
+        pending = null;
+      }
     };
     scroller.addEventListener("touchstart", onStart, { passive: true });
     scroller.addEventListener("touchmove", onMove, { passive: false });
@@ -806,7 +830,7 @@ export function Timeline({
         <button className="text-button" type="button" disabled={disabled || duration <= 0} onClick={fitZoom}>
           {t("studio.fit")}
         </button>
-        <span className="studio-hint">{t("studio.zoomHint")}</span>
+        <span className="studio-hint studio-keys-hint">{t("studio.zoomHint")}</span>
         <span className="studio-zoom-value num">{Math.round(clampZoom(pxPerSecond))} px/s</span>
       </div>
     </div>

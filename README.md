@@ -2,7 +2,7 @@
 
 A fast, private, browser-based music utility for producers. Analyze a track's BPM and key, calculate tempo-locked delay and reverb, check streaming loudness penalties, make slowed + reverb edits, and convert audio — all in a clean black-and-white interface that follows your system light/dark theme.
 
-**Live:** deployed on Vercel. **Stack:** Next.js 15, React 19, TypeScript, Web Audio API, essentia.js (WASM), optional Supabase.
+**Live:** deployed on Vercel. **Stack:** Next.js 16, React 19, TypeScript, Web Audio API, essentia.js (WASM), optional Supabase.
 
 ## Features
 
@@ -21,7 +21,7 @@ A fast, private, browser-based music utility for producers. Analyze a track's BP
 
 ```bash
 npm install
-npm run dev          # http://localhost:3002 (or the default Next port)
+npm run dev          # http://localhost:3000 (pass -- -p 3002 for the preview config)
 ```
 
 The link downloader is off by default. To enable it locally, create `.env.local`:

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { jsonLdString } from "@/lib/seo/jsonld";
 import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "../globals.css";
 import { SITE_URL, SOCIAL_PROFILES } from "@/lib/site";
 import { fontVariables } from "@/lib/fonts";
@@ -157,6 +158,10 @@ export default function RootLayout({
         {/* Cookieless, anonymous page-view counts (no-op in dev). Audio never
             leaves the visitor's device; this does not change that. */}
         <Analytics />
+        {/* Field Core Web Vitals from real visits. Lab numbers (Lighthouse)
+            were the only perf signal before this, and they cannot see a slow
+            phone on a bad connection — which is most of the traffic. */}
+        <SpeedInsights />
         {/* Reports uncaught client errors to our own API (no third party —
             the CSP allows no external beacon). Message + stack only. */}
         <ClientErrorReporter />

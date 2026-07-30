@@ -13,6 +13,7 @@
 
 import type { Metadata, Viewport } from "next";
 import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "../../globals.css";
 import { fontVariables } from "@/lib/fonts";
 import { sharedRootMetadata, sharedViewport } from "@/lib/seo/base-metadata";
@@ -63,6 +64,10 @@ export default async function LocaleLayout({
           {children}
         </LocaleBoundary>
         <Analytics />
+        {/* Field Core Web Vitals from real visits. Lab numbers (Lighthouse)
+            were the only perf signal before this, and they cannot see a slow
+            phone on a bad connection — which is most of the traffic. */}
+        <SpeedInsights />
         <ClientErrorReporter />
       </body>
     </html>

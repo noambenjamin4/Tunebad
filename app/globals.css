@@ -5054,6 +5054,31 @@ tbody tr:last-child td {
   .studio-field-wide { width: 100%; }
   .studio-hint { width: 100%; }
   .studio-clip-name { font-size: 10px; }
+
+  /* Transport follows you down the page. On a phone the timeline plus the
+     master controls are taller than the viewport, so Play scrolled away the
+     moment you went to adjust anything — the one control you reach for most
+     was the one that needed a scroll back up. Sticky, not fixed: it keeps its
+     place in the flow (no content hidden underneath, no layout shift) and
+     only pins once it would leave the screen. */
+  .studio-transport {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: var(--display, var(--fill, #fff));
+    padding: 8px 0;
+    /* Full-bleed backdrop so clips scrolling under it are covered rather
+       than showing through the row's gaps. */
+    box-shadow: 0 6px 12px -10px rgba(0, 0, 0, 0.35);
+  }
+}
+
+/* Pointer-specific copy: the keyboard-shortcut line and the ctrl+scroll hint
+   are noise on a touch-only device, where neither input exists. */
+@media (pointer: coarse) {
+  .studio-keys-hint {
+    display: none;
+  }
 }
 
 /* Empty-state lines: what the tool does, before there is anything to see. */

@@ -24,11 +24,19 @@ export const sharedRootMetadata: Pick<
     card: "summary_large_image",
   },
   icons: {
+    // Adaptive transparent SVG first (black in light mode, white in dark, via
+    // prefers-color-scheme inside the file); PNGs are opaque fallbacks for the
+    // contexts that don't render SVG favicons. 48px is the size Google Search
+    // wants for result favicons.
+    //
+    // icon-512.png is deliberately NOT listed: it is 190 KB, some browsers
+    // fetch the largest declared icon eagerly, and nothing about a favicon
+    // needs 512px. It stays in manifest.json, which is where an install
+    // prompt actually reads it from.
     icon: [
       { url: "/icon.svg", type: "image/svg+xml" },
       { url: "/icon-48.png", sizes: "48x48", type: "image/png" },
       { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
-      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
     ],
     apple: "/apple-touch-icon.png",
   },

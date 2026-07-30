@@ -1340,7 +1340,7 @@ export function StudioPanel() {
             >
               {t("studio.redo")}
             </button>
-            <span className="studio-hint">{t("studio.keysHint")}</span>
+            <span className="studio-hint studio-keys-hint">{t("studio.keysHint")}</span>
             <button
               className="text-button"
               type="button"
