@@ -583,23 +583,42 @@ export function baseEffectiveSpeed(params: RemixParams): number {
 }
 
 /**
- * Where a take's t=0 sits on the FULL render's output timeline.
+ * Where a take's t=0 sits on the render's output timeline.
  *
- * A take can start partway into the song (song position `startOffset`), but
- * the render always plays the whole track from the beginning. Everything
- * before the take runs at the base params — constant speed — so the source
- * reaches song position S after `S / baseEffectiveSpeed` seconds of OUTPUT.
- * That, not S itself, is where the take's events begin.
+ * A take can start partway into the song (position `startOffset` — song
+ * position for a full export, or a delta against a loop window's start for a
+ * loop-only bounce, which can be negative when the take began before the
+ * window). Everything before the take runs at the base params — constant
+ * speed — so the source reaches position S after `S / baseEffectiveSpeed`
+ * seconds of OUTPUT. That, not S itself, is where the take's events begin.
+ *
+ * Deliberately NOT clamped to 0 here: a negative result still carries the
+ * true (negative) offset an event needs added to it before per-EVENT
+ * clamping in `shiftEvents`. Clamping this anchor instead of each event's
+ * final position was the exact bug a loop-only bounce hit — see the
+ * `shiftEvents` comment below.
  */
 export function takeOutputStart(baseParams: RemixParams, startOffset: number): number {
-  return Math.max(0, startOffset) / baseEffectiveSpeed(baseParams);
+  return startOffset / baseEffectiveSpeed(baseParams);
 }
 
-// Rebases take-relative event times onto the full render's output timeline.
-// The spread needs a cast: TS widens `{...event, t}` over a union rather than
-// distributing it, which would decouple each member's kind/value pair.
-function shiftEvents(events: AutomationEvent[], offset: number): AutomationEvent[] {
-  return events.map((event) => ({ ...event, t: offset + Math.max(0, event.t) }) as AutomationEvent);
+/**
+ * Rebases take-relative event times onto the render's output timeline.
+ *
+ * Clamps the FINAL per-event position (`offset + event.t`), not `event.t`
+ * alone. A loop-only bounce can pass a negative `offset` (the take began
+ * before the loop window) with several events spread across it: clamping
+ * `event.t` first and adding an already-zeroed offset would silently
+ * restart every event's clock at the take's own t=0 instead of the window's,
+ * compressing an event that truly lands mid-window (e.g. 3s in) back to
+ * wherever it sat in the take's own recording (e.g. 6s in) — audible drift
+ * for anything past the take's very first event.
+ *
+ * The spread needs a cast: TS widens `{...event, t}` over a union rather than
+ * distributing it, which would decouple each member's kind/value pair.
+ */
+export function shiftEvents(events: AutomationEvent[], offset: number): AutomationEvent[] {
+  return events.map((event) => ({ ...event, t: Math.max(0, offset + event.t) }) as AutomationEvent);
 }
 
 /**

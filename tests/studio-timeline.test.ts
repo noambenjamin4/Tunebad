@@ -43,6 +43,7 @@ import {
   automatedOutputDuration,
   reverbTailSeconds,
   takeOutputStart,
+  shiftEvents,
 } from "../lib/audio/remix";
 import { keysMix } from "../lib/audio/harmonic";
 import { withGaplessHeader } from "../lib/audio/mp3-tag";
@@ -1293,9 +1294,9 @@ test("a loop-only export rebases the take's start against the WINDOW, not the wh
   const rawStart = takeOutputStart(base, 9);
   const windowed = takeOutputStart(base, 9 - 12); // what the fix actually computes
   assert.equal(rawStart, 9, "sanity: unshifted, this is the bug's own number");
-  // Negative -> clamped to the window's own t=0, so the automation is
-  // audible from the start of the bounce instead of scheduled past its end.
-  assert.equal(windowed, 0);
+  // takeOutputStart itself is deliberately left negative here -- clamping
+  // happens per-event in shiftEvents, not on this anchor (see next test).
+  assert.equal(windowed, -3);
 
   // Recorded mid-window (song position 14, loop [12, 20)): the event should
   // land 2s into the 8s bounce, not 14s into a render that is only 8s long.
@@ -1304,6 +1305,37 @@ test("a loop-only export rebases the take's start against the WINDOW, not the wh
   // A loop starting at 0 must be a no-op -- the common case, and the one
   // that would have hidden this bug from a naive smoke test.
   assert.equal(takeOutputStart(base, 9 - 0), 9);
+});
+
+test("shiftEvents clamps each event's OWN final position, not the shared anchor", () => {
+  // The bug this pins: a take recorded at song position 2, with a speed
+  // change at t=1 (song position 3, before a [5, 20) loop window) and
+  // another at t=6 (song position 8, 3s into the window). The old code
+  // clamped the anchor itself (Math.max(0, startOffset) inside
+  // takeOutputStart) before adding each event's own t -- so once the anchor
+  // hit 0, every event's position collapsed back to its raw take-relative
+  // t, landing the second event at loop-local t=6 instead of the correct 3s,
+  // a full 3-second drift for anything after the take's first event.
+  const base: RemixParams = {
+    speed: 1, lockPitch: false, pitchSemitones: 0, bassBoostDb: 0,
+    reverb: 0, reverbType: "hall", reverbEq: NEUTRAL_REVERB_EQ, effect: "none",
+  };
+  const events: AutomationEvent[] = [
+    { t: 1, kind: "speed", value: 0.5 },
+    { t: 6, kind: "speed", value: 1 },
+  ];
+
+  // Full export (no loop rebase): unaffected, matches the take's own numbers
+  // shifted by its song-position anchor -- 2+1=3, 2+6=8.
+  const full = shiftEvents(events, takeOutputStart(base, 2));
+  assert.deepEqual(full.map((e) => e.t), [3, 8]);
+
+  // Loop-only export of [5, 20): true absolute positions are 3 and 8; loop-
+  // relative that's -2 (already in effect before the window -> clamp to 0)
+  // and 3 (3s into the bounce) -- NOT 1 and 6, which is what the anchor-only
+  // clamp used to produce.
+  const windowed = shiftEvents(events, takeOutputStart(base, 2 - 5));
+  assert.deepEqual(windowed.map((e) => e.t), [0, 3]);
 });
 
 test("scaleClipTiming: the SAME durations that address the buffer scale with it -- fades included", () => {
