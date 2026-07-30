@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { jsonLdString } from "@/lib/seo/jsonld";
 import { Geist, Geist_Mono, Baloo_2 } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
-import "./globals.css";
+import "../globals.css";
 import { SITE_URL, SOCIAL_PROFILES } from "@/lib/site";
 import { ClientErrorReporter } from "@/components/layout/ClientErrorReporter";
 
