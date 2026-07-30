@@ -5,12 +5,13 @@ import { ToolPageNav } from "@/components/layout/ToolPageNav";
 import { PlaylistAnalyzer } from "@/components/playlist/PlaylistAnalyzer";
 import { MinimalFooter } from "@/components/layout/MinimalFooter";
 import { jsonLdString, faqPageJsonLd } from "@/lib/seo/jsonld";
+import { languageAlternates } from "@/lib/seo/hreflang";
 
 export const metadata: Metadata = {
   title: "Free Playlist Analyzer: Key & BPM of Every Track",
   description:
     "Paste a Spotify or YouTube playlist link and get the key, BPM, and Camelot code for every track, in one table. Free, no signup, export to CSV.",
-  alternates: { canonical: "/playlist-analyzer" },
+  alternates: { canonical: "/playlist-analyzer", languages: languageAlternates("/playlist-analyzer") },
   openGraph: { images: [{ url: "/og/playlist-analyzer.png", width: 1200, height: 630 }] },
 };
 

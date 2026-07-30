@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 import { ToolPageShell } from "@/components/files/ToolPageShell";
 import { RelatedTools } from "@/components/files/RelatedTools";
 import { HeicTool } from "@/components/files/HeicTool";
+import { languageAlternates } from "@/lib/seo/hreflang";
 
 export const metadata: Metadata = {
   title: "HEIC to JPG Converter: iPhone Photos Online",
   description:
     "Convert HEIC or HEIF photos from an iPhone to JPG or PNG in your browser. No upload, no account, works on any device, including ones that can't open HEIC.",
-  alternates: { canonical: "/heic-to-jpg" },
+  alternates: { canonical: "/heic-to-jpg", languages: languageAlternates("/heic-to-jpg") },
   openGraph: { images: [{ url: "/og/heic-to-jpg.png", width: 1200, height: 630 }] },
 };
 

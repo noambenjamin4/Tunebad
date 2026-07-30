@@ -8,6 +8,7 @@ import { CamelotWheel } from "./CamelotWheel";
 import { MinimalFooter } from "@/components/layout/MinimalFooter";
 import { SITE_URL } from "@/lib/site";
 import { jsonLdString, breadcrumbJsonLd, faqPageJsonLd } from "@/lib/seo/jsonld";
+import { languageAlternates } from "@/lib/seo/hreflang";
 
 // Standalone, crawlable Camelot wheel page: an interactive chart (client
 // island) on top of fully server-rendered reference content — the 24-code
@@ -19,7 +20,7 @@ export const metadata: Metadata = {
   title: "Camelot Wheel: Interactive Harmonic Mixing Chart",
   description:
     "A free interactive Camelot wheel. Click any of the 24 codes to see its musical key, which codes mix cleanly with it, and real analyzed songs in that key.",
-  alternates: { canonical: "/camelot-wheel" },
+  alternates: { canonical: "/camelot-wheel", languages: languageAlternates("/camelot-wheel") },
   openGraph: { images: [{ url: "/og/camelot-wheel.png", width: 1200, height: 630 }] },
 };
 

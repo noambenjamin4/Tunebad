@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 import { ToolPageShell } from "@/components/files/ToolPageShell";
 import { RelatedTools } from "@/components/files/RelatedTools";
 import { ZipTool } from "@/components/files/ZipTool";
+import { languageAlternates } from "@/lib/seo/hreflang";
 
 export const metadata: Metadata = {
   title: "Unzip Files Online (ZIP, TAR, TAR.GZ)",
   description:
     "Open a ZIP, TAR, or TAR.GZ archive and download its contents, or bundle files into a new archive. Runs in your browser, nothing uploaded. No sign-up, free.",
-  alternates: { canonical: "/unzip-files" },
+  alternates: { canonical: "/unzip-files", languages: languageAlternates("/unzip-files") },
   openGraph: { images: [{ url: "/og/unzip-files.png", width: 1200, height: 630 }] },
 };
 

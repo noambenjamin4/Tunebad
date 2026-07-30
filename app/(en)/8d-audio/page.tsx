@@ -3,12 +3,13 @@ import { ToolPageShell } from "@/components/files/ToolPageShell";
 import { RelatedTools } from "@/components/files/RelatedTools";
 import { ToolFaq } from "@/components/files/ToolFaq";
 import { EightDTool } from "@/components/files/EightDTool";
+import { languageAlternates } from "@/lib/seo/hreflang";
 
 export const metadata: Metadata = {
   title: "8D Audio Maker: Convert Any Song to 8D Online",
   description:
     "Make an 8D audio edit that slowly pans left to right for headphones, right in your browser. Free, no upload, no sign-up.",
-  alternates: { canonical: "/8d-audio" },
+  alternates: { canonical: "/8d-audio", languages: languageAlternates("/8d-audio") },
   openGraph: { images: [{ url: "/og/8d-audio.png", width: 1200, height: 630 }] },
 };
 

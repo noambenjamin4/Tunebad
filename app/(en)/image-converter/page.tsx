@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 import { ToolPageShell } from "@/components/files/ToolPageShell";
 import { RelatedTools } from "@/components/files/RelatedTools";
 import { ImageTool } from "@/components/files/ImageTool";
+import { languageAlternates } from "@/lib/seo/hreflang";
 
 export const metadata: Metadata = {
   title: "Image Converter: PNG, JPG & WebP",
   description:
     "Convert images between PNG, JPG, and WebP right in your browser. Files never leave your device. Free, no sign-up, no ads.",
-  alternates: { canonical: "/image-converter" },
+  alternates: { canonical: "/image-converter", languages: languageAlternates("/image-converter") },
   openGraph: { images: [{ url: "/og/image-converter.png", width: 1200, height: 630 }] },
 };
 

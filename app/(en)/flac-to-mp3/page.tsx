@@ -3,12 +3,13 @@ import { ToolPageShell } from "@/components/files/ToolPageShell";
 import { RelatedTools } from "@/components/files/RelatedTools";
 import { ToolFaq } from "@/components/files/ToolFaq";
 import { MediaConvertTool } from "@/components/files/MediaConvertTool";
+import { languageAlternates } from "@/lib/seo/hreflang";
 
 export const metadata: Metadata = {
   title: "FLAC to MP3 Converter (Pick the Bitrate)",
   description:
     "Convert lossless FLAC files to MP3 at 128, 192, or 320 kbps, right in your browser. Your music never leaves your device. Free, no sign-up, no ads.",
-  alternates: { canonical: "/flac-to-mp3" },
+  alternates: { canonical: "/flac-to-mp3", languages: languageAlternates("/flac-to-mp3") },
   openGraph: { images: [{ url: "/og/flac-to-mp3.png", width: 1200, height: 630 }] },
 };
 

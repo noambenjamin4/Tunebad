@@ -3,12 +3,13 @@ import { ToolPageShell } from "@/components/files/ToolPageShell";
 import { RelatedTools } from "@/components/files/RelatedTools";
 import { ToolFaq } from "@/components/files/ToolFaq";
 import { VideoTool } from "@/components/files/VideoTool";
+import { languageAlternates } from "@/lib/seo/hreflang";
 
 export const metadata: Metadata = {
   title: "Compress Video Online (No Upload)",
   description:
     "Shrink a video to 10, 25, 50, or 100 MB right in your browser. The file never leaves your device. Free, no sign-up, no watermark.",
-  alternates: { canonical: "/compress-video" },
+  alternates: { canonical: "/compress-video", languages: languageAlternates("/compress-video") },
   openGraph: { images: [{ url: "/og/compress-video.png", width: 1200, height: 630 }] },
 };
 

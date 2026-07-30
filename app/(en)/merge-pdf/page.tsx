@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 import { ToolPageShell } from "@/components/files/ToolPageShell";
 import { RelatedTools } from "@/components/files/RelatedTools";
 import { PdfTool } from "@/components/files/PdfTool";
+import { languageAlternates } from "@/lib/seo/hreflang";
 
 export const metadata: Metadata = {
   title: "Merge PDF Files Online",
   description:
     "Combine multiple PDF files into one document, in the order you choose. Runs in your browser, nothing gets uploaded. No sign-up, no ads, free.",
-  alternates: { canonical: "/merge-pdf" },
+  alternates: { canonical: "/merge-pdf", languages: languageAlternates("/merge-pdf") },
   openGraph: { images: [{ url: "/og/merge-pdf.png", width: 1200, height: 630 }] },
 };
 

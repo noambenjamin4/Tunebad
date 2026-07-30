@@ -3,12 +3,13 @@ import { ToolPageShell } from "@/components/files/ToolPageShell";
 import { RelatedTools } from "@/components/files/RelatedTools";
 import { ToolFaq } from "@/components/files/ToolFaq";
 import { VideoTool } from "@/components/files/VideoTool";
+import { languageAlternates } from "@/lib/seo/hreflang";
 
 export const metadata: Metadata = {
   title: "Compress Video for Discord (Under 10MB)",
   description:
     "Get a video under Discord's 10MB upload limit in your browser, no upload and no watermark. Presets for 10MB free tier and 50MB Nitro Basic.",
-  alternates: { canonical: "/compress-video-for-discord" },
+  alternates: { canonical: "/compress-video-for-discord", languages: languageAlternates("/compress-video-for-discord") },
   openGraph: { images: [{ url: "/og/compress-video-discord.png", width: 1200, height: 630 }] },
 };
 

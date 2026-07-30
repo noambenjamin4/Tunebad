@@ -3,12 +3,13 @@ import { ToolPageShell } from "@/components/files/ToolPageShell";
 import { RelatedTools } from "@/components/files/RelatedTools";
 import { ToolFaq } from "@/components/files/ToolFaq";
 import { VideoTool } from "@/components/files/VideoTool";
+import { languageAlternates } from "@/lib/seo/hreflang";
 
 export const metadata: Metadata = {
   title: "Compress Video for WhatsApp (Under 16MB)",
   description:
     "Get a video under WhatsApp's 16MB share limit in your browser, no upload and no watermark. Presets for 16, 25, and 50 MB.",
-  alternates: { canonical: "/compress-video-for-whatsapp" },
+  alternates: { canonical: "/compress-video-for-whatsapp", languages: languageAlternates("/compress-video-for-whatsapp") },
   openGraph: { images: [{ url: "/og/compress-video-whatsapp.png", width: 1200, height: 630 }] },
 };
 

@@ -14,13 +14,47 @@
 
 import { LOCALE_CODES, type LocaleCode } from "@/lib/i18n/codes";
 
-/** Routes with localized variants. Grows in phase C4; keep alphabetical. */
+/** Routes with localized variants — the 36 high-value static tool/hub pages.
+ *  NOT the 163k /song/* pages or the /songs hubs (English-only by design).
+ *  Keep alphabetical; scripts/check-i18n-routes.mjs asserts each entry has
+ *  both an (en) page carrying `languages:` and an (intl) re-export page. */
 export const LOCALIZED_PATHS: readonly string[] = [
+  "/8d-audio",
+  "/audio-converter",
+  "/audio-joiner",
+  "/audio-mastering",
+  "/bass-booster",
+  "/bpm-tap",
+  "/camelot-wheel",
+  "/compress-image",
+  "/compress-image-to-100kb",
+  "/compress-video",
+  "/compress-video-for-discord",
+  "/compress-video-for-whatsapp",
   "/converter",
   "/daw",
+  "/delay-reverb-calculator",
+  "/flac-to-mp3",
+  "/heic-to-jpg",
+  "/image-converter",
+  "/jpg-to-pdf",
   "/key-bpm-finder",
+  "/loudness",
+  "/merge-pdf",
+  "/mkv-to-mp4",
+  "/mov-to-mp4",
   "/mp3-cutter",
+  "/nightcore-maker",
+  "/pitch-shifter",
+  "/playlist-analyzer",
+  "/resize-image",
+  "/resize-image-for-instagram",
   "/slowed-reverb",
+  "/split-pdf",
+  "/tools",
+  "/unzip-files",
+  "/video-converter",
+  "/wav-to-mp3",
 ];
 
 export function isLocalizedPath(path: string): boolean {

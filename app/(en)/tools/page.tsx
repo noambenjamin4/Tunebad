@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { ToolPageShell } from "@/components/files/ToolPageShell";
 import { ToolsHub } from "@/components/files/ToolsHub";
+import { languageAlternates } from "@/lib/seo/hreflang";
 
 export const metadata: Metadata = {
   title: "Free Online File Tools",
   description:
     "Free file tools that run in your browser: convert, resize, and compress images, and more. No uploads, no sign-up, no ads.",
-  alternates: { canonical: "/tools" },
+  alternates: { canonical: "/tools", languages: languageAlternates("/tools") },
   openGraph: { images: [{ url: "/og/tools.png", width: 1200, height: 630 }] },
 };
 

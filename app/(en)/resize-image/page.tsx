@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 import { ToolPageShell } from "@/components/files/ToolPageShell";
 import { RelatedTools } from "@/components/files/RelatedTools";
 import { ImageTool } from "@/components/files/ImageTool";
+import { languageAlternates } from "@/lib/seo/hreflang";
 
 export const metadata: Metadata = {
   title: "Resize Images Online",
   description:
     "Resize any image to exact pixel dimensions in your browser, with optional aspect-ratio lock. Files never leave your device. Free, no sign-up.",
-  alternates: { canonical: "/resize-image" },
+  alternates: { canonical: "/resize-image", languages: languageAlternates("/resize-image") },
   openGraph: { images: [{ url: "/og/resize-image.png", width: 1200, height: 630 }] },
 };
 

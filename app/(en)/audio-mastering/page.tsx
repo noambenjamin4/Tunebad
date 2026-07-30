@@ -3,12 +3,13 @@ import { ToolPageShell } from "@/components/files/ToolPageShell";
 import { RelatedTools } from "@/components/files/RelatedTools";
 import { ToolFaq } from "@/components/files/ToolFaq";
 import { AudioMasteringTool } from "@/components/files/AudioMasteringTool";
+import { languageAlternates } from "@/lib/seo/hreflang";
 
 export const metadata: Metadata = {
   title: "Free Online Audio Mastering: Master a Song",
   description:
     "Master any song in your browser with EQ, glue compression, and a loudness limiter, or match a reference track's tone and loudness. Free, no upload, no sign-up.",
-  alternates: { canonical: "/audio-mastering" },
+  alternates: { canonical: "/audio-mastering", languages: languageAlternates("/audio-mastering") },
   openGraph: { images: [{ url: "/og/audio-mastering.png", width: 1200, height: 630 }] },
 };
 

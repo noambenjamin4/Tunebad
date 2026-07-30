@@ -3,12 +3,13 @@ import { ToolPageShell } from "@/components/files/ToolPageShell";
 import { RelatedTools } from "@/components/files/RelatedTools";
 import { ToolFaq } from "@/components/files/ToolFaq";
 import { MediaConvertTool } from "@/components/files/MediaConvertTool";
+import { languageAlternates } from "@/lib/seo/hreflang";
 
 export const metadata: Metadata = {
   title: "WAV to MP3 Converter (Free, In Your Browser)",
   description:
     "Turn huge uncompressed WAV files into small MP3s at 128, 192, or 320 kbps, right in your browser. Files never leave your device. Free, no sign-up.",
-  alternates: { canonical: "/wav-to-mp3" },
+  alternates: { canonical: "/wav-to-mp3", languages: languageAlternates("/wav-to-mp3") },
   openGraph: { images: [{ url: "/og/wav-to-mp3.png", width: 1200, height: 630 }] },
 };
 

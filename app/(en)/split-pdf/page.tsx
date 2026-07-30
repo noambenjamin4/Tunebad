@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 import { ToolPageShell } from "@/components/files/ToolPageShell";
 import { RelatedTools } from "@/components/files/RelatedTools";
 import { PdfSplitTool } from "@/components/files/PdfSplitTool";
+import { languageAlternates } from "@/lib/seo/hreflang";
 
 export const metadata: Metadata = {
   title: "Split PDF: Extract Pages Online",
   description:
     "Pull a range of pages out of a PDF into a new file, right in your browser. Nothing gets uploaded. No sign-up, no ads, free.",
-  alternates: { canonical: "/split-pdf" },
+  alternates: { canonical: "/split-pdf", languages: languageAlternates("/split-pdf") },
   openGraph: { images: [{ url: "/og/split-pdf.png", width: 1200, height: 630 }] },
 };
 
