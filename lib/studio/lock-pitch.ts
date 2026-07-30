@@ -16,7 +16,7 @@
 // the export still cannot drift from the preview.
 
 import { timeStretch } from "@/lib/audio/remix";
-import type { StudioClip } from "./timeline";
+import { type StudioClip, scaleClipTiming } from "./timeline";
 
 /** Stretch cache key. Speed is quantised so slider jitter can't thrash it. */
 export function stretchedIdFor(bufferId: string, speed: number): string {
@@ -106,14 +106,10 @@ export function forgetStretched(bufferId: string): void {
  */
 export function scaleClipsForLock(clips: StudioClip[], speed: number): StudioClip[] {
   if (speed === 1) return clips;
-  const k = 1 / speed;
   return clips.map((clip) => ({
     ...clip,
+    ...scaleClipTiming(clip, speed),
     bufferId: stretchedIdFor(clip.bufferId, speed),
-    timelineStart: clip.timelineStart * k,
-    clipStart: clip.clipStart * k,
-    clipEnd: clip.clipEnd * k,
-    fadeInSec: clip.fadeInSec * k,
-    fadeOutSec: clip.fadeOutSec * k,
+    timelineStart: clip.timelineStart / speed,
   }));
 }

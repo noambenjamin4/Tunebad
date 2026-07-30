@@ -82,6 +82,34 @@ export type FadeCurve = "linear" | "equalPower";
 const EQUAL_POWER_STEPS = 12;
 
 /**
+ * How a clip's own time fields move when its BUFFER is stretched by `ratio`
+ * (ratio > 1 means faster/shorter). `clipStart`/`clipEnd` address the
+ * buffer, so they divide by ratio along with it; `fadeInSec`/`fadeOutSec`
+ * are durations measured in that same clock, so they divide too, or the
+ * fade keeps its old length while the clip it lives in changes length
+ * around it. Measured what skipping the fades does: an 8s fade-in on a
+ * 20s clip (40% of it) left unscaled after a 2x speed-up covers 80% of
+ * the now-10s clip instead -- at the point it used to reach full volume,
+ * it plays at half. `timelineStart` is deliberately NOT here: one caller
+ * scales it directly (locking pitch moves the whole timeline uniformly),
+ * the other re-derives it from a beat-phase correction instead (matching
+ * one clip to a grid) -- both callers own that field themselves.
+ * `fadeInFrom`/`fadeInTo` etc. are gain levels, not time, so a pure time
+ * stretch leaves them untouched; callers keep them via their own spread.
+ */
+export function scaleClipTiming(
+  clip: StudioClip,
+  ratio: number,
+): Pick<StudioClip, "clipStart" | "clipEnd" | "fadeInSec" | "fadeOutSec"> {
+  return {
+    clipStart: clip.clipStart / ratio,
+    clipEnd: clip.clipEnd / ratio,
+    fadeInSec: clip.fadeInSec / ratio,
+    fadeOutSec: clip.fadeOutSec / ratio,
+  };
+}
+
+/**
  * Clamp a clip's two fades so they cannot pass through each other.
  *
  * The rule is that they must TOGETHER fit inside the clip, not that each

@@ -24,6 +24,7 @@ import {
   snapCandidates,
   withFadeIn,
   withFadeOut,
+  scaleClipTiming,
   MAX_TIMELINE_SECONDS,
 } from "../lib/studio/timeline";
 import {
@@ -1303,4 +1304,45 @@ test("a loop-only export rebases the take's start against the WINDOW, not the wh
   // A loop starting at 0 must be a no-op -- the common case, and the one
   // that would have hidden this bug from a naive smoke test.
   assert.equal(takeOutputStart(base, 9 - 0), 9);
+});
+
+test("scaleClipTiming: the SAME durations that address the buffer scale with it -- fades included", () => {
+  // The bug this pins: Match-to-grid stretches a clip's OWN buffer (via a
+  // ratio) and already scaled clipStart/clipEnd to match, but left
+  // fadeInSec/fadeOutSec untouched. An 8s fade-in on a 20s clip (40% of it),
+  // left unscaled after a 2x speed-up, still reads "8s" -- but the clip is
+  // now only 10s long, so the SAME fade covers 80% of it: at the point it
+  // used to reach full volume, it now plays at exactly half.
+  const source = clip({ id: "a", timelineStart: 0, clipStart: 0, clipEnd: 20, fadeInSec: 8 });
+  const ratio = 2;
+
+  const scaled = scaleClipTiming(source, ratio);
+  assert.equal(scaled.clipStart, 0);
+  assert.equal(scaled.clipEnd, 10);
+  assert.equal(scaled.fadeInSec, 4); // NOT 8 -- this is the fix
+  assert.equal(scaled.fadeOutSec, 0);
+
+  const after = { ...source, ...scaled };
+  const newDuration = clipDuration(after);
+  // 40% through the new (10s) clip is exactly where the fade should finish,
+  // matching the ORIGINAL 8-of-20 = 40% proportion.
+  assert.equal(fadeGain(0.4 * newDuration, newDuration, after), 1);
+
+  // fadeInFrom/fadeInTo are gain levels, not time -- scaleClipTiming returns
+  // only the four time fields, so a caller's own spread is what carries a
+  // split's partial-fade window through unchanged.
+  assert.deepEqual(Object.keys(scaled).sort(), ["clipEnd", "clipStart", "fadeInSec", "fadeOutSec"]);
+});
+
+test("scaleClipsForLock still scales fades after sharing scaleClipTiming", () => {
+  // Regression check for the refactor: scaleClipsForLock used to inline this
+  // same division; it must produce identical numbers now that both callers
+  // share one function.
+  const a = clip({ id: "a", timelineStart: 4, clipStart: 0, clipEnd: 20, fadeInSec: 8, fadeOutSec: 2 });
+  const [scaled] = scaleClipsForLock([a], 2);
+  assert.equal(scaled.timelineStart, 2);
+  assert.equal(scaled.clipStart, 0);
+  assert.equal(scaled.clipEnd, 10);
+  assert.equal(scaled.fadeInSec, 4);
+  assert.equal(scaled.fadeOutSec, 1);
 });

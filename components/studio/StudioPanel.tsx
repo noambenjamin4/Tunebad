@@ -41,6 +41,7 @@ import {
   loopRegionFor,
   sliceClipsToWindow,
   moveClip,
+  scaleClipTiming,
   splitClip,
   timelineDuration,
   trimClipEnd,
@@ -635,10 +636,12 @@ export function StudioPanel() {
       // for exactly the clips that were just matched.
       noteClipInfo(id, { ...info, bpm: Math.round(info.bpm * ratio), bpmAlternate: null });
 
-      // The stretched buffer is 1/ratio as long, so every source-time field
-      // scales with it.
-      const nextClipStart = clip.clipStart / ratio;
-      const nextClipEnd = clip.clipEnd / ratio;
+      // The stretched buffer is 1/ratio as long, so its own time fields --
+      // clipStart/clipEnd AND the fades measured against them -- scale with
+      // it; scaleClipTiming is the same math scaleClipsForLock uses for a
+      // whole-timeline speed lock, applied here to just this one clip.
+      const { clipStart: nextClipStart, clipEnd: nextClipEnd, fadeInSec: nextFadeInSec, fadeOutSec: nextFadeOutSec } =
+        scaleClipTiming(clip, ratio);
 
       // TEMPO ALONE IS HALF A BEATMATCH. The clip now runs at the project's
       // tempo, but its downbeat can still sit anywhere between two grid
@@ -665,6 +668,8 @@ export function StudioPanel() {
                 bufferId: id,
                 clipStart: nextClipStart,
                 clipEnd: nextClipEnd,
+                fadeInSec: nextFadeInSec,
+                fadeOutSec: nextFadeOutSec,
                 timelineStart: nextStart,
                 // Provenance, so a restored session can rebuild this
                 // stretch instead of storing the stretched audio.
