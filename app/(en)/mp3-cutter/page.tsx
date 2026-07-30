@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { TunebadApp } from "@/components/TunebadApp";
 import { languageAlternates } from "@/lib/seo/hreflang";
+import { ToolFaq } from "@/components/files/ToolFaq";
 
 export const metadata: Metadata = {
   title: "MP3 Cutter and Ringtone Maker",
@@ -11,5 +12,24 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <TunebadApp initialView="cutter" />;
+  // The FAQ rides in as a landingSlot: TunebadApp is a client component,
+  // so its body is not in the SSR HTML — a slot passed from this server
+  // page is how crawlable content gets in (same mechanism the homepage
+  // uses for LandingSeo). It renders only while the initial view is
+  // showing, so switching tabs does not leave the wrong tool's FAQ up.
+  return (
+    <TunebadApp
+      initialView="cutter"
+      landingSlot={
+        <ToolFaq
+          faqs={[
+          { q: "toolfaq.cutter.q1", a: "toolfaq.cutter.a1" },
+          { q: "toolfaq.cutter.q2", a: "toolfaq.cutter.a2" },
+          { q: "toolfaq.cutter.q3", a: "toolfaq.cutter.a3" },
+          { q: "toolfaq.cutter.q4", a: "toolfaq.cutter.a4" },
+          ]}
+        />
+      }
+    />
+  );
 }

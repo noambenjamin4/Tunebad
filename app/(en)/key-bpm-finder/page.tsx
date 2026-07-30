@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { TunebadApp } from "@/components/TunebadApp";
+import { ToolFaq } from "@/components/files/ToolFaq";
 
 export const metadata: Metadata = {
   title: "Song Key & BPM Finder",
@@ -15,5 +16,24 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <TunebadApp initialView="analysis" />;
+  // The FAQ rides in as a landingSlot: TunebadApp is a client component,
+  // so its body is not in the SSR HTML — a slot passed from this server
+  // page is how crawlable content gets in (same mechanism the homepage
+  // uses for LandingSeo). It renders only while the initial view is
+  // showing, so switching tabs does not leave the wrong tool's FAQ up.
+  return (
+    <TunebadApp
+      initialView="analysis"
+      landingSlot={
+        <ToolFaq
+          faqs={[
+          { q: "toolfaq.keyBpm.q1", a: "toolfaq.keyBpm.a1" },
+          { q: "toolfaq.keyBpm.q2", a: "toolfaq.keyBpm.a2" },
+          { q: "toolfaq.keyBpm.q3", a: "toolfaq.keyBpm.a3" },
+          { q: "toolfaq.keyBpm.q4", a: "toolfaq.keyBpm.a4" },
+          ]}
+        />
+      }
+    />
+  );
 }

@@ -49,6 +49,8 @@ const STATIC_ENTRIES: ToolEntry[] = [
   { path: "/guides/how-to-make-a-beat-switch", changefreq: "monthly", priority: 0.6 },
   { path: "/tunebad-vs-tunebat", changefreq: "monthly", priority: 0.6 },
   { path: "/tools", changefreq: "weekly", priority: 0.8 },
+  { path: "/guides", changefreq: "monthly", priority: 0.7 },
+  { path: "/extension", changefreq: "monthly", priority: 0.7 },
   { path: "/image-converter", changefreq: "weekly", priority: 0.9 },
   { path: "/compress-image", changefreq: "weekly", priority: 0.9 },
   { path: "/resize-image", changefreq: "weekly", priority: 0.9 },

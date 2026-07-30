@@ -45,6 +45,7 @@ export function Footer() {
         {/* File tools: standalone pages outside the SPA. */}
         <nav className="site-footer-tools" aria-label={t("nav.moreTools")}>
           <Link href={localized("/daw")}>{t("nav.daw")}</Link>
+          <Link href="/extension">Chrome extension</Link>
           <Link href="/tools">{t("nav.moreTools")}</Link>
           <Link href="/image-converter">{t("tools.cardImageConvert")}</Link>
           <Link href="/compress-image">{t("tools.cardImageCompress")}</Link>
@@ -77,6 +78,7 @@ export function Footer() {
           <Link href="/camelot-wheel">Camelot wheel chart</Link>
           <Link href="/songs">Song database</Link>
           <Link href="/tunebad-vs-tunebat">TuneBad vs Tunebat</Link>
+          <Link href="/guides">All guides</Link>
           <Link href="/guides/find-key-and-bpm-of-any-song">Key & BPM guide</Link>
           <Link href="/guides/camelot-wheel-harmonic-mixing">Camelot wheel</Link>
           <Link href="/guides/what-is-lufs-streaming-loudness">What is LUFS</Link>
