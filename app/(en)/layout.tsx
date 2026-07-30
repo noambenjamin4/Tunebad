@@ -1,33 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import { jsonLdString } from "@/lib/seo/jsonld";
-import { Geist, Geist_Mono, Baloo_2 } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import "../globals.css";
 import { SITE_URL, SOCIAL_PROFILES } from "@/lib/site";
+import { fontVariables } from "@/lib/fonts";
+import { sharedRootMetadata, sharedViewport } from "@/lib/seo/base-metadata";
+import { languageAlternates } from "@/lib/seo/hreflang";
 import { ClientErrorReporter } from "@/components/layout/ClientErrorReporter";
-
-const geistSans = Geist({
-  // 900 was loaded but never referenced in any stylesheet — dropping it removes
-  // a font-file download and its render-blocking preload from every page.
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
-  display: "swap",
-  variable: "--font-sans",
-});
-
-const geistMono = Geist_Mono({
-  subsets: ["latin"],
-  weight: ["400", "700"],
-  display: "swap",
-  variable: "--font-mono",
-});
-
-const baloo2 = Baloo_2({
-  subsets: ["latin"],
-  weight: ["600", "700", "800"],
-  display: "swap",
-  variable: "--font-display",
-});
 
 // Brand FIRST on the homepage. Google autocorrects the query "tunebad" to
 // "tunebat" (a far older, higher-authority brand one letter away), and with the
@@ -38,8 +17,7 @@ const TITLE = "TuneBad — Free Key & BPM Finder for Any Song";
 const DESCRIPTION =
   "Find the key, BPM, and loudness of any song for free. Upload a file or paste a YouTube, Spotify, or SoundCloud link and convert it to MP3, WAV, or MP4, all in your browser.";
 export const metadata: Metadata = {
-  metadataBase: new URL(SITE_URL),
-  applicationName: "TuneBad",
+  ...sharedRootMetadata,
   title: {
     default: TITLE,
     template: "%s | TuneBad",
@@ -62,12 +40,14 @@ export const metadata: Metadata = {
     "audio converter",
     "TuneBad",
   ],
-  authors: [{ name: "TuneBad" }],
-  creator: "TuneBad",
-  publisher: "TuneBad",
-  category: "music",
   alternates: {
     canonical: "/",
+    // The homepage is the EN member of the key-bpm-finder hreflang cluster:
+    // /key-bpm-finder canonicalizes to "/" (same TunebadApp, same view), and
+    // hreflang must point at canonicals — so en/x-default are "/" here, the
+    // localized variants hang off /<locale>/key-bpm-finder, and
+    // /key-bpm-finder itself carries no hreflang.
+    languages: { ...languageAlternates("/key-bpm-finder"), en: "/", "x-default": "/" },
   },
   openGraph: {
     title: TITLE,
@@ -77,46 +57,12 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
   },
-  // Card TYPE only, no title/description. Next merges this `twitter` object
-  // wholesale into every child page, so a title here overrode ~50 pages'
-  // correct og:title with the homepage's — X and friends fall back to og:*
-  // when twitter:* is absent, which is exactly the behaviour we want.
-  twitter: {
-    card: "summary_large_image",
-  },
-  icons: {
-    // Adaptive, transparent favicon first: black logo in light mode, white in
-    // dark mode (prefers-color-scheme inside the SVG). PNGs are opaque
-    // fallbacks for the few contexts that don't render SVG favicons.
-    icon: [
-      { url: "/icon.svg", type: "image/svg+xml" },
-      // 48px is the size multiple Google Search wants for result favicons;
-      // app/favicon.ico (48px PNG-in-ICO) covers the /favicon.ico fallback.
-      { url: "/icon-48.png", sizes: "48x48", type: "image/png" },
-      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
-      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
-    ],
-    apple: "/apple-touch-icon.png",
-  },
-  manifest: "/manifest.json",
-  robots: {
-    index: true,
-    follow: true,
-  },
   verification: {
     google: "7Kg7htG_MaFzvf4ji62IMkIpmkHznMug-3XSnAzaIAU",
   },
 };
 
-export const viewport: Viewport = {
-  width: "device-width",
-  initialScale: 1,
-  maximumScale: 5,
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
-  ],
-};
+export const viewport: Viewport = sharedViewport;
 
 // Static structured data (JSON-LD) so Google understands what TuneBad is and can
 // show rich results. Content is a fixed string literal — no user input — so this
@@ -200,7 +146,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: jsonLdString(STRUCTURED_DATA) }}
         />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} ${baloo2.variable}`}>
+      <body className={fontVariables}>
         {/* First tabbable element on every page. The full footer alone holds
             34 links; without this, keyboard and screen-reader users walk the
             whole chrome before reaching any tool (WCAG 2.4.1). */}

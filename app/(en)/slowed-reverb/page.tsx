@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import { TunebadApp } from "@/components/TunebadApp";
+import { languageAlternates } from "@/lib/seo/hreflang";
 
 export const metadata: Metadata = {
   title: "Slowed + Reverb Maker",
   description:
     "Make a slowed and reverb version of any song, or speed it up for a nightcore edit. Set the speed, pitch, and reverb, then export it free in your browser.",
-  alternates: { canonical: "/slowed-reverb" },
+  alternates: { canonical: "/slowed-reverb", languages: languageAlternates("/slowed-reverb") },
   openGraph: { images: [{ url: "/og/slowed-reverb.png", width: 1200, height: 630 }] },
 };
 

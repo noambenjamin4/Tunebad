@@ -2,6 +2,8 @@ import { groupSongsByArtist } from "@/lib/server/artists";
 import { ALL_KEYS, keyToSlug } from "@/lib/audio/harmonic";
 import { ACTIVITIES } from "@/lib/server/activities";
 import { HUB_PAGE_SIZE } from "@/components/songs/HubPagination";
+import { LOCALE_CODES } from "@/lib/i18n/codes";
+import { isLocalizedPath } from "@/lib/seo/hreflang";
 import { SITE_URL, SONGS_CAP, SONGS_PER_SHARD, urlsetXml, xmlResponse } from "@/lib/server/sitemap";
 import { readSongFacets, readSongSlugRange } from "@/lib/server/link-analysis";
 
@@ -87,8 +89,23 @@ export async function GET(_req: Request, { params }: { params: Promise<{ shard: 
     // and a lastmod that is always the render time is worse than none (the
     // same rule the song shard documents below) — Google learns the signal
     // lies and discounts it for the whole site.
+    // Routes with localized variants also list /<locale><path> for the 7
+    // non-EN locales — discovery only; the hreflang cluster itself is
+    // page-level <link> tags (a valid standalone mechanism per Google).
+    const expanded = STATIC_ENTRIES.flatMap((e) =>
+      isLocalizedPath(e.path)
+        ? [
+            e,
+            ...LOCALE_CODES.filter((c) => c !== "en").map((c) => ({
+              ...e,
+              path: `/${c}${e.path}`,
+              priority: 0.7,
+            })),
+          ]
+        : [e],
+    );
     const xml = urlsetXml(
-      STATIC_ENTRIES.map((e) => ({
+      expanded.map((e) => ({
         loc: `${SITE_URL}${e.path}`,
         changefreq: e.changefreq,
         priority: e.priority,

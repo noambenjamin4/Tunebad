@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import { TunebadApp } from "@/components/TunebadApp";
+import { languageAlternates } from "@/lib/seo/hreflang";
 
 export const metadata: Metadata = {
   title: "YouTube & Spotify to MP3 Converter",
   description:
     "Turn YouTube, Spotify, SoundCloud, TikTok, Instagram, and X links into MP3, WAV, or MP4 files with cover art and title tags. Free, no sign-up, no ads.",
-  alternates: { canonical: "/converter" },
+  alternates: { canonical: "/converter", languages: languageAlternates("/converter") },
   openGraph: { images: [{ url: "/og/converter.png", width: 1200, height: 630 }] },
 };
 

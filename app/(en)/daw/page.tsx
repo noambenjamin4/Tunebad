@@ -6,6 +6,7 @@ import { StudioClient } from "@/components/studio/StudioClient";
 import { DawSeo } from "@/components/studio/DawSeo";
 import { SITE_URL } from "@/lib/site";
 import { jsonLdString, softwareAppJsonLd } from "@/lib/seo/jsonld";
+import { languageAlternates } from "@/lib/seo/hreflang";
 
 const DESCRIPTION =
   "Put up to 12 songs on one timeline, see the waveforms, drag them to overlap for a beat switch, cut and split, add live slowed + reverb and phone effects, then export as MP3 or WAV. Free, in your browser, nothing uploaded.";
@@ -23,7 +24,7 @@ export const metadata: Metadata = {
     "browser music editor",
     "overlap songs online",
   ],
-  alternates: { canonical: "/daw" },
+  alternates: { canonical: "/daw", languages: languageAlternates("/daw") },
   openGraph: { images: [{ url: "/og/daw.png", width: 1200, height: 630 }] },
 };
 

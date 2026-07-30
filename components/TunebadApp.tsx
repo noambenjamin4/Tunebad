@@ -5,6 +5,9 @@ import type { AnalysisResult, HistoryEntry } from "@/types/analysis";
 import { clampBpm } from "@/lib/format";
 import { useHistory } from "@/hooks/useHistory";
 import { I18nProvider, useI18n } from "@/lib/i18n";
+import { LocaleBoundaryContext } from "@/lib/i18n/LocaleBoundary";
+import { isLocalizedPath } from "@/lib/seo/hreflang";
+import type { DictKey } from "@/lib/i18n/locales/en";
 import { TopBar } from "./layout/TopBar";
 import { Footer } from "./layout/Footer";
 import { AnalyzerPanel } from "./analysis/AnalyzerPanel";
@@ -60,6 +63,18 @@ function viewForPath(pathname: string): ViewName | null {
   return match ?? null;
 }
 
+// Localized tab titles reuse the meta.*.title keys the localized routes'
+// generateMetadata already uses — one source, so a tab switch on /fr/... and
+// a real load of the same URL agree. Views WITHOUT an entry are not
+// localized routes (their tab switch writes the unprefixed path) and keep
+// the English VIEW_TO_TITLE.
+const VIEW_TO_TITLE_KEY: Partial<Record<ViewName, DictKey>> = {
+  analysis: "meta.keyBpm.title",
+  converter: "meta.converter.title",
+  remix: "meta.slowedReverb.title",
+  cutter: "meta.mp3Cutter.title",
+};
+
 interface TunebadContextValue {
   view: ViewName;
   showView(view: ViewName): void;
@@ -106,27 +121,45 @@ export function TunebadApp({
   const [pendingTarget, setPendingTarget] = useState<ViewName | null>(null);
   const { items: history, rememberResult, clearHistory } = useHistory();
 
+  // On a /fr/... route the URL owns the locale (the [locale] layout mounts
+  // this context); tab switches must keep the prefix for views that HAVE a
+  // localized route and deliberately DROP it for views that don't (a
+  // prefixed /fr/history would 404 on refresh).
+  const boundary = useContext(LocaleBoundaryContext);
+
   useEffect(() => {
-    // Sync the view from the real path first (e.g. /converter), then fall back to
-    // legacy #hash links so old bookmarks still work.
-    const byPath = viewForPath(window.location.pathname);
+    // Sync the view from the real path first (e.g. /converter or
+    // /fr/converter), then fall back to legacy #hash links so old bookmarks
+    // still work.
+    const raw = window.location.pathname;
+    const prefix = boundary ? `/${boundary.locale}` : "";
+    const stripped = prefix && raw.startsWith(`${prefix}/`) ? raw.slice(prefix.length) : raw;
+    const byPath = viewForPath(stripped);
     if (byPath) {
       setView(byPath);
       return;
     }
     const initial = window.location.hash.replace("#", "");
     if (VIEW_NAMES.includes(initial as ViewName)) setView(initial as ViewName);
+    // Runs once; boundary is layout-stable for the life of the page.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
 
-  const showView = useCallback((next: ViewName) => {
-    setView(next);
-    window.history.replaceState(null, "", VIEW_TO_PATH[next]);
-    document.title = VIEW_TO_TITLE[next];
-    // Jump, don't glide: a smooth scroll animates for ~400ms on every tab
-    // switch, which reads as the whole switch being slow.
-    window.scrollTo({ top: 0, behavior: "auto" });
-  }, []);
+  const showView = useCallback(
+    (next: ViewName) => {
+      setView(next);
+      const path = VIEW_TO_PATH[next];
+      const localized = boundary && isLocalizedPath(path) ? `/${boundary.locale}${path}` : path;
+      window.history.replaceState(null, "", localized);
+      const titleKey = boundary ? VIEW_TO_TITLE_KEY[next] : undefined;
+      document.title = titleKey && boundary ? `${boundary.dict[titleKey]} | TuneBad` : VIEW_TO_TITLE[next];
+      // Jump, don't glide: a smooth scroll animates for ~400ms on every tab
+      // switch, which reads as the whole switch being slow.
+      window.scrollTo({ top: 0, behavior: "auto" });
+    },
+    [boundary],
+  );
 
   const setDelayBpmInput = useCallback((value: string) => {
     setDelayBpm(value);

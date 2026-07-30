@@ -4,6 +4,7 @@ import Link from "next/link";
 import { VIEW_TO_PATH, type ViewName } from "../TunebadApp";
 import { useI18n } from "@/lib/i18n";
 import type { DictKey } from "@/lib/i18n/locales/en";
+import { useLocalizedPath } from "@/lib/i18n/LocaleBoundary";
 
 // Crawlable links to every indexable tool page, labeled with the existing
 // nav.* keys (already translated in all 8 locales). /history is noindex, so
@@ -21,6 +22,7 @@ const TOOL_LINKS: { page: ViewName; labelKey: DictKey }[] = [
 
 export function Footer() {
   const { t } = useI18n();
+  const localized = useLocalizedPath();
 
   return (
     <footer className="site-footer">
@@ -35,14 +37,14 @@ export function Footer() {
         <p className="site-footer-tagline">{t("footer.tagline")}</p>
         <nav className="site-footer-tools" aria-label="Tools">
           {TOOL_LINKS.map((tool) => (
-            <a key={tool.page} href={VIEW_TO_PATH[tool.page]}>
+            <a key={tool.page} href={localized(VIEW_TO_PATH[tool.page])}>
               {t(tool.labelKey)}
             </a>
           ))}
         </nav>
         {/* File tools: standalone pages outside the SPA. */}
         <nav className="site-footer-tools" aria-label={t("nav.moreTools")}>
-          <Link href="/daw">{t("nav.daw")}</Link>
+          <Link href={localized("/daw")}>{t("nav.daw")}</Link>
           <Link href="/tools">{t("nav.moreTools")}</Link>
           <Link href="/image-converter">{t("tools.cardImageConvert")}</Link>
           <Link href="/compress-image">{t("tools.cardImageCompress")}</Link>

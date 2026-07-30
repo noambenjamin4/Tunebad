@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { useTunebad, VIEW_TO_PATH, type ViewName } from "../TunebadApp";
 import { useI18n } from "@/lib/i18n";
 import type { DictKey } from "@/lib/i18n/locales/en";
+import { useLocalizedPath } from "@/lib/i18n/LocaleBoundary";
 
 // Nav items in display order. Most are SPA views; a few are standalone pages
 // that live outside TunebadApp and so navigate for real.
@@ -38,6 +39,7 @@ export function NavTabs({ onNavigate }: { onNavigate?: () => void }) {
   const { view, showView } = useTunebad();
   const { t } = useI18n();
   const pathname = usePathname();
+  const localized = useLocalizedPath();
 
   return (
     <>
@@ -49,7 +51,7 @@ export function NavTabs({ onNavigate }: { onNavigate?: () => void }) {
             <a
               key={item.href}
               className={`ghost-button${active ? " active" : ""}`}
-              href={item.href}
+              href={localized(item.href)}
               aria-current={active ? "page" : undefined}
               onClick={() => onNavigate?.()}
             >
@@ -64,7 +66,7 @@ export function NavTabs({ onNavigate }: { onNavigate?: () => void }) {
           <a
             key={item.page}
             className={`ghost-button${active ? " active" : ""}`}
-            href={VIEW_TO_PATH[item.page]}
+            href={localized(VIEW_TO_PATH[item.page])}
             aria-current={active ? "page" : undefined}
             onClick={(event) => {
               if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;

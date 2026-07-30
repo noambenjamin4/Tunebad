@@ -2,9 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import { LOCALES, useI18n, type LocaleCode } from "@/lib/i18n";
+import { isLocalizedPath, localizedHref } from "@/lib/seo/hreflang";
 
 export function LanguageMenu({ variant }: { variant: "desktop" | "mobile" }) {
-  const { locale, setLocale } = useI18n();
+  const { locale, setLocale, fixedLocale } = useI18n();
   const [open, setOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
   const current = LOCALES.find((option) => option.code === locale) ?? LOCALES[0];
@@ -26,6 +27,20 @@ export function LanguageMenu({ variant }: { variant: "desktop" | "mobile" }) {
   }, [variant, open]);
 
   const selectLocale = (code: LocaleCode) => {
+    // On a localized route the locale IS the URL, so picking a language
+    // NAVIGATES to the sibling URL (a full load — the two locale trees have
+    // different root layouts, so an in-place swap cannot serve the right
+    // document). setLocale first persists the preference, so wherever the
+    // user goes next agrees with what they just picked.
+    if (fixedLocale) {
+      setLocale(code);
+      setOpen(false);
+      const base = window.location.pathname.replace(new RegExp(`^/${fixedLocale}(?=/)`), "");
+      if (isLocalizedPath(base)) {
+        window.location.assign(localizedHref(base, code));
+        return;
+      }
+    }
     setLocale(code);
     setOpen(false);
   };
