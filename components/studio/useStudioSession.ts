@@ -110,13 +110,22 @@ export function useStudioSession(options: SessionOptions): void {
         }
         for (const clip of saved.clips) {
           if (cancelled) return;
-          if (!clip.sourceBufferId || !clip.tempoRatio || bufferMap.has(clip.bufferId)) continue;
+          if (
+            !clip.sourceBufferId ||
+            (!clip.tempoRatio && !clip.pitchSemitones) ||
+            bufferMap.has(clip.bufferId)
+          )
+            continue;
           const origin = bufferMap.get(clip.sourceBufferId);
           if (!origin) continue;
+          // One pass, whatever combination the clip accumulated live — the
+          // buffer lands under clip.bufferId, so nested live ids never need
+          // to match the one-pass spelling.
           const stretched = await getStretchedBuffer(
             clip.sourceBufferId,
             origin,
-            clip.tempoRatio,
+            clip.tempoRatio ?? 1,
+            clip.pitchSemitones ?? 0,
           );
           bufferMap.set(clip.bufferId, stretched);
         }

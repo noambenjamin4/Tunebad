@@ -68,6 +68,51 @@ export function slugToKey(slug: string): string | null {
   return match ?? null;
 }
 
+// The Camelot wheel IS the circle of fifths, which is what makes transposition
+// arithmetic on it trivial: one semitone up = seven fifths up = seven steps
+// clockwise. (Check: C Major is 8B, C# Major is 3B; 8 + 7 = 15 wraps to 3.)
+const WHEEL_STEPS_PER_SEMITONE = 7;
+
+/** "8B" transposed +1 semitone -> "3B". Unknown codes return null. */
+export function transposeCode(code: string, semitones: number): CamelotCode | null {
+  const p = parse(code);
+  if (!p) return null;
+  // Normalise first: -1 % 12 is -1 in JS, wrap() expects small overshoots.
+  const steps = ((semitones % 12) + 12) % 12;
+  return `${wrap(p.n + steps * WHEEL_STEPS_PER_SEMITONE)}${p.letter}`;
+}
+
+const NOTE_ORDER = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+
+/** "A Minor" transposed +3 -> "C Minor". Unknown keys return null. */
+export function transposeKey(key: string, semitones: number): string | null {
+  const m = /^([A-G]#?) (Major|Minor)$/.exec(key.trim());
+  if (!m) return null;
+  const idx = NOTE_ORDER.indexOf(m[1]);
+  if (idx < 0) return null;
+  const next = NOTE_ORDER[(((idx + semitones) % 12) + 12) % 12];
+  return `${next} ${m[2]}`;
+}
+
+/**
+ * The smallest pitch shift, in semitones, that makes `here` mix with `there`
+ * on the wheel — 0 when they already mix, positive preferred over negative on
+ * a tie (a slight lift reads better than a drop), null when nothing within
+ * ±6 fits or a code is unknown. Pure wheel arithmetic: no shift is "found"
+ * by trying what a re-analysis would say, so the suggestion can't disagree
+ * with the transposition that acts on it.
+ */
+export function semitonesToFit(here: string, there: string): number | null {
+  if (!parse(here) || !parse(there)) return null;
+  for (let d = 0; d <= 6; d++) {
+    for (const s of d === 0 ? [0] : [d, -d]) {
+      const shifted = transposeCode(here, s);
+      if (shifted && keysMix(shifted, there)) return s;
+    }
+  }
+  return null;
+}
+
 /** Plain-language label for how a neighbor relates to the source key. */
 export function relationLabel(fromCode: string, toCode: string): string {
   const a = parse(fromCode);

@@ -67,6 +67,10 @@ export interface StudioClip {
    */
   sourceBufferId?: string;
   tempoRatio?: number;
+  /** Accumulated per-clip pitch shift, in semitones. Same provenance rule as
+   *  tempoRatio: restore re-runs ONE timeStretch(source, tempoRatio,
+   *  pitchSemitones) instead of storing the shifted audio. */
+  pitchSemitones?: number;
 }
 
 /* ------------------------------ fade shape ------------------------------ */

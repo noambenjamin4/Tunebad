@@ -45,7 +45,8 @@ import {
   takeOutputStart,
   shiftEvents,
 } from "../lib/audio/remix";
-import { keysMix } from "../lib/audio/harmonic";
+import { keysMix, semitonesToFit, transposeCode, transposeKey } from "../lib/audio/harmonic";
+import { camelot as camelotMap } from "../lib/audio/constants";
 import { withGaplessHeader } from "../lib/audio/mp3-tag";
 import {
   type BeatGrid,
@@ -836,6 +837,71 @@ test("keysMix accepts the DJ neighbour set and nothing else", () => {
   for (const [a, b] of [["8A", "9A"], ["8A", "2B"], ["12B", "1B"], ["3A", "6B"]]) {
     assert.equal(keysMix(a, b), keysMix(b, a), `${a}/${b} disagreed on order`);
   }
+});
+
+test("transposition IS wheel arithmetic: +1 semitone = +7 Camelot steps", () => {
+  // C Major is 8B, C# Major is 3B: 8 + 7 wraps to 3. The wheel is the circle
+  // of fifths, which is what makes the pitch-shift math a one-liner.
+  assert.equal(transposeCode("8B", 1), "3B");
+  assert.equal(transposeKey("C Major", 1), "C# Major");
+  // Down a semitone: C -> B (8B -> 1B).
+  assert.equal(transposeCode("8B", -1), "1B");
+  assert.equal(transposeKey("C Major", -1), "B Major");
+  // A full octave lands home, in both spellings.
+  assert.equal(transposeCode("11A", 12), "11A");
+  assert.equal(transposeKey("F# Minor", 12), "F# Minor");
+  assert.equal(transposeKey("A Minor", -12), "A Minor");
+  // Note-name wraparound.
+  assert.equal(transposeKey("B Major", 1), "C Major");
+  assert.equal(transposeKey("A Minor", 3), "C Minor");
+  // The two spellings must AGREE — the readout shows the key, the harmony
+  // check uses the code, and they travel together on every shift.
+  for (const [key, code] of Object.entries(camelotMap)) {
+    for (const s of [-5, -1, 1, 2, 7]) {
+      const shiftedKey = transposeKey(key, s)!;
+      assert.equal(
+        transposeCode(code, s),
+        camelotMap[shiftedKey],
+        `${key} (${code}) shifted ${s}: key says ${shiftedKey} -> ${camelotMap[shiftedKey]}, code says ${transposeCode(code, s)}`,
+      );
+    }
+  }
+  // Garbage stays garbage, never a guess.
+  assert.equal(transposeCode("nope", 1), null);
+  assert.equal(transposeKey("H Sharp", 1), null);
+});
+
+test("semitonesToFit finds the SMALLEST shift that lands in the mix set", () => {
+  // Already compatible -> 0, no pointless shift.
+  assert.equal(semitonesToFit("8A", "9A"), 0);
+  assert.equal(semitonesToFit("8A", "8B"), 0);
+  // 8A vs 10A is the classic two-steps clash. +2 wheel steps needs 2*7=14≡2
+  // semitones... but ±1 semitone moves ±7 steps: 8A+1st=3A (no), 8A-1st=1A
+  // (no). +2st = 10A — exact landing, so 2 is the answer.
+  assert.equal(semitonesToFit("8A", "10A"), 2);
+  // Symmetric clash the other way prefers the negative twin when smaller.
+  assert.equal(semitonesToFit("10A", "8A"), -2);
+  // The suggestion must actually WORK when applied — the whole point of
+  // doing it with the same arithmetic the shift uses.
+  for (const [here, there] of [["8A", "10A"], ["5B", "9B"], ["1A", "6A"]]) {
+    const d = semitonesToFit(here, there);
+    assert.ok(d !== null, `${here}->${there} should have a fit`);
+    assert.ok(keysMix(transposeCode(here, d!)!, there), `${here} shifted ${d} should mix with ${there}`);
+  }
+  // Unknown codes refuse rather than invent.
+  assert.equal(semitonesToFit("", "8A"), null);
+});
+
+test("stretch ids: zero semitones keeps the historical spelling saved sessions hold", () => {
+  // clip.bufferId in sessions saved before pitch shift existed looks like
+  // "file@0.80" — the exact string this must keep producing, or restore
+  // orphans every beatmatched clip in the wild.
+  assert.equal(stretchedIdFor("file", 0.8), "file@0.80");
+  assert.equal(stretchedIdFor("file", 0.8, 0), "file@0.80");
+  // The pitched variant is a distinct key, and nesting composes like tempo
+  // nesting always has.
+  assert.equal(stretchedIdFor("file", 1, 2), "file@1.00s2");
+  assert.equal(stretchedIdFor(stretchedIdFor("file", 1.2), 1, -3), "file@1.20@1.00s-3");
 });
 
 test("an unknown key is never reported as a fit", () => {

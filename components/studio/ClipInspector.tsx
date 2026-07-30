@@ -7,7 +7,7 @@
 import { useI18n } from "@/lib/i18n";
 import type { BeatGrid, ClipAnalysis } from "@/lib/studio/beat-grid";
 import { needsTempoMatch, tempoMatchRatio } from "@/lib/studio/beat-grid";
-import { keysMix } from "@/lib/audio/harmonic";
+import { keysMix, semitonesToFit } from "@/lib/audio/harmonic";
 import type { FadeCurve, StudioClip } from "@/lib/studio/timeline";
 import type { EffectId } from "@/lib/audio/remix";
 
@@ -35,6 +35,7 @@ export function ClipInspector({
   onToggleMute,
   onToggleSolo,
   onMatchTempo,
+  onShiftPitch,
   onCrossfade,
   canCrossfade,
   onSplit,
@@ -57,6 +58,8 @@ export function ClipInspector({
   onToggleMute: () => void;
   onToggleSolo: () => void;
   onMatchTempo: () => void;
+  /** Shift this clip's pitch by a semitone delta (accumulates on the clip). */
+  onShiftPitch: (delta: number) => void;
   onCrossfade: () => void;
   /** False when nothing overlaps — the action is hidden, not disabled. */
   canCrossfade: boolean;
@@ -76,6 +79,11 @@ export function ClipInspector({
   const here = info?.camelot ?? "";
   const there = partnerInfo?.camelot ?? "";
   const harmony = here && there ? { fits: keysMix(here, there), here, there } : null;
+  // The one-click fix for a clash: the smallest transposition that lands this
+  // clip in the partner's compatible set. Pure wheel arithmetic, so the
+  // suggestion and the shift it triggers cannot disagree.
+  const fitDelta = harmony && !harmony.fits ? semitonesToFit(here, there) : null;
+  const pitch = clip.pitchSemitones ?? 0;
 
   return (
     <div className="studio-inspector">
@@ -183,6 +191,42 @@ export function ClipInspector({
             ? t("studio.keysFit", { a: harmony.here, b: harmony.there })
             : t("studio.keysClash", { a: harmony.here, b: harmony.there })}
         </span>
+      )}
+      {/* Pitch steppers appear once a key is known (there is nothing harmonic
+          to shift toward before that). ±1 accumulates on the clip; the total
+          reads next to the steppers. */}
+      {info?.key && (
+        <span className="studio-field studio-pitch">
+          {t("studio.pitchShift")}
+          <button
+            className="text-button num"
+            type="button"
+            disabled={working || pitch <= -12}
+            onClick={() => onShiftPitch(-1)}
+          >
+            −1
+          </button>
+          <span className="num">{pitch >= 0 ? "+" : ""}{pitch} st</span>
+          <button
+            className="text-button num"
+            type="button"
+            disabled={working || pitch >= 12}
+            onClick={() => onShiftPitch(1)}
+          >
+            +1
+          </button>
+        </span>
+      )}
+      {fitDelta != null && fitDelta !== 0 && Math.abs(fitDelta) <= 3 && (
+        <button
+          className="text-button"
+          type="button"
+          disabled={working}
+          onClick={() => onShiftPitch(fitDelta)}
+          title={t("studio.pitchMatchHint")}
+        >
+          {t("studio.pitchMatch", { delta: `${fitDelta > 0 ? "+" : ""}${fitDelta}` })}
+        </button>
       )}
       {/* Disabled-with-reason instead of hidden: a control that vanishes reads
           as a bug ("where did Crossfade go?"), one that is greyed with a title

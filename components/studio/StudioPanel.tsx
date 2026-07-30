@@ -60,6 +60,7 @@ import {
 } from "@/lib/studio/buffer-store";
 import { makeClipId, reserveClipIds } from "@/lib/studio/clip-ids";
 import { DEMO_OVERLAP_SECONDS, makeDemoFiles } from "@/lib/studio/demo";
+import { transposeCode, transposeKey } from "@/lib/audio/harmonic";
 import { displayKey, getDisplaySignal } from "@/lib/studio/display-signal";
 import { StudioEngine } from "@/lib/studio/engine";
 import {
@@ -723,6 +724,71 @@ export function StudioPanel() {
     }
   }, [selectedId, grid, clipInfo, noteClipInfo, pushUndo, requestReschedule, t]);
 
+  /**
+   * Per-clip pitch shift — the harmonic half of Match to grid. Same
+   * mechanics: stretch the clip's CURRENT buffer (tempo 1, delta semitones),
+   * register the result under a nested id, repoint the clip, accumulate the
+   * total in provenance. Duration is untouched (tempo ratio 1), so no timing
+   * field moves — the round-54 scaling law only applies to rate changes.
+   * Restore rebuilds with ONE timeStretch(source, tempoRatio, pitchSemitones),
+   * landing the buffer under clip.bufferId, so the nested live id never needs
+   * to match the one-pass spelling (same convention repeated Match uses).
+   */
+  const handleShiftPitch = useCallback(
+    async (delta: number) => {
+      const clip = clipsRef.current.find((c) => c.id === selectedId);
+      if (!clip || delta === 0) return;
+      const current = clip.pitchSemitones ?? 0;
+      const next = Math.max(-12, Math.min(12, current + delta));
+      if (next === current) return;
+      const applied = next - current;
+      const source = bufferMap.get(clip.bufferId);
+      if (!source) return;
+
+      setWorking(true);
+      setStage("rendering");
+      try {
+        const shifted = await getStretchedBuffer(clip.bufferId, source, 1, applied);
+        const id = stretchedIdFor(clip.bufferId, 1, applied);
+        bufferMap.set(id, shifted);
+        // The key moves WITH the audio: transpose the readout by the applied
+        // delta so the harmony hint keeps telling the truth. BPM untouched —
+        // pitch at tempo 1 does not move the beat.
+        const info = clipInfo.get(clip.bufferId);
+        if (info) {
+          noteClipInfo(id, {
+            ...info,
+            key: transposeKey(info.key, applied) ?? info.key,
+            camelot: transposeCode(info.camelot, applied) ?? info.camelot,
+          });
+        }
+        pushUndo();
+        setClips((prev) =>
+          prev.map((c) =>
+            c.id === clip.id
+              ? {
+                  ...c,
+                  bufferId: id,
+                  sourceBufferId: c.sourceBufferId ?? c.bufferId,
+                  pitchSemitones: next,
+                }
+              : c,
+          ),
+        );
+        setStatus(t("studio.pitched", { delta: `${next >= 0 ? "+" : ""}${next}` }));
+        setStatusIsError(false);
+        requestReschedule("now");
+      } catch {
+        setStatus(t("studio.matchFailed"));
+        setStatusIsError(true);
+      } finally {
+        setStage(null);
+        setWorking(false);
+      }
+    },
+    [selectedId, clipInfo, noteClipInfo, pushUndo, requestReschedule, t],
+  );
+
   const handleToggleSolo = useCallback(() => {
     if (!selectedId) return;
     editClip(selectedId, (c) => ({ ...c, soloed: !c.soloed }));
@@ -1324,6 +1390,7 @@ export function StudioPanel() {
               onToggleMute={handleToggleMute}
               onToggleSolo={handleToggleSolo}
               onMatchTempo={() => void handleMatchTempo()}
+              onShiftPitch={(delta) => void handleShiftPitch(delta)}
               onCrossfade={handleCrossfade}
               canCrossfade={crossfadeOverlap(clips, selectedClip.id) !== null}
               onSplit={handleSplitSelected}

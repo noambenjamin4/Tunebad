@@ -18,9 +18,12 @@
 import { timeStretch } from "@/lib/audio/remix";
 import { type StudioClip, scaleClipTiming } from "./timeline";
 
-/** Stretch cache key. Speed is quantised so slider jitter can't thrash it. */
-export function stretchedIdFor(bufferId: string, speed: number): string {
-  return `${bufferId}@${speed.toFixed(2)}`;
+/** Stretch cache key. Speed is quantised so slider jitter can't thrash it.
+ *  Zero semitones keeps the EXACT historical format — saved sessions hold
+ *  these ids in clip.bufferId, so changing the spelling would orphan them. */
+export function stretchedIdFor(bufferId: string, speed: number, semitones = 0): string {
+  const base = `${bufferId}@${speed.toFixed(2)}`;
+  return semitones === 0 ? base : `${base}s${semitones}`;
 }
 
 /**
@@ -62,13 +65,14 @@ function touch(key: string, buffer: AudioBuffer): void {
   }
 }
 
-/** Cached pre-stretch. `speed` only — pitch shifting stays out of the DAW. */
+/** Cached pre-stretch and/or pitch shift, in one SoundTouch pass. */
 export function getStretchedBuffer(
   bufferId: string,
   buffer: AudioBuffer,
   speed: number,
+  semitones = 0,
 ): Promise<AudioBuffer> {
-  const key = stretchedIdFor(bufferId, speed);
+  const key = stretchedIdFor(bufferId, speed, semitones);
   const hit = cache.get(key);
   if (hit) {
     touch(key, hit);
@@ -77,7 +81,7 @@ export function getStretchedBuffer(
   const inFlight = pending.get(key);
   if (inFlight) return inFlight;
 
-  const job = timeStretch(buffer, speed, 0)
+  const job = timeStretch(buffer, speed, semitones)
     .then((stretched) => {
       touch(key, stretched);
       pending.delete(key);
