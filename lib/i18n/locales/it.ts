@@ -964,6 +964,7 @@ const it: Record<keyof typeof en, string> = {
   "studio.recordStop": "Ferma registrazione",
   "studio.keysHint": "Spazio riproduci · ↑↓ scegli clip · ←→ sposta · S dividi · D duplica · L loop · ⌫ elimina · Home/Fine · ⌘Z annulla · pizzica per zoom",
   "studio.clipGain": "Volume clip",
+  "studio.gainEnvelope": "Inviluppo di volume — clicca sulla linea per aggiungere un punto, trascina un punto per spostarlo, doppio clic per eliminarlo",
   "studio.fadeIn": "Dissolvenza in entrata (s)",
   "studio.fadeOut": "Dissolvenza in uscita (s)",
   "studio.split": "Dividi al cursore",

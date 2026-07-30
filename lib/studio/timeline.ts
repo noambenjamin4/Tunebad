@@ -71,6 +71,95 @@ export interface StudioClip {
    *  tempoRatio: restore re-runs ONE timeStretch(source, tempoRatio,
    *  pitchSemitones) instead of storing the shifted audio. */
   pitchSemitones?: number;
+  /**
+   * Volume automation inside the clip — ducking under a vocal, riding a
+   * transition up, a hard accent. Absent or empty means "flat at clip.gain",
+   * exactly today's behavior.
+   *
+   * Deliberately stored in BUFFER-absolute seconds (the same coordinate
+   * clipStart/clipEnd already use), NOT clip-local time the way
+   * fadeInSec/fadeOutSec are. A fade means "the shape at whatever edge is
+   * CURRENTLY playing" — local=0 is defined as that edge, so a fixed
+   * duration measured from it is automatically still right after a trim
+   * moves the edge. A gain point means "duck right here, in the music" — it
+   * has to track the SAME audio content through a trim, which is exactly
+   * what an absolute buffer coordinate does for free: trimClipStart/
+   * trimClipEnd/moveClip need to touch nothing (same reasoning that already
+   * cleared them for fades), while a buffer RESCALE (scaleClipTiming) and a
+   * structural cut (splitClip, sliceClipsToWindow) need the same windowing
+   * treatment fades get, because those genuinely change what the coordinate
+   * means or slice the timeline the points live on.
+   */
+  gainPoints?: GainPoint[];
+}
+
+export interface GainPoint {
+  /** Buffer-absolute seconds — the same clock clipStart/clipEnd use. */
+  at: number;
+  /** Absolute linear gain at this point, same range as StudioClip.gain (0..1.5). */
+  gain: number;
+}
+
+/**
+ * The gain envelope's value at a buffer-absolute time, piecewise-linear
+ * between points and held flat past either end. `fallback` (clip.gain) is
+ * what an empty/absent envelope means — the one call this function makes
+ * safe to leave unguarded at every use site.
+ *
+ * One function for the same reason fadeGain is one function: the scheduler
+ * samples it to build automation points and any future waveform overlay
+ * would sample it to draw the line — two copies of this arithmetic is
+ * exactly how a fade and its picture went out of sync once already.
+ */
+export function gainEnvelopeAt(at: number, points: GainPoint[] | undefined, fallback: number): number {
+  if (!points || points.length === 0) return fallback;
+  const sorted = [...points].sort((a, b) => a.at - b.at);
+  const first = sorted[0];
+  const last = sorted[sorted.length - 1];
+  // Strict "<", not "<=": two points sharing one `at` is a deliberate hard
+  // cut (a gate closing instantly rather than ramping), and the LATER of
+  // the pair should win — the same convention Web Audio itself uses for two
+  // automation events at one instant. An "<=" here would return the FIRST
+  // of a tied pair and silently undo the cut. Falling through to the loop
+  // below reaches the span===0 branch, which returns `b.gain` — the second
+  // (later) of the tie.
+  if (at < first.at) return first.gain;
+  if (at >= last.at) return last.gain;
+  for (let i = 0; i < sorted.length - 1; i++) {
+    const a = sorted[i];
+    const b = sorted[i + 1];
+    if (at >= a.at && at <= b.at) {
+      const span = b.at - a.at;
+      return span > 0 ? a.gain + (b.gain - a.gain) * ((at - a.at) / span) : b.gain;
+    }
+  }
+  return fallback; // unreachable given the bounds above; keeps this total
+}
+
+/**
+ * Window a gain envelope into [from, to] (both buffer-absolute), preserving
+ * the value the FULL original envelope had at both cut edges. Same law as
+ * the fade windowing splitClip/sliceClipsToWindow already do: slicing must
+ * not change what the kept portion sounds like, so a cut that lands between
+ * two points gets a synthesized boundary point holding the interpolated
+ * value, not a jump to whatever point happens to survive the filter.
+ *
+ * Returns undefined when there is nothing to window — the caller can then
+ * leave the field unset rather than storing an empty array.
+ */
+export function windowGainPoints(
+  points: GainPoint[] | undefined,
+  from: number,
+  to: number,
+  fallback: number,
+): GainPoint[] | undefined {
+  if (!points || points.length === 0) return undefined;
+  const kept = points.filter((p) => p.at >= from && p.at <= to);
+  const startValue = gainEnvelopeAt(from, points, fallback);
+  const endValue = gainEnvelopeAt(to, points, fallback);
+  if (kept.length === 0 || kept[0].at > from) kept.unshift({ at: from, gain: startValue });
+  if (kept[kept.length - 1].at < to) kept.push({ at: to, gain: endValue });
+  return kept;
 }
 
 /* ------------------------------ fade shape ------------------------------ */
@@ -104,12 +193,17 @@ const EQUAL_POWER_STEPS = 12;
 export function scaleClipTiming(
   clip: StudioClip,
   ratio: number,
-): Pick<StudioClip, "clipStart" | "clipEnd" | "fadeInSec" | "fadeOutSec"> {
+): Pick<StudioClip, "clipStart" | "clipEnd" | "fadeInSec" | "fadeOutSec" | "gainPoints"> {
   return {
     clipStart: clip.clipStart / ratio,
     clipEnd: clip.clipEnd / ratio,
     fadeInSec: clip.fadeInSec / ratio,
     fadeOutSec: clip.fadeOutSec / ratio,
+    // Buffer-absolute like clipStart/clipEnd, so it scales the same way the
+    // stretch moves them — a point authored at a specific drum hit has to
+    // land on that same hit in the now-longer-or-shorter buffer. `gain`
+    // (a level, not a time) is untouched, exactly like fadeInFrom/fadeInTo.
+    gainPoints: clip.gainPoints?.map((p) => ({ at: p.at / ratio, gain: p.gain })),
   };
 }
 
@@ -332,11 +426,19 @@ export function computeClipSchedule(
     const curve = clip.fadeCurve ?? "linear";
     const points: FadePoint[] = [];
     const toWall = (t: number) => (t - position) / speed;
-    if (fadeIn > 0 || fadeOut > 0) {
+    // Buffer-absolute (clip.gainPoints' own coordinate) for a given
+    // TIMELINE-absolute t: local time since the clip started is (t -
+    // clip.timelineStart), and clipStart is where that local clock reads on
+    // the buffer — same arithmetic offsetInBuffer above uses.
+    const toBuffer = (t: number) => clip.clipStart + (t - clip.timelineStart);
+    const hasGainEnvelope = Boolean(clip.gainPoints && clip.gainPoints.length > 0);
+    if (fadeIn > 0 || fadeOut > 0 || hasGainEnvelope) {
       const startT = clip.timelineStart + intoClip;
       // Sample the envelope at every corner, plus intermediate steps along a
       // curved ramp since the consumers only interpolate straight lines. A
-      // linear ramp needs its two ends and nothing between them.
+      // linear ramp needs its two ends and nothing between them. Gain-point
+      // corners need no subdivision — the envelope between them IS a
+      // straight line, so the points themselves are already the corners.
       const times = new Set<number>([startT, end]);
       const addRamp = (from: number, to: number) => {
         const steps = curve === "equalPower" ? EQUAL_POWER_STEPS : 1;
@@ -344,19 +446,25 @@ export function computeClipSchedule(
       };
       if (fadeIn > 0) addRamp(clip.timelineStart, clip.timelineStart + fadeIn);
       if (fadeOut > 0) addRamp(end - fadeOut, end);
+      if (hasGainEnvelope) {
+        for (const p of clip.gainPoints!) {
+          // Buffer-absolute -> timeline-absolute is the inverse of toBuffer.
+          times.add(clip.timelineStart + (p.at - clip.clipStart));
+        }
+      }
       for (const t of [...times].sort((a, b) => a - b)) {
         // A seek can land mid-fade, so anything before the resume point is
         // not scheduled — the first point emitted carries its gain instead.
         if (t < startT || t > end) continue;
-        points.push({
-          at: toWall(t),
-          gain:
-            fadeGain(t - clip.timelineStart, duration, {
-              ...clip,
-              fadeInSec: fadeIn,
-              fadeOutSec: fadeOut,
-            }) * clip.gain,
+        const fade = fadeGain(t - clip.timelineStart, duration, {
+          ...clip,
+          fadeInSec: fadeIn,
+          fadeOutSec: fadeOut,
         });
+        const envelope = hasGainEnvelope
+          ? gainEnvelopeAt(toBuffer(t), clip.gainPoints, clip.gain)
+          : clip.gain;
+        points.push({ at: toWall(t), gain: fade * envelope });
       }
     }
 
@@ -457,6 +565,12 @@ export function sliceClipsToWindow(
       sliced.fadeOutFrom = lerp(to, from, (tailCut + keptOut) / fadeOut);
       sliced.fadeOutTo = lerp(to, from, tailCut / fadeOut);
     }
+
+    // Gain points are already buffer-absolute (nextStart/nextEnd ARE that
+    // coordinate), so this is a window-and-synthesize-boundaries op with no
+    // rebasing step at all — the same continuity law as the fades above,
+    // simpler because the storage choice already did half the work.
+    sliced.gainPoints = windowGainPoints(clip.gainPoints, nextStart, nextEnd, clip.gain);
 
     out.push(sliced);
   }
@@ -722,5 +836,15 @@ export function splitClip(
     right.fadeOutFrom = atCut;
     right.fadeOutTo = to;
   }
+
+  // Gain points are buffer-absolute, so the cut is just "everything on
+  // either side of cutInBuffer" — no rebasing, since both halves keep
+  // reading the SAME coordinate their clipStart/clipEnd already live in.
+  // windowGainPoints still has to synthesize a boundary value at the cut,
+  // the same continuity law as the fades above: a cut landing between two
+  // points must not jump to whichever one the filter happens to keep.
+  left.gainPoints = windowGainPoints(clip.gainPoints, clip.clipStart, cutInBuffer, clip.gain);
+  right.gainPoints = windowGainPoints(clip.gainPoints, cutInBuffer, clip.clipEnd, clip.gain);
+
   return [left, right];
 }

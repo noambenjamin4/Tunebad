@@ -962,6 +962,7 @@ const ja: Record<keyof typeof en, string> = {
   "studio.recordStop": "記録を停止",
   "studio.keysHint": "スペース 再生 · ↑↓ クリップ選択 · ←→ 微調整 · S 分割 · D 複製 · L ループ · ⌫ 削除 · Home/End · ⌘Z 元に戻す · ピンチで拡大",
   "studio.clipGain": "クリップ音量",
+  "studio.gainEnvelope": "ゲインエンベロープ — 線をクリックしてポイントを追加、ドラッグで移動、ダブルクリックで削除",
   "studio.fadeIn": "フェードイン（秒）",
   "studio.fadeOut": "フェードアウト（秒）",
   "studio.split": "再生位置で分割",

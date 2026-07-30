@@ -20,6 +20,7 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import { useI18n } from "@/lib/i18n";
 import { formatTime, formatTimeTenths } from "@/lib/format";
 import {
+  type GainPoint,
   type StudioClip,
   adjacentClipId,
   assignDisplayRows,
@@ -48,6 +49,7 @@ import type { EffectId } from "@/lib/audio/remix";
 import { type DisplaySignal, displayKey } from "@/lib/studio/display-signal";
 import { type BeatGrid, beatTimesInRange, nearestGridTime } from "@/lib/studio/beat-grid";
 import { ClipCanvas } from "./ClipCanvas";
+import { GainEnvelopeOverlay } from "./GainEnvelopeOverlay";
 import { useThemeSignal } from "./useThemeSignal";
 
 const CLIP_PAD = 6;
@@ -74,6 +76,8 @@ export function Timeline({
   onMoveClip,
   onTrimStart,
   onTrimEnd,
+  onGainEnvelopeBeginEdit,
+  onGainEnvelopeChange,
   onSeek,
   onTogglePlay,
   onDeleteSelected,
@@ -100,6 +104,10 @@ export function Timeline({
   onMoveClip: (id: string, timelineStart: number) => void;
   onTrimStart: (id: string, newClipStart: number) => void;
   onTrimEnd: (id: string, newClipEnd: number) => void;
+  /** Push one undo entry before a gain-envelope add/drag/delete starts. */
+  onGainEnvelopeBeginEdit: () => void;
+  /** Full replacement gain-point list for one clip (empty clears it). */
+  onGainEnvelopeChange: (id: string, points: GainPoint[]) => void;
   onSeek: (seconds: number) => void;
   onTogglePlay: () => void;
   onDeleteSelected: () => void;
@@ -791,6 +799,23 @@ export function Timeline({
                   />
                 ) : (
                   <span className="studio-clip-pending" aria-hidden="true" />
+                )}
+                {visible && (
+                  <GainEnvelopeOverlay
+                    label={t("studio.gainEnvelope")}
+                    clipStart={clip.clipStart}
+                    clipEnd={clip.clipEnd}
+                    fromSec={visible.fromSec}
+                    toSec={visible.toSec}
+                    gain={clip.gain}
+                    points={clip.gainPoints}
+                    widthPx={visible.widthPx}
+                    heightPx={WAVE_HEIGHT}
+                    offsetPx={visible.offsetPx}
+                    disabled={disabled}
+                    onBeginEdit={onGainEnvelopeBeginEdit}
+                    onChange={(points) => onGainEnvelopeChange(clip.id, points)}
+                  />
                 )}
                 {dragLabel !== null && dragRef.current?.kind === "move" && clip.id === dragRef.current.clipId && (
                   <span className="studio-clip-time num">{dragLabel}</span>

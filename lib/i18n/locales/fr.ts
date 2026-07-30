@@ -971,6 +971,7 @@ const fr: Record<keyof typeof en, string> = {
   "studio.recordStop": "Arrêter l'enregistrement",
   "studio.keysHint": "Espace lecture · ↑↓ choisir un clip · ←→ déplacer · S diviser · D dupliquer · L boucle · ⌫ supprimer · Début/Fin · ⌘Z annuler · pincer pour zoomer",
   "studio.clipGain": "Volume du clip",
+  "studio.gainEnvelope": "Enveloppe de volume — cliquez sur la ligne pour ajouter un point, glissez un point pour le déplacer, double-cliquez pour le supprimer",
   "studio.fadeIn": "Fondu d'entrée (s)",
   "studio.fadeOut": "Fondu de sortie (s)",
   "studio.split": "Couper au curseur",

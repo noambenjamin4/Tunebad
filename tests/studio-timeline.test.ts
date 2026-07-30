@@ -25,6 +25,8 @@ import {
   withFadeIn,
   withFadeOut,
   scaleClipTiming,
+  gainEnvelopeAt,
+  windowGainPoints,
   MAX_TIMELINE_SECONDS,
 } from "../lib/studio/timeline";
 import {
@@ -1480,9 +1482,197 @@ test("scaleClipTiming: the SAME durations that address the buffer scale with it 
   assert.equal(fadeGain(0.4 * newDuration, newDuration, after), 1);
 
   // fadeInFrom/fadeInTo are gain levels, not time -- scaleClipTiming returns
-  // only the four time fields, so a caller's own spread is what carries a
-  // split's partial-fade window through unchanged.
-  assert.deepEqual(Object.keys(scaled).sort(), ["clipEnd", "clipStart", "fadeInSec", "fadeOutSec"]);
+  // only the time fields (gainPoints' own `at` is a time too, so it belongs
+  // here alongside them), so a caller's own spread is what carries a split's
+  // partial-fade window through unchanged.
+  assert.deepEqual(
+    Object.keys(scaled).sort(),
+    ["clipEnd", "clipStart", "fadeInSec", "fadeOutSec", "gainPoints"],
+  );
+  // No envelope on this clip -- scaling must not invent one.
+  assert.equal(scaled.gainPoints, undefined);
+});
+
+test("scaleClipTiming scales gain-point TIMES, never their gain LEVELS", () => {
+  // gainPoints are buffer-absolute, same coordinate as clipStart/clipEnd, so
+  // a point authored at a specific drum hit must land on that same hit after
+  // the buffer is stretched -- exactly the law that already governs
+  // clipStart/clipEnd/fadeInSec here. `gain` is a level, not a time, and
+  // must be untouched, exactly like fadeInFrom/fadeInTo.
+  const source = clip({
+    id: "a",
+    clipStart: 0,
+    clipEnd: 20,
+    gainPoints: [{ at: 4, gain: 0.3 }, { at: 16, gain: 1.2 }],
+  });
+  const scaled = scaleClipTiming(source, 2);
+  assert.deepEqual(scaled.gainPoints, [{ at: 2, gain: 0.3 }, { at: 8, gain: 1.2 }]);
+});
+
+test("gainEnvelopeAt: flat before the first point, flat after the last, linear between", () => {
+  const points = [{ at: 2, gain: 0.2 }, { at: 6, gain: 1.0 }, { at: 8, gain: 0.5 }];
+  // Before the first point and after the last: held flat at that point's
+  // own value, not at the clip's base gain -- once an envelope exists it is
+  // the sole authority over its own domain.
+  assert.equal(gainEnvelopeAt(0, points, 1), 0.2);
+  assert.equal(gainEnvelopeAt(2, points, 1), 0.2);
+  assert.equal(gainEnvelopeAt(9, points, 1), 0.5);
+  // Midpoint of a straight segment. Float division doesn't land on an exact
+  // binary fraction here, so this is a tolerance check like the rest of the
+  // suite's fade-curve assertions, not a strict equality.
+  assert.ok(Math.abs(gainEnvelopeAt(4, points, 1) - 0.6) < 1e-9); // halfway from 0.2 to 1.0
+  assert.ok(Math.abs(gainEnvelopeAt(7, points, 1) - 0.75) < 1e-9); // halfway from 1.0 to 0.5
+  // No points at all -- and no points argument -- both fall back to the
+  // clip's flat gain, i.e. today's behavior, exactly.
+  assert.equal(gainEnvelopeAt(4, [], 0.7), 0.7);
+  assert.equal(gainEnvelopeAt(4, undefined, 0.7), 0.7);
+});
+
+test("gainEnvelopeAt: two points at the same instant is a real, deliberate hard cut", () => {
+  // A ducking gate wants an instant drop, not a ramp -- two points sharing
+  // one `at` is how that is expressed, and it must not divide by zero.
+  const points = [{ at: 5, gain: 1.0 }, { at: 5, gain: 0.1 }];
+  assert.equal(gainEnvelopeAt(5, points, 1), 0.1);
+});
+
+test("windowGainPoints synthesizes a CONTINUOUS boundary value, not a jump to the nearest surviving point", () => {
+  // Same law as splitClip's fade windowing: a cut landing between two
+  // points must read the interpolated value the FULL envelope had there,
+  // not whichever point the [from,to] filter happens to keep. Asserted by
+  // BEHAVIOR (what gainEnvelopeAt reports) rather than an exact point list:
+  // windowGainPoints is free to carry a harmless redundant boundary point
+  // (one that already equals what hold-flat would report anyway) as long as
+  // no query inside the window disagrees with the original.
+  const points = [{ at: 2, gain: 0.5 }, { at: 8, gain: 1.0 }];
+  const windowed = windowGainPoints(points, 0, 5, 1);
+  for (const t of [0, 1, 2, 3, 4, 5]) {
+    assert.ok(
+      Math.abs(gainEnvelopeAt(t, windowed, 1) - gainEnvelopeAt(t, points, 1)) < 1e-9,
+      `windowed envelope disagreed with the original at t=${t}`,
+    );
+  }
+  // The cut at 5 sits mid-ramp in the FULL envelope (0.5+(1-0.5)*(5-2)/(8-2)
+  // = 0.75) -- the one value that MUST be synthesized, since nothing in the
+  // filtered [0,5] range would produce it on its own.
+  assert.ok(Math.abs(gainEnvelopeAt(5, windowed, 1) - 0.75) < 1e-9);
+
+  // Window entirely past the last point: held at the last point's value
+  // throughout, matching what the original envelope also does out there.
+  const held = windowGainPoints(points, 9, 12, 1);
+  for (const t of [9, 10, 12]) {
+    assert.equal(gainEnvelopeAt(t, held, 1), gainEnvelopeAt(t, points, 1));
+  }
+
+  // Nothing to window -- undefined/empty stays undefined, not an empty array
+  // (so a clip with no envelope after slicing still reads as "no envelope").
+  assert.equal(windowGainPoints(undefined, 0, 5, 1), undefined);
+  assert.equal(windowGainPoints([], 0, 5, 1), undefined);
+});
+
+test("splitClip windows the gain envelope with NO rebasing, because it is already buffer-absolute", () => {
+  // Cut a 10s clip (buffer [0,10]) at timeline position 6, so cutInBuffer=6.
+  // A point at buffer=8 sits on the RIGHT half; the envelope value at the
+  // cut (buffer=6) must be identical on both sides of the split, and every
+  // point EITHER half reports inside its own range must match what the
+  // ORIGINAL, unsplit clip would have said there.
+  const source = clip({ id: "a", timelineStart: 0, clipStart: 0, clipEnd: 10, gainPoints: [{ at: 8, gain: 0.4 }] });
+  const [left, right] = splitClip(source, 6, () => "b")!;
+  for (const t of [0, 2, 4, 6]) {
+    assert.equal(
+      gainEnvelopeAt(t, left.gainPoints, 1),
+      gainEnvelopeAt(t, source.gainPoints, 1),
+      `left half disagreed with the original at buffer=${t}`,
+    );
+  }
+  for (const t of [6, 7, 8, 9, 10]) {
+    assert.equal(
+      gainEnvelopeAt(t, right.gainPoints, 1),
+      gainEnvelopeAt(t, source.gainPoints, 1),
+      `right half disagreed with the original at buffer=${t}`,
+    );
+  }
+  // The cut itself must read IDENTICALLY on both sides — a split is not
+  // supposed to be audible.
+  assert.equal(gainEnvelopeAt(6, left.gainPoints, 1), gainEnvelopeAt(6, right.gainPoints, 1));
+  // Right keeps its real point untouched -- buffer-absolute storage means
+  // splitting never has to rebase a surviving point's own coordinate.
+  assert.equal(gainEnvelopeAt(8, right.gainPoints, 1), 0.4);
+
+  // A clip with no envelope splits into two clips with no envelope --
+  // splitting must never INVENT automation.
+  const plain = clip({ id: "p", timelineStart: 0, clipStart: 0, clipEnd: 10 });
+  const [plainLeft, plainRight] = splitClip(plain, 4, () => "q")!;
+  assert.equal(plainLeft.gainPoints, undefined);
+  assert.equal(plainRight.gainPoints, undefined);
+});
+
+test("sliceClipsToWindow windows the gain envelope the same continuity law as fades, no rebasing", () => {
+  // A 20s clip (buffer [0,20]) with a ramp from 2 to 18; slice the window
+  // [5,15] of the TIMELINE (clip starts at timeline 0, so this cuts buffer
+  // [5,15] straight through -- headCut=5, tailCut=5).
+  const source = clip({
+    id: "a",
+    timelineStart: 0,
+    clipStart: 0,
+    clipEnd: 20,
+    gainPoints: [{ at: 2, gain: 0.2 }, { at: 18, gain: 1.0 }],
+  });
+  const [sliced] = sliceClipsToWindow([source], 5, 15);
+  const expectStart = gainEnvelopeAt(5, source.gainPoints, 1); // 0.2+(1-0.2)*(5-2)/(18-2)
+  const expectEnd = gainEnvelopeAt(15, source.gainPoints, 1);
+  assert.deepEqual(sliced.gainPoints, [
+    { at: 5, gain: expectStart },
+    { at: 15, gain: expectEnd },
+  ]);
+  assert.ok(expectStart > 0.2 && expectStart < 1, "boundary value must be a real interpolation, not a held edge");
+
+  // No envelope on the source -- the sliced clip must not have one either.
+  const [plainSliced] = sliceClipsToWindow(
+    [clip({ id: "p", timelineStart: 0, clipStart: 0, clipEnd: 20 })],
+    5,
+    15,
+  );
+  assert.equal(plainSliced.gainPoints, undefined);
+});
+
+test("computeClipSchedule multiplies the fade envelope BY the gain envelope, sampled at every corner either needs", () => {
+  // A clip with NO fade but a gain ramp must still schedule fadePoints --
+  // the envelope alone is enough to need automation, the same way a fade
+  // alone is.
+  const rampOnly = clip({
+    id: "a",
+    timelineStart: 0,
+    clipStart: 0,
+    clipEnd: 10,
+    gainPoints: [{ at: 2, gain: 0.25 }, { at: 8, gain: 1.0 }],
+  });
+  const [scheduled] = computeClipSchedule([rampOnly], 0, 1);
+  assert.ok(scheduled.fadePoints.length > 0, "a gain ramp alone must produce automation points");
+  // The two envelope corners must be sampled AT the envelope's own gain --
+  // no fade is active, so fadeGain contributes exactly 1 throughout.
+  const at2 = scheduled.fadePoints.find((p) => Math.abs(p.at - 2) < 1e-9);
+  const at8 = scheduled.fadePoints.find((p) => Math.abs(p.at - 8) < 1e-9);
+  assert.equal(at2?.gain, 0.25);
+  assert.equal(at8?.gain, 1.0);
+
+  // Combine WITH a fade-in: at the moment the fade-in finishes (t=2, full
+  // fade gain 1) the envelope is still ramping (0.25 at that same instant on
+  // a 0->4 ramp reaching 1.0 by t=4, so at t=2 the envelope reads 0.625) --
+  // the scheduled gain at that corner must be the PRODUCT, not just the fade.
+  const both = clip({
+    id: "b",
+    timelineStart: 0,
+    clipStart: 0,
+    clipEnd: 10,
+    fadeInSec: 2,
+    gainPoints: [{ at: 0, gain: 0.25 }, { at: 4, gain: 1.0 }],
+  });
+  const [bothScheduled] = computeClipSchedule([both], 0, 1);
+  const atFadeEnd = bothScheduled.fadePoints.find((p) => Math.abs(p.at - 2) < 1e-9);
+  // fadeGain(2, 10, {fadeInSec:2,...}) = 1 (fade-in complete); envelope at
+  // buffer=2 (clipStart 0 + local 2) on the 0.25->1.0/0->4 ramp = 0.625.
+  assert.ok(atFadeEnd, "the fade-in's own end corner must still be sampled");
+  assert.equal(atFadeEnd?.gain, 0.625);
 });
 
 test("scaleClipsForLock still scales fades after sharing scaleClipTiming", () => {

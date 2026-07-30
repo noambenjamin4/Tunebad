@@ -964,6 +964,7 @@ const pt: Record<keyof typeof en, string> = {
   "studio.recordStop": "Parar gravação",
   "studio.keysHint": "Espaço tocar · ↑↓ escolher clipe · ←→ mover · S dividir · D duplicar · L loop · ⌫ apagar · Home/End · ⌘Z desfazer · pinçar para zoom",
   "studio.clipGain": "Volume do clipe",
+  "studio.gainEnvelope": "Envelope de volume — clique na linha para adicionar um ponto, arraste um ponto para movê-lo, clique duas vezes para excluí-lo",
   "studio.fadeIn": "Fade in (s)",
   "studio.fadeOut": "Fade out (s)",
   "studio.split": "Dividir no cursor",

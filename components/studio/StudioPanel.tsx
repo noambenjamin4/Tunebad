@@ -31,6 +31,7 @@ import {
   NEUTRAL_REVERB_EQ,
 } from "@/lib/audio/remix";
 import {
+  type GainPoint,
   type StudioClip,
   MAX_CLIPS,
   MAX_DECODED_BYTES,
@@ -668,8 +669,13 @@ export function StudioPanel() {
       // clipStart/clipEnd AND the fades measured against them -- scale with
       // it; scaleClipTiming is the same math scaleClipsForLock uses for a
       // whole-timeline speed lock, applied here to just this one clip.
-      const { clipStart: nextClipStart, clipEnd: nextClipEnd, fadeInSec: nextFadeInSec, fadeOutSec: nextFadeOutSec } =
-        scaleClipTiming(clip, ratio);
+      const {
+        clipStart: nextClipStart,
+        clipEnd: nextClipEnd,
+        fadeInSec: nextFadeInSec,
+        fadeOutSec: nextFadeOutSec,
+        gainPoints: nextGainPoints,
+      } = scaleClipTiming(clip, ratio);
 
       // TEMPO ALONE IS HALF A BEATMATCH. The clip now runs at the project's
       // tempo, but its downbeat can still sit anywhere between two grid
@@ -703,6 +709,7 @@ export function StudioPanel() {
                 clipEnd: nextClipEnd,
                 fadeInSec: nextFadeInSec,
                 fadeOutSec: nextFadeOutSec,
+                gainPoints: nextGainPoints,
                 timelineStart: nextStart,
                 // Provenance, so a restored session can rebuild this
                 // stretch instead of storing the stretched audio.
@@ -1239,6 +1246,13 @@ export function StudioPanel() {
             }
             onTrimEnd={(id, v) =>
               editClip(id, (c) => trimClipEnd(c, v, bufferDurationOf(c)), { reschedule: "defer" })
+            }
+            onGainEnvelopeBeginEdit={pushUndo}
+            onGainEnvelopeChange={(id, points: GainPoint[]) =>
+              editClip(id, (c) => ({ ...c, gainPoints: points.length ? points : undefined }), {
+                undoable: false,
+                reschedule: "defer",
+              })
             }
             onSeek={handleSeek}
             onTogglePlay={togglePlay}

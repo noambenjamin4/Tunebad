@@ -1013,6 +1013,7 @@ const en = {
   "studio.recordStop": "Stop recording",
   "studio.keysHint": "Space play · ↑↓ pick a clip · ←→ nudge · S split · D duplicate · L loop · ⌫ delete · Home/End · ⌘Z undo · pinch to zoom",
   "studio.clipGain": "Clip volume",
+  "studio.gainEnvelope": "Gain envelope — click the line to add a point, drag a point to move it, double-click to delete",
   "studio.fadeIn": "Fade in (s)",
   "studio.fadeOut": "Fade out (s)",
   "studio.split": "Split at playhead",

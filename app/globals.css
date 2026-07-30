@@ -4719,6 +4719,29 @@ tbody tr:last-child td {
   position: absolute;
   top: 18px;
 }
+.studio-clip-envelope {
+  display: block;
+  pointer-events: none;
+  overflow: visible;
+  /* Same viewport-slice positioning as .studio-clip-canvas, so the two
+     layers stay pixel-aligned (see components/studio/GainEnvelopeOverlay.tsx). */
+  position: absolute;
+  top: 18px;
+}
+.studio-clip-envelope-line {
+  stroke: var(--ink);
+  stroke-width: 1.5;
+  opacity: 0.55;
+}
+.studio-clip-envelope-dot {
+  fill: var(--surface);
+  stroke: var(--ink);
+  stroke-width: 1.5;
+}
+.studio-clip.muted .studio-clip-envelope-line,
+.studio-clip.muted .studio-clip-envelope-dot {
+  opacity: 0.3;
+}
 .studio-clip-grip {
   position: absolute;
   top: 0; bottom: 0;
