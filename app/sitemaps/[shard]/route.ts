@@ -1,7 +1,7 @@
-import { readAllSongs } from "@/lib/server/link-analysis";
 import { groupSongsByArtist } from "@/lib/server/artists";
 import { ALL_KEYS, keyToSlug } from "@/lib/audio/harmonic";
 import { ACTIVITIES } from "@/lib/server/activities";
+import { HUB_PAGE_SIZE } from "@/components/songs/HubPagination";
 import { SITE_URL, SONGS_CAP, SONGS_PER_SHARD, urlsetXml, xmlResponse } from "@/lib/server/sitemap";
 import { readSongFacets, readSongSlugRange } from "@/lib/server/link-analysis";
 
@@ -73,6 +73,7 @@ const STATIC_ENTRIES: ToolEntry[] = [
   { path: "/audio-joiner", changefreq: "weekly", priority: 0.9 },
   { path: "/daw", changefreq: "weekly", priority: 0.9 },
   { path: "/songs", changefreq: "daily", priority: 0.7 },
+  { path: "/history", changefreq: "weekly", priority: 0.3 },
   { path: "/privacy", changefreq: "yearly", priority: 0.3 },
   { path: "/copyright", changefreq: "yearly", priority: 0.3 },
 ];
@@ -82,10 +83,13 @@ export async function GET(_req: Request, { params }: { params: Promise<{ shard: 
   const now = new Date().toISOString();
 
   if (shard === "static") {
+    // No lastmod on purpose: these pages have no tracked modification date,
+    // and a lastmod that is always the render time is worse than none (the
+    // same rule the song shard documents below) — Google learns the signal
+    // lies and discounts it for the whole site.
     const xml = urlsetXml(
       STATIC_ENTRIES.map((e) => ({
         loc: `${SITE_URL}${e.path}`,
-        lastmod: now,
         changefreq: e.changefreq,
         priority: e.priority,
       })),
@@ -150,12 +154,28 @@ export async function GET(_req: Request, { params }: { params: Promise<{ shard: 
       }
     }
 
-    const keyUrls = ALL_KEYS.filter((k) => (keyCounts.get(k) ?? 0) > 0).map((k) => ({
-      loc: `${SITE_URL}/songs/key/${keyToSlug(k)}`,
-      lastmod: now,
-      changefreq: "weekly",
-      priority: 0.6,
-    }));
+    // Hub URLs carry no lastmod — same honesty rule as the static shard: an
+    // always-"now" lastmod teaches Google to ignore the field site-wide.
+    // Paginated pages (/page/2..N) are emitted alongside page 1: they were in
+    // NO shard at all before, so the crawl surface they exist to provide
+    // (numbered access deep into the catalog) was invisible to the crawler.
+    const hubPages = (count: number, base: string, priority: number) => {
+      const totalPages = Math.max(1, Math.ceil(count / HUB_PAGE_SIZE));
+      return Array.from({ length: totalPages - 1 }, (_, i) => ({
+        loc: `${base}/page/${i + 2}`,
+        changefreq: "weekly",
+        priority,
+      }));
+    };
+
+    const keyUrls = ALL_KEYS.filter((k) => (keyCounts.get(k) ?? 0) > 0).flatMap((k) => [
+      {
+        loc: `${SITE_URL}/songs/key/${keyToSlug(k)}`,
+        changefreq: "weekly",
+        priority: 0.6,
+      },
+      ...hubPages(keyCounts.get(k) ?? 0, `${SITE_URL}/songs/key/${keyToSlug(k)}`, 0.4),
+    ]);
 
     // 1A..12A, 1B..12B — same code list the /camelot-wheel table and the
     // /songs/camelot/[code] page's generateStaticParams use.
@@ -165,18 +185,19 @@ export async function GET(_req: Request, { params }: { params: Promise<{ shard: 
     ];
     const camelotUrls = allCamelotCodes
       .filter((c) => (camelotCounts.get(c) ?? 0) > 0)
-      .map((c) => ({
-        loc: `${SITE_URL}/songs/camelot/${c.toLowerCase()}`,
-        lastmod: now,
-        changefreq: "weekly",
-        priority: 0.6,
-      }));
+      .flatMap((c) => [
+        {
+          loc: `${SITE_URL}/songs/camelot/${c.toLowerCase()}`,
+          changefreq: "weekly",
+          priority: 0.6,
+        },
+        ...hubPages(camelotCounts.get(c) ?? 0, `${SITE_URL}/songs/camelot/${c.toLowerCase()}`, 0.4),
+      ]);
 
     const bpmUrls = [...bpmCounts.entries()]
       .filter(([bpm, count]) => bpm >= 40 && bpm <= 220 && count >= 3)
       .map(([bpm]) => ({
         loc: `${SITE_URL}/songs/bpm/${bpm}`,
-        lastmod: now,
         changefreq: "weekly",
         priority: 0.55,
       }));
@@ -188,7 +209,6 @@ export async function GET(_req: Request, { params }: { params: Promise<{ shard: 
       (a) => songs.filter((s) => s.bpm != null && s.bpm >= a.min && s.bpm <= a.max).length >= 3,
     ).map((a) => ({
       loc: `${SITE_URL}/songs/bpm-for/${a.slug}`,
-      lastmod: now,
       changefreq: "monthly",
       priority: 0.5,
     }));
@@ -199,7 +219,6 @@ export async function GET(_req: Request, { params }: { params: Promise<{ shard: 
       .filter((a) => a.songs.length >= 2)
       .map((a) => ({
         loc: `${SITE_URL}/artist/${a.slug}`,
-        lastmod: now,
         changefreq: "weekly",
         priority: 0.5,
       }));

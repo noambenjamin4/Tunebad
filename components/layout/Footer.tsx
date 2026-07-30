@@ -42,6 +42,7 @@ export function Footer() {
         </nav>
         {/* File tools: standalone pages outside the SPA. */}
         <nav className="site-footer-tools" aria-label={t("nav.moreTools")}>
+          <Link href="/daw">{t("nav.daw")}</Link>
           <Link href="/tools">{t("nav.moreTools")}</Link>
           <Link href="/image-converter">{t("tools.cardImageConvert")}</Link>
           <Link href="/compress-image">{t("tools.cardImageCompress")}</Link>
@@ -79,6 +80,7 @@ export function Footer() {
           <Link href="/guides/what-is-lufs-streaming-loudness">What is LUFS</Link>
           <Link href="/guides/how-to-make-slowed-and-reverb">Slowed + reverb guide</Link>
           <Link href="/guides/how-to-make-a-ringtone">Ringtone guide</Link>
+          <Link href="/guides/how-to-make-a-beat-switch">Beat switch guide</Link>
         </nav>
         <p className="site-footer-copyright">{t("footer.copyright")}</p>
         <p className="site-footer-legal">
