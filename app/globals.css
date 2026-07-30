@@ -4867,6 +4867,69 @@ tbody tr:last-child td {
 .studio-eq-body .text-button {
   align-self: flex-end;
 }
+/* Solo parallel to the muted treatment: outline, not opacity — a soloed clip
+   is the LOUD one, dimming it would read backwards. */
+.studio-clip.soloed {
+  outline: 2px solid var(--ink);
+  outline-offset: -2px;
+}
+.studio-demo-button {
+  align-self: flex-start;
+}
+/* Shortcut sheet */
+.studio-keys-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: color-mix(in srgb, var(--ink) 24%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.studio-keys-card {
+  background: var(--display, var(--fill, #fff));
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  padding: 24px;
+  max-width: 380px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.studio-keys-card h3 {
+  margin: 0;
+  font-size: 16px;
+}
+.studio-keys-list {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.studio-keys-row {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+.studio-keys-row dt {
+  min-width: 110px;
+}
+.studio-keys-row dd {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+.studio-keys-row kbd {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
 .studio-inspector-name {
   font-size: 13px;
   font-weight: 600;

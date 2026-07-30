@@ -731,6 +731,7 @@ export function Timeline({
                   "studio-clip",
                   clip.id === selectedId ? "selected" : "",
                   clip.muted ? "muted" : "",
+                  clip.soloed ? "soloed" : "",
                   `studio-clip-shade-${clip.colorIndex % 3}`,
                 ]
                   .filter(Boolean)

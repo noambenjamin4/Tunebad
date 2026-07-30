@@ -184,28 +184,30 @@ export function ClipInspector({
             : t("studio.keysClash", { a: harmony.here, b: harmony.there })}
         </span>
       )}
-      {offGrid && (
+      {/* Disabled-with-reason instead of hidden: a control that vanishes reads
+          as a bug ("where did Crossfade go?"), one that is greyed with a title
+          teaches what makes it available. Match only renders once a grid
+          exists at all — before that the concept has nothing to refer to. */}
+      {grid && (
         <button
           className="text-button"
           type="button"
-          disabled={working}
+          disabled={working || !offGrid}
           onClick={onMatchTempo}
-          title={t("studio.matchHint")}
+          title={offGrid ? t("studio.matchHint") : t("studio.matchOnGrid")}
         >
           {t("studio.match")}
         </button>
       )}
-      {canCrossfade && (
-        <button
-          className="text-button"
-          type="button"
-          disabled={working}
-          onClick={onCrossfade}
-          title={t("studio.crossfadeHint")}
-        >
-          {t("studio.crossfade")}
-        </button>
-      )}
+      <button
+        className="text-button"
+        type="button"
+        disabled={working || !canCrossfade}
+        onClick={onCrossfade}
+        title={canCrossfade ? t("studio.crossfadeHint") : t("studio.crossfadeNeedsOverlap")}
+      >
+        {t("studio.crossfade")}
+      </button>
       <button
         className={`text-button${clip.soloed ? " active" : ""}`}
         type="button"

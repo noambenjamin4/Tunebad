@@ -59,6 +59,7 @@ import {
   releaseUnreachable,
 } from "@/lib/studio/buffer-store";
 import { makeClipId, reserveClipIds } from "@/lib/studio/clip-ids";
+import { DEMO_OVERLAP_SECONDS, makeDemoFiles } from "@/lib/studio/demo";
 import { displayKey, getDisplaySignal } from "@/lib/studio/display-signal";
 import { StudioEngine } from "@/lib/studio/engine";
 import {
@@ -566,6 +567,28 @@ export function StudioPanel() {
     bufferMap.get(clip.bufferId)?.duration ?? clip.clipEnd;
 
   /**
+   * One-click demo: two synthesized loops at different tempos, the second
+   * overlapping the first with a crossfade — a beat switch, assembled through
+   * the SAME ingest path a dropped file takes. The arrangement runs in a
+   * functional setClips because addFiles' own setClips calls are still
+   * pending when it resolves (see its closing comment) — `prev` is the only
+   * view guaranteed to contain the new clips.
+   */
+  const handleDemo = useCallback(async () => {
+    const files = await makeDemoFiles();
+    await addFiles(files);
+    setClips((prev) => {
+      if (prev.length < 2) return prev;
+      const a = prev[prev.length - 2];
+      const b = prev[prev.length - 1];
+      const overlapStart = Math.max(0, a.timelineStart + (a.clipEnd - a.clipStart) - DEMO_OVERLAP_SECONDS);
+      const moved = prev.map((c) => (c.id === b.id ? moveClip(c, overlapStart) : c));
+      return crossfadeOverlap(moved, b.id) ?? moved;
+    });
+    requestReschedule("defer");
+  }, [addFiles, requestReschedule]);
+
+  /**
    * Free whatever the session can no longer reach — decoded audio in memory,
    * source files in storage.
    *
@@ -754,6 +777,69 @@ export function StudioPanel() {
     const limit = timelineDuration(clipsRef.current);
     applyLoop(grid ? expandToBars(region, grid, limit) : region);
   }, [loop, selectedId, applyLoop, grid]);
+
+  /* ----------------------- global transport keys ----------------------- */
+
+  const [keysOpen, setKeysOpen] = useState(false);
+
+  // Space/S/D/L/Delete work anywhere in the studio, not only while the
+  // timeline div holds focus. This is the fix for the single most common
+  // DAW-feel complaint: touch any slider or pill and Space went dead,
+  // because the only Space handler lived on the focused track element.
+  // The timeline's own handler still runs first for keys that need its
+  // selection context (arrows, Home/End) — anything it preventDefaults is
+  // skipped here via event.defaultPrevented.
+  useEffect(() => {
+    const isTyping = (el: HTMLElement | null): boolean =>
+      Boolean(
+        el &&
+          (el.isContentEditable ||
+            el.tagName === "TEXTAREA" ||
+            el.tagName === "SELECT" ||
+            (el.tagName === "INPUT" &&
+              !/^(range|checkbox|radio|button)$/.test((el as HTMLInputElement).type))),
+      );
+    const onKey = (event: KeyboardEvent) => {
+      if (event.defaultPrevented) return;
+      if (event.metaKey || event.ctrlKey || event.altKey) return;
+      const target = event.target as HTMLElement | null;
+      if (isTyping(target)) return;
+      if (event.key === "?") {
+        event.preventDefault();
+        setKeysOpen((open) => !open);
+        return;
+      }
+      if (event.key === "Escape") {
+        setKeysOpen(false);
+        return; // no preventDefault — Escape keeps its other jobs
+      }
+      if (clipsRef.current.length === 0) return;
+      if (event.key === " ") {
+        // A focused button keeps its native Space activation — after
+        // clicking Play, focus IS Play, so Space still toggles transport.
+        if (target && (target.tagName === "BUTTON" || target.closest("button"))) return;
+        event.preventDefault();
+        togglePlay();
+        return;
+      }
+      const key = event.key.toLowerCase();
+      if (event.key === "Delete" || event.key === "Backspace") {
+        event.preventDefault();
+        handleDeleteSelected();
+      } else if (key === "s") {
+        event.preventDefault();
+        handleSplitSelected();
+      } else if (key === "d") {
+        event.preventDefault();
+        handleDuplicate();
+      } else if (key === "l") {
+        event.preventDefault();
+        handleLoopSelection();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [togglePlay, handleDeleteSelected, handleSplitSelected, handleDuplicate, handleLoopSelection]);
 
   /**
    * One click turns an overlap into a transition. Deliberately not automatic
@@ -1050,13 +1136,24 @@ export function StudioPanel() {
 
       {/* First contact. Everything this tool can do lives behind dropping a
           file, so an empty drop zone teaches nothing — three lines name the
-          moves, and they disappear the moment there is a timeline. */}
+          moves, and one click builds a real beat switch out of synthesized
+          loops (nothing bundled, nothing licensed — see lib/studio/demo.ts). */}
       {clips.length === 0 && (
-        <ul className="studio-intro">
-          <li>{t("studio.introA")}</li>
-          <li>{t("studio.introB")}</li>
-          <li>{t("studio.introC")}</li>
-        </ul>
+        <>
+          <ul className="studio-intro">
+            <li>{t("studio.introA")}</li>
+            <li>{t("studio.introB")}</li>
+            <li>{t("studio.introC")}</li>
+          </ul>
+          <button
+            className="secondary-button studio-demo-button"
+            type="button"
+            disabled={decoding || working}
+            onClick={() => void handleDemo()}
+          >
+            {t("studio.demoButton")}
+          </button>
+        </>
       )}
 
       {clips.length > 0 && (
@@ -1093,7 +1190,13 @@ export function StudioPanel() {
           />
 
           <div className="studio-transport">
-            <button className="primary-button" type="button" onClick={togglePlay} disabled={working}>
+            <button
+              className="primary-button"
+              type="button"
+              onClick={togglePlay}
+              disabled={working}
+              title={`${playing ? t("studio.pause") : t("studio.play")} (Space)`}
+            >
               {playing ? t("studio.pause") : t("studio.play")}
             </button>
             <button
@@ -1101,7 +1204,7 @@ export function StudioPanel() {
               type="button"
               onClick={toggleRecording}
               disabled={working || params.lockPitch}
-              title={params.lockPitch ? t("studio.lockVsRecord") : undefined}
+              title={params.lockPitch ? t("studio.lockVsRecord") : t("studio.record")}
               aria-pressed={recording}
             >
               {recording ? t("studio.recordStop") : t("studio.record")}
@@ -1172,6 +1275,14 @@ export function StudioPanel() {
               {t("studio.redo")}
             </button>
             <span className="studio-hint">{t("studio.keysHint")}</span>
+            <button
+              className="text-button"
+              type="button"
+              onClick={() => setKeysOpen(true)}
+              title={t("studio.keysSheetTitle")}
+            >
+              {t("studio.keysButton")}
+            </button>
           </div>
 
           {selectedClip && (
@@ -1406,6 +1517,49 @@ export function StudioPanel() {
         <p className={`studio-status${statusIsError ? " error" : ""}`} role="status">
           {decoding ? t("studio.decoding") : status}
         </p>
+      )}
+
+      {/* Shortcut sheet: one data structure, so this and the one-line hint
+          cannot drift apart. Opens on "?" or the Keys button; closes on
+          Escape, backdrop, or the button. */}
+      {keysOpen && (
+        <div className="studio-keys-backdrop" onClick={() => setKeysOpen(false)}>
+          <div
+            className="studio-keys-card"
+            role="dialog"
+            aria-modal="true"
+            aria-label={t("studio.keysSheetTitle")}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3>{t("studio.keysSheetTitle")}</h3>
+            <dl className="studio-keys-list">
+              {(
+                [
+                  ["Space", `${t("studio.play")} / ${t("studio.pause")}`],
+                  ["S", t("studio.split")],
+                  ["D", t("studio.duplicate")],
+                  ["L", t("studio.loop")],
+                  ["⌫", t("studio.remove")],
+                  ["↑ ↓", t("studio.keysSelect")],
+                  ["← →", t("studio.keysNudge")],
+                  ["Home / End", t("studio.keysSeek")],
+                  ["+ / −", t("studio.keysZoom")],
+                  ["⌘Z / ⇧⌘Z", `${t("studio.undo")} / ${t("studio.redo")}`],
+                ] as const
+              ).map(([combo, label]) => (
+                <div className="studio-keys-row" key={combo}>
+                  <dt>
+                    <kbd>{combo}</kbd>
+                  </dt>
+                  <dd>{label}</dd>
+                </div>
+              ))}
+            </dl>
+            <button className="secondary-button" type="button" onClick={() => setKeysOpen(false)}>
+              {t("studio.close")}
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );
