@@ -2,8 +2,10 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import en, { type DictKey } from "./locales/en";
+import { isLocaleCode, type LocaleCode } from "./codes";
+import { LocaleBoundaryContext } from "./LocaleBoundary";
 
-export type LocaleCode = "en" | "fr" | "es" | "de" | "pt" | "it" | "ja" | "zh";
+export type { LocaleCode } from "./codes";
 
 export const LOCALES: { code: LocaleCode; name: string }[] = [
   { code: "en", name: "English" },
@@ -37,10 +39,6 @@ const LOCALE_LOADERS: Record<Exclude<LocaleCode, "en">, () => Promise<{ default:
 const STORAGE_KEY = "tunebad-locale";
 const LEGACY_STORAGE_KEY = "tuner-locale";
 
-function isLocaleCode(value: string): value is LocaleCode {
-  return LOCALES.some((locale) => locale.code === value);
-}
-
 function detectLocale(): LocaleCode {
   if (typeof window === "undefined") return "en";
   try {
@@ -58,6 +56,10 @@ interface I18nContextValue {
   locale: LocaleCode;
   setLocale(locale: LocaleCode): void;
   t(key: DictKey, vars?: Record<string, string | number>): string;
+  /** Set when the LOCALE IS THE URL (a /fr/... route): the provider serves
+   *  this locale from the server-passed dict and skips detection. Null on
+   *  every root route, where locale stays a client-side preference. */
+  fixedLocale: LocaleCode | null;
 }
 
 const I18nContext = createContext<I18nContextValue | null>(null);
@@ -69,9 +71,17 @@ export function useI18n(): I18nContextValue {
 }
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-  // Initial render (SSR + first client render) must stay "en" to avoid a
-  // hydration mismatch; the detected locale is applied after mount.
-  const [locale, setLocaleState] = useState<LocaleCode>("en");
+  // On a localized route the [locale] layout mounts a LocaleBoundary above
+  // every page shell; its locale + dict make the FIRST render (server and
+  // hydration alike) come out in the route's language — no mismatch, because
+  // both passes read the same context. On root routes this is null and
+  // everything below behaves exactly as it always has.
+  const boundary = useContext(LocaleBoundaryContext);
+
+  // Initial render (SSR + first client render) must stay "en" on root routes
+  // to avoid a hydration mismatch; the detected locale is applied after
+  // mount. On localized routes the URL's locale is correct from byte one.
+  const [locale, setLocaleState] = useState<LocaleCode>(boundary?.locale ?? "en");
 
   // Non-en dictionaries are fetched on demand and cached here once loaded.
   // `t()` stays synchronous: it reads whatever is already in this map and
@@ -93,6 +103,17 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   }, [loadedDicts]);
 
   useEffect(() => {
+    // URL wins over preference: on /fr/... the stored/browser locale must
+    // NOT swap the page out from under the address bar. Persist the URL's
+    // locale instead, so root routes visited later match what was read.
+    if (boundary) {
+      try {
+        window.localStorage.setItem(STORAGE_KEY, boundary.locale);
+      } catch {
+        // localStorage unavailable — the URL still governs this page.
+      }
+      return;
+    }
     const detected = detectLocale();
     if (detected !== "en") {
       ensureLoaded(detected);
@@ -122,7 +143,16 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 
   const t = useCallback(
     (key: DictKey, vars?: Record<string, string | number>): string => {
-      const dictionary = locale === "en" ? en : loadedDicts[locale] ?? en;
+      // The boundary's dict is served with the page, so a localized route
+      // renders its language on the FIRST pass — no loader round-trip, no
+      // English flash. Switching locale in place (setLocale on a localized
+      // route) falls back to the loaded-dict path like anywhere else.
+      const dictionary =
+        boundary && locale === boundary.locale
+          ? boundary.dict
+          : locale === "en"
+            ? en
+            : loadedDicts[locale] ?? en;
       let text = dictionary[key] ?? en[key];
       if (vars) {
         for (const [name, value] of Object.entries(vars)) {
@@ -131,10 +161,13 @@ export function I18nProvider({ children }: { children: ReactNode }) {
       }
       return text;
     },
-    [locale, loadedDicts],
+    [locale, loadedDicts, boundary],
   );
 
-  const value = useMemo<I18nContextValue>(() => ({ locale, setLocale, t }), [locale, setLocale, t]);
+  const value = useMemo<I18nContextValue>(
+    () => ({ locale, setLocale, t, fixedLocale: boundary?.locale ?? null }),
+    [locale, setLocale, t, boundary],
+  );
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
 }
