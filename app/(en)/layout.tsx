@@ -58,9 +58,6 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
   },
-  verification: {
-    google: "7Kg7htG_MaFzvf4ji62IMkIpmkHznMug-3XSnAzaIAU",
-  },
 };
 
 export const viewport: Viewport = sharedViewport;
