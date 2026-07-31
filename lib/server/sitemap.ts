@@ -14,12 +14,32 @@ export { SITE_URL };
 // sitemap protocol's 50k-URL / 50MB-uncompressed caps with headroom.
 export const SONGS_PER_SHARD = 20000;
 
-// readAllSongs pages through Supabase 1000 rows at a time (now in parallel
-// batches, so this cap costs ~20 batched rounds worst-case, not 200 serial
-// round-trips); 200k bounds shard-generation cost at 10 song shards while
-// leaving months of headroom over the perpetual seeder. Raise it (and
-// re-check shard math + function memory) if the catalog outgrows it.
-export const SONGS_CAP = 1000000;
+// How many song URLs we ADVERTISE to search engines. This is a free-tier
+// safety limit, not a technical one — deliberately far below the 217k songs
+// actually in the catalog.
+//
+// Two costs scale directly with it, both of which have already taken the site
+// down or come close:
+//
+//  1. Vercel ISR writes. Only 2,000 song pages are prerendered at build; the
+//     rest are `dynamicParams` pages generated on first request, and each
+//     generation is one ISR write. Hobby allows ~200k writes/month (the
+//     2026-07-15 pause logged 1.4M as 695% of the limit). Advertising the
+//     whole catalog meant a single thorough Google crawl — ~160k crawl
+//     requests/month observed in Search Console — could exceed the cap by
+//     itself, and EVERY DEPLOY drops the ISR cache so the next crawl pays it
+//     again. At 25k the same crawl costs ~25k writes, leaving room for several
+//     deploys a month.
+//
+//  2. Supabase egress. The sitemap index calls readAllSongs(SONGS_CAP), which
+//     reads every column of every song — ~49 MB uncapped, once per day at
+//     REVALIDATE_SITEMAP. That alone was ~1.5 GB/month against Supabase Free's
+//     5 GB. At 25k it's ~6 MB/day.
+//
+// Pages outside this cap still render fine when visited or linked; they just
+// aren't pushed to Google for crawling. Raising it trades uptime for reach —
+// re-check both budgets above before you do.
+export const SONGS_CAP = 25000;
 
 type UrlEntry = {
   loc: string;

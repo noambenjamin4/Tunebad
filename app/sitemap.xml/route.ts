@@ -41,7 +41,11 @@ export const revalidate = 86400;
  */
 async function countSongShards(): Promise<number> {
   const total = await countSongs();
-  if (total !== null) return Math.max(1, Math.ceil(total / SONGS_PER_SHARD));
+  // Clamp to SONGS_CAP. The shard route serves an EMPTY urlset for any slice
+  // starting at or beyond the cap, so counting shards off the raw catalog size
+  // would advertise a pile of empty sitemaps to Google — 11 shards for a 217k
+  // catalog when only the first 2 have URLs in them.
+  if (total !== null) return Math.max(1, Math.ceil(Math.min(total, SONGS_CAP) / SONGS_PER_SHARD));
   const songs = await readAllSongs(SONGS_CAP);
   return Math.max(1, Math.ceil(songs.length / SONGS_PER_SHARD));
 }
