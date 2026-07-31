@@ -48,6 +48,12 @@ publish_url() {
   local args=(--yes vercel edge-config update "$EDGE_CONFIG_ID"
     --patch "{\"items\":[{\"operation\":\"upsert\",\"key\":\"bridgeUrl\",\"value\":\"$url\"}]}")
   [ -n "${VERCEL_TOKEN:-}" ] && args+=(--token "$VERCEL_TOKEN")
+  # Edge Config is a TEAM-level resource, so the CLI resolves it against the
+  # current team scope — not the project this repo is linked to. Without an
+  # explicit --scope it reads .vercel/project.json and dies with "Could not
+  # retrieve Project Settings". The token must also be team-wide ("All
+  # Projects"); a project-scoped one fails earlier still, with "User not found".
+  [ -n "${VERCEL_SCOPE:-}" ] && args+=(--scope "$VERCEL_SCOPE")
   if npx "${args[@]}" >> "$LOG" 2>&1; then
     echo "$(date '+%H:%M:%S') published $url" >> "$LOG"
   else

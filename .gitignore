@@ -16,7 +16,9 @@ tsconfig.tsbuildinfo
 .venv*
 
 # Home Bridge secrets
-scripts/tunebad-bridge.env
+# Any variant — a `.bak` copy of this file once sat here untracked with a
+# live API_KEY in it, one `git add -A` from being published.
+scripts/tunebad-bridge.env*
 logs/
 AUTONOMOUS-QUEUE.md
 
