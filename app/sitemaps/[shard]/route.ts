@@ -126,7 +126,14 @@ export async function GET(_req: Request, { params }: { params: Promise<{ shard: 
     // out of it — 10x the rows and ~10x the bytes per shard, and it got worse
     // with every song added.
     const start = shardIndex * SONGS_PER_SHARD;
-    const slice = start >= SONGS_CAP ? [] : await readSongSlugRange(start, SONGS_PER_SHARD);
+    // Clamp the LAST shard to whatever budget is left, not a full page. Gating
+    // only on `start < SONGS_CAP` let the final shard return a whole
+    // SONGS_PER_SHARD window past the cap — with a 25k cap and 20k shards that
+    // published 40k URLs, 60% over budget. SONGS_CAP is an ISR-write and
+    // egress limit (see lib/server/sitemap.ts), so overshooting it is the
+    // thing that takes the site down.
+    const remaining = Math.min(SONGS_PER_SHARD, SONGS_CAP - start);
+    const slice = remaining <= 0 ? [] : await readSongSlugRange(start, remaining);
     // Shard 0 always resolves (even to an empty urlset pre-launch); any
     // higher shard index that's out of range is a stale/guessed URL, 404 it.
     // (notFound() from next/navigation only works inside the React render

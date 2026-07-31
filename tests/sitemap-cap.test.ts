@@ -45,3 +45,28 @@ test("a catalog smaller than one shard still advertises exactly one shard", () =
   assert.equal(shardCount(0), 1);
   assert.equal(shardCount(19_999), 1);
 });
+
+// The shard route's actual slice size. Gating only on `start < SONGS_CAP`
+// shipped a full 20k window from the last shard, publishing 40k URLs under a
+// 25k cap — the counts above all still passed, because they only checked how
+// many shards exist, never how many URLs those shards contain.
+function sliceSize(shardIndex: number): number {
+  const start = shardIndex * SONGS_PER_SHARD;
+  return Math.max(0, Math.min(SONGS_PER_SHARD, SONGS_CAP - start));
+}
+
+test("total advertised song URLs never exceed the cap", () => {
+  let total = 0;
+  for (let i = 0; i < shardCount(1_000_000); i++) total += sliceSize(i);
+  assert.equal(
+    total,
+    SONGS_CAP,
+    `sitemap advertises ${total} song URLs under a ${SONGS_CAP} cap`,
+  );
+});
+
+test("shards past the cap contribute nothing", () => {
+  const firstOutOfRange = Math.ceil(SONGS_CAP / SONGS_PER_SHARD);
+  assert.equal(sliceSize(firstOutOfRange), 0);
+  assert.equal(sliceSize(firstOutOfRange + 5), 0);
+});
